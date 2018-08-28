@@ -18,15 +18,19 @@ cache:
   - "$HOME/.gradle/wrapper/"
 android:
   components:
-  - tools
-  - platform-tools
-  - build-tools-26.0.2
-  - android-26
-  - extra-google-google_play_services
-  - extra-google-m2repository
-  - extra-android-m2repository
-  - addon-google_apis-google-26
-  - sys-img-armeabi-v7a-android-26
-  - sys-img-armeabi-v7a-android-17
+    - tools
+    - platform-tools
+    - build-tools-26.0.2
+    - android-26
+    - extra-google-google_play_services
+    - extra-google-m2repository
+    - extra-android-m2repository
+    - addon-google_apis-google-26
+    - sys-img-armeabi-v7a-android-26
+    - sys-img-armeabi-v7a-android-17
+  licenses:
+    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
 script:
 - "./gradlew sonarqube -Dsonar.organization=dglozano-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=cfabc1e9ee6b305fd60cf3258f7861e3ebbe598b"
