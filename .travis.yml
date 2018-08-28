@@ -10,12 +10,14 @@ addons:
     token:
       secure: "$SONAR_TOKEN"
 before_cache:
-- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
+before_install:
+  - yes | sdkmanager "platforms;android-27"
 android:
   components:
     - tools
@@ -33,4 +35,4 @@ android:
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
 script:
-- "./gradlew sonarqube -Dsonar.organization=dglozano-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=cfabc1e9ee6b305fd60cf3258f7861e3ebbe598b"
+  - "./gradlew sonarqube -Dsonar.organization=dglozano-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=cfabc1e9ee6b305fd60cf3258f7861e3ebbe598b"
