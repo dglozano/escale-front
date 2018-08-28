@@ -37,4 +37,4 @@ android:
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
 script:
-  - "./gradlew sonarqube -Dsonar.organization=dglozano-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=cfabc1e9ee6b305fd60cf3258f7861e3ebbe598b"
+  - "./gradlew sonarqube -Dsonar.organization=dglozano-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=b9363a065875cb4a3658d102d024e98f209eefc7 -Dsonar.projectKey=escale-mobile -Dsonar.projectName=escale-mobile"
