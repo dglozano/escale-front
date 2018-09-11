@@ -1,9 +1,20 @@
 <resources>
     <string name="app_name">Escale</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="bluetooth_scan_btn">Bluetooth Scan Button</string>
+    <string name="alert">Alert</string>
+    <string name="scale">Scale</string>
+    <string name="logo">Scale Alert Logo</string>
+    <string name="info_scan_devices">Escanee los dispositivos cercanos y seleccione <b>BF600</b> para conectarse a la balanza.</string>
+    <string name="name_example">DISPOSITIVO_BLUETOOTH[1230BF500]</string>
+    <string name="number_example">15:A2:F8:25:C1:00</string>
+    <string name="ble_not_supported">Tu dispositivo no soporta Bluetooth 4.x</string>
+    <string name="error_bluetooth_not_supported">Tu dispositivo no soporta Bluetooth</string>
+    <string name="coarse_permission_message">Para conectarse con Bluetooth, la aplicación necesita permiso para acceder a tu ubicación.</string>
+    <string name="ask_permission_dialog_title">Solicitud de Permisos</string>
+    <string name="bf600">BF600</string>
+    <string name="devices_not_found">Dispositivo no encontrado. Prueba de nuevo.</string>
+    <string name="connected">Conectado</string>
+    <string name="disconnected">Desconectado</string>
+    <string name="navigation_drawer_open">Nav drawer open</string>
+    <string name="navigation_drawer_close">nav drawe close</string>
 </resources>
