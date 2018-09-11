@@ -26,8 +26,14 @@
             android:layout_alignParentBottom="true"
             android:background="@color/colorBackground"
             app:menu="@menu/activity_main_foot_nav" />
-    </RelativeLayout>
 
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:paddingTop="?android:attr/actionBarSize"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/bnve"/>
+    </RelativeLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"

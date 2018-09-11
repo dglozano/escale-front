@@ -22,4 +22,7 @@
     <string name="menu_stats">Estadísticas</string>
     <string name="menu_diet">Dieta</string>
     <string name="menu_message">Mensajes</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
