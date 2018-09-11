@@ -21,18 +21,18 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
-            android:name=".MeasurementActivity"
-            android:label="Scan Activity"
-            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".bluetooth.BluetoothCommunication"></service>
+        <activity
+            android:name=".MeasurementActivity"
+            android:label="Scan Activity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <service android:name=".bluetooth.BluetoothCommunication"/>
     </application>
 
 </manifest>

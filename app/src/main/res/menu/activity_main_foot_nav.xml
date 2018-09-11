@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_home"
+        android:title=""
+        android:icon="@drawable/footnav_ic_home" />
+    <item android:id="@+id/action_stats"
+        android:title=""
+        android:icon="@drawable/footnav_ic_graph_colored" />
+    <item android:id="@+id/action_diet"
+        android:title=""
+        android:icon="@drawable/footnav_ic_juice" />
+    <item android:id="@+id/action_message"
+        android:title=""
+        android:icon="@drawable/footnav_ic_message" />
+    <item android:id="@+id/action_settings"
+        android:title=""
+        android:icon="@drawable/footnav_ic_outline_settings" />
+</menu>

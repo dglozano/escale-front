@@ -17,4 +17,9 @@
     <string name="disconnected">Desconectado</string>
     <string name="navigation_drawer_open">Nav drawer open</string>
     <string name="navigation_drawer_close">nav drawe close</string>
+    <string name="menu_home">Inicio</string>
+    <string name="menu_settings">Configuraciones</string>
+    <string name="menu_stats">Estadísticas</string>
+    <string name="menu_diet">Dieta</string>
+    <string name="menu_message">Mensajes</string>
 </resources>
