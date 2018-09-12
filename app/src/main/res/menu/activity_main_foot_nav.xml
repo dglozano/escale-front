@@ -8,11 +8,8 @@
         android:icon="@drawable/footnav_ic_graph_colored" />
     <item android:id="@+id/action_diet"
         android:title=""
-        android:icon="@drawable/footnav_ic_juice" />
+        android:icon="@drawable/footnav_ic_cutlery" />
     <item android:id="@+id/action_message"
         android:title=""
         android:icon="@drawable/footnav_ic_message" />
-    <item android:id="@+id/action_settings"
-        android:title=""
-        android:icon="@drawable/footnav_ic_outline_settings" />
 </menu>

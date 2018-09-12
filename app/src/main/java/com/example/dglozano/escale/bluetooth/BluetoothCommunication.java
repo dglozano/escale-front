@@ -318,13 +318,22 @@ public class BluetoothCommunication extends Service {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        disconnect();
         super.onDestroy();
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind");
+        disconnect();
         return super.onUnbind(intent);
+    }
+
+    public void disconnect() {
+        Log.d(TAG, "Disconnecting from Gatt Server");
+        //FIXME
+        if(mBluetoothGatt != null)
+            mBluetoothGatt.disconnect();
     }
 
     public CompletableFuture<Integer> createUser(byte[] pin) {
@@ -369,9 +378,11 @@ public class BluetoothCommunication extends Service {
                 if (!gatt.discoverServices()) {
                     // FIXME
                     Log.e(TAG, "Could not start service discovery");
-                    mGattConnectedFuture.completeExceptionally(new Exception("Disconnected"));
+                    mGattConnectedFuture.completeExceptionally(new Exception("No pudo descubrir servicio"));
 
                     //disconnect(false);
+                } else {
+                    mGattConnectedFuture.complete(true);
                 }
             }
             else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -391,8 +402,6 @@ public class BluetoothCommunication extends Service {
                 characteristicRequestQueue = new LinkedList<>();
                 descriptorRequestQueue = new LinkedList<>();
                 openRequest = false;
-                // TODO
-                mGattConnectedFuture.complete(true);
             }
 
             try {

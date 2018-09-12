@@ -1,20 +1,31 @@
 package com.example.dglozano.escale;
 
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.example.dglozano.escale.bluetooth.BluetoothCommunication;
 import com.example.dglozano.escale.fragments.DietFragment;
 import com.example.dglozano.escale.fragments.HomeFragment;
 import com.example.dglozano.escale.fragments.MessagesFragment;
-import com.example.dglozano.escale.fragments.SettingsFragment;
 import com.example.dglozano.escale.fragments.StatsFragment;
+import com.example.dglozano.escale.utils.PermissionHelper;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import q.rorbin.badgeview.Badge;
@@ -24,8 +35,27 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MessagesFragment.OnFragmentInteractionListener{
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private BottomNavigationViewEx mBnv;
     private Badge mMessagesBadge;
+
+    // Variables de control
+    private boolean mBound = false;
+    private BluetoothCommunication mBluetoothCommService;
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            mBound = true;
+            BluetoothCommunication.LocalBinder localBinder = (BluetoothCommunication.LocalBinder) binder;
+            mBluetoothCommService = localBinder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBound = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,44 +84,18 @@ public class MainActivity extends AppCompatActivity
         mMessagesBadge.setBadgeNumber(10);
 
         //Replace Default Fragment
-        FragmentManager manager = getSupportFragmentManager();
-        manager
-                .beginTransaction()
-                .replace(R.id.fragment_container, new HomeFragment())
-                .commit();
+        switchFragment(HomeFragment.newInstance());
 
         mBnv.setOnNavigationItemSelectedListener((MenuItem item) -> {
             switch (item.getItemId()) {
                 case R.id.action_home:
-                    manager
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, new HomeFragment())
-                            .commit();
-                    return true;
+                    return switchFragment(HomeFragment.newInstance());
                 case R.id.action_stats:
-                    manager
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, new StatsFragment())
-                            .commit();
-                    return true;
+                    return switchFragment(StatsFragment.newInstance("",""));
                 case R.id.action_diet:
-                    manager
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, new DietFragment())
-                            .commit();
-                    return true;
+                    return switchFragment(DietFragment.newInstance("",""));
                 case R.id.action_message:
-                    manager
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, new MessagesFragment())
-                            .commit();
-                    return true;
-                case R.id.action_settings:
-                    manager
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, new SettingsFragment())
-                            .commit();
-                    return true;
+                    return switchFragment(MessagesFragment.newInstance("",""));
             }
             return false;
         });
@@ -137,12 +141,81 @@ public class MainActivity extends AppCompatActivity
         // add badge
         return new QBadgeView(this)
                 .setBadgeNumber(number)
-                .setGravityOffset(12, 2, true)
+                .setGravityOffset(22, 2, true)
                 .bindTarget(mBnv.getBottomNavigationItemView(position));
     }
 
     @Override
     public void onMessagesRead() {
         mMessagesBadge.setBadgeNumber(0);
+    }
+
+    private boolean switchFragment(Fragment fragment) {
+        FragmentManager manager = getSupportFragmentManager();
+        manager
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit();
+        return true;
+    }
+
+    // PermissionHelper solicitó habilitar Bluetooth porque estaba desactivado. Este es el callback.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // User chose not to enable Bluetooth.
+        if (requestCode == PermissionHelper.REQUEST_ENABLE_BT) {
+            if (resultCode == Activity.RESULT_CANCELED) {
+                finish();
+                return;
+            } else {
+                if(mBound)
+                    mBluetoothCommService.scanForBleDevices(getString(R.string.bf600)).thenAccept(device -> {
+                        System.out.println("Got a device from remote service " + device.getAddress());
+                    });
+            }
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    // PermissionHelper pidió permiso para COARSE, cuando elije algo vuelve acá
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[],int[] grantResults) {
+        switch (requestCode) {
+            case PermissionHelper.PERMISSION_REQUEST_COARSE: {
+                // si el request es cancelado el arreglo es vacio.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //FIXME
+                } else {
+                    Toast.makeText(this, R.string.coarse_permission_message, Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, BluetoothCommunication.class);
+        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mBound) {
+            unbindService(mServiceConnection);
+            mBound = false;
+        }
+    }
+
+    public boolean isBound() {
+        return mBound;
+    }
+
+    public BluetoothCommunication getBluetoothCommService() {
+        return mBluetoothCommService;
     }
 }

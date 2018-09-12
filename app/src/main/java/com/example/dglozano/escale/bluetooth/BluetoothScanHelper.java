@@ -61,13 +61,17 @@ public class BluetoothScanHelper {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             final BluetoothDevice device = result.getDevice();
-            Log.d(TAG, "Stop scanning, found " + device.getName());
             if(device != null
                     && device.getName() != null
                     && device.getName().toString().contains(targetDeviceName)) {
                 stopScanningForBleDevices();
+                Log.d(TAG, "Stop scanning, found " + device.getName());
                 mScanResultFuture.complete(device);
-            }
+            } /*else {
+                Log.d(TAG, "Stop Scanning after founding null device");
+                //TODO: STRING RESOURCE
+                mScanResultFuture.completeExceptionally(new Exception("Found null device"));
+            }*/
             mScanning = false;
             super.onScanResult(callbackType, result);
         }

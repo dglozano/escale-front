@@ -3,6 +3,7 @@
     android:id="@+id/fragment_stats"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorAlmostWhite"
     tools:context=".fragments.StatsFragment">
     <!-- TODO: Update blank fragment layout -->
     <TextView
