@@ -7,7 +7,7 @@
     android:id="@+id/fragment_home"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAlmostWhite"
+    android:background="@color/colorBackground"
     tools:context=".fragments.HomeFragment">
 
     <RelativeLayout
@@ -36,7 +36,7 @@
                 app:layout_constraintRight_toLeftOf="@id/gauge"
                 android:text="IMC"
                 android:textAppearance="@android:style/TextAppearance.Material"
-                android:textColor="@color/colorDisabled"
+                android:textColor="@color/colorText"
                 android:textSize="12sp" />
 
             <TextView
@@ -70,7 +70,7 @@
                 app:gaugePointStartColor="@color/colorAccent"
                 app:gaugeStartAngle="135"
                 app:gaugeStrokeCap="ROUND"
-                app:gaugeStrokeColor="@color/colorDisabled"
+                app:gaugeStrokeColor="@color/colorText"
                 app:gaugeStrokeWidth="10dp"
                 app:gaugeSweepAngle="270" />
 
@@ -127,7 +127,7 @@
                 app:layout_constraintLeft_toRightOf="@id/gauge"
                 android:text="GRASA"
                 android:textAppearance="@android:style/TextAppearance.Material"
-                android:textColor="@color/colorDisabled"
+                android:textColor="@color/colorText"
                 android:layout_centerHorizontal="true"
                 android:textSize="12sp" />
 
@@ -137,6 +137,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/layout_top_measurement"
+            android:background="@drawable/home_shadow_listview"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginBottom="@dimen/activity_vertical_margin">
@@ -145,22 +146,23 @@
                 android:id="@+id/ble_connect_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="4dp"
-                fancy:fb_defaultColor="@color/colorDisabled"
+                android:padding="@dimen/padding_small"
+                fancy:fb_defaultColor="@color/colorText"
                 fancy:fb_iconResource="@drawable/home_bluetooth_disconnected"
                 fancy:fb_iconPosition="left"
-                fancy:fb_radiusTopLeft="8dp"
-                fancy:fb_radiusTopRight="8dp"
+                fancy:fb_radiusTopLeft="@dimen/radius"
+                fancy:fb_radiusTopRight="@dimen/radius"
                 fancy:fb_text="DESCONECTADO"
-                fancy:fb_textColor="@color/colorAlmostWhite"/>
+                fancy:fb_textColor="@color/colorBackground" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_measurements"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:paddingEnd="@dimen/padding_small"
+                android:background="@drawable/home_round_listview"
+                android:paddingStart="@dimen/padding_small"
                 android:scrollbars="vertical"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:layout_below="@id/ble_connect_btn"/>
 
         </RelativeLayout>
@@ -169,8 +171,9 @@
 
     <WebView
         android:id="@+id/loader_webview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:background="@color/colorBackground"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:visibility="invisible" />

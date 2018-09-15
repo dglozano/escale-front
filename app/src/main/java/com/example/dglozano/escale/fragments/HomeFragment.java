@@ -169,9 +169,9 @@ public class HomeFragment extends Fragment {
             mConnectButton.setIconResource(ContextCompat.getDrawable(mMainActivity,R.drawable.home_bluetooth_connected));
         } else {
             mConnected = false;
-            mConnectButton.setBackgroundColor(ContextCompat.getColor(mMainActivity, R.color.colorDisabled));
+            mConnectButton.setBackgroundColor(ContextCompat.getColor(mMainActivity, R.color.colorText));
             mConnectButton.setText("DESCONECTADO");
-            mConnectButton.setIconResource(R.drawable.button_background_connected);
+            mConnectButton.setIconResource(R.drawable.home_round_listview);
             mConnectButton.setIconResource(ContextCompat.getDrawable(mMainActivity,R.drawable.home_bluetooth_disconnected));
         }
     }

@@ -4,7 +4,7 @@
     android:id="@+id/fragment_diet"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAlmostWhite"
+    android:background="@color/colorBackground"
     tools:context=".fragments.DietFragment">
 
     <!-- TODO: Update blank fragment layout -->
