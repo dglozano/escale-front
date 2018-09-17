@@ -159,11 +159,6 @@ public class MeasurementActivity extends AppCompatActivity {
                     Log.d(TAG,"Oops! We have an exception - " + ex.getMessage());
                     scanAndConnect();
                     return null;
-                })
-                .thenCompose(device -> mBluetoothCommService.connectGatt(device))
-                .thenRun(() -> {
-                    Log.d(TAG, "HOLA");
-                    initScale();
                 });
     }
 

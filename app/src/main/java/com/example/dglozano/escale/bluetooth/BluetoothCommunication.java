@@ -15,9 +15,8 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
-import com.example.dglozano.escale.utils.GattConstants;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -38,18 +37,28 @@ public class BluetoothCommunication extends Service {
     // Gatt server variables
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGattCustomCallback mGattCallback;
-    private CompletableFuture<Boolean> mGattConnectedFuture;
+    private int mConnectionState = STATE_DISCONNECTED;
+    private static final int STATE_DISCONNECTED = 0;
+    private static final int STATE_CONNECTING = 1;
+    private static final int STATE_CONNECTED = 2;
 
     // Syncrhonization of read/write over Bluetooth BLE
     private Queue<GattObjectValue<BluetoothGattDescriptor>> descriptorRequestQueue;
     private Queue<GattObjectValue<BluetoothGattCharacteristic>> characteristicRequestQueue;
     private CompletableFuture<BluetoothGattDescriptor> mWriteDescriptorFuture;
     private CompletableFuture<BluetoothGattCharacteristic> mReadResultFuture;
-    //FIXME
-    private CompletableFuture<Integer> mTestFuture;
+    private CompletableFuture<Integer> mOperationFuture;
+
     private static final long POST_DELAYED_WAIT = 60;
     private boolean openRequest;
     private final Object lock = new Object();
+
+    public final static String ACTION_GATT_CONNECTED =
+            "com.dglozano.escale.bluetooth.ACTION_GATT_CONNECTED";
+    public final static String ACTION_GATT_DISCONNECTED =
+            "com.dglozano.escale.bluetooth.ACTION_GATT_DISCONNECTED";
+    public final static String ACTION_DATA_NOTIFICATION =
+            "com.dglozano.escale.bluetooth.ACTION_DATA_NOTIFICATION";
 
     // Representation of a GattObject plus its bytes
     private class GattObjectValue <GattObject> {
@@ -68,13 +77,11 @@ public class BluetoothCommunication extends Service {
         return bleScanHelper.scanForBleDevices(targetDeviceName);
     }
 
-    public CompletableFuture<Boolean> connectGatt(BluetoothDevice device) {
-        mGattConnectedFuture = new CompletableFuture<>();
+    public void connectGatt(BluetoothDevice device) {
         Log.d(TAG, String.format("Connecting to [%s]", device.getAddress()));
 
         mBluetoothGatt = device.connectGatt(
                 this, false, mGattCallback);
-        return mGattConnectedFuture;
     }
 
     /**
@@ -331,33 +338,40 @@ public class BluetoothCommunication extends Service {
 
     public void disconnect() {
         Log.d(TAG, "Disconnecting from Gatt Server");
-        //FIXME
-        if(mBluetoothGatt != null)
-            mBluetoothGatt.disconnect();
+        if(mBluetoothGatt == null)
+            return;
+        mBluetoothGatt.disconnect();
+        mBluetoothGatt = null;
     }
 
     public CompletableFuture<Integer> createUser(byte[] pin) {
-        mTestFuture = new CompletableFuture<>();
+        mOperationFuture = new CompletableFuture<>();
         byte[] bytesCreate = {0x01, pin[0], pin[1]}; // create user, PIN 0x1000
         writeBytes(USER_DATA_SERVICE, USER_CONTROL_POINT, bytesCreate);
 
-        return mTestFuture;
+        return mOperationFuture;
     }
 
     public CompletableFuture<Integer> deleteUser(byte index) {
-        mTestFuture = new CompletableFuture<>();
+        mOperationFuture = new CompletableFuture<>();
         byte[] bytesDelete = {0x03, index}; // create user, PIN 0x1000
         writeBytes(USER_DATA_SERVICE, USER_CONTROL_POINT, bytesDelete);
 
-        return mTestFuture;
+        return mOperationFuture;
     }
 
     public CompletableFuture<Integer> consentUser(byte index, byte[] pin) {
-        mTestFuture = new CompletableFuture<>();
+        mOperationFuture = new CompletableFuture<>();
         byte[] bytesConsent = {0x02, index, pin[0], pin[1]}; // create user, PIN 0x1000
         writeBytes(USER_DATA_SERVICE, USER_CONTROL_POINT, bytesConsent);
 
-        return mTestFuture;
+        return mOperationFuture;
+    }
+
+    private void broadcastUpdate(final String action) {
+        Log.d(TAG, "Enviando intent");
+        final Intent intent = new Intent(action);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     protected class BluetoothGattCustomCallback extends BluetoothGattCallback {
@@ -365,7 +379,7 @@ public class BluetoothCommunication extends Service {
         @Override
         public void onConnectionStateChange(final BluetoothGatt gatt, int status, int newState) {
             Log.d(TAG,String.format("onConnectionStateChange: status=%d, newState=%d", status, newState));
-
+            String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
 
                 try {
@@ -376,19 +390,15 @@ public class BluetoothCommunication extends Service {
                 }
 
                 if (!gatt.discoverServices()) {
-                    // FIXME
-                    Log.e(TAG, "Could not start service discovery");
-                    mGattConnectedFuture.completeExceptionally(new Exception("No pudo descubrir servicio"));
-
-                    //disconnect(false);
-                } else {
-                    mGattConnectedFuture.complete(true);
+                    Log.d(TAG, "Could not start service discovery");
+                    disconnect();
                 }
             }
             else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                // FIXME
-                //disconnect(false);
-                mGattConnectedFuture.completeExceptionally(new Exception("Disconnected"));
+                Log.d(TAG, "Disconnected from GATT server");
+                intentAction = ACTION_GATT_DISCONNECTED;
+                mConnectionState = STATE_DISCONNECTED;
+                broadcastUpdate(intentAction);
             }
         }
 
@@ -396,6 +406,9 @@ public class BluetoothCommunication extends Service {
         public void onServicesDiscovered(final BluetoothGatt gatt, int status) {
             Log.d(TAG, String.format("onServicesDiscovered: status=%d (%d services)",
                     status, gatt.getServices().size()));
+
+            mConnectionState = STATE_CONNECTED;
+            broadcastUpdate(ACTION_GATT_CONNECTED);
 
             synchronized (lock) {
                 // Clear from possible previous setups
@@ -465,7 +478,7 @@ public class BluetoothCommunication extends Service {
 
             synchronized (lock) {
                 System.out.println("entro + " + characteristic.getValue());
-                mTestFuture.complete(1);
+                mOperationFuture.complete(1);
             }
         }
 

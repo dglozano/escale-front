@@ -1,9 +1,15 @@
 package com.example.dglozano.escale.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,8 +47,6 @@ public class HomeFragment extends Fragment {
     private static final String TAG = HomeFragment.class.getSimpleName();
     private MainActivity mMainActivity;
 
-    private boolean mConnected = false;
-    private boolean mScanning = false;
     private WebView mLoaderWebView;
     private RelativeLayout mMeasurementLayout;
     private FancyButton mConnectButton;
@@ -94,14 +98,15 @@ public class HomeFragment extends Fragment {
 
         mConnectButton = view.findViewById(R.id.ble_connect_btn);
         mConnectButton.setOnClickListener((View v) -> {
-                if(!mConnected) {
+                if(!mMainActivity.getConnected()) {
                     if(PermissionHelper.requestBluetoothPermission(mMainActivity))
                         scanAndConnect();
                 } else {
                     if(mMainActivity.isBound()) {
                         Log.d(TAG, "Clicked on disconnect");
-                        switchConnected(false);
                         mMainActivity.getBluetoothCommService().disconnect();
+                    } else {
+                        Log.d(TAG, "Not bound to service yet.");
                     }
                 }
         });
@@ -134,41 +139,28 @@ public class HomeFragment extends Fragment {
     public void scanAndConnect() {
         if(mMainActivity.isBound()){
             BluetoothCommunication bluetoothCommunication = mMainActivity.getBluetoothCommService();
-            mScanning = true;
+            mMainActivity.setLoading(true);
             showLoader(true);
             bluetoothCommunication.scanForBleDevices(getString(R.string.bf600))
+                    .thenAccept(bluetoothCommunication::connectGatt)
                     .exceptionally(ex -> {
                         Log.d(TAG,"Oops! We have an exception - " + ex.getMessage());
-                        mScanning = false;
+                        mMainActivity.setLoading(false);
+                        mMainActivity.setConnected(false);
                         switchConnected(false);
                         showLoader(false);
-                        return null;
-                    })
-                    .thenAccept(device -> bluetoothCommunication.connectGatt(device))
-                    .thenRun(() -> {
-                        mScanning = false;
-                        switchConnected(true);
-                        showLoader(false);
-                        Log.d(TAG, "Conectado");
-                        //initScale();
-                    }).exceptionally( ex -> {
-                        mScanning = false;
-                        switchConnected(false);
-                        showLoader(false);
-                        Log.d(TAG, "Desconectado");
                         return null;
                     });
         }
     }
 
+    // Cambia el color e icono del boton de conexion Bluetooth dependiendo de si se esta conectado o no
     private void switchConnected(boolean connect) {
         if(connect) {
-            mConnected = true;
             mConnectButton.setBackgroundColor(ContextCompat.getColor(mMainActivity, R.color.colorPrimary));
             mConnectButton.setText("CONECTADO");
             mConnectButton.setIconResource(ContextCompat.getDrawable(mMainActivity,R.drawable.home_bluetooth_connected));
         } else {
-            mConnected = false;
             mConnectButton.setBackgroundColor(ContextCompat.getColor(mMainActivity, R.color.colorText));
             mConnectButton.setText("DESCONECTADO");
             mConnectButton.setIconResource(R.drawable.home_round_listview);
@@ -176,6 +168,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    // Switch entre el loader y la vista normal
     private void showLoader(boolean show) {
         if(show){
             mMeasurementLayout.setVisibility(View.GONE);
@@ -184,5 +177,30 @@ public class HomeFragment extends Fragment {
             mLoaderWebView.setVisibility(View.GONE);
             mMeasurementLayout.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "OnResume Fragment Home");
+        refreshUi();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Log.d(TAG, "onViewStateRestored Fragment Home");
+        refreshUi();
+    }
+
+    public void refreshUi() {
+        switchConnected(mMainActivity.getConnected());
+        showLoader(mMainActivity.getLoading());
+        // TODO refrescar datos recibidos.
     }
 }

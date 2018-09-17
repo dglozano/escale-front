@@ -22,8 +22,8 @@
             android:background="@android:color/white"
             app:menu="@menu/activity_main_foot_nav" />
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
+        <com.example.dglozano.escale.utils.NoSwipePager
+            android:id="@+id/fragment_viewpager"
             android:paddingTop="?android:attr/actionBarSize"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

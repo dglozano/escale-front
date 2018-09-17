@@ -67,11 +67,7 @@ public class BluetoothScanHelper {
                 stopScanningForBleDevices();
                 Log.d(TAG, "Stop scanning, found " + device.getName());
                 mScanResultFuture.complete(device);
-            } /*else {
-                Log.d(TAG, "Stop Scanning after founding null device");
-                //TODO: STRING RESOURCE
-                mScanResultFuture.completeExceptionally(new Exception("Found null device"));
-            }*/
+            }
             mScanning = false;
             super.onScanResult(callbackType, result);
         }
