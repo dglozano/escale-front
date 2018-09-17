@@ -1,4 +1,4 @@
 package com.example.dglozano.escale.model;
 
-public class WeightMeasurement {
+public class BodyMeasurement {
 }
