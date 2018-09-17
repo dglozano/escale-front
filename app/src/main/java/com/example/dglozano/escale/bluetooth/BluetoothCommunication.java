@@ -33,6 +33,7 @@ public class BluetoothCommunication extends Service {
     private static final String TAG = BluetoothCommunication.class.getSimpleName();
     private IBinder mBinder = new LocalBinder();
     private Handler mHandler = new Handler();
+    private BluetoothScanHelper mBluetoothScannerHelper = new BluetoothScanHelper();
 
     // Gatt server variables
     private BluetoothGatt mBluetoothGatt;
@@ -72,9 +73,7 @@ public class BluetoothCommunication extends Service {
     }
 
     public CompletableFuture<BluetoothDevice> scanForBleDevices(String targetDeviceName) {
-        BluetoothScanHelper bleScanHelper = new BluetoothScanHelper();
-
-        return bleScanHelper.scanForBleDevices(targetDeviceName);
+        return mBluetoothScannerHelper.scanForBleDevices(targetDeviceName);
     }
 
     public void connectGatt(BluetoothDevice device) {
@@ -332,6 +331,7 @@ public class BluetoothCommunication extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind");
+        mBluetoothScannerHelper.stopScanningForBleDevices(new Exception("Service unbinded"));
         disconnect();
         return super.onUnbind(intent);
     }

@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.dglozano.escale.MainActivity;
 import com.example.dglozano.escale.R;
@@ -149,6 +150,7 @@ public class HomeFragment extends Fragment {
                         mMainActivity.setConnected(false);
                         switchConnected(false);
                         showLoader(false);
+                        Toast.makeText(mMainActivity, R.string.devices_not_found, Toast.LENGTH_LONG).show();
                         return null;
                     });
         }

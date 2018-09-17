@@ -106,12 +106,6 @@ public class MainActivity extends AppCompatActivity
         mNoSwipePager.setAdapter(mPagerAdapter);
 
         mBnv.setupWithViewPager(mNoSwipePager);
-
-        // Brodcast receiver setup for receiving messages from BluetoothService
-        IntentFilter filter = new IntentFilter(BluetoothCommunication.ACTION_GATT_CONNECTED);
-        filter.addAction(BluetoothCommunication.ACTION_GATT_DISCONNECTED);
-        filter.addAction(BluetoothCommunication.ACTION_DATA_NOTIFICATION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mGattUpdateReceiver, filter);
     }
 
     @Override
@@ -223,6 +217,11 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         Log.d(TAG, String.format("onResume MainActivity. Bound %b", mBound));
+        // Brodcast receiver setup for receiving messages from BluetoothService
+        IntentFilter filter = new IntentFilter(BluetoothCommunication.ACTION_GATT_CONNECTED);
+        filter.addAction(BluetoothCommunication.ACTION_GATT_DISCONNECTED);
+        filter.addAction(BluetoothCommunication.ACTION_DATA_NOTIFICATION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mGattUpdateReceiver, filter);
     }
 
     public boolean isBound() {
@@ -246,9 +245,11 @@ public class MainActivity extends AppCompatActivity
             if (BluetoothCommunication.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
                 mLoading = false;
+                Toast.makeText(MainActivity.this, R.string.connected, Toast.LENGTH_SHORT).show();
             } else if (BluetoothCommunication.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
                 mLoading = false;
+                Toast.makeText(MainActivity.this, R.string.disconnected, Toast.LENGTH_SHORT).show();
             } else if (BluetoothCommunication.
                     ACTION_DATA_NOTIFICATION.equals(action)) {
                 // TODO Save new data.

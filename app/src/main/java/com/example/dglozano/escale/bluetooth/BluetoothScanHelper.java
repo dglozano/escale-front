@@ -39,10 +39,8 @@ public class BluetoothScanHelper {
         // Stops scanning after a pre-defined scan period.
         mScanPeriodHandler.postDelayed(() -> {
             if(mScanning) {
-                mScanning = false;
-                bluetoothLeScanner.stopScan(mLeScanCallback);
                 Log.d(TAG, "Stop Scanning after 10 seconds");
-                mScanResultFuture.completeExceptionally(new Exception("Device not found after 10 seconds"));
+                stopScanningForBleDevices(new Exception("Device not found after 10 seconds"));
             }
         }, SCAN_PERIOD);
         mScanning = true;
@@ -51,10 +49,17 @@ public class BluetoothScanHelper {
         return mScanResultFuture;
     }
 
-    protected void stopScanningForBleDevices() {
+    private void stopScanningForBleDevices() {
         final BluetoothLeScanner bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         mScanning = false;
         bluetoothLeScanner.stopScan(mLeScanCallback);
+    }
+
+    public void stopScanningForBleDevices(Throwable exception) {
+        if(mScanning) {
+            stopScanningForBleDevices();
+            mScanResultFuture.completeExceptionally(exception);
+        }
     }
 
     private class MyScanCallback extends ScanCallback {
@@ -63,7 +68,7 @@ public class BluetoothScanHelper {
             final BluetoothDevice device = result.getDevice();
             if(device != null
                     && device.getName() != null
-                    && device.getName().toString().contains(targetDeviceName)) {
+                    && device.getName().contains(targetDeviceName)) {
                 stopScanningForBleDevices();
                 Log.d(TAG, "Stop scanning, found " + device.getName());
                 mScanResultFuture.complete(device);
