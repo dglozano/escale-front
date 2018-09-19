@@ -9,15 +9,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.dglozano.escale.MainActivity;
 import com.example.dglozano.escale.R;
-import com.example.dglozano.escale.model.Measurement;
+import com.example.dglozano.escale.data.BodyMeasurement;
+import com.example.dglozano.escale.data.MeasurementItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementListAdapter.MeasurementViewHolder> {
 
-    private List<Measurement> mMeasurements;
+    private List<MeasurementItem> mMeasurementItems;
     private Context mContext;
 
     public static class MeasurementViewHolder extends RecyclerView.ViewHolder {
@@ -36,10 +37,11 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MeasurementListAdapter(List<Measurement> measurementList, Context context) {
-        mMeasurements = measurementList;
+    public MeasurementListAdapter(List<MeasurementItem> measurementItemList, Context context) {
+        mMeasurementItems = measurementItemList;
         mContext = context;
     }
+
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -54,11 +56,10 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(MeasurementViewHolder holder, int position) {
-        final Measurement measurement = mMeasurements.get(position);
-        holder.mMeasurementTypeTextView.setText(measurement.getType());
-        //TODO
-        holder.mMeasurementValueTextView.setText(measurement.getValue() + measurement.getUnit());
-        //FIXME
+        final MeasurementItem measurement = mMeasurementItems.get(position);
+        holder.mMeasurementTypeTextView.setText(measurement.getName().toString());
+        // FIXME: Add string resource
+        holder.mMeasurementValueTextView.setText(measurement.getValue() + measurement.getUnit().toString());
         switch (measurement.getIconResource()){
             case 1:
                 holder.mIconImageView.setImageDrawable(
@@ -90,6 +91,7 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mMeasurements.size();
+        return mMeasurementItems.size();
     }
+
 }

@@ -1,15 +1,10 @@
 package com.example.dglozano.escale.fragments;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,7 +20,9 @@ import android.widget.Toast;
 import com.example.dglozano.escale.MainActivity;
 import com.example.dglozano.escale.R;
 import com.example.dglozano.escale.bluetooth.BluetoothCommunication;
-import com.example.dglozano.escale.model.Measurement;
+import com.example.dglozano.escale.data.BodyMeasurement;
+import com.example.dglozano.escale.data.EscaleDatabase;
+import com.example.dglozano.escale.data.MeasurementItem;
 import com.example.dglozano.escale.utils.MeasurementListAdapter;
 import com.example.dglozano.escale.utils.PermissionHelper;
 
@@ -54,6 +51,8 @@ public class HomeFragment extends Fragment {
     private RecyclerView mRecyclerViewMeasurements;
     private RecyclerView.Adapter mAdapterRecView;
     private RecyclerView.LayoutManager mLayoutManager;
+    private BodyMeasurement mBodyMeasurement;
+    private List<MeasurementItem> mMeasurementItemList;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -121,17 +120,14 @@ public class HomeFragment extends Fragment {
                 mMainActivity,
                 LinearLayoutManager.VERTICAL));
 
-        //TODO Borrar
-        List<Measurement> measurementList = new ArrayList<>();
-        measurementList.add(new Measurement(1,115," kg", "Peso"));
-        measurementList.add(new Measurement(2,45,"%", "Agua Corporal"));
-        measurementList.add(new Measurement(3,32,"%", "Grasa Corporal"));
-        measurementList.add(new Measurement(4,7," kg", "Masa Ósea"));
-        measurementList.add(new Measurement(5,23,"", "IMC"));
-        measurementList.add(new Measurement(6,40," kg", "Masa Muscular"));
-
-        mAdapterRecView = new MeasurementListAdapter(measurementList, mMainActivity);
+        mMeasurementItemList = new ArrayList<>();
+        mAdapterRecView = new MeasurementListAdapter(mMeasurementItemList, mMainActivity);
         mRecyclerViewMeasurements.setAdapter(mAdapterRecView);
+
+        //TODO Borrar
+        mBodyMeasurement = BodyMeasurement.createMockBodyMeasurementForUser(7);
+        mMeasurementItemList.addAll(MeasurementItem.getMeasurementList(mBodyMeasurement));
+        mAdapterRecView.notifyDataSetChanged();
 
         CustomGauge customGauge = view.findViewById(R.id.gauge);
         customGauge.setValue(1000);

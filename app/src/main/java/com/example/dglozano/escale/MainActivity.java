@@ -1,6 +1,7 @@
 package com.example.dglozano.escale;
 
 import android.app.Activity;
+import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -22,6 +23,9 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.dglozano.escale.bluetooth.BluetoothCommunication;
+import com.example.dglozano.escale.data.BodyMeasurement;
+import com.example.dglozano.escale.data.EscaleDatabase;
+import com.example.dglozano.escale.data.User;
 import com.example.dglozano.escale.fragments.BottomBarAdapter;
 import com.example.dglozano.escale.fragments.DietFragment;
 import com.example.dglozano.escale.fragments.HomeFragment;
@@ -43,6 +47,7 @@ public class MainActivity extends AppCompatActivity
     private NoSwipePager mNoSwipePager;
     private BottomBarAdapter mPagerAdapter;
     private Badge mMessagesBadge;
+    private EscaleDatabase mDatabase;
 
     // Variables de control
     private boolean mBound = false;
@@ -74,6 +79,9 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         mConnected = false;
         mLoading = false;
+
+        // Database connection and mock setup
+        mDatabase = EscaleDatabase.getInstance(getApplicationContext());
 
         // Drawer Layout setup
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
