@@ -1,10 +1,12 @@
-package com.example.dglozano.escale.data;
+package com.example.dglozano.escale.data.dao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+
+import com.example.dglozano.escale.data.entities.User;
 
 import java.util.List;
 

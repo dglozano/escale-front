@@ -1,10 +1,13 @@
-package com.example.dglozano.escale.data;
+package com.example.dglozano.escale.data.dao;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+
+import com.example.dglozano.escale.data.entities.BodyMeasurement;
 
 import java.util.List;
 
@@ -14,7 +17,7 @@ public interface BodyMeasurementDao {
     List<BodyMeasurement> getAllBodyMeasurement();
 
     @Query("SELECT * FROM BodyMeasurement WHERE userId == :userId ORDER BY date DESC")
-    List<BodyMeasurement> getAllBodyMeasurementByUserId(Integer userId);
+    LiveData<List<BodyMeasurement>> getAllBodyMeasurementByUserId(Integer userId);
 
     @Query("SELECT * FROM BodyMeasurement WHERE id == :id")
     BodyMeasurement getBodyMeasurementById(Integer id);

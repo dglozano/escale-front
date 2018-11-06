@@ -1,7 +1,6 @@
-package com.example.dglozano.escale;
+package com.example.dglozano.escale.ui;
 
 import android.app.Activity;
-import android.bluetooth.le.ScanCallback;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -17,12 +16,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.dglozano.escale.bluetooth.BluetoothCommunication;
-import com.example.dglozano.escale.utils.GattConstants;
+import com.example.dglozano.escale.R;
+import com.example.dglozano.escale.ble.BluetoothCommunication;
+import com.example.dglozano.escale.ble.GattConstants;
 import com.example.dglozano.escale.utils.PermissionHelper;
 
-import static com.example.dglozano.escale.bluetooth.BluetoothCommunication.byteInHex;
-import static com.example.dglozano.escale.utils.GattConstants.*;
+import static com.example.dglozano.escale.ble.GattConstants.*;
 
 public class MeasurementActivity extends AppCompatActivity {
 

@@ -1,7 +1,6 @@
-package com.example.dglozano.escale;
+package com.example.dglozano.escale.ui;
 
 import android.app.Activity;
-import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -22,16 +21,15 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.dglozano.escale.bluetooth.BluetoothCommunication;
-import com.example.dglozano.escale.data.BodyMeasurement;
+import com.example.dglozano.escale.R;
+import com.example.dglozano.escale.ble.BluetoothCommunication;
 import com.example.dglozano.escale.data.EscaleDatabase;
-import com.example.dglozano.escale.data.User;
-import com.example.dglozano.escale.fragments.BottomBarAdapter;
-import com.example.dglozano.escale.fragments.DietFragment;
-import com.example.dglozano.escale.fragments.HomeFragment;
-import com.example.dglozano.escale.fragments.MessagesFragment;
-import com.example.dglozano.escale.fragments.StatsFragment;
-import com.example.dglozano.escale.utils.NoSwipePager;
+import com.example.dglozano.escale.ui.utils.BottomBarAdapter;
+import com.example.dglozano.escale.ui.diet.DietFragment;
+import com.example.dglozano.escale.ui.home.HomeFragment;
+import com.example.dglozano.escale.ui.messages.MessagesFragment;
+import com.example.dglozano.escale.ui.stats.StatsFragment;
+import com.example.dglozano.escale.ui.utils.NoSwipePager;
 import com.example.dglozano.escale.utils.PermissionHelper;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 

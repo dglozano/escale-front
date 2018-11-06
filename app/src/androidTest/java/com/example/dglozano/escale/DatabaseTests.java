@@ -5,25 +5,20 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.example.dglozano.escale.data.BodyMeasurement;
+import com.example.dglozano.escale.data.entities.BodyMeasurement;
 import com.example.dglozano.escale.data.EscaleDatabase;
-import com.example.dglozano.escale.data.User;
+import com.example.dglozano.escale.data.entities.User;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.time.Month;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 
-import static com.example.dglozano.escale.data.BodyMeasurement.createMockBodyMeasurementForUser;
-import static com.example.dglozano.escale.data.User.createMockUser;
+import static com.example.dglozano.escale.data.entities.BodyMeasurement.createMockBodyMeasurementForUser;
+import static com.example.dglozano.escale.data.entities.User.createMockUser;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;

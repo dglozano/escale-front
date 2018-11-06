@@ -22,7 +22,7 @@
             android:background="@android:color/white"
             app:menu="@menu/activity_main_foot_nav" />
 
-        <com.example.dglozano.escale.utils.NoSwipePager
+        <com.example.dglozano.escale.ui.utils.NoSwipePager
             android:id="@+id/fragment_viewpager"
             android:paddingTop="?android:attr/actionBarSize"
             android:layout_width="match_parent"

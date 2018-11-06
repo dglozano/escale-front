@@ -2,6 +2,8 @@ package com.example.dglozano.escale.data;
 
 import android.arch.persistence.room.TypeConverter;
 
+import com.example.dglozano.escale.data.entities.User;
+
 import java.util.Date;
 
 public class DatabaseConverters {

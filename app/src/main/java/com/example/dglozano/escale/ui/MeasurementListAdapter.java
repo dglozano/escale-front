@@ -1,4 +1,4 @@
-package com.example.dglozano.escale.utils;
+package com.example.dglozano.escale.ui;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -10,10 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.dglozano.escale.R;
-import com.example.dglozano.escale.data.BodyMeasurement;
 import com.example.dglozano.escale.data.MeasurementItem;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementListAdapter.MeasurementViewHolder> {
@@ -56,42 +54,47 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(MeasurementViewHolder holder, int position) {
-        final MeasurementItem measurement = mMeasurementItems.get(position);
-        holder.mMeasurementTypeTextView.setText(measurement.getName().toString());
-        // FIXME: Add string resource
-        holder.mMeasurementValueTextView.setText(measurement.getValue() + measurement.getUnit().toString());
-        switch (measurement.getIconResource()){
-            case 1:
-                holder.mIconImageView.setImageDrawable(
-                        ContextCompat.getDrawable(mContext, R.drawable.home_ic_scale_colored ));
-                break;
-            case 2:
-                holder.mIconImageView.setImageDrawable(
-                        ContextCompat.getDrawable(mContext, R.drawable.home_ic_drop_colored ));
-                break;
-            case 3:
-                holder.mIconImageView.setImageDrawable(
-                        ContextCompat.getDrawable(mContext, R.drawable.home_ic_pizza_slice_colored ));
-                break;
-            case 4:
-                holder.mIconImageView.setImageDrawable(
-                        ContextCompat.getDrawable(mContext, R.drawable.home_ic_bone_colored ));
-                break;
-            case 5:
-                holder.mIconImageView.setImageDrawable(
-                        ContextCompat.getDrawable(mContext, R.drawable.home_ic_bmi_colored ));
-                break;
-            case 6:
-                holder.mIconImageView.setImageDrawable(
-                        ContextCompat.getDrawable(mContext, R.drawable.home_ic_muscle_colored ));
-                break;
+        if(mMeasurementItems != null) {
+            final MeasurementItem measurement = mMeasurementItems.get(position);
+            holder.mMeasurementTypeTextView.setText(measurement.getName().toString());
+            // FIXME: Add string resource
+            holder.mMeasurementValueTextView.setText(measurement.getValue() + measurement.getUnit().toString());
+            switch (measurement.getIconResource()){
+                case 1:
+                    holder.mIconImageView.setImageDrawable(
+                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_scale_colored ));
+                    break;
+                case 2:
+                    holder.mIconImageView.setImageDrawable(
+                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_drop_colored ));
+                    break;
+                case 3:
+                    holder.mIconImageView.setImageDrawable(
+                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_pizza_slice_colored ));
+                    break;
+                case 4:
+                    holder.mIconImageView.setImageDrawable(
+                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_bone_colored ));
+                    break;
+                case 5:
+                    holder.mIconImageView.setImageDrawable(
+                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_bmi_colored ));
+                    break;
+                case 6:
+                    holder.mIconImageView.setImageDrawable(
+                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_muscle_colored ));
+                    break;
+            }
         }
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mMeasurementItems.size();
+        if(mMeasurementItems != null) {
+            return mMeasurementItems.size();
+        }
+        else return 0;
     }
 
 }

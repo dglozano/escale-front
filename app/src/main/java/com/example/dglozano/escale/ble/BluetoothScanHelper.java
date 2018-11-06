@@ -1,4 +1,4 @@
-package com.example.dglozano.escale.bluetooth;
+package com.example.dglozano.escale.ble;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;

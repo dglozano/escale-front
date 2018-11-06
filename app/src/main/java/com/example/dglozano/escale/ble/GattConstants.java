@@ -1,4 +1,4 @@
-package com.example.dglozano.escale.utils;
+package com.example.dglozano.escale.ble;
 
 import java.util.UUID;
 

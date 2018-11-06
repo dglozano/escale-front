@@ -1,4 +1,4 @@
-package com.example.dglozano.escale.bluetooth;
+package com.example.dglozano.escale.ble;
 
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
@@ -25,8 +25,8 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static com.example.dglozano.escale.utils.GattConstants.USER_CONTROL_POINT;
-import static com.example.dglozano.escale.utils.GattConstants.USER_DATA_SERVICE;
+import static com.example.dglozano.escale.ble.GattConstants.USER_CONTROL_POINT;
+import static com.example.dglozano.escale.ble.GattConstants.USER_DATA_SERVICE;
 
 public class BluetoothCommunication extends Service {
 

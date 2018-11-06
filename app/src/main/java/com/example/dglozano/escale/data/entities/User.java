@@ -1,4 +1,4 @@
-package com.example.dglozano.escale.data;
+package com.example.dglozano.escale.data.entities;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;

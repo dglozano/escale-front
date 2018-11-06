@@ -1,4 +1,4 @@
-package com.example.dglozano.escale.fragments;
+package com.example.dglozano.escale.ui.diet;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

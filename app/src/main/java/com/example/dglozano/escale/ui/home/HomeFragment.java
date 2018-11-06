@@ -1,6 +1,5 @@
-package com.example.dglozano.escale.fragments;
+package com.example.dglozano.escale.ui.home;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,13 +16,12 @@ import android.webkit.WebView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.dglozano.escale.MainActivity;
+import com.example.dglozano.escale.ui.MainActivity;
 import com.example.dglozano.escale.R;
-import com.example.dglozano.escale.bluetooth.BluetoothCommunication;
-import com.example.dglozano.escale.data.BodyMeasurement;
-import com.example.dglozano.escale.data.EscaleDatabase;
+import com.example.dglozano.escale.ble.BluetoothCommunication;
+import com.example.dglozano.escale.data.entities.BodyMeasurement;
 import com.example.dglozano.escale.data.MeasurementItem;
-import com.example.dglozano.escale.utils.MeasurementListAdapter;
+import com.example.dglozano.escale.ui.MeasurementListAdapter;
 import com.example.dglozano.escale.utils.PermissionHelper;
 
 import java.util.ArrayList;
