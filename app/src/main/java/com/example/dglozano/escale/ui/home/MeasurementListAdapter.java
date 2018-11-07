@@ -2,6 +2,7 @@ package com.example.dglozano.escale.ui.home;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,8 +50,9 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     }
 
     // Create new views (invoked by the layout manager)
+    @NonNull
     @Override
-    public MeasurementViewHolder onCreateViewHolder(ViewGroup parent,
+    public MeasurementViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                      int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.measurement_row_item, parent, false);
@@ -60,7 +62,7 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(MeasurementViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MeasurementViewHolder holder, int position) {
         if(mMeasurementItems != null) {
             final MeasurementItem measurement = mMeasurementItems.get(position);
             holder.mMeasurementTypeTextView.setText(measurement.getName().toString());

@@ -57,11 +57,10 @@ public class PermissionHelper {
     }
 
     public static boolean requestCoarsePermission(final Activity activity) {
-        boolean alcanzaLaVersion = Build.VERSION.SDK_INT <= Build.VERSION_CODES.M;
-        boolean permisoYaDado = ContextCompat
+        boolean alreadyGiven = ContextCompat
                 .checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED;
-        if(!alcanzaLaVersion && !permisoYaDado) {
+        if(!alreadyGiven) {
             askForPermission(Manifest.permission.ACCESS_COARSE_LOCATION, PERMISSION_REQUEST_COARSE,
                     activity.getResources().getString(R.string.coarse_permission_message), activity);
             return false;
@@ -73,8 +72,7 @@ public class PermissionHelper {
                                         String rationaleMsgStr, final Activity activity){
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
                 permisoManifest)) {
-            // Por lo que entiendo, esto lo pide solamente si ya intento varias veces y
-            // hay que hacerle una explicacion mas detallada de por que necesitamos el permiso
+            //If it had already asked many times for permission, it show a different message
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             builder.setTitle(R.string.ask_permission_dialog_title);
             builder.setPositiveButton(android.R.string.ok,null);

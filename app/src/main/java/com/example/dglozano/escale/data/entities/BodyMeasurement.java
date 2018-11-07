@@ -37,7 +37,7 @@ public class BodyMeasurement {
     }
 
     @Ignore
-    public BodyMeasurement(int id, int userId, Date date, float weight) {
+    private BodyMeasurement(int id, int userId, Date date, float weight) {
         this.id = id;
         this.userId = userId;
         this.date = date;
