@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.example.dglozano.escale.R;
 import com.example.dglozano.escale.ble.BluetoothCommunication;
 import com.example.dglozano.escale.ble.GattConstants;
-import com.example.dglozano.escale.utils.PermissionHelper;
+import com.example.dglozano.escale.util.PermissionHelper;
 
 import static com.example.dglozano.escale.ble.GattConstants.BATTERY_LEVEL;
 import static com.example.dglozano.escale.ble.GattConstants.CLIENT_CHARACTERISTICS_CONFIGURATION;

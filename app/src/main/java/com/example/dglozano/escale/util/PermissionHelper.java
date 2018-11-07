@@ -1,4 +1,4 @@
-package com.example.dglozano.escale.utils;
+package com.example.dglozano.escale.util;
 
 import android.Manifest;
 import android.app.Activity;
@@ -14,9 +14,7 @@ import android.widget.Toast;
 
 import com.example.dglozano.escale.R;
 
-/**
- * Created by dglozano on 29/04/18.
- */
+import timber.log.Timber;
 
 public class PermissionHelper {
 
@@ -35,24 +33,27 @@ public class PermissionHelper {
         // selectively disable BLE-related features.
         if (!activity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(activity, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+            Timber.d("Device does not support Bluetooth 4.x");
             return false;
         }
 
         // Checks if Bluetooth is supported on the device.
         if (bluetoothAdapter == null) {
             Toast.makeText(activity, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+            Timber.d("Device does not support Bluetooth at all");
             return false;
         }
 
         // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
         // fire an intent to display a dialog asking the user to grant permission to enable it.
         if (!bluetoothAdapter.isEnabled()) {
+            Timber.d("Bluetooth is not Enabled. Preparing intent to activate it...");
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             return false;
         }
 
-        // Pedir el permiso de ubicacion y si no lo tiene pedirlo
+        // Ask for Coarse Location permission
         return requestCoarsePermission(activity);
     }
 
@@ -61,30 +62,33 @@ public class PermissionHelper {
                 .checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED;
         if (!alreadyGiven) {
+            Timber.d("Coarse Location permission has not been given yet");
             askForPermission(Manifest.permission.ACCESS_COARSE_LOCATION, PERMISSION_REQUEST_COARSE,
                     activity.getResources().getString(R.string.coarse_permission_message), activity);
             return false;
         }
+        Timber.d("Coarse Location permission has already been given");
         return true;
     }
 
-    public static void askForPermission(final String permisoManifest, final int codigoPermiso,
+    public static void askForPermission(final String manifestPermission, final int permissionCode,
                                         String rationaleMsgStr, final Activity activity) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                permisoManifest)) {
-            //If it had already asked many times for permission, it show a different message
+                manifestPermission)) {
+            Timber.d("Permission for %1$s has been asked several times. Showing rationale msg...", manifestPermission);
+            //If it had already asked many times for permission, it shows a different message
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             builder.setTitle(R.string.ask_permission_dialog_title);
             builder.setPositiveButton(android.R.string.ok, null);
             builder.setMessage(rationaleMsgStr);
             builder.setOnDismissListener(dialog -> activity.requestPermissions(
                     new String[]
-                            {permisoManifest}
-                    , codigoPermiso));
+                            {manifestPermission}
+                    , permissionCode));
             builder.show();
         } else {
-            // Abre el dialogo para pedir el permiso de la ubicacion.
-            ActivityCompat.requestPermissions(activity, new String[]{permisoManifest}, codigoPermiso);
+            Timber.d("Requestion permission for %1$s", manifestPermission);
+            ActivityCompat.requestPermissions(activity, new String[]{manifestPermission}, permissionCode);
         }
     }
 }

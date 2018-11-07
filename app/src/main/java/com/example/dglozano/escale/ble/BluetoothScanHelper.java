@@ -6,14 +6,13 @@ import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class BluetoothScanHelper {
+import timber.log.Timber;
 
-    private static final String TAG = BluetoothScanHelper.class.getSimpleName();
+public class BluetoothScanHelper {
 
     // Scanning variables
     private static final long SCAN_PERIOD = 10 * 1000;
@@ -39,12 +38,12 @@ public class BluetoothScanHelper {
         // Stops scanning after a pre-defined scan period.
         mScanPeriodHandler.postDelayed(() -> {
             if (mScanning) {
-                Log.d(TAG, "Stop Scanning after 10 seconds");
+                Timber.d("Stop Scanning after 10 seconds");
                 stopScanningForBleDevices(new Exception("Device not found after 10 seconds"));
             }
         }, SCAN_PERIOD);
         mScanning = true;
-        Log.d(TAG, "Scanning");
+        Timber.d("Scanning");
         bluetoothLeScanner.startScan(mLeScanCallback);
         return mScanResultFuture;
     }
@@ -70,7 +69,7 @@ public class BluetoothScanHelper {
                     && device.getName() != null
                     && device.getName().contains(targetDeviceName)) {
                 stopScanningForBleDevices();
-                Log.d(TAG, "Stop scanning, found " + device.getName());
+                Timber.d("Stop scanning, found %1$s", device.getName());
                 mScanResultFuture.complete(device);
             }
             mScanning = false;
@@ -79,14 +78,14 @@ public class BluetoothScanHelper {
 
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
-            Log.d(TAG, "onBatchScanResults " + results.size());
+            Timber.d("onBatchScanResults %1$s", results.size());
             mScanning = false;
             super.onBatchScanResults(results);
         }
 
         @Override
         public void onScanFailed(int errorCode) {
-            Log.d(TAG, "OnScanFailed - errorCode: " + errorCode);
+            Timber.d("OnScanFailed - errorCode: %1$s", errorCode);
             mScanning = false;
             super.onScanFailed(errorCode);
         }

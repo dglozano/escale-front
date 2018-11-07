@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -23,12 +22,13 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import timber.log.Timber;
+
 import static com.example.dglozano.escale.ble.GattConstants.USER_CONTROL_POINT;
 import static com.example.dglozano.escale.ble.GattConstants.USER_DATA_SERVICE;
 
 public class BluetoothCommunication extends Service {
 
-    private static final String TAG = BluetoothCommunication.class.getSimpleName();
     private IBinder mBinder = new LocalBinder();
     private Handler mHandler = new Handler();
     private BluetoothScanHelper mBluetoothScannerHelper = new BluetoothScanHelper();
@@ -75,7 +75,7 @@ public class BluetoothCommunication extends Service {
     }
 
     public void connectGatt(BluetoothDevice device) {
-        Log.d(TAG, String.format("Connecting to [%s]", device.getAddress()));
+        Timber.d("Connecting to [%s]", device.getAddress());
 
         mBluetoothGatt = device.connectGatt(
                 this, false, mGattCallback);
@@ -126,7 +126,7 @@ public class BluetoothCommunication extends Service {
         BluetoothGattCharacteristic gattCharacteristic = mBluetoothGatt.getService(service)
                 .getCharacteristic(characteristic);
 
-        Log.d(TAG, String.format("Read characteristic %s", characteristic));
+        Timber.d("Read characteristic %s", characteristic);
         mBluetoothGatt.readCharacteristic(gattCharacteristic);
 
         return mReadResultFuture;
@@ -138,7 +138,7 @@ public class BluetoothCommunication extends Service {
         BluetoothGattDescriptor gattDescriptor = mBluetoothGatt.getService(service)
                 .getCharacteristic(characteristic).getDescriptor(descriptor);
 
-        Log.d(TAG, String.format("Read descriptor %s", descriptor));
+        Timber.d("Read descriptor %s", descriptor);
         mBluetoothGatt.readDescriptor(gattDescriptor);
 
         return mReadResultFuture;
@@ -153,7 +153,7 @@ public class BluetoothCommunication extends Service {
     public CompletableFuture<BluetoothGattDescriptor> setIndicationOn(UUID service, UUID characteristic, UUID descriptor) {
         mWriteDescriptorFuture = new CompletableFuture<>();
 
-        Log.d(TAG, String.format("Set indication on for %s", characteristic));
+        Timber.d("Set indication on for %s", characteristic);
 
         try {
             BluetoothGattCharacteristic gattCharacteristic =
@@ -183,7 +183,7 @@ public class BluetoothCommunication extends Service {
     public CompletableFuture<BluetoothGattDescriptor> setNotificationOn(UUID service, UUID characteristic, UUID descriptor) {
         mWriteDescriptorFuture = new CompletableFuture<>();
 
-        Log.d(TAG, String.format("Set notification on for %s", characteristic));
+        Timber.d("Set notification on for %s", characteristic);
 
         try {
             BluetoothGattCharacteristic gattCharacteristic =
@@ -213,7 +213,7 @@ public class BluetoothCommunication extends Service {
     public CompletableFuture<BluetoothGattDescriptor> setNotificationOff(UUID service, UUID characteristic, UUID descriptor) {
         mWriteDescriptorFuture = new CompletableFuture<>();
 
-        Log.d(TAG, String.format("Set notification off for %s", characteristic));
+        Timber.d("Set notification off for %s", characteristic);
 
         BluetoothGattCharacteristic gattCharacteristic =
                 mBluetoothGatt.getService(service).getCharacteristic(characteristic);
@@ -233,8 +233,8 @@ public class BluetoothCommunication extends Service {
         synchronized (lock) {
             // check for pending request
             if (openRequest) {
-                Log.d(TAG, String.format("Request pending (queue %d %d)",
-                        descriptorRequestQueue.size(), characteristicRequestQueue.size()));
+                Timber.d("Request pending (queue %d %d)",
+                        descriptorRequestQueue.size(), characteristicRequestQueue.size());
                 return; // yes, do nothing
             }
 
@@ -243,12 +243,12 @@ public class BluetoothCommunication extends Service {
             if (descriptor != null) {
                 descriptor.gattObject.setValue(descriptor.value);
 
-                Log.d(TAG, String.format("Write descriptor %s: %s (queue: %d %d)",
+                Timber.d("Write descriptor %s: %s (queue: %d %d)",
                         descriptor.gattObject.getUuid(), byteInHex(descriptor.gattObject.getValue()),
-                        descriptorRequestQueue.size(), characteristicRequestQueue.size()));
+                        descriptorRequestQueue.size(), characteristicRequestQueue.size());
                 if (!mBluetoothGatt.writeDescriptor(descriptor.gattObject)) {
-                    Log.d(TAG, String.format("Failed to initiate write of descriptor %s",
-                            descriptor.gattObject.getUuid()));
+                    Timber.d("Failed to initiate write of descriptor %s",
+                            descriptor.gattObject.getUuid());
                 }
                 openRequest = true;
                 return;
@@ -259,12 +259,12 @@ public class BluetoothCommunication extends Service {
             if (characteristic != null) {
                 characteristic.gattObject.setValue(characteristic.value);
 
-                Log.d(TAG, String.format("Write characteristic %s: %s (queue: %d %d)",
+                Timber.d("Write characteristic %s: %s (queue: %d %d)",
                         characteristic.gattObject.getUuid(), byteInHex(characteristic.gattObject.getValue()),
-                        descriptorRequestQueue.size(), characteristicRequestQueue.size()));
+                        descriptorRequestQueue.size(), characteristicRequestQueue.size());
                 if (!mBluetoothGatt.writeCharacteristic(characteristic.gattObject)) {
-                    Log.d(TAG, String.format("Failed to initiate write of characteristic %s",
-                            characteristic.gattObject.getUuid()));
+                    Timber.d("Failed to initiate write of characteristic %s",
+                            characteristic.gattObject.getUuid());
                 }
                 openRequest = true;
             }
@@ -302,7 +302,7 @@ public class BluetoothCommunication extends Service {
 
     @Override
     public void onCreate() {
-        Log.d(TAG, "onCreate");
+        Timber.d("onCreate");
 
         mGattCallback = new BluetoothGattCustomCallback();
         mBluetoothGatt = null;
@@ -311,27 +311,27 @@ public class BluetoothCommunication extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG, "onBind");
+        Timber.d("onBind");
         return mBinder;
     }
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy");
+        Timber.d("onDestroy");
         disconnect();
         super.onDestroy();
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.d(TAG, "onUnbind");
+        Timber.d("onUnbind");
         mBluetoothScannerHelper.stopScanningForBleDevices(new Exception("Service unbinded"));
         disconnect();
         return super.onUnbind(intent);
     }
 
     public void disconnect() {
-        Log.d(TAG, "Disconnecting from Gatt Server");
+        Timber.d("Disconnecting from Gatt Server");
         if (mBluetoothGatt == null)
             return;
         mBluetoothGatt.disconnect();
@@ -363,7 +363,7 @@ public class BluetoothCommunication extends Service {
     }
 
     private void broadcastUpdate(final String action) {
-        Log.d(TAG, "Enviando intent");
+        Timber.d("Sending intent %1$s", action);
         final Intent intent = new Intent(action);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -372,7 +372,7 @@ public class BluetoothCommunication extends Service {
 
         @Override
         public void onConnectionStateChange(final BluetoothGatt gatt, int status, int newState) {
-            Log.d(TAG, String.format("onConnectionStateChange: status=%d, newState=%d", status, newState));
+            Timber.d("onConnectionStateChange: status=%d, newState=%d", status, newState);
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
 
@@ -383,11 +383,11 @@ public class BluetoothCommunication extends Service {
                 }
 
                 if (!gatt.discoverServices()) {
-                    Log.d(TAG, "Could not start service discovery");
+                    Timber.d("Could not start service discovery");
                     disconnect();
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.d(TAG, "Disconnected from GATT server");
+                Timber.d("Disconnected from GATT server");
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
                 broadcastUpdate(intentAction);
@@ -396,8 +396,8 @@ public class BluetoothCommunication extends Service {
 
         @Override
         public void onServicesDiscovered(final BluetoothGatt gatt, int status) {
-            Log.d(TAG, String.format("onServicesDiscovered: status=%d (%d services)",
-                    status, gatt.getServices().size()));
+            Timber.d("onServicesDiscovered: status=%d (%d services)",
+                    status, gatt.getServices().size());
 
             mConnectionState = STATE_CONNECTED;
             broadcastUpdate(ACTION_GATT_CONNECTED);
@@ -449,8 +449,8 @@ public class BluetoothCommunication extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
-            Log.d(TAG, String.format("onCharacteristicRead %s (status=%d): %s",
-                    characteristic.getUuid(), status, byteInHex(characteristic.getValue())));
+            Timber.d("onCharacteristicRead %s (status=%d): %s",
+                    characteristic.getUuid(), status, byteInHex(characteristic.getValue()));
 
             synchronized (lock) {
                 mReadResultFuture.complete(characteristic);
@@ -461,11 +461,10 @@ public class BluetoothCommunication extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            Log.d(TAG, String.format("onCharacteristicChanged %s: %s",
-                    characteristic.getUuid(), byteInHex(characteristic.getValue())));
+            Timber.d("onCharacteristicChanged %s: %s",
+                    characteristic.getUuid(), byteInHex(characteristic.getValue()));
 
             synchronized (lock) {
-                System.out.println("entro + " + characteristic.getValue());
                 mOperationFuture.complete(1);
             }
         }
@@ -474,8 +473,8 @@ public class BluetoothCommunication extends Service {
         public void onDescriptorRead(BluetoothGatt gatt,
                                      BluetoothGattDescriptor descriptor,
                                      int status) {
-            Log.d(TAG, String.format("onDescriptorRead %s (status=%d): %s",
-                    descriptor.getUuid(), status, byteInHex(descriptor.getValue())));
+            Timber.d("onDescriptorRead %s (status=%d): %s",
+                    descriptor.getUuid(), status, byteInHex(descriptor.getValue()));
 
             postDelayedHandleRequests();
         }

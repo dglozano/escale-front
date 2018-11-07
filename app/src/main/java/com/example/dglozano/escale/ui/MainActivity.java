@@ -18,7 +18,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -26,13 +25,13 @@ import com.example.dglozano.escale.EscaleApp;
 import com.example.dglozano.escale.R;
 import com.example.dglozano.escale.ble.BluetoothCommunication;
 import com.example.dglozano.escale.data.EscaleDatabase;
+import com.example.dglozano.escale.ui.common.BottomBarAdapter;
+import com.example.dglozano.escale.ui.common.NoSwipePager;
 import com.example.dglozano.escale.ui.diet.DietFragment;
 import com.example.dglozano.escale.ui.home.HomeFragment;
 import com.example.dglozano.escale.ui.messages.MessagesFragment;
 import com.example.dglozano.escale.ui.stats.StatsFragment;
-import com.example.dglozano.escale.ui.utils.BottomBarAdapter;
-import com.example.dglozano.escale.ui.utils.NoSwipePager;
-import com.example.dglozano.escale.utils.PermissionHelper;
+import com.example.dglozano.escale.util.PermissionHelper;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import butterknife.BindView;
@@ -43,8 +42,6 @@ import q.rorbin.badgeview.QBadgeView;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MessagesFragment.OnFragmentInteractionListener {
-
-    private static final String TAG = MainActivity.class.getSimpleName();
 
     // Binding views with Butterknife
     @BindView(R.id.bnve)
@@ -201,7 +198,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart MainActivity");
         Intent intent = new Intent(this, BluetoothCommunication.class);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -209,7 +205,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop MainActivity");
         mLoading = false;
         mConnected = false;
         if (mBound) {
@@ -226,7 +221,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, String.format("onResume MainActivity. Bound %b", mBound));
         // Brodcast receiver setup for receiving messages from BluetoothService
         IntentFilter filter = new IntentFilter(BluetoothCommunication.ACTION_GATT_CONNECTED);
         filter.addAction(BluetoothCommunication.ACTION_GATT_DISCONNECTED);
@@ -249,7 +243,6 @@ public class MainActivity extends AppCompatActivity
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Recibio intent en broadcast receiver");
             HomeFragment homeFragment = (HomeFragment) mPagerAdapter.getRegisteredFragment(0);
             final String action = intent.getAction();
             if (BluetoothCommunication.ACTION_GATT_CONNECTED.equals(action)) {

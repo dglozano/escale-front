@@ -1,4 +1,4 @@
-package com.example.dglozano.escale.ui.utils;
+package com.example.dglozano.escale.ui.common;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

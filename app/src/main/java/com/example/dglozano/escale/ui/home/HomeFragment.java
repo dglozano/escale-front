@@ -22,16 +22,18 @@ import com.example.dglozano.escale.ble.BluetoothCommunication;
 import com.example.dglozano.escale.data.MeasurementItem;
 import com.example.dglozano.escale.data.entities.BodyMeasurement;
 import com.example.dglozano.escale.ui.MainActivity;
-import com.example.dglozano.escale.utils.PermissionHelper;
+import com.example.dglozano.escale.util.PermissionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import mehdi.sakout.fancybuttons.FancyButton;
 import pl.pawelkleczkowski.customgauge.CustomGauge;
+import timber.log.Timber;
 
 
 /**
@@ -57,6 +59,8 @@ public class HomeFragment extends Fragment {
     RecyclerView mRecyclerViewMeasurements;
     @BindView(R.id.gauge)
     CustomGauge customGauge;
+    @BindString(R.string.bf600)
+    String scaleBleName;
 
 
     public HomeFragment() {
@@ -91,6 +95,7 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
+        mMainActivity = (MainActivity) getActivity();
         return view;
     }
 
@@ -138,10 +143,10 @@ public class HomeFragment extends Fragment {
             BluetoothCommunication bluetoothCommunication = mMainActivity.getBluetoothCommService();
             mMainActivity.setLoading(true);
             showLoader(true);
-            bluetoothCommunication.scanForBleDevices(getString(R.string.bf600))
+            bluetoothCommunication.scanForBleDevices(scaleBleName)
                     .thenAccept(bluetoothCommunication::connectGatt)
                     .exceptionally(ex -> {
-                        Log.d(TAG, "Oops! We have an exception - " + ex.getMessage());
+                        Timber.e(ex, "Ups, we had an exception while connection to %1$s", scaleBleName);
                         mMainActivity.setLoading(false);
                         mMainActivity.setConnected(false);
                         switchConnected(false);
@@ -152,7 +157,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    // Cambia el color e icono del boton de conexion Bluetooth dependiendo de si se esta conectado o no
+    // Change Bluetooth Button color
     private void switchConnected(boolean connect) {
         if (connect) {
             mConnectButton.setBackgroundColor(ContextCompat.getColor(mMainActivity, R.color.colorPrimary));
@@ -166,7 +171,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    // Switch entre el loader y la vista normal
+    // Switch between loader and normal view
     private void showLoader(boolean show) {
         if (show) {
             mMeasurementLayout.setVisibility(View.GONE);
@@ -180,26 +185,27 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "OnResume Fragment Home");
+        Timber.d("OnResume");
         refreshUi();
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        Log.d(TAG, "onViewStateRestored Fragment Home");
+        Timber.d("onViewStateRestored");
         refreshUi();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Timber.d("onDestroyView");
+        mViewUnbinder.unbind();
     }
 
     public void refreshUi() {
         switchConnected(mMainActivity.getConnected());
         showLoader(mMainActivity.getLoading());
         // TODO refrescar datos recibidos.
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mViewUnbinder.unbind();
     }
 }

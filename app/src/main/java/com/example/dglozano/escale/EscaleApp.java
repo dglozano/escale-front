@@ -1,17 +1,14 @@
 package com.example.dglozano.escale;
 
 import android.app.Application;
-import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
-import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 
 import com.example.dglozano.escale.data.EscaleDatabase;
-import com.example.dglozano.escale.data.dao.BodyMeasurementDao;
-import com.example.dglozano.escale.data.dao.UserDao;
-import com.example.dglozano.escale.data.entities.BodyMeasurement;
-import com.example.dglozano.escale.data.entities.User;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import timber.log.Timber;
 
 public class EscaleApp extends Application {
 
@@ -23,15 +20,30 @@ public class EscaleApp extends Application {
                 EscaleDatabase.class,
                 "EscaleDatabase")
                 .fallbackToDestructiveMigration()
-                .addCallback(sRoomDatabaseCallback)
+                //.addCallback(sRoomDatabaseCallback)
                 .build();
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree() {
+                //Add the line number to the tag
+
+                @Override
+                protected @Nullable String createStackElementTag(@NotNull StackTraceElement element) {
+                    return super.createStackElementTag(element) + ':' + element.getLineNumber();
+                }
+            });
+        }
+
         super.onCreate();
     }
 
     public EscaleDatabase getEscaleDatabase() {
         return escaleDatabase;
     }
+}
 
+
+/*
     private RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback() {
 
@@ -69,4 +81,4 @@ public class EscaleApp extends Application {
             return null;
         }
     }
-}
+*/
