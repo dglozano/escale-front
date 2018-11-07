@@ -21,7 +21,14 @@ import com.example.dglozano.escale.ble.BluetoothCommunication;
 import com.example.dglozano.escale.ble.GattConstants;
 import com.example.dglozano.escale.utils.PermissionHelper;
 
-import static com.example.dglozano.escale.ble.GattConstants.*;
+import static com.example.dglozano.escale.ble.GattConstants.BATTERY_LEVEL;
+import static com.example.dglozano.escale.ble.GattConstants.CLIENT_CHARACTERISTICS_CONFIGURATION;
+import static com.example.dglozano.escale.ble.GattConstants.CUSTOM_FFF0_SERVICE;
+import static com.example.dglozano.escale.ble.GattConstants.CUSTOM_FFF4_ACTIVATE_SCALE_CHARACTERISTIC;
+import static com.example.dglozano.escale.ble.GattConstants.USER_CONTROL_POINT;
+import static com.example.dglozano.escale.ble.GattConstants.USER_DATA_SERVICE;
+import static com.example.dglozano.escale.ble.GattConstants.WEIGHT_MEASUREMENT;
+import static com.example.dglozano.escale.ble.GattConstants.WEIGHT_SCALE_SERVICE;
 
 public class MeasurementActivity extends AppCompatActivity {
 

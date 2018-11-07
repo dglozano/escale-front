@@ -3,8 +3,6 @@ package com.example.dglozano.escale.ui.utils;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
-import com.example.dglozano.escale.ui.utils.SmartFragmentStatePagerAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 

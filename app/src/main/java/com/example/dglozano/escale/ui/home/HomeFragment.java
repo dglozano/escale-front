@@ -16,11 +16,11 @@ import android.webkit.WebView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.dglozano.escale.ui.MainActivity;
 import com.example.dglozano.escale.R;
 import com.example.dglozano.escale.ble.BluetoothCommunication;
-import com.example.dglozano.escale.data.entities.BodyMeasurement;
 import com.example.dglozano.escale.data.MeasurementItem;
+import com.example.dglozano.escale.data.entities.BodyMeasurement;
+import com.example.dglozano.escale.ui.MainActivity;
 import com.example.dglozano.escale.utils.PermissionHelper;
 
 import java.util.ArrayList;

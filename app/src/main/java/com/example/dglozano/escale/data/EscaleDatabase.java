@@ -1,13 +1,8 @@
 package com.example.dglozano.escale.data;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
-import android.content.Context;
-import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 
 import com.example.dglozano.escale.data.dao.BodyMeasurementDao;
 import com.example.dglozano.escale.data.dao.UserDao;
