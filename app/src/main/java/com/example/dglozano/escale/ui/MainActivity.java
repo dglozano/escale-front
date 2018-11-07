@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.dglozano.escale.EscaleApp;
 import com.example.dglozano.escale.R;
 import com.example.dglozano.escale.ble.BluetoothCommunication;
 import com.example.dglozano.escale.data.EscaleDatabase;
@@ -33,6 +34,8 @@ import com.example.dglozano.escale.ui.utils.NoSwipePager;
 import com.example.dglozano.escale.utils.PermissionHelper;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import q.rorbin.badgeview.Badge;
 import q.rorbin.badgeview.QBadgeView;
 
@@ -41,15 +44,22 @@ public class MainActivity extends AppCompatActivity
         MessagesFragment.OnFragmentInteractionListener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private BottomNavigationViewEx mBnv;
-    private NoSwipePager mNoSwipePager;
+
+    // Binding views with Butterknife
+    @BindView(R.id.bnve) BottomNavigationViewEx mBnv;
+    @BindView(R.id.drawer_layout) DrawerLayout mDrawer;
+    @BindView(R.id.nav_view) NavigationView mNavigationView;
+    @BindView(R.id.toolbar) Toolbar mToolbar;
+    @BindView(R.id.fragment_viewpager) NoSwipePager mNoSwipePager;
+
+    // Control Variables
+    private BluetoothCommunication mBluetoothCommService;
+    private boolean mBound = false;
+    private boolean mConnected;
+    private boolean mLoading;
     private BottomBarAdapter mPagerAdapter;
     private Badge mMessagesBadge;
     private EscaleDatabase mDatabase;
-
-    // Variables de control
-    private boolean mBound = false;
-    private BluetoothCommunication mBluetoothCommService;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -66,33 +76,28 @@ public class MainActivity extends AppCompatActivity
             mLoading = false;
         }
     };
-    private boolean mConnected;
-    private boolean mLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        ButterKnife.bind(this);
+        setSupportActionBar(mToolbar);
         mConnected = false;
         mLoading = false;
 
         // Database connection and mock setup
-        mDatabase = EscaleDatabase.getInstance(getApplicationContext());
+        mDatabase = ((EscaleApp) getApplication()).getEscaleDatabase();
 
         // Drawer Layout setup
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
+                this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView.setNavigationItemSelectedListener(this);
 
         // Bottom Nav setup
-        mBnv = findViewById(R.id.bnve);
         mBnv.enableAnimation(true);
         mBnv.enableShiftingMode(false);
         mBnv.enableItemShiftingMode(false);
@@ -102,7 +107,6 @@ public class MainActivity extends AppCompatActivity
         mMessagesBadge.setBadgeNumber(10);
 
         // ViewPager setup for navigating between fragments
-        mNoSwipePager = findViewById(R.id.fragment_viewpager);
         mNoSwipePager.setPagingEnabled(false);
         mPagerAdapter = new BottomBarAdapter(getSupportFragmentManager());
         mPagerAdapter.addFragments(HomeFragment.newInstance());
@@ -116,9 +120,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+            mDrawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -144,12 +147,11 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        mDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    // Agrega numero con notificaciones (para mensajes por ejemplo)
+    // Add notifications' number to bottomNav icon at position
     private Badge addBadgeAt(int position, int number) {
         // add badge
         return new QBadgeView(this)
@@ -163,7 +165,7 @@ public class MainActivity extends AppCompatActivity
         mMessagesBadge.setBadgeNumber(0);
     }
 
-    // PermissionHelper solicitó habilitar Bluetooth porque estaba desactivado. Este es el callback.
+    // Callback after PermissionHelper requested Bluetooth activation
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // User chose not to enable Bluetooth.
@@ -177,7 +179,7 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    // PermissionHelper pidió permiso para COARSE, cuando elije algo vuelve acá
+    // Callback after PermissionHelper requested COARSE location permission
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[],int[] grantResults) {
         switch (requestCode) {

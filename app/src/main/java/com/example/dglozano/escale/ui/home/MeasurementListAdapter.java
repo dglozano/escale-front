@@ -1,6 +1,7 @@
-package com.example.dglozano.escale.ui;
+package com.example.dglozano.escale.ui.home;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,32 +15,39 @@ import com.example.dglozano.escale.data.MeasurementItem;
 
 import java.util.List;
 
+import butterknife.BindDrawable;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementListAdapter.MeasurementViewHolder> {
 
     private List<MeasurementItem> mMeasurementItems;
     private Context mContext;
 
-    public static class MeasurementViewHolder extends RecyclerView.ViewHolder {
+    @BindDrawable(R.drawable.home_ic_scale_colored) Drawable scaleIcon;
+    @BindDrawable(R.drawable.home_ic_drop_colored) Drawable waterIcon;
+    @BindDrawable(R.drawable.home_ic_pizza_slice_colored) Drawable pizzaIcon;
+    @BindDrawable(R.drawable.home_ic_bone_colored) Drawable boneIcon;
+    @BindDrawable(R.drawable.home_ic_bmi_colored) Drawable bmiIcon;
+    @BindDrawable(R.drawable.home_ic_muscle_colored) Drawable muscleIcon;
 
-        public TextView mMeasurementTypeTextView;
-        public TextView mMeasurementValueTextView;
-        public ImageView mIconImageView;
+    static class MeasurementViewHolder extends RecyclerView.ViewHolder {
 
-        public MeasurementViewHolder(View v) {
+        @BindView(R.id.measurement_item_text) TextView mMeasurementTypeTextView;
+        @BindView(R.id.measurement_item_number) TextView mMeasurementValueTextView;
+        @BindView(R.id.measurement_item_icon) ImageView mIconImageView;
+
+        MeasurementViewHolder(View v) {
             super(v);
-            mMeasurementTypeTextView = v.findViewById(R.id.measurement_item_text);
-            mMeasurementValueTextView = v.findViewById(R.id.measurement_item_number);
-            mIconImageView = v.findViewById(R.id.measurement_item_icon);
-
+            ButterKnife.bind(this, v);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MeasurementListAdapter(List<MeasurementItem> measurementItemList, Context context) {
+    MeasurementListAdapter(List<MeasurementItem> measurementItemList, Context context) {
         mMeasurementItems = measurementItemList;
         mContext = context;
     }
-
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -61,28 +69,22 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
             holder.mMeasurementValueTextView.setText(measurement.getValue() + measurement.getUnit().toString());
             switch (measurement.getIconResource()){
                 case 1:
-                    holder.mIconImageView.setImageDrawable(
-                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_scale_colored ));
+                    holder.mIconImageView.setImageDrawable(scaleIcon);
                     break;
                 case 2:
-                    holder.mIconImageView.setImageDrawable(
-                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_drop_colored ));
+                    holder.mIconImageView.setImageDrawable(waterIcon);
                     break;
                 case 3:
-                    holder.mIconImageView.setImageDrawable(
-                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_pizza_slice_colored ));
+                    holder.mIconImageView.setImageDrawable(pizzaIcon);
                     break;
                 case 4:
-                    holder.mIconImageView.setImageDrawable(
-                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_bone_colored ));
+                    holder.mIconImageView.setImageDrawable(boneIcon);
                     break;
                 case 5:
-                    holder.mIconImageView.setImageDrawable(
-                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_bmi_colored ));
+                    holder.mIconImageView.setImageDrawable(bmiIcon);
                     break;
                 case 6:
-                    holder.mIconImageView.setImageDrawable(
-                            ContextCompat.getDrawable(mContext, R.drawable.home_ic_muscle_colored ));
+                    holder.mIconImageView.setImageDrawable(muscleIcon);
                     break;
             }
         }
@@ -96,5 +98,4 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
         }
         else return 0;
     }
-
 }

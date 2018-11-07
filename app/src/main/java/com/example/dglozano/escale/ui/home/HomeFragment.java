@@ -21,12 +21,14 @@ import com.example.dglozano.escale.R;
 import com.example.dglozano.escale.ble.BluetoothCommunication;
 import com.example.dglozano.escale.data.entities.BodyMeasurement;
 import com.example.dglozano.escale.data.MeasurementItem;
-import com.example.dglozano.escale.ui.MeasurementListAdapter;
 import com.example.dglozano.escale.utils.PermissionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import mehdi.sakout.fancybuttons.FancyButton;
 import pl.pawelkleczkowski.customgauge.CustomGauge;
 
@@ -42,15 +44,14 @@ public class HomeFragment extends Fragment {
 
     private static final String TAG = HomeFragment.class.getSimpleName();
     private MainActivity mMainActivity;
+    private Unbinder mViewUnbinder;
 
-    private WebView mLoaderWebView;
-    private RelativeLayout mMeasurementLayout;
-    private FancyButton mConnectButton;
-    private RecyclerView mRecyclerViewMeasurements;
-    private RecyclerView.Adapter mAdapterRecView;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private BodyMeasurement mBodyMeasurement;
-    private List<MeasurementItem> mMeasurementItemList;
+    @BindView(R.id.loader_webview) WebView mLoaderWebView;
+    @BindView(R.id.layout_measurement) RelativeLayout mMeasurementLayout;
+    @BindView(R.id.ble_connect_btn) FancyButton mConnectButton;
+    @BindView(R.id.recycler_view_measurements) RecyclerView mRecyclerViewMeasurements;
+    @BindView(R.id.gauge) CustomGauge customGauge;
+
 
     public HomeFragment() {
         // Required empty public constructor
@@ -82,19 +83,16 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mMainActivity = (MainActivity) getActivity();
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        mViewUnbinder = ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
-        mLoaderWebView = view.findViewById(R.id.loader_webview);
         mLoaderWebView.loadUrl("file:///android_asset/loader.html");
 
-        mMeasurementLayout = view.findViewById(R.id.layout_measurement);
-
-        mConnectButton = view.findViewById(R.id.ble_connect_btn);
         mConnectButton.setOnClickListener((View v) -> {
                 if(!mMainActivity.getConnected()) {
                     if(PermissionHelper.requestBluetoothPermission(mMainActivity))
@@ -109,25 +107,23 @@ public class HomeFragment extends Fragment {
                 }
         });
 
-        mRecyclerViewMeasurements = mMainActivity.findViewById(R.id.recycler_view_measurements);
         mRecyclerViewMeasurements.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(mMainActivity);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mMainActivity);
         mRecyclerViewMeasurements.setLayoutManager(mLayoutManager);
         mRecyclerViewMeasurements.setItemAnimator(new DefaultItemAnimator());
         mRecyclerViewMeasurements.addItemDecoration(new DividerItemDecoration(
                 mMainActivity,
                 LinearLayoutManager.VERTICAL));
 
-        mMeasurementItemList = new ArrayList<>();
-        mAdapterRecView = new MeasurementListAdapter(mMeasurementItemList, mMainActivity);
+        List<MeasurementItem> mMeasurementItemList = new ArrayList<>();
+        RecyclerView.Adapter mAdapterRecView = new MeasurementListAdapter(mMeasurementItemList, mMainActivity);
         mRecyclerViewMeasurements.setAdapter(mAdapterRecView);
 
         //TODO Borrar
-        mBodyMeasurement = BodyMeasurement.createMockBodyMeasurementForUser(7);
+        BodyMeasurement mBodyMeasurement = BodyMeasurement.createMockBodyMeasurementForUser(7);
         mMeasurementItemList.addAll(MeasurementItem.getMeasurementList(mBodyMeasurement));
         mAdapterRecView.notifyDataSetChanged();
 
-        CustomGauge customGauge = view.findViewById(R.id.gauge);
         customGauge.setValue(1000);
     }
 
@@ -198,5 +194,11 @@ public class HomeFragment extends Fragment {
         switchConnected(mMainActivity.getConnected());
         showLoader(mMainActivity.getLoading());
         // TODO refrescar datos recibidos.
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mViewUnbinder.unbind();
     }
 }
