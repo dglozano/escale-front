@@ -47,11 +47,16 @@ public class HomeFragment extends Fragment {
     private MainActivity mMainActivity;
     private Unbinder mViewUnbinder;
 
-    @BindView(R.id.loader_webview) WebView mLoaderWebView;
-    @BindView(R.id.layout_measurement) RelativeLayout mMeasurementLayout;
-    @BindView(R.id.ble_connect_btn) FancyButton mConnectButton;
-    @BindView(R.id.recycler_view_measurements) RecyclerView mRecyclerViewMeasurements;
-    @BindView(R.id.gauge) CustomGauge customGauge;
+    @BindView(R.id.loader_webview)
+    WebView mLoaderWebView;
+    @BindView(R.id.layout_measurement)
+    RelativeLayout mMeasurementLayout;
+    @BindView(R.id.ble_connect_btn)
+    FancyButton mConnectButton;
+    @BindView(R.id.recycler_view_measurements)
+    RecyclerView mRecyclerViewMeasurements;
+    @BindView(R.id.gauge)
+    CustomGauge customGauge;
 
 
     public HomeFragment() {
@@ -95,17 +100,17 @@ public class HomeFragment extends Fragment {
         mLoaderWebView.loadUrl("file:///android_asset/loader.html");
 
         mConnectButton.setOnClickListener((View v) -> {
-                if(!mMainActivity.getConnected()) {
-                    if(PermissionHelper.requestBluetoothPermission(mMainActivity))
-                        scanAndConnect();
+            if (!mMainActivity.getConnected()) {
+                if (PermissionHelper.requestBluetoothPermission(mMainActivity))
+                    scanAndConnect();
+            } else {
+                if (mMainActivity.isBound()) {
+                    Log.d(TAG, "Clicked on disconnect");
+                    mMainActivity.getBluetoothCommService().disconnect();
                 } else {
-                    if(mMainActivity.isBound()) {
-                        Log.d(TAG, "Clicked on disconnect");
-                        mMainActivity.getBluetoothCommService().disconnect();
-                    } else {
-                        Log.d(TAG, "Not bound to service yet.");
-                    }
+                    Log.d(TAG, "Not bound to service yet.");
                 }
+            }
         });
 
         mRecyclerViewMeasurements.setHasFixedSize(true);
@@ -129,14 +134,14 @@ public class HomeFragment extends Fragment {
     }
 
     public void scanAndConnect() {
-        if(mMainActivity.isBound()){
+        if (mMainActivity.isBound()) {
             BluetoothCommunication bluetoothCommunication = mMainActivity.getBluetoothCommService();
             mMainActivity.setLoading(true);
             showLoader(true);
             bluetoothCommunication.scanForBleDevices(getString(R.string.bf600))
                     .thenAccept(bluetoothCommunication::connectGatt)
                     .exceptionally(ex -> {
-                        Log.d(TAG,"Oops! We have an exception - " + ex.getMessage());
+                        Log.d(TAG, "Oops! We have an exception - " + ex.getMessage());
                         mMainActivity.setLoading(false);
                         mMainActivity.setConnected(false);
                         switchConnected(false);
@@ -149,21 +154,21 @@ public class HomeFragment extends Fragment {
 
     // Cambia el color e icono del boton de conexion Bluetooth dependiendo de si se esta conectado o no
     private void switchConnected(boolean connect) {
-        if(connect) {
+        if (connect) {
             mConnectButton.setBackgroundColor(ContextCompat.getColor(mMainActivity, R.color.colorPrimary));
             mConnectButton.setText("CONECTADO");
-            mConnectButton.setIconResource(ContextCompat.getDrawable(mMainActivity,R.drawable.home_bluetooth_connected));
+            mConnectButton.setIconResource(ContextCompat.getDrawable(mMainActivity, R.drawable.home_bluetooth_connected));
         } else {
             mConnectButton.setBackgroundColor(ContextCompat.getColor(mMainActivity, R.color.colorText));
             mConnectButton.setText("DESCONECTADO");
             mConnectButton.setIconResource(R.drawable.home_round_listview);
-            mConnectButton.setIconResource(ContextCompat.getDrawable(mMainActivity,R.drawable.home_bluetooth_disconnected));
+            mConnectButton.setIconResource(ContextCompat.getDrawable(mMainActivity, R.drawable.home_bluetooth_disconnected));
         }
     }
 
     // Switch entre el loader y la vista normal
     private void showLoader(boolean show) {
-        if(show){
+        if (show) {
             mMeasurementLayout.setVisibility(View.GONE);
             mLoaderWebView.setVisibility(View.VISIBLE);
         } else {
@@ -177,11 +182,6 @@ public class HomeFragment extends Fragment {
         super.onResume();
         Log.d(TAG, "OnResume Fragment Home");
         refreshUi();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     @Override

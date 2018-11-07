@@ -60,7 +60,7 @@ public class BluetoothCommunication extends Service {
             "com.dglozano.escale.bluetooth.ACTION_DATA_NOTIFICATION";
 
     // Representation of a GattObject plus its bytes
-    private class GattObjectValue <GattObject> {
+    private class GattObjectValue<GattObject> {
         public final GattObject gattObject;
         public final byte[] value;
 
@@ -99,9 +99,9 @@ public class BluetoothCommunication extends Service {
     /**
      * Write a byte array to a Bluetooth device.
      *
-     * @param service the Bluetooth UUID device service
+     * @param service        the Bluetooth UUID device service
      * @param characteristic the Bluetooth UUID characteristic
-     * @param bytes the bytes that should be written
+     * @param bytes          the bytes that should be written
      */
     public void writeBytes(UUID service, UUID characteristic, byte[] bytes) {
         synchronized (lock) {
@@ -115,10 +115,9 @@ public class BluetoothCommunication extends Service {
 
     /**
      * Read bytes from a Bluetooth device.
+     * onBluetoothDataRead() will be triggered if read command was successful.
      *
-     * @note onBluetoothDataRead() will be triggered if read command was successful.
-     *
-     * @param service the Bluetooth UUID device service
+     * @param service        the Bluetooth UUID device service
      * @param characteristic the Bluetooth UUID characteristic
      */
     public CompletableFuture<BluetoothGattCharacteristic> readBytes(UUID service, UUID characteristic) {
@@ -127,7 +126,7 @@ public class BluetoothCommunication extends Service {
         BluetoothGattCharacteristic gattCharacteristic = mBluetoothGatt.getService(service)
                 .getCharacteristic(characteristic);
 
-        Log.d(TAG,String.format("Read characteristic %s", characteristic));
+        Log.d(TAG, String.format("Read characteristic %s", characteristic));
         mBluetoothGatt.readCharacteristic(gattCharacteristic);
 
         return mReadResultFuture;
@@ -139,7 +138,7 @@ public class BluetoothCommunication extends Service {
         BluetoothGattDescriptor gattDescriptor = mBluetoothGatt.getService(service)
                 .getCharacteristic(characteristic).getDescriptor(descriptor);
 
-        Log.d(TAG,String.format("Read descriptor %s", descriptor));
+        Log.d(TAG, String.format("Read descriptor %s", descriptor));
         mBluetoothGatt.readDescriptor(gattDescriptor);
 
         return mReadResultFuture;
@@ -148,13 +147,13 @@ public class BluetoothCommunication extends Service {
     /**
      * Set indication flag on for the Bluetooth device.
      *
-     * @param service the Bluetooth UUID device service
+     * @param service        the Bluetooth UUID device service
      * @param characteristic the Bluetooth UUID characteristic
      */
     public CompletableFuture<BluetoothGattDescriptor> setIndicationOn(UUID service, UUID characteristic, UUID descriptor) {
         mWriteDescriptorFuture = new CompletableFuture<>();
 
-        Log.d(TAG,String.format("Set indication on for %s", characteristic));
+        Log.d(TAG, String.format("Set indication on for %s", characteristic));
 
         try {
             BluetoothGattCharacteristic gattCharacteristic =
@@ -168,8 +167,7 @@ public class BluetoothCommunication extends Service {
                                 BluetoothGattDescriptor.ENABLE_INDICATION_VALUE));
                 handleRequests();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -179,13 +177,13 @@ public class BluetoothCommunication extends Service {
     /**
      * Set notification flag on for the Bluetooth device.
      *
-     * @param service the Bluetooth UUID device service
+     * @param service        the Bluetooth UUID device service
      * @param characteristic the Bluetooth UUID characteristic
      */
-    public CompletableFuture<BluetoothGattDescriptor>  setNotificationOn(UUID service, UUID characteristic, UUID descriptor) {
+    public CompletableFuture<BluetoothGattDescriptor> setNotificationOn(UUID service, UUID characteristic, UUID descriptor) {
         mWriteDescriptorFuture = new CompletableFuture<>();
 
-        Log.d(TAG,String.format("Set notification on for %s", characteristic));
+        Log.d(TAG, String.format("Set notification on for %s", characteristic));
 
         try {
             BluetoothGattCharacteristic gattCharacteristic =
@@ -199,8 +197,7 @@ public class BluetoothCommunication extends Service {
                                 BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE));
                 handleRequests();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -210,7 +207,7 @@ public class BluetoothCommunication extends Service {
     /**
      * Set notification flag off for the Bluetooth device.
      *
-     * @param service the Bluetooth UUID device service
+     * @param service        the Bluetooth UUID device service
      * @param characteristic the Bluetooth UUID characteristic
      */
     public CompletableFuture<BluetoothGattDescriptor> setNotificationOff(UUID service, UUID characteristic, UUID descriptor) {
@@ -270,7 +267,6 @@ public class BluetoothCommunication extends Service {
                             characteristic.gattObject.getUuid()));
                 }
                 openRequest = true;
-                return;
             }
         }
     }
@@ -336,7 +332,7 @@ public class BluetoothCommunication extends Service {
 
     public void disconnect() {
         Log.d(TAG, "Disconnecting from Gatt Server");
-        if(mBluetoothGatt == null)
+        if (mBluetoothGatt == null)
             return;
         mBluetoothGatt.disconnect();
         mBluetoothGatt = null;
@@ -376,14 +372,13 @@ public class BluetoothCommunication extends Service {
 
         @Override
         public void onConnectionStateChange(final BluetoothGatt gatt, int status, int newState) {
-            Log.d(TAG,String.format("onConnectionStateChange: status=%d, newState=%d", status, newState));
+            Log.d(TAG, String.format("onConnectionStateChange: status=%d, newState=%d", status, newState));
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
 
                 try {
                     Thread.sleep(1000);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     // Empty
                 }
 
@@ -391,8 +386,7 @@ public class BluetoothCommunication extends Service {
                     Log.d(TAG, "Could not start service discovery");
                     disconnect();
                 }
-            }
-            else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d(TAG, "Disconnected from GATT server");
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
@@ -420,8 +414,7 @@ public class BluetoothCommunication extends Service {
                 // See https://github.com/NordicSemiconductor/Android-DFU-Library/issues/10
                 // for some technical background.
                 Thread.sleep(1000);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -429,13 +422,10 @@ public class BluetoothCommunication extends Service {
         private void postDelayedHandleRequests() {
             // Wait a short while before starting the next operation as suggested
             // on the android.jlelse.eu link above.
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (lock) {
-                        openRequest = false;
-                        handleRequests();
-                    }
+            mHandler.postDelayed(() -> {
+                synchronized (lock) {
+                    openRequest = false;
+                    handleRequests();
                 }
             }, POST_DELAYED_WAIT);
         }

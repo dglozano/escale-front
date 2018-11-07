@@ -13,10 +13,10 @@ import java.util.List;
 public class BodyMeasurementRepository {
 
     private BodyMeasurementDao mBodyMeasurementDao;
-    private LiveData<List<BodyMeasurement>>  mAllBodyMeasurements;
+    private LiveData<List<BodyMeasurement>> mAllBodyMeasurements;
 
     public BodyMeasurementRepository() {
-        EscaleDatabase db = ((EscaleApp) getApplication).getEscaleDatabase() ;
+        EscaleDatabase db = ((EscaleApp) getApplication).getEscaleDatabase();
         mBodyMeasurementDao = db.bodyMeasurementDao();
     }
 

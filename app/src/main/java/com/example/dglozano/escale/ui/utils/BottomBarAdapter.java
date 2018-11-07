@@ -12,6 +12,7 @@ public class BottomBarAdapter extends SmartFragmentStatePagerAdapter {
     public BottomBarAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
     }
+
     // Our custom method that populates this Adapter with Fragments
     public void addFragments(Fragment fragment) {
         fragments.add(fragment);

@@ -42,16 +42,21 @@ import q.rorbin.badgeview.QBadgeView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        MessagesFragment.OnFragmentInteractionListener{
+        MessagesFragment.OnFragmentInteractionListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
     // Binding views with Butterknife
-    @BindView(R.id.bnve) BottomNavigationViewEx mBnv;
-    @BindView(R.id.drawer_layout) DrawerLayout mDrawer;
-    @BindView(R.id.nav_view) NavigationView mNavigationView;
-    @BindView(R.id.toolbar) Toolbar mToolbar;
-    @BindView(R.id.fragment_viewpager) NoSwipePager mNoSwipePager;
+    @BindView(R.id.bnve)
+    BottomNavigationViewEx mBnv;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout mDrawer;
+    @BindView(R.id.nav_view)
+    NavigationView mNavigationView;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.fragment_viewpager)
+    NoSwipePager mNoSwipePager;
 
     // Control Variables
     private BluetoothCommunication mBluetoothCommService;
@@ -104,16 +109,16 @@ public class MainActivity extends AppCompatActivity
         mBnv.enableItemShiftingMode(false);
         mBnv.setTextVisibility(false);
         mBnv.setIconSizeAt(0, 28, 28);
-        mMessagesBadge = addBadgeAt(3,0);
+        mMessagesBadge = addBadgeAt(3, 0);
         mMessagesBadge.setBadgeNumber(10);
 
         // ViewPager setup for navigating between fragments
         mNoSwipePager.setPagingEnabled(false);
         mPagerAdapter = new BottomBarAdapter(getSupportFragmentManager());
         mPagerAdapter.addFragments(HomeFragment.newInstance());
-        mPagerAdapter.addFragments(StatsFragment.newInstance("",""));
-        mPagerAdapter.addFragments(DietFragment.newInstance("",""));
-        mPagerAdapter.addFragments(MessagesFragment.newInstance("",""));
+        mPagerAdapter.addFragments(StatsFragment.newInstance("", ""));
+        mPagerAdapter.addFragments(DietFragment.newInstance("", ""));
+        mPagerAdapter.addFragments(MessagesFragment.newInstance("", ""));
         mNoSwipePager.setAdapter(mPagerAdapter);
 
         mBnv.setupWithViewPager(mNoSwipePager);
@@ -259,7 +264,7 @@ public class MainActivity extends AppCompatActivity
                     ACTION_DATA_NOTIFICATION.equals(action)) {
                 // TODO Save new data.
             }
-            if(homeFragment != null)
+            if (homeFragment != null)
                 homeFragment.refreshUi();
         }
     };

@@ -14,5 +14,6 @@ import com.example.dglozano.escale.data.entities.User;
 public abstract class EscaleDatabase extends RoomDatabase {
 
     public abstract BodyMeasurementDao bodyMeasurementDao();
+
     public abstract UserDao userDao();
 }

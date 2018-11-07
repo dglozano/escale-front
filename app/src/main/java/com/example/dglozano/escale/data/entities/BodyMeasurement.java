@@ -5,7 +5,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
@@ -32,7 +32,7 @@ public class BodyMeasurement {
     private float bones;
     private float muscles;
 
-    public BodyMeasurement(){
+    public BodyMeasurement() {
 
     }
 
@@ -118,9 +118,9 @@ public class BodyMeasurement {
 
     @Override
     public boolean equals(Object other) {
-        if(other == null) return false;
-        if(other == this) return true;
-        if(!(other instanceof  BodyMeasurement)) return false;
+        if (other == null) return false;
+        if (other == this) return true;
+        if (!(other instanceof BodyMeasurement)) return false;
         BodyMeasurement otherMeasurement = (BodyMeasurement) other;
 
         return otherMeasurement.id == this.id
@@ -136,7 +136,7 @@ public class BodyMeasurement {
 
     @Override
     public String toString() {
-        SimpleDateFormat df = new SimpleDateFormat("dd/mm/yyyy");
+        DateFormat df = DateFormat.getDateInstance();
         return String.format("{\n " +
                 "   id: %s \n" +
                 "   userId: %s \n" +

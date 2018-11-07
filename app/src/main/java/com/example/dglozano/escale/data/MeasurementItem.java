@@ -31,10 +31,10 @@ public class MeasurementItem {
     }
 
     public enum Unit {
-        KG(" kg"),
-        LB(" lb"),
+        KG("kg"),
+        LB("lb"),
         NO_UNIT(""),
-        PERCENTAGE(" %");
+        PERCENTAGE("%");
 
         private final String name;
 

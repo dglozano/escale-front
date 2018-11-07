@@ -16,6 +16,7 @@ import com.example.dglozano.escale.data.MeasurementItem;
 import java.util.List;
 
 import butterknife.BindDrawable;
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -24,18 +25,29 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     private List<MeasurementItem> mMeasurementItems;
     private Context mContext;
 
-    @BindDrawable(R.drawable.home_ic_scale_colored) Drawable scaleIcon;
-    @BindDrawable(R.drawable.home_ic_drop_colored) Drawable waterIcon;
-    @BindDrawable(R.drawable.home_ic_pizza_slice_colored) Drawable pizzaIcon;
-    @BindDrawable(R.drawable.home_ic_bone_colored) Drawable boneIcon;
-    @BindDrawable(R.drawable.home_ic_bmi_colored) Drawable bmiIcon;
-    @BindDrawable(R.drawable.home_ic_muscle_colored) Drawable muscleIcon;
+    @BindDrawable(R.drawable.home_ic_scale_colored)
+    Drawable scaleIcon;
+    @BindDrawable(R.drawable.home_ic_drop_colored)
+    Drawable waterIcon;
+    @BindDrawable(R.drawable.home_ic_pizza_slice_colored)
+    Drawable pizzaIcon;
+    @BindDrawable(R.drawable.home_ic_bone_colored)
+    Drawable boneIcon;
+    @BindDrawable(R.drawable.home_ic_bmi_colored)
+    Drawable bmiIcon;
+    @BindDrawable(R.drawable.home_ic_muscle_colored)
+    Drawable muscleIcon;
+    @BindString(R.string.measurement_item_holder_value)
+    String measurementItemHolderValueString;
 
     static class MeasurementViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.measurement_item_text) TextView mMeasurementTypeTextView;
-        @BindView(R.id.measurement_item_number) TextView mMeasurementValueTextView;
-        @BindView(R.id.measurement_item_icon) ImageView mIconImageView;
+        @BindView(R.id.measurement_item_text)
+        TextView mMeasurementTypeTextView;
+        @BindView(R.id.measurement_item_number)
+        TextView mMeasurementValueTextView;
+        @BindView(R.id.measurement_item_icon)
+        ImageView mIconImageView;
 
         MeasurementViewHolder(View v) {
             super(v);
@@ -53,7 +65,7 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     @NonNull
     @Override
     public MeasurementViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
-                                                     int viewType) {
+                                                    int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.measurement_row_item, parent, false);
 
@@ -63,12 +75,13 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(@NonNull MeasurementViewHolder holder, int position) {
-        if(mMeasurementItems != null) {
+        if (mMeasurementItems != null) {
             final MeasurementItem measurement = mMeasurementItems.get(position);
             holder.mMeasurementTypeTextView.setText(measurement.getName().toString());
-            // FIXME: Add string resource
-            holder.mMeasurementValueTextView.setText(measurement.getValue() + measurement.getUnit().toString());
-            switch (measurement.getIconResource()){
+            holder.mMeasurementValueTextView.setText(String.format(measurementItemHolderValueString,
+                    measurement.getValue(),
+                    measurement.getUnit().toString()));
+            switch (measurement.getIconResource()) {
                 case 1:
                     holder.mIconImageView.setImageDrawable(scaleIcon);
                     break;
@@ -94,9 +107,8 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        if(mMeasurementItems != null) {
+        if (mMeasurementItems != null) {
             return mMeasurementItems.size();
-        }
-        else return 0;
+        } else return 0;
     }
 }

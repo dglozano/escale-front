@@ -8,12 +8,12 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.dglozano.escale.R;
@@ -44,7 +44,7 @@ public class MeasurementActivity extends AppCompatActivity {
             mBound = true;
             BluetoothCommunication.LocalBinder localBinder = (BluetoothCommunication.LocalBinder) binder;
             mBluetoothCommService = localBinder.getService();
-            if(PermissionHelper.requestBluetoothPermission(MeasurementActivity.this)){
+            if (PermissionHelper.requestBluetoothPermission(MeasurementActivity.this)) {
                 scanAndConnect();
             }
         }
@@ -73,7 +73,7 @@ public class MeasurementActivity extends AppCompatActivity {
                 })
                 .thenCompose(ds -> {
                     System.out.println("write response " + ds.toString());
-                    return mBluetoothCommService.createUser(new byte[] {0x10,0x00});
+                    return mBluetoothCommService.createUser(new byte[]{0x10, 0x00});
                 })
                 .thenCompose(ds -> {
                     System.out.println("write response " + ds.toString());
@@ -81,7 +81,7 @@ public class MeasurementActivity extends AppCompatActivity {
                 })
                 .thenCompose(ds -> {
                     System.out.println("write response " + ds.toString());
-                    return mBluetoothCommService.consentUser((byte) 0x01, new byte[] {0x10,0x00});
+                    return mBluetoothCommService.consentUser((byte) 0x01, new byte[]{0x10, 0x00});
                 })
                 .thenCompose(ds -> {
                     System.out.println("write response " + ds.toString());
@@ -89,11 +89,11 @@ public class MeasurementActivity extends AppCompatActivity {
                 })
                 .thenCompose(ds -> {
                     System.out.println("write response " + ds.toString());
-                    return mBluetoothCommService.createUser(new byte[] {0x10,0x00});
+                    return mBluetoothCommService.createUser(new byte[]{0x10, 0x00});
                 })
                 .thenCompose(ds -> {
                     System.out.println("write response " + ds.toString());
-                    return mBluetoothCommService.consentUser((byte) 0x01, new byte[] {0x10,0x00});
+                    return mBluetoothCommService.consentUser((byte) 0x01, new byte[]{0x10, 0x00});
                 })
                 .thenAccept(ch -> {
                     byte[] bytesTurnOnscale = {0x00};
@@ -109,17 +109,12 @@ public class MeasurementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show());
     }
 
     // PermissionHelper solicitó habilitar Bluetooth porque estaba desactivado. Este es el callback.
@@ -131,10 +126,9 @@ public class MeasurementActivity extends AppCompatActivity {
                 finish();
                 return;
             } else {
-                if(mBound)
-                    mBluetoothCommService.scanForBleDevices(getString(R.string.bf600)).thenAccept(device -> {
-                        System.out.println("Got a device from remote service " + device.getAddress());
-                    });
+                if (mBound)
+                    mBluetoothCommService.scanForBleDevices(getString(R.string.bf600))
+                            .thenAccept(device -> System.out.println("Got a device from remote service " + device.getAddress()));
             }
         }
 
@@ -143,7 +137,7 @@ public class MeasurementActivity extends AppCompatActivity {
 
     // PermissionHelper pidió permiso para COARSE, cuando elije algo vuelve acá
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[],int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case PermissionHelper.PERMISSION_REQUEST_COARSE: {
                 // si el request es cancelado el arreglo es vacio.
@@ -154,7 +148,6 @@ public class MeasurementActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(this, R.string.coarse_permission_message, Toast.LENGTH_SHORT).show();
                 }
-                return;
             }
         }
     }
@@ -162,16 +155,10 @@ public class MeasurementActivity extends AppCompatActivity {
     private void scanAndConnect() {
         mBluetoothCommService.scanForBleDevices(getString(R.string.bf600))
                 .exceptionally(ex -> {
-                    Log.d(TAG,"Oops! We have an exception - " + ex.getMessage());
+                    Log.d(TAG, "Oops! We have an exception - " + ex.getMessage());
                     scanAndConnect();
                     return null;
                 });
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
     }
 
     @Override
@@ -188,10 +175,5 @@ public class MeasurementActivity extends AppCompatActivity {
             unbindService(mServiceConnection);
             mBound = false;
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 }

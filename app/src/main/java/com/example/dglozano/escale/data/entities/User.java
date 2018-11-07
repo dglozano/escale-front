@@ -27,7 +27,7 @@ public class User {
     private int physicalActivity;
     private Date birthday;
 
-    public User () {
+    public User() {
     }
 
     @Ignore
@@ -120,9 +120,9 @@ public class User {
 
     @Override
     public boolean equals(Object other) {
-        if(other == null) return false;
-        if(other == this) return true;
-        if(!(other instanceof  User)) return false;
+        if (other == null) return false;
+        if (other == this) return true;
+        if (!(other instanceof User)) return false;
         User otherUser = (User) other;
 
         return otherUser.id == this.id
@@ -158,8 +158,8 @@ public class User {
         String lastName = lastNames[r.nextInt(lastNames.length)];
         String email = String.format(
                 "%s%s@%s",
-                name.trim().replaceAll("\\s","").toLowerCase(),
-                lastName.trim().replaceAll("\\s","").toLowerCase(),
+                name.trim().replaceAll("\\s", "").toLowerCase(),
+                lastName.trim().replaceAll("\\s", "").toLowerCase(),
                 emailProviders[r.nextInt(emailProviders.length)]);
 
         Calendar cal = Calendar.getInstance();
