@@ -1,10 +1,10 @@
-package com.example.dglozano.escale.repositories;
+package com.example.dglozano.escale.repository;
 
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 
-import com.example.dglozano.escale.data.dao.BodyMeasurementDao;
-import com.example.dglozano.escale.data.entities.BodyMeasurement;
+import com.example.dglozano.escale.db.dao.BodyMeasurementDao;
+import com.example.dglozano.escale.db.entity.BodyMeasurement;
 
 import java.util.List;
 

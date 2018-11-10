@@ -1,4 +1,4 @@
-package com.example.dglozano.escale.data.entities;
+package com.example.dglozano.escale.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;

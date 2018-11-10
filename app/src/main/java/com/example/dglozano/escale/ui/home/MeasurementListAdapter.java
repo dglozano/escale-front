@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.dglozano.escale.R;
-import com.example.dglozano.escale.data.MeasurementItem;
+import com.example.dglozano.escale.db.MeasurementItem;
 
 import java.util.List;
 

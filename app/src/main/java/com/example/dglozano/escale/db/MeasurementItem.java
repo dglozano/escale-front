@@ -1,6 +1,6 @@
-package com.example.dglozano.escale.data;
+package com.example.dglozano.escale.db;
 
-import com.example.dglozano.escale.data.entities.BodyMeasurement;
+import com.example.dglozano.escale.db.entity.BodyMeasurement;
 
 import java.util.ArrayList;
 import java.util.List;

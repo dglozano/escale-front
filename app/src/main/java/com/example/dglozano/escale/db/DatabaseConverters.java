@@ -1,8 +1,8 @@
-package com.example.dglozano.escale.data;
+package com.example.dglozano.escale.db;
 
 import android.arch.persistence.room.TypeConverter;
 
-import com.example.dglozano.escale.data.entities.User;
+import com.example.dglozano.escale.db.entity.User;
 
 import java.util.Date;
 

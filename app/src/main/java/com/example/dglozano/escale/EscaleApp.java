@@ -3,7 +3,7 @@ package com.example.dglozano.escale;
 import android.app.Application;
 import android.arch.persistence.room.Room;
 
-import com.example.dglozano.escale.data.EscaleDatabase;
+import com.example.dglozano.escale.db.EscaleDatabase;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -24,7 +24,7 @@ import android.widget.Toast;
 import com.example.dglozano.escale.EscaleApp;
 import com.example.dglozano.escale.R;
 import com.example.dglozano.escale.ble.BluetoothCommunication;
-import com.example.dglozano.escale.data.EscaleDatabase;
+import com.example.dglozano.escale.db.EscaleDatabase;
 import com.example.dglozano.escale.ui.common.BottomBarAdapter;
 import com.example.dglozano.escale.ui.common.NoSwipePager;
 import com.example.dglozano.escale.ui.diet.DietFragment;

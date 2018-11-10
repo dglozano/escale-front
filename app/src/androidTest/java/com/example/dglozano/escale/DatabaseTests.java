@@ -5,9 +5,9 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.example.dglozano.escale.data.entities.BodyMeasurement;
-import com.example.dglozano.escale.data.EscaleDatabase;
-import com.example.dglozano.escale.data.entities.User;
+import com.example.dglozano.escale.db.entity.BodyMeasurement;
+import com.example.dglozano.escale.db.EscaleDatabase;
+import com.example.dglozano.escale.db.entity.User;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -17,8 +17,8 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
-import static com.example.dglozano.escale.data.entities.BodyMeasurement.createMockBodyMeasurementForUser;
-import static com.example.dglozano.escale.data.entities.User.createMockUser;
+import static com.example.dglozano.escale.db.entity.BodyMeasurement.createMockBodyMeasurementForUser;
+import static com.example.dglozano.escale.db.entity.User.createMockUser;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
