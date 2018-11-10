@@ -20,7 +20,6 @@ public class EscaleApp extends Application {
                 EscaleDatabase.class,
                 "EscaleDatabase")
                 .fallbackToDestructiveMigration()
-                //.addCallback(sRoomDatabaseCallback)
                 .build();
 
         if (BuildConfig.DEBUG) {
