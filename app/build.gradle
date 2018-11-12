@@ -7,7 +7,7 @@ apply plugin: "com.android.application"
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.example.dglozano.escale"
+        applicationId "com.dglozano.escale"
         minSdkVersion 24
         targetSdkVersion 27
         versionCode 1
@@ -56,6 +56,7 @@ dependencies {
     implementation "com.jakewharton:butterknife:$butterknife_version"
     implementation "com.jakewharton.timber:timber:$timber_version"
     implementation "com.polidea.rxandroidble2:rxandroidble:$rxble_version"
+    implementation "com.google.dagger:dagger:$dagger_version"
     implementation "com.google.dagger:dagger-android:$dagger_version"
     implementation "com.google.dagger:dagger-android-support:$dagger_version"
     implementation "com.android.support.constraint:constraint-layout:1.1.3"
@@ -67,6 +68,8 @@ dependencies {
     annotationProcessor "com.jakewharton:butterknife-compiler:$butterknife_version"
     annotationProcessor "android.arch.persistence.room:compiler:$room_version"
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
+
 
     testImplementation "junit:junit:$junit_version"
     testImplementation "android.arch.core:core-testing:$lifecycle_version"

@@ -6,7 +6,7 @@ env:
     secure: aGbkdwJG3HtUtnVQIlv9Od8YZUUSB07wyjoV59L7GW0HTt46HRSArqcLzfwtobzRpRdNpVj/WydNUaci0Bvs1eJ9N4c7/v8U2JluvrDOixHL5vLEDU4Hr9QzXpEOi/hKPMdYTUBjDPKadcymLc67HDsaTj0rhC6FYqpP3C0MTtDkcCRaykHatT+Sqk16HXVesR8JsHvBbR4g+M6YfpNKMlPDW2lhWffsU0QKa31mIa/163cI568eHZeJ+MdvLQJM7CD2fLO4WCjt3VBctGTZhB2S7SeDao4Z4yWQtU34VBy+gOudaiyBXiygC8vrPxvToUrmf1XZ72BaQGqYZVOi5uQL+v8wheLARRzSyZZRyJCgmOoeRyjGX0ZMrY+tCZ1o7vzYtExs01u3aOqYGeSroiB36ZXDuYhaOuJTYsKZw0uVI3WRqdxJJTpAiJqXaTOJ6FphBOj0J90WTDGG+l66MnpMu8a6sE5RPAL+VDe6X6EjNpyOqBZxWetUYKkmvp8VqiArWpns7i98yJ9E0XWtU3OZrVfaoKNA8X7jnZl+1P7SCGUkHRG9dTPZUVGOPnZee+UnA86CBwhD1iFI1PnpcidefvvwglDGJ7GyUbiKvRAg5wGPW7tTICHIomJ/48YnAwRs2ACOZEmy+ZUazswkVWcoq0JYh4vNVa1s4WmzvR0=
 addons:
   sonarcloud:
-    organization: dglozano-github
+    organization: com.dglozano-github
     token:
       secure: "$SONAR_TOKEN"
 before_cache:
@@ -37,4 +37,4 @@ android:
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
 script:
-  - "./gradlew sonarqube -Dsonar.organization=dglozano-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=b9363a065875cb4a3658d102d024e98f209eefc7 -Dsonar.projectKey=escale-mobile -Dsonar.projectName=escale-mobile"
+  - "./gradlew sonarqube -Dsonar.organization=com.dglozano-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=b9363a065875cb4a3658d102d024e98f209eefc7 -Dsonar.projectKey=escale-mobile -Dsonar.projectName=escale-mobile"

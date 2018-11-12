@@ -11,8 +11,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
             android:id="@+id/bnve"
@@ -22,12 +21,12 @@
             android:background="@android:color/white"
             app:menu="@menu/activity_main_foot_nav" />
 
-        <com.example.dglozano.escale.ui.common.NoSwipePager
+        <com.dglozano.escale.ui.main.common.NoSwipePager
             android:id="@+id/fragment_viewpager"
-            android:paddingTop="?android:attr/actionBarSize"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/bnve"/>
+            android:layout_above="@id/bnve"
+            android:paddingTop="?android:attr/actionBarSize" />
 
         <include
             layout="@layout/app_bar_main"
