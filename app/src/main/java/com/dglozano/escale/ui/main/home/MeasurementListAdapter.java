@@ -1,6 +1,5 @@
 package com.dglozano.escale.ui.main.home;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -10,13 +9,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dglozano.escale.db.MeasurementItem;
 import com.dglozano.escale.R;
+import com.dglozano.escale.db.MeasurementItem;
 import com.dglozano.escale.ui.main.MainActivity;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindDrawable;
 import butterknife.BindString;
@@ -44,6 +45,7 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
 
     private List<MeasurementItem> mMeasurementItems;
 
+    @Inject
     public MeasurementListAdapter(MainActivity mainActivity) {
         mMeasurementItems = new ArrayList<>();
         ButterKnife.bind(this, mainActivity);

@@ -1,5 +1,6 @@
 package com.dglozano.escale.db.dao;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -13,10 +14,10 @@ import java.util.List;
 @Dao
 public interface UserDao {
     @Query("SELECT * FROM User")
-    List<User> getAllUsers();
+    LiveData<List<User>> getAllUsers();
 
     @Query("SELECT * FROM User WHERE id == :id")
-    User getUserById(Integer id);
+    LiveData<User> getUserById(Integer id);
 
     @Delete
     void deleteUser(User user);
@@ -24,4 +25,7 @@ public interface UserDao {
     //FIXME: Borrar REPLACE cuando entre en produccion
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insertUser(User user);
+
+    @Query("DELETE FROM User")
+    void deleteAll();
 }

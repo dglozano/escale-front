@@ -1,6 +1,8 @@
 package com.dglozano.escale.ui.main;
 
 import android.app.Activity;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -20,9 +22,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BluetoothCommunication;
+import com.dglozano.escale.db.entity.User;
 import com.dglozano.escale.ui.main.common.BottomBarAdapter;
 import com.dglozano.escale.ui.main.common.NoSwipePager;
 import com.dglozano.escale.ui.main.diet.DietFragment;
@@ -30,7 +35,6 @@ import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
 import com.dglozano.escale.util.PermissionHelper;
-import com.dglozano.escale.R;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import javax.inject.Inject;
@@ -65,6 +69,10 @@ public class MainActivity extends AppCompatActivity
     BottomBarAdapter mPagerAdapter;
     @Inject
     DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
+
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
+    private MainActivityViewModel mViewModel;
 
     // Control Variables
     private BluetoothCommunication mBluetoothCommService;
@@ -149,6 +157,18 @@ public class MainActivity extends AppCompatActivity
         mNoSwipePager.setAdapter(mPagerAdapter);
 
         mBnv.setupWithViewPager(mNoSwipePager);
+
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainActivityViewModel.class);
+
+        TextView navUsername = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_name);
+        TextView navEmail = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_mail);
+        mViewModel.getAllUsers().observe(this, users -> {
+            if (users != null && !users.isEmpty()) {
+                User user = users.get(0);
+                navUsername.setText(String.format("%1$s %2$s", user.getName(), user.getLastName()));
+                navEmail.setText(user.getEmail());
+            }
+        });
     }
 
     @Override

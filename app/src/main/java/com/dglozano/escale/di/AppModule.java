@@ -14,7 +14,7 @@ import com.dglozano.escale.di.annotation.DatabaseInfo;
 import dagger.Module;
 import dagger.Provides;
 
-@Module
+@Module(includes = ViewModelModule.class)
 public class AppModule {
 
     @Provides

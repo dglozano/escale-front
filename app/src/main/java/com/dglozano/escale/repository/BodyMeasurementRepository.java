@@ -5,21 +5,24 @@ import android.os.AsyncTask;
 
 import com.dglozano.escale.db.dao.BodyMeasurementDao;
 import com.dglozano.escale.db.entity.BodyMeasurement;
+import com.dglozano.escale.di.annotation.ApplicationScope;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+@ApplicationScope
 public class BodyMeasurementRepository {
 
     private BodyMeasurementDao mBodyMeasurementDao;
-    private LiveData<List<BodyMeasurement>> mAllBodyMeasurements;
 
+    @Inject
     public BodyMeasurementRepository(BodyMeasurementDao bodyMeasurementDao) {
         mBodyMeasurementDao = bodyMeasurementDao;
     }
 
     public LiveData<List<BodyMeasurement>> getAllBodyMeasurementsOfUser(int userId) {
-        mAllBodyMeasurements = mBodyMeasurementDao.getAllBodyMeasurementByUserId(userId);
-        return mAllBodyMeasurements;
+        return mBodyMeasurementDao.getAllBodyMeasurementByUserId(userId);
     }
 
     public void insert(BodyMeasurement bodyMeasurement) {

@@ -17,12 +17,14 @@ import android.webkit.WebView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BluetoothCommunication;
 import com.dglozano.escale.db.MeasurementItem;
 import com.dglozano.escale.db.entity.BodyMeasurement;
+import com.dglozano.escale.repository.BodyMeasurementRepository;
+import com.dglozano.escale.repository.UserRepository;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.util.PermissionHelper;
-import com.dglozano.escale.R;
 
 import javax.inject.Inject;
 
@@ -67,10 +69,14 @@ public class HomeFragment extends Fragment {
     DefaultItemAnimator mDefaultItemAnimator;
     @Inject
     DividerItemDecoration mDividerItemDecoration;
+    @Inject
+    BodyMeasurementRepository bodyMeasurementRepository;
+    @Inject
+    MainActivity mMainActivity;
+    @Inject
+    UserRepository mUserRepository;
 
     private Unbinder mViewUnbinder;
-    private MainActivity mMainActivity;
-
 
     public HomeFragment() {
         // Required empty public constructor
@@ -98,7 +104,6 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
-        mMainActivity = (MainActivity) getActivity();
         return view;
     }
 
@@ -130,6 +135,7 @@ public class HomeFragment extends Fragment {
         //TODO Borrar
         BodyMeasurement mBodyMeasurement = BodyMeasurement.createMockBodyMeasurementForUser(7);
         mMeasurementListAdapter.addItems(MeasurementItem.getMeasurementList(mBodyMeasurement));
+
 
         mCustomGauge.setValue(1000);
     }

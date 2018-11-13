@@ -13,11 +13,6 @@ import dagger.Provides;
 public class HomeFragmentModule {
 
     @Provides
-    MeasurementListAdapter provideMeasurementListAdapter(MainActivity mainActivity) {
-        return new MeasurementListAdapter(mainActivity);
-    }
-
-    @Provides
     LinearLayoutManager provideLinearLayoutManager(HomeFragment fragment) {
         return new LinearLayoutManager(fragment.getActivity());
     }

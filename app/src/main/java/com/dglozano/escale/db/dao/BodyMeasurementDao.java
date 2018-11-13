@@ -14,7 +14,7 @@ import java.util.List;
 @Dao
 public interface BodyMeasurementDao {
     @Query("SELECT * FROM BodyMeasurement ORDER BY date DESC")
-    List<BodyMeasurement> getAllBodyMeasurement();
+    LiveData<List<BodyMeasurement>> getAllBodyMeasurement();
 
     @Query("SELECT * FROM BodyMeasurement WHERE userId == :userId ORDER BY date DESC")
     LiveData<List<BodyMeasurement>> getAllBodyMeasurementByUserId(Integer userId);
