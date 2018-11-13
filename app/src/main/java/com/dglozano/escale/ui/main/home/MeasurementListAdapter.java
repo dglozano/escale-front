@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.db.MeasurementItem;
 import com.dglozano.escale.ui.main.MainActivity;
 
 import java.text.DecimalFormat;
@@ -81,22 +80,22 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
                     getFormattedValue(measurement.getValue()),
                     measurement.getUnit().toString()));
             switch (measurement.getIconResource()) {
-                case 1:
+                case MeasurementItem.ICON_RESOURCE_WEIGHT:
                     holder.mIconImageView.setImageDrawable(scaleIcon);
                     break;
-                case 2:
+                case MeasurementItem.ICON_RESOURCE_WATER:
                     holder.mIconImageView.setImageDrawable(waterIcon);
                     break;
-                case 3:
+                case MeasurementItem.ICON_RESOURCE_FAT:
                     holder.mIconImageView.setImageDrawable(pizzaIcon);
                     break;
-                case 4:
+                case MeasurementItem.ICON_RESOURCE_BONES:
                     holder.mIconImageView.setImageDrawable(boneIcon);
                     break;
-                case 5:
+                case MeasurementItem.ICON_RESOURCE_BMI:
                     holder.mIconImageView.setImageDrawable(bmiIcon);
                     break;
-                case 6:
+                case MeasurementItem.ICON_RESOURCE_MUSCLES:
                     holder.mIconImageView.setImageDrawable(muscleIcon);
                     break;
             }

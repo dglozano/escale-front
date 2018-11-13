@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BluetoothCommunication;
-import com.dglozano.escale.db.MeasurementItem;
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.UserRepository;
