@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
-            Timber.d( "MainActivity onServiceConnected(): Bluetooth Service is Bound.");
+            Timber.d("onServiceConnected(). Bluetooth Service is Bound.");
             mBleServiceIsBound = true;
             BleCommunicationService.LocalBinder localBinder = (BleCommunicationService.LocalBinder) binder;
             mBluetoothCommService = localBinder.getService();
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Timber.d( "MainActivity onServiceDisconnected(): unbinding Bluetooth Service.");
+            Timber.d("onServiceDisconnected(). Unbinding Bluetooth Service.");
             mBleServiceIsBound = false;
         }
     };
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        Timber.d( "MainActivity onStart(): sending intent to Bind Bluetooth Service.");
+        Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
         Intent intent = new Intent(this, BleCommunicationService.class);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        Timber.d("MainActivity onStop(): unbinding Bluetooth Service.");
+        Timber.d("onStop(). Unbinding Bluetooth Service.");
         if (mBleServiceIsBound) {
             unbindService(mServiceConnection);
         }

@@ -26,6 +26,41 @@ public class MeasurementItem {
         this.name = name;
     }
 
+    static List<MeasurementItem> getMeasurementList(BodyMeasurement bodyMeasurement) {
+        List<MeasurementItem> measurementItemList = new ArrayList<>();
+        measurementItemList.add(new MeasurementItem(
+                ICON_RESOURCE_WEIGHT,
+                bodyMeasurement.getWeight(),
+                MeasurementItem.Unit.KG,
+                MeasurementItem.MeasurementName.WEIGHT));
+        measurementItemList.add(new MeasurementItem(
+                ICON_RESOURCE_WATER,
+                bodyMeasurement.getWater(),
+                MeasurementItem.Unit.PERCENTAGE,
+                MeasurementItem.MeasurementName.WATER));
+        measurementItemList.add(new MeasurementItem(
+                ICON_RESOURCE_FAT,
+                bodyMeasurement.getFat(),
+                MeasurementItem.Unit.PERCENTAGE,
+                MeasurementItem.MeasurementName.FAT));
+        measurementItemList.add(new MeasurementItem(
+                ICON_RESOURCE_BONES,
+                bodyMeasurement.getBones(),
+                MeasurementItem.Unit.KG,
+                MeasurementItem.MeasurementName.BONES));
+        measurementItemList.add(new MeasurementItem(
+                ICON_RESOURCE_BMI,
+                bodyMeasurement.getBmi(),
+                MeasurementItem.Unit.NO_UNIT,
+                MeasurementItem.MeasurementName.BMI));
+        measurementItemList.add(new MeasurementItem(
+                ICON_RESOURCE_MUSCLES,
+                bodyMeasurement.getMuscles(),
+                MeasurementItem.Unit.PERCENTAGE,
+                MeasurementItem.MeasurementName.MUSCLES));
+        return measurementItemList;
+    }
+
     int getIconResource() {
         return iconResource;
     }
@@ -96,40 +131,5 @@ public class MeasurementItem {
         public String toString() {
             return this.name;
         }
-    }
-
-    static List<MeasurementItem> getMeasurementList(BodyMeasurement bodyMeasurement) {
-        List<MeasurementItem> measurementItemList = new ArrayList<>();
-        measurementItemList.add(new MeasurementItem(
-                ICON_RESOURCE_WEIGHT,
-                bodyMeasurement.getWeight(),
-                MeasurementItem.Unit.KG,
-                MeasurementItem.MeasurementName.WEIGHT));
-        measurementItemList.add(new MeasurementItem(
-                ICON_RESOURCE_WATER,
-                bodyMeasurement.getWater(),
-                MeasurementItem.Unit.PERCENTAGE,
-                MeasurementItem.MeasurementName.WATER));
-        measurementItemList.add(new MeasurementItem(
-                ICON_RESOURCE_FAT,
-                bodyMeasurement.getFat(),
-                MeasurementItem.Unit.PERCENTAGE,
-                MeasurementItem.MeasurementName.FAT));
-        measurementItemList.add(new MeasurementItem(
-                ICON_RESOURCE_BONES,
-                bodyMeasurement.getBones(),
-                MeasurementItem.Unit.KG,
-                MeasurementItem.MeasurementName.BONES));
-        measurementItemList.add(new MeasurementItem(
-                ICON_RESOURCE_BMI,
-                bodyMeasurement.getBmi(),
-                MeasurementItem.Unit.NO_UNIT,
-                MeasurementItem.MeasurementName.BMI));
-        measurementItemList.add(new MeasurementItem(
-                ICON_RESOURCE_MUSCLES,
-                bodyMeasurement.getMuscles(),
-                MeasurementItem.Unit.PERCENTAGE,
-                MeasurementItem.MeasurementName.MUSCLES));
-        return measurementItemList;
     }
 }

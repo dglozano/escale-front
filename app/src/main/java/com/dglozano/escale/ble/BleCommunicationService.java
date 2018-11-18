@@ -50,6 +50,7 @@ public class BleCommunicationService extends Service {
     public void onCreate() {
         AndroidInjection.inject(this);
         super.onCreate();
+        Timber.d("onCreate.");
         mIsScanning = new MutableLiveData<>();
         mIsConnectedToScale = new MutableLiveData<>();
         mIsConnecting = new MutableLiveData<>();
@@ -74,6 +75,7 @@ public class BleCommunicationService extends Service {
     }
 
     public void scanBleDevices() {
+        Timber.d("start scanning.");
         mScanDisposable = rxBleClient.scanBleDevices(
                 new ScanSettings.Builder()
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -93,7 +95,7 @@ public class BleCommunicationService extends Service {
         mIsConnecting.postValue(true);
         disposeScanning();
         RxBleDevice scaleDevice = scanResult.getBleDevice();
-        Timber.d("Bluetooth Service Found %1$s device. MAC Address: %2$s. Trying to connect...",
+        Timber.d("Found %1$s device. MAC Address: %2$s. Trying to connect...",
                 scaleDevice.getName(),
                 scaleDevice.getMacAddress());
         if (mConnectionStateDisposable != null) {
@@ -109,6 +111,7 @@ public class BleCommunicationService extends Service {
     }
 
     private void throwException(Throwable throwable) {
+        Timber.d("throwException(). Message: %1$s", throwable.getMessage());
         if (throwable instanceof BleScanException) {
             ScanExceptionHandler.handleException(this, (BleScanException) throwable);
         } else {
@@ -120,7 +123,7 @@ public class BleCommunicationService extends Service {
     }
 
     private void disposeScanning() {
-        Timber.d("Bluetooth Service Disposing scanning.");
+        Timber.d("Disposing Scanning.");
         if (mScanDisposable != null) {
             mScanDisposable.dispose();
         }
@@ -129,7 +132,7 @@ public class BleCommunicationService extends Service {
     }
 
     public void disposeConnection() {
-        Timber.d("Bluetooth Service Disposing connection.");
+        Timber.d("Disposing Connection.");
         if (mConnectionDisposable != null) {
             mConnectionDisposable.dispose();
         }
@@ -139,7 +142,7 @@ public class BleCommunicationService extends Service {
     }
 
     private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState rxBleConnectionState) {
-        Timber.d("Bluetooth Service ConnectionState changed. New state: %1$s", rxBleConnectionState.toString());
+        Timber.d("ConnectionState changed. New state: %1$s", rxBleConnectionState.toString());
         if (rxBleConnectionState.equals(RxBleConnection.RxBleConnectionState.CONNECTED)) {
             mIsScanning.postValue(false);
             mIsConnecting.postValue(false);
@@ -167,19 +170,19 @@ public class BleCommunicationService extends Service {
 
     @SuppressWarnings("unused")
     private void onConnectionReceived(RxBleConnection rxBleConnection) {
-        Timber.d("Bluetooth Service Connection received.");
+        Timber.d("Connection received.");
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Timber.d("Bluetooth Service onBind. Returning binder...");
+        Timber.d("onBind(). Returning binder...");
         return mBinder;
     }
 
     @Override
     public void onDestroy() {
-        Timber.d("Bluetooth Service onDestroy.");
+        Timber.d("onDestroy(). Disposing connection and scanning...");
         disposeConnection();
         disposeScanning();
         super.onDestroy();
@@ -187,9 +190,7 @@ public class BleCommunicationService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Timber.d("onUnbind");
-        disposeConnection();
-        disposeScanning();
+        Timber.d("onUnbind().");
         return super.onUnbind(intent);
     }
 

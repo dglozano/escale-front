@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.dglozano.escale.db.entity.User;
-import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.repository.UserRepository;
 
 import java.util.List;

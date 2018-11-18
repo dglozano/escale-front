@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BleCommunicationService;
@@ -94,6 +95,22 @@ public class HomeFragment extends Fragment {
 
     private BleCommunicationService mBluetoothCommService;
     private boolean mBleServiceIsBound = false;
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            Timber.d("onServiceConnected(). Bluetooth Service is Bound.");
+            mBleServiceIsBound = true;
+            BleCommunicationService.LocalBinder localBinder = (BleCommunicationService.LocalBinder) binder;
+            mBluetoothCommService = localBinder.getService();
+            observeServiceLiveData();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Timber.d("onServiceDisconnected(). Unbinding Bluetooth Service.");
+            mBleServiceIsBound = false;
+        }
+    };
 
     public HomeFragment() {
         // Required empty public constructor
@@ -103,24 +120,8 @@ public class HomeFragment extends Fragment {
         return new HomeFragment();
     }
 
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder binder) {
-            Timber.d("HomeFragment onServiceConnected(): Bluetooth Service is Bound.");
-            mBleServiceIsBound = true;
-            BleCommunicationService.LocalBinder localBinder = (BleCommunicationService.LocalBinder) binder;
-            mBluetoothCommService = localBinder.getService();
-            observeServiceLiveData();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Timber.d("HomeFragment onServiceDisconnected(): unbinding Bluetooth Service.");
-            mBleServiceIsBound = false;
-        }
-    };
-
     private void observeServiceLiveData() {
+        Timber.d("Start observing Bluetooth Service data.");
         mBluetoothCommService.isScanningOrConnecting().observe(this, this::showLoader);
         mBluetoothCommService.isConnectedToScale().observe(this, this::switchConnected);
     }
@@ -142,6 +143,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Timber.d("onCreate().");
         mHomeViewModel = ViewModelProviders.of(this, mViewModelFactory).get(HomeViewModel.class);
     }
 
@@ -166,14 +168,14 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Timber.d("onDestroyView");
+        Timber.d("onDestroyView().");
         mViewUnbinder.unbind();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Timber.d("HomeFragment onStart(): sending intent to Bind Bluetooth Service.");
+        Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
         Intent intent = new Intent(mMainActivity, BleCommunicationService.class);
         mMainActivity.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -181,7 +183,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        Timber.d("HomeFragment onStop(): unbinding Bluetooth Service.");
+        Timber.d("onStop(). Unbinding Bluetooth Service.");
         if (mBleServiceIsBound) {
             mMainActivity.unbindService(mServiceConnection);
         }
@@ -194,7 +196,10 @@ public class HomeFragment extends Fragment {
                 && mHasClickedScan) {
             mHasClickedScan = false;
             if (mBleServiceIsBound) {
+                Timber.d("Permission granted. Starting Ble Scan...");
                 mBluetoothCommService.scanBleDevices();
+            } else {
+                Toast.makeText(mMainActivity, "Couldn't connect. Try again...", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -204,14 +209,22 @@ public class HomeFragment extends Fragment {
         Boolean isConnected = mBluetoothCommService.isConnectedToScale().getValue();
         if (isConnected != null && isConnected) {
             if (mBleServiceIsBound) {
+                Timber.d("Pressed disconnect button. Triggering disconnection...");
                 mBluetoothCommService.disposeConnection();
+            } else {
+                Toast.makeText(mMainActivity, "Couldn't disconnect. Try again...", Toast.LENGTH_SHORT).show();
             }
         } else {
             if (LocationPermission.checkLocationPermissionGranted(mMainActivity)) {
+                Timber.d("Clicked on connect. Permission already granted...");
                 if (mBleServiceIsBound) {
+                    Timber.d("BleService is Bound. Starting Ble Scan...");
                     mBluetoothCommService.scanBleDevices();
+                } else {
+                    Toast.makeText(mMainActivity, "Couldn't connect. Try again...", Toast.LENGTH_SHORT).show();
                 }
             } else {
+                Timber.d("Doesn't have Permission. Asking for it...");
                 mHasClickedScan = true;
                 LocationPermission.requestLocationPermissionInFragment(this);
             }
@@ -220,10 +233,12 @@ public class HomeFragment extends Fragment {
 
     private void switchConnected(boolean connected) {
         if (connected) {
+            Timber.d("Bluetooth BLE Connected. Changing Button color and text...");
             mConnectButton.setBackgroundColor(mColorPrimary);
             mConnectButton.setText(mConnectedString.toUpperCase());
             mConnectButton.setIconResource(mBleConnectedIconDrawable);
         } else {
+            Timber.d("Bluetooth BLE Disconnected. Changing Button color and text...");
             mConnectButton.setBackgroundColor(mColorText);
             mConnectButton.setText(mDisconnectedString.toUpperCase());
             mConnectButton.setIconResource(mBleDisonnectedIconDrawable);
@@ -232,11 +247,11 @@ public class HomeFragment extends Fragment {
 
     private void showLoader(boolean isScanningOrConnecting) {
         if (isScanningOrConnecting) {
-            Timber.d("Bluetooth BLE Scan start. Showing loader.");
+            Timber.d("Bluetooth BLE Scan start. Showing loader...");
             mMeasurementLayout.setVisibility(View.GONE);
             mLoaderWebView.setVisibility(View.VISIBLE);
         } else {
-            Timber.d("Bluetooth BLE Scan stop. Hiding loader.");
+            Timber.d("Bluetooth BLE Scan stop. Hiding loader...");
             mLoaderWebView.setVisibility(View.GONE);
             mMeasurementLayout.setVisibility(View.VISIBLE);
         }

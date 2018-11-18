@@ -1,7 +1,6 @@
 package com.dglozano.escale.util;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
@@ -21,10 +20,6 @@ import timber.log.Timber;
  * Helper class to show BleScanException error messages as toasts.
  */
 public class ScanExceptionHandler {
-
-    private ScanExceptionHandler() {
-        // Utility class
-    }
 
     /**
      * Mapping of exception reasons to error string resource ids.
@@ -56,6 +51,10 @@ public class ScanExceptionHandler {
         );
         ERROR_MESSAGES.put(BleScanException.BLUETOOTH_CANNOT_START, R.string.error_bluetooth_cannot_start);
         ERROR_MESSAGES.put(BleScanException.UNKNOWN_ERROR_CODE, R.string.error_unknown_error);
+    }
+
+    private ScanExceptionHandler() {
+        // Utility class
     }
 
     /**
