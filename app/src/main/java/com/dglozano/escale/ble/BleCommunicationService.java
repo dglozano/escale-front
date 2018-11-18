@@ -21,6 +21,9 @@ import com.polidea.rxandroidble2.scan.ScanFilter;
 import com.polidea.rxandroidble2.scan.ScanResult;
 import com.polidea.rxandroidble2.scan.ScanSettings;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
@@ -85,6 +88,7 @@ public class BleCommunicationService extends Service {
                         .setDeviceName(mScaleBleNameString)
                         .build()
         )
+                .timeout(10, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally(this::disposeScanning)
                 .subscribe(this::connectToBleDevice, this::throwException);
@@ -114,6 +118,8 @@ public class BleCommunicationService extends Service {
         Timber.d("throwException(). Message: %1$s", throwable.getMessage());
         if (throwable instanceof BleScanException) {
             ScanExceptionHandler.handleException(this, (BleScanException) throwable);
+        } else if (throwable instanceof TimeoutException) {
+            Toast.makeText(this, R.string.ble_scan_timeout, Toast.LENGTH_SHORT).show();
         } else {
             Timber.e(throwable);
             Toast.makeText(this, R.string.ble_error_try_again, Toast.LENGTH_SHORT).show();

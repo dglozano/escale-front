@@ -26,4 +26,5 @@
     <string name="error_bluetooth_cannot_start">Unable to start scanning</string>
     <string name="error_unknown_error">Unknown error</string>
     <string name="ble_error_try_again">Bluetooth error. Try again.</string>
+    <string name="ble_scan_timeout">Scale not found after 10 s. Try Again...</string>
 </resources>
