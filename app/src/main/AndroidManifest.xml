@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.dglozano.escale.ble.BluetoothCommunication" />
+        <service android:name="com.dglozano.escale.ble.BleCommunicationService" />
     </application>
 
 </manifest>

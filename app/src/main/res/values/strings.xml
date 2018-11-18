@@ -1,32 +1,29 @@
 <resources>
     <string name="app_name">Escale</string>
-    <string name="bluetooth_scan_btn">Bluetooth Scan Button</string>
-    <string name="alert">Alert</string>
-    <string name="scale">Scale</string>
-    <string name="logo">Scale Alert Logo</string>
-    <string name="info_scan_devices">Escanee los dispositivos cercanos y seleccione <b>BF600</b> para conectarse a la balanza.</string>
-    <string name="name_example">DISPOSITIVO_BLUETOOTH[1230BF500]</string>
-    <string name="number_example">15:A2:F8:25:C1:00</string>
-    <string name="ble_not_supported">Tu dispositivo no soporta Bluetooth 4.x</string>
-    <string name="error_bluetooth_not_supported">Tu dispositivo no soporta Bluetooth</string>
-    <string name="coarse_permission_message">Para conectarse con Bluetooth, la aplicación necesita permiso para acceder a tu ubicación.</string>
-    <string name="ask_permission_dialog_title">Solicitud de Permisos</string>
-    <string name="bf600">BF600</string>
-    <string name="devices_not_found">Dispositivo no encontrado. Prueba de nuevo.</string>
     <string name="connected">Conectado</string>
     <string name="disconnected">Desconectado</string>
     <string name="navigation_drawer_open">Nav drawer open</string>
     <string name="navigation_drawer_close">nav drawe close</string>
-    <string name="menu_home">Inicio</string>
-    <string name="menu_settings">Configuraciones</string>
-    <string name="menu_stats">Estadísticas</string>
-    <string name="menu_diet">Dieta</string>
-    <string name="menu_message">Mensajes</string>
     <string name="measurement_item_holder_value">%1$s %2$s</string>
     <string name="decimal_format">###,###.##</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="loading">Loading...</string>
     <string name="user_profile_picture">Foto de perfil de usuario</string>
+
+    <!-- Ble scan error messages -->
+    <string name="error_bluetooth_not_available">Bluetooth is not available</string>
+    <string name="error_bluetooth_disabled">Enable bluetooth and try again</string>
+    <string name="error_location_permission_missing">On Android 6.0 location permission is required. Please enable it in phone settings</string>
+    <string name="error_location_services_disabled">Location services need to be enabled on Android 6.0</string>
+    <string name="error_scan_failed_already_started">Scan with the same filters is already started</string>
+    <string name="error_scan_failed_application_registration_failed">Failed to register application for bluetooth scan</string>
+    <string name="error_scan_failed_feature_unsupported">Scan with specified parameters is not supported</string>
+    <string name="error_scan_failed_internal_error">Scan failed due to internal error</string>
+    <string name="error_scan_failed_out_of_hardware_resources">Scan cannot start due to limited hardware resources</string>
+    <string name="error_undocumented_scan_throttle">Android 7+ does not allow more scans.</string>
+    <string name="error_undocumented_scan_throttle_retry">Try in %d seconds</string>
+    <string name="error_bluetooth_cannot_start">Unable to start scanning</string>
+    <string name="error_unknown_error">Unknown error</string>
+    <string name="ble_error_try_again">Bluetooth error. Try again.</string>
 </resources>

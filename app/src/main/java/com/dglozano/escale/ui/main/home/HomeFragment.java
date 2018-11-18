@@ -1,11 +1,17 @@
 package com.dglozano.escale.ui.main.home;
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,38 +21,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.ble.BluetoothCommunication;
+import com.dglozano.escale.ble.BleCommunicationService;
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
-import com.dglozano.escale.repository.UserRepository;
 import com.dglozano.escale.ui.main.MainActivity;
-import com.dglozano.escale.util.PermissionHelper;
+import com.dglozano.escale.util.LocationPermission;
 
 import javax.inject.Inject;
 
+import butterknife.BindColor;
+import butterknife.BindDrawable;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 import mehdi.sakout.fancybuttons.FancyButton;
 import pl.pawelkleczkowski.customgauge.CustomGauge;
 import timber.log.Timber;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class HomeFragment extends Fragment {
 
-    private static final String TAG = HomeFragment.class.getSimpleName();
+    private static final int SCAN_REQUEST_CODE = 42;
+
     @BindView(R.id.loader_webview)
     WebView mLoaderWebView;
     @BindView(R.id.layout_measurement)
@@ -57,8 +57,21 @@ public class HomeFragment extends Fragment {
     RecyclerView mRecyclerViewMeasurements;
     @BindView(R.id.gauge)
     CustomGauge mCustomGauge;
-    @BindString(R.string.bf600)
-    String mScaleBleName;
+
+    @BindString(R.string.connected)
+    String mConnectedString;
+    @BindString(R.string.disconnected)
+    String mDisconnectedString;
+
+    @BindDrawable(R.drawable.home_bluetooth_connected)
+    Drawable mBleConnectedIconDrawable;
+    @BindDrawable(R.drawable.home_bluetooth_disconnected)
+    Drawable mBleDisonnectedIconDrawable;
+
+    @BindColor(R.color.colorPrimary)
+    int mColorPrimary;
+    @BindColor(R.color.colorText)
+    int mColorText;
 
     @Inject
     LinearLayoutManager mLayoutManager;
@@ -73,22 +86,43 @@ public class HomeFragment extends Fragment {
     @Inject
     MainActivity mMainActivity;
     @Inject
-    UserRepository mUserRepository;
+    ViewModelProvider.Factory mViewModelFactory;
 
     private Unbinder mViewUnbinder;
+    private HomeViewModel mHomeViewModel;
+    private boolean mHasClickedScan;
+
+    private BleCommunicationService mBluetoothCommService;
+    private boolean mBleServiceIsBound = false;
 
     public HomeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment HomeFragment.
-     */
     public static HomeFragment newInstance() {
         return new HomeFragment();
+    }
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            Timber.d("HomeFragment onServiceConnected(): Bluetooth Service is Bound.");
+            mBleServiceIsBound = true;
+            BleCommunicationService.LocalBinder localBinder = (BleCommunicationService.LocalBinder) binder;
+            mBluetoothCommService = localBinder.getService();
+            observeServiceLiveData();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Timber.d("HomeFragment onServiceDisconnected(): unbinding Bluetooth Service.");
+            mBleServiceIsBound = false;
+        }
+    };
+
+    private void observeServiceLiveData() {
+        mBluetoothCommService.isScanningOrConnecting().observe(this, this::showLoader);
+        mBluetoothCommService.isConnectedToScale().observe(this, this::switchConnected);
     }
 
     @Override
@@ -100,30 +134,21 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mHomeViewModel = ViewModelProviders.of(this, mViewModelFactory).get(HomeViewModel.class);
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         mLoaderWebView.loadUrl("file:///android_asset/loader.html");
-
-        mConnectButton.setOnClickListener((View v) -> {
-            if (!mMainActivity.getConnected()) {
-                if (PermissionHelper.requestBluetoothPermission(mMainActivity))
-                    scanAndConnect();
-            } else {
-                if (mMainActivity.isBound()) {
-                    Timber.d("Clicked on disconnect");
-                    mMainActivity.getBluetoothCommService().disconnect();
-                } else {
-                    Timber.d("Not bound to service yet.");
-                }
-            }
-        });
 
         mRecyclerViewMeasurements.setHasFixedSize(true);
         mRecyclerViewMeasurements.setLayoutManager(mLayoutManager);
@@ -135,66 +160,7 @@ public class HomeFragment extends Fragment {
         BodyMeasurement mBodyMeasurement = BodyMeasurement.createMockBodyMeasurementForUser(7);
         mMeasurementListAdapter.addItems(MeasurementItem.getMeasurementList(mBodyMeasurement));
 
-
         mCustomGauge.setValue(1000);
-    }
-
-    public void scanAndConnect() {
-        if (mMainActivity.isBound()) {
-            BluetoothCommunication bluetoothCommunication = mMainActivity.getBluetoothCommService();
-            mMainActivity.setLoading(true);
-            showLoader(true);
-            bluetoothCommunication.scanForBleDevices(mScaleBleName)
-                    .thenAccept(bluetoothCommunication::connectGatt)
-                    .exceptionally(ex -> {
-                        Timber.e(ex, "Ups, we had an exception while connection to %1$s", mScaleBleName);
-                        mMainActivity.setLoading(false);
-                        mMainActivity.setConnected(false);
-                        switchConnected(false);
-                        showLoader(false);
-                        Toast.makeText(mMainActivity, R.string.devices_not_found, Toast.LENGTH_LONG).show();
-                        return null;
-                    });
-        }
-    }
-
-    // Change Bluetooth Button color
-    private void switchConnected(boolean connect) {
-        if (connect) {
-            mConnectButton.setBackgroundColor(ContextCompat.getColor(mMainActivity, R.color.colorPrimary));
-            mConnectButton.setText("CONECTADO");
-            mConnectButton.setIconResource(ContextCompat.getDrawable(mMainActivity, R.drawable.home_bluetooth_connected));
-        } else {
-            mConnectButton.setBackgroundColor(ContextCompat.getColor(mMainActivity, R.color.colorText));
-            mConnectButton.setText("DESCONECTADO");
-            mConnectButton.setIconResource(R.drawable.home_round_listview);
-            mConnectButton.setIconResource(ContextCompat.getDrawable(mMainActivity, R.drawable.home_bluetooth_disconnected));
-        }
-    }
-
-    // Switch between loader and normal view
-    private void showLoader(boolean show) {
-        if (show) {
-            mMeasurementLayout.setVisibility(View.GONE);
-            mLoaderWebView.setVisibility(View.VISIBLE);
-        } else {
-            mLoaderWebView.setVisibility(View.GONE);
-            mMeasurementLayout.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Timber.d("OnResume");
-        refreshUi();
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        Timber.d("onViewStateRestored");
-        refreshUi();
     }
 
     @Override
@@ -204,9 +170,75 @@ public class HomeFragment extends Fragment {
         mViewUnbinder.unbind();
     }
 
-    public void refreshUi() {
-        switchConnected(mMainActivity.getConnected());
-        showLoader(mMainActivity.getLoading());
-        // TODO refrescar datos recibidos.
+    @Override
+    public void onStart() {
+        super.onStart();
+        Timber.d("HomeFragment onStart(): sending intent to Bind Bluetooth Service.");
+        Intent intent = new Intent(mMainActivity, BleCommunicationService.class);
+        mMainActivity.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Timber.d("HomeFragment onStop(): unbinding Bluetooth Service.");
+        if (mBleServiceIsBound) {
+            mMainActivity.unbindService(mServiceConnection);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions,
+                                           @NonNull final int[] grantResults) {
+        if (LocationPermission.isRequestLocationPermissionGranted(requestCode, permissions, grantResults)
+                && mHasClickedScan) {
+            mHasClickedScan = false;
+            if (mBleServiceIsBound) {
+                mBluetoothCommService.scanBleDevices();
+            }
+        }
+    }
+
+    @OnClick(R.id.ble_connect_btn)
+    public void onConnectButtonClicked() {
+        Boolean isConnected = mBluetoothCommService.isConnectedToScale().getValue();
+        if (isConnected != null && isConnected) {
+            if (mBleServiceIsBound) {
+                mBluetoothCommService.disposeConnection();
+            }
+        } else {
+            if (LocationPermission.checkLocationPermissionGranted(mMainActivity)) {
+                if (mBleServiceIsBound) {
+                    mBluetoothCommService.scanBleDevices();
+                }
+            } else {
+                mHasClickedScan = true;
+                LocationPermission.requestLocationPermissionInFragment(this);
+            }
+        }
+    }
+
+    private void switchConnected(boolean connected) {
+        if (connected) {
+            mConnectButton.setBackgroundColor(mColorPrimary);
+            mConnectButton.setText(mConnectedString.toUpperCase());
+            mConnectButton.setIconResource(mBleConnectedIconDrawable);
+        } else {
+            mConnectButton.setBackgroundColor(mColorText);
+            mConnectButton.setText(mDisconnectedString.toUpperCase());
+            mConnectButton.setIconResource(mBleDisonnectedIconDrawable);
+        }
+    }
+
+    private void showLoader(boolean isScanningOrConnecting) {
+        if (isScanningOrConnecting) {
+            Timber.d("Bluetooth BLE Scan start. Showing loader.");
+            mMeasurementLayout.setVisibility(View.GONE);
+            mLoaderWebView.setVisibility(View.VISIBLE);
+        } else {
+            Timber.d("Bluetooth BLE Scan stop. Hiding loader.");
+            mLoaderWebView.setVisibility(View.GONE);
+            mMeasurementLayout.setVisibility(View.VISIBLE);
+        }
     }
 }

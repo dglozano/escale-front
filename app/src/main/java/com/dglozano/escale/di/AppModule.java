@@ -9,7 +9,9 @@ import com.dglozano.escale.db.dao.BodyMeasurementDao;
 import com.dglozano.escale.db.dao.UserDao;
 import com.dglozano.escale.di.annotation.ApplicationContext;
 import com.dglozano.escale.di.annotation.ApplicationScope;
+import com.dglozano.escale.di.annotation.BluetoothInfo;
 import com.dglozano.escale.di.annotation.DatabaseInfo;
+import com.polidea.rxandroidble2.RxBleClient;
 
 import dagger.Module;
 import dagger.Provides;
@@ -49,5 +51,18 @@ public class AppModule {
     String provideDatabaseName() {
         // TODO: Move to App Constants
         return "escale.db";
+    }
+
+    @Provides
+    @ApplicationScope
+    RxBleClient providesRxBleClient(@ApplicationContext Context context) {
+        return RxBleClient.create(context);
+    }
+
+    @Provides
+    @BluetoothInfo
+    String provideScaleName() {
+        // TODO: Move to App Constants
+        return "BF600";
     }
 }

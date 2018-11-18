@@ -2,19 +2,24 @@ package com.dglozano.escale;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.Service;
 
 import com.dglozano.escale.di.DaggerAppComponent;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
+import dagger.android.HasServiceInjector;
 import timber.log.Timber;
 
-public class EscaleApp extends Application implements HasActivityInjector {
+public class EscaleApp extends Application implements HasActivityInjector, HasServiceInjector {
 
     @Inject
     DispatchingAndroidInjector<Activity> activityDispatchingAndroidInjector;
+    @Inject
+    DispatchingAndroidInjector<Service> dispatchingServiceInjector;
 
     @Override
     public void onCreate() {
@@ -42,5 +47,10 @@ public class EscaleApp extends Application implements HasActivityInjector {
     @Override
     public DispatchingAndroidInjector<Activity> activityInjector() {
         return activityDispatchingAndroidInjector;
+    }
+
+    @Override
+    public AndroidInjector<Service> serviceInjector() {
+        return dispatchingServiceInjector;
     }
 }

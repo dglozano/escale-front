@@ -13,7 +13,9 @@ import dagger.android.AndroidInjectionModule;
 @Component(modules = {
         AndroidInjectionModule.class,
         AppModule.class,
-        ActivityBuilder.class})
+        ActivityBuilder.class,
+        ServiceBuilderModule.class
+})
 public interface AppComponent {
 
     void inject(EscaleApp app);

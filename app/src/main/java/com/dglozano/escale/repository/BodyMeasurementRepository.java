@@ -21,8 +21,16 @@ public class BodyMeasurementRepository {
         mBodyMeasurementDao = bodyMeasurementDao;
     }
 
+    public LiveData<List<BodyMeasurement>> getAllBodyMeasurements() {
+        return mBodyMeasurementDao.getAllBodyMeasurement();
+    }
+
     public LiveData<List<BodyMeasurement>> getAllBodyMeasurementsOfUser(int userId) {
         return mBodyMeasurementDao.getAllBodyMeasurementByUserId(userId);
+    }
+
+    public LiveData<BodyMeasurement> getLastBodyMeasurementOfUserWithId(int userId) {
+        return mBodyMeasurementDao.getLastBodyMeasurementOfUserWithId(userId);
     }
 
     public void insert(BodyMeasurement bodyMeasurement) {

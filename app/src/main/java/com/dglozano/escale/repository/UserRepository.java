@@ -30,18 +30,18 @@ public class UserRepository {
     }
 
     public void insert(User user) {
-        new UserRepository.insertAsyncTask(mUserDao).execute(user);
+        new UserRepository.InsertAsyncTask(mUserDao).execute(user);
     }
 
     public void deleteAll() {
-        new UserRepository.deleteAsyncTask(mUserDao).execute();
+        new UserRepository.DeleteAsyncTask(mUserDao).execute();
     }
 
-    private static class insertAsyncTask extends AsyncTask<User, Void, Void> {
+    private static class InsertAsyncTask extends AsyncTask<User, Void, Void> {
 
         private UserDao mAsyncTaskDao;
 
-        insertAsyncTask(UserDao dao) {
+        InsertAsyncTask(UserDao dao) {
             mAsyncTaskDao = dao;
         }
 
@@ -52,11 +52,11 @@ public class UserRepository {
         }
     }
 
-    private static class deleteAsyncTask extends AsyncTask<Void, Void, Void> {
+    private static class DeleteAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private UserDao mAsyncTaskDao;
 
-        deleteAsyncTask(UserDao dao) {
+        DeleteAsyncTask(UserDao dao) {
             mAsyncTaskDao = dao;
         }
 

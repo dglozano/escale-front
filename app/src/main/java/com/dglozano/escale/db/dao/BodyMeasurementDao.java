@@ -19,6 +19,9 @@ public interface BodyMeasurementDao {
     @Query("SELECT * FROM BodyMeasurement WHERE userId == :userId ORDER BY date DESC")
     LiveData<List<BodyMeasurement>> getAllBodyMeasurementByUserId(Integer userId);
 
+    @Query("SELECT * FROM BodyMeasurement WHERE userId == :userId ORDER BY date DESC LIMIT 1")
+    LiveData<BodyMeasurement> getLastBodyMeasurementOfUserWithId(Integer userId);
+
     @Query("SELECT * FROM BodyMeasurement WHERE id == :id")
     BodyMeasurement getBodyMeasurementById(Integer id);
 

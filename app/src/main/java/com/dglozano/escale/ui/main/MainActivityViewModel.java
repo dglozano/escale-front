@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-@ApplicationScope
 public class MainActivityViewModel extends ViewModel {
 
     private LiveData<User> loggedUser;
