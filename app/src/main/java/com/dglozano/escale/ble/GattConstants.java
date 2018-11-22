@@ -116,7 +116,7 @@ public class GattConstants {
     public static final UUID USER_INDEX =
             UUID.fromString("00002A9A-0000-1000-8000-00805F9B34FB");
     public static final UUID USER_CONTROL_POINT =
-            UUID.fromString("00002A9F-0000-1000-8000-00805F9B34FB");
+            UUID.fromString("00002a9f-0000-1000-8000-00805f9b34fb");
 
     // Descriptors
     public static final UUID CLIENT_CHARACTERISTICS_CONFIGURATION =
