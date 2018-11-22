@@ -50,6 +50,11 @@ public class BondingHelper {
         return bondWithDevice(context, rxBleDevice, DEFAULT_TIMEOUT, TimeUnit.SECONDS);
     }
 
+    /**
+     * TODO: Refactor anonymous Broadcast Receivers
+     * Try to refactor the anonymous Broadcast Receivers
+     * into an inner class that accepts a Predicate to decide when to complete
+     */
     public static Completable bondWithDevice(final Context context, final RxBleDevice rxBleDevice,
                                              long timeout, TimeUnit timeunit) {
         return removeBond(context, rxBleDevice.getBluetoothDevice())
