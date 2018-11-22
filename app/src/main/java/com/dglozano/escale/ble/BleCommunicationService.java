@@ -17,7 +17,6 @@ import com.dglozano.escale.util.ScanExceptionHandler;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleConnection;
 import com.polidea.rxandroidble2.RxBleDevice;
-import com.polidea.rxandroidble2.Timeout;
 import com.polidea.rxandroidble2.exceptions.BleScanException;
 import com.polidea.rxandroidble2.internal.RxBleLog;
 import com.polidea.rxandroidble2.scan.ScanFilter;
@@ -58,6 +57,7 @@ public class BleCommunicationService extends Service {
     private MutableLiveData<Boolean> mIsConnecting;
     private MutableLiveData<Boolean> mIsConnectedToScale;
     private MediatorLiveData<Boolean> mIsScanningOrConnecting;
+    private Observable<RxBleConnection> mConnectionObservable;
 
     @Override
     public void onCreate() {
