@@ -8,11 +8,11 @@ import java.util.GregorianCalendar;
 
 import timber.log.Timber;
 
-public class ByteHelper {
+public class CommunicationHelper {
 
     private static SimpleDateFormat sdf = new SimpleDateFormat(Constants.SIMPLE_DATE_FORMAT);
 
-    private ByteHelper() {
+    private CommunicationHelper() {
         // Utility class.
     }
 
