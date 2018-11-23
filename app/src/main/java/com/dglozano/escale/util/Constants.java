@@ -1,8 +1,46 @@
-package com.dglozano.escale.ble;
+package com.dglozano.escale.util;
 
 import java.util.UUID;
 
-public class GattConstants {
+public class Constants {
+
+    // State
+    public static final String SCANNING = "Scanning";
+    public static final String BONDING = "Bonding";
+    public static final String CONNECTING = "Connecting";
+    public static final String INITIALIZING = "Initializing";
+    public static final String CONNECTED = "Connected";
+    public static final String DISCONNECTED = "Disconnected";
+
+    // Scale name
+    public static final String BF600 = "BF600";
+
+    // Date format
+    public static final String SIMPLE_DATE_FORMAT = "dd-MM-yyyy HH:mm:ss EEEE";
+
+    // Bytes
+    public static final String BYTES_SET_KG = "FF00FFFF1E00FFFF";
+    public static final String BYTES_SET_LB = "FF01FFFF1E00FFFF";
+    /**
+     * 1: User index
+     * 2: Birth year (2 bytes)
+     * 3: Birth month
+     * 4: Birth day
+     * 5: Height in CM
+     * 6: Gender
+     * 7: Activity
+     */
+    public static final String FFF2_LIST_FORMAT = "00%1$sFFFFFF%2$s%3$s%4$s%5$s%6$s%7$s";
+
+    /**
+     * 1: Year (2 bytes)
+     * 2: Month
+     * 3: Day
+     * 4: Hours
+     * 5: Minutes
+     * 6: Seconds
+     */
+    public static final String DATE_SERVICE_FORMAT = "%1$s%2$s%3$s%4$s%5$s%6$s000000";
 
     // Generic Access Service
     public static final UUID GENERIC_ACCESS_SERVICE =
@@ -123,5 +161,4 @@ public class GattConstants {
             UUID.fromString("00002902-0000-1000-8000-00805F9B34FB");
     public static final UUID CHARACTERISTIC_USER_DESCRIPTION =
             UUID.fromString("00002901-0000-1000-8000-00805F9B34FB");
-
 }

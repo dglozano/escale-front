@@ -13,7 +13,8 @@
     <RelativeLayout
         android:id="@+id/layout_measurement"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="visible">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/layout_top_measurement"
@@ -169,13 +170,33 @@
 
     </RelativeLayout>
 
-    <WebView
-        android:id="@+id/loader_webview"
+    <RelativeLayout
+        android:id="@+id/layout_loader"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:background="@color/colorBackground"
-        android:visibility="gone" />
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <WebView
+            android:id="@+id/loader_webview"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@color/colorBackground"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/loader_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/loader_webview"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:text="@string/loader_scanning"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/colorTextDark"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+    </RelativeLayout>
 
 </RelativeLayout>

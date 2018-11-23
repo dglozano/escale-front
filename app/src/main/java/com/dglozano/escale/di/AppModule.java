@@ -11,7 +11,10 @@ import com.dglozano.escale.di.annotation.ApplicationContext;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BluetoothInfo;
 import com.dglozano.escale.di.annotation.DatabaseInfo;
+import com.dglozano.escale.util.Constants;
 import com.polidea.rxandroidble2.RxBleClient;
+
+import java.text.SimpleDateFormat;
 
 import dagger.Module;
 import dagger.Provides;
@@ -63,6 +66,11 @@ public class AppModule {
     @BluetoothInfo
     String provideScaleName() {
         // TODO: Move to App Constants
-        return "BF600";
+        return Constants.BF600;
+    }
+
+    @Provides
+    SimpleDateFormat provideSimpleDateFormat() {
+        return new SimpleDateFormat(Constants.SIMPLE_DATE_FORMAT);
     }
 }

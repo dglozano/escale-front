@@ -12,8 +12,7 @@ import android.widget.Toast;
 import com.dglozano.escale.R;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BluetoothInfo;
-import com.dglozano.escale.util.HexString;
-import com.dglozano.escale.util.ScanExceptionHandler;
+import com.dglozano.escale.util.Constants;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleConnection;
 import com.polidea.rxandroidble2.RxBleDevice;
@@ -23,8 +22,6 @@ import com.polidea.rxandroidble2.scan.ScanFilter;
 import com.polidea.rxandroidble2.scan.ScanResult;
 import com.polidea.rxandroidble2.scan.ScanSettings;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -32,12 +29,15 @@ import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
+
+import static com.dglozano.escale.ble.ByteHelper.*;
 
 @ApplicationScope
 public class BleCommunicationService extends Service {
@@ -54,10 +54,10 @@ public class BleCommunicationService extends Service {
     private Disposable mConnectionDisposable;
     private CompositeDisposable mCompositeDisposable;
     private MutableLiveData<Boolean> mIsScanning;
-    private MutableLiveData<Boolean> mIsConnecting;
-    private MutableLiveData<Boolean> mIsConnectedToScale;
+    private MutableLiveData<String> mConnectionState;
     private MediatorLiveData<Boolean> mIsScanningOrConnecting;
     private Observable<RxBleConnection> mConnectionObservable;
+    private RxBleConnection mRxBleConnection;
 
     @Override
     public void onCreate() {
@@ -68,24 +68,28 @@ public class BleCommunicationService extends Service {
         mBinder = new LocalBinder();
         mCompositeDisposable = new CompositeDisposable();
         mIsScanning = new MutableLiveData<>();
-        mIsConnectedToScale = new MutableLiveData<>();
-        mIsConnecting = new MutableLiveData<>();
-        mIsConnectedToScale.setValue(false);
+        mConnectionState = new MutableLiveData<>();
         mIsScanning.setValue(false);
-        mIsConnecting.setValue(false);
+        mConnectionState.setValue(Constants.DISCONNECTED);
         mIsScanningOrConnecting = new MediatorLiveData<>();
         prepareScanningOrConnectionMediator();
     }
 
     private void prepareScanningOrConnectionMediator() {
         mIsScanningOrConnecting.addSource(mIsScanning, isScanning -> {
-            if (mIsConnecting.getValue() || isScanning) {
+            boolean connected = mConnectionState.getValue().equals(Constants.CONNECTED);
+            boolean disconnected = mConnectionState.getValue().equals(Constants.DISCONNECTED);
+            boolean isConnecting = !connected && !disconnected;
+            if (isConnecting || isScanning) {
                 mIsScanningOrConnecting.postValue(true);
             } else {
                 mIsScanningOrConnecting.postValue(false);
             }
         });
-        mIsScanningOrConnecting.addSource(mIsConnecting, isConnecting -> {
+        mIsScanningOrConnecting.addSource(mConnectionState, state -> {
+            boolean connected = state.equals(Constants.CONNECTED);
+            boolean disconnected = state.equals(Constants.DISCONNECTED);
+            boolean isConnecting = !connected && !disconnected;
             if (mIsScanning.getValue() || isConnecting) {
                 mIsScanningOrConnecting.postValue(true);
             } else {
@@ -95,7 +99,7 @@ public class BleCommunicationService extends Service {
     }
 
     public void scanBleDevices() {
-        Timber.d("start scanning.");
+        Timber.d("Start scanning.");
         mScanDisposable = rxBleClient.scanBleDevices(
                 new ScanSettings.Builder()
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -109,11 +113,12 @@ public class BleCommunicationService extends Service {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally(this::disposeScanning)
                 .subscribe(this::connectToBleDevice, this::throwException);
+        mConnectionState.postValue(Constants.SCANNING);
         mIsScanning.postValue(true);
     }
 
     private void connectToBleDevice(ScanResult scanResult) {
-        mIsConnecting.postValue(true);
+        mConnectionState.postValue(Constants.BONDING);
         disposeScanning();
         RxBleDevice scaleDevice = scanResult.getBleDevice();
         Timber.d("Found %1$s device. MAC Address: %2$s. Trying to connect...",
@@ -126,12 +131,21 @@ public class BleCommunicationService extends Service {
         mConnectionStateDisposable = scaleDevice.observeConnectionStateChanges()
                 .subscribe(this::onConnectionStateChanged, this::throwException);
 
+        mConnectionObservable = prepareObservableForConnection(scaleDevice);
+
         mConnectionDisposable =
-                BondingHelper.bondWithDevice(this, scaleDevice, 30, TimeUnit.SECONDS)
-                        .andThen(scaleDevice.establishConnection(false))
+                BondingHelper.bondWithDevice(this, scaleDevice, 10, TimeUnit.SECONDS)
+                        .andThen(Completable.fromAction(() -> mConnectionState.postValue(Constants.CONNECTING)))
+                        .andThen(mConnectionObservable)
+                        .flatMapSingle(this::communicationInitialization)//andThen...
                         .observeOn(AndroidSchedulers.mainThread())
                         .doFinally(this::disposeConnection)
-                        .subscribe(this::communicationInitialization, this::throwException);
+                        .doOnError(this::throwException)
+                        .subscribe();
+    }
+
+    private Observable<RxBleConnection> prepareObservableForConnection(RxBleDevice scaleDevice) {
+        return scaleDevice.establishConnection(false);
     }
 
     private void throwException(Throwable throwable) {
@@ -145,7 +159,7 @@ public class BleCommunicationService extends Service {
             Toast.makeText(this, R.string.ble_error_try_again, Toast.LENGTH_SHORT).show();
         }
         mIsScanning.postValue(false);
-        mIsConnecting.postValue(false);
+        mConnectionState.postValue(Constants.DISCONNECTED);
     }
 
     private void disposeScanning() {
@@ -163,43 +177,33 @@ public class BleCommunicationService extends Service {
             mConnectionDisposable.dispose();
         }
         mConnectionDisposable = null;
-        mIsConnectedToScale.postValue(false);
-        mIsConnecting.postValue(false);
+        mConnectionState.postValue(Constants.DISCONNECTED);
     }
 
     private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState rxBleConnectionState) {
         Timber.d("ConnectionState changed. New state: %1$s", rxBleConnectionState.toString());
-        if (rxBleConnectionState.equals(RxBleConnection.RxBleConnectionState.CONNECTED)) {
-            mIsScanning.postValue(false);
-            mIsConnecting.postValue(false);
-            mIsConnectedToScale.postValue(true);
-        } else {
-            mIsConnectedToScale.postValue(false);
+        if (rxBleConnectionState.equals(RxBleConnection.RxBleConnectionState.DISCONNECTED)) {
+            mConnectionState.postValue(Constants.DISCONNECTED);
         }
     }
 
 
-    private Single<byte[]> prepareObservableToWriteCharacteristic(
+    private Single<byte[]> singleToWrite(
             UUID characteristicUuid,
             String hexString,
             RxBleConnection connection) {
-        return connection.writeCharacteristic(characteristicUuid, getInputBytes(hexString))
-                .doOnSuccess(notificationObservable ->
-                        Timber.d("Characteristic %1$s written with bytes %2$s",
-                                characteristicUuid.toString(),
-                                hexString));
+        return connection.writeCharacteristic(characteristicUuid, hexToBytes(hexString))
+                .doOnSuccess(bytes -> Timber.d("Bytes written %1$s", bytesToHex(bytes)));
     }
 
-    private Single<byte[]> prepareObservableToReadCharacteristic(
+    private Single<byte[]> singleToRead(
             UUID characteristicUuid,
             RxBleConnection connection) {
         return connection.readCharacteristic(characteristicUuid)
-                .doOnSuccess(notificationObservable ->
-                        Timber.d("Characteristic %1$s read", characteristicUuid.toString()))
-                .observeOn(AndroidSchedulers.mainThread());
+                .doOnSuccess(bytes -> Timber.d("Bytes read %1$s", bytesToHex(bytes)));
     }
 
-    private Observable<byte[]> prepareObservableToSetNotification(
+    private Observable<byte[]> observableToSetNotification(
             UUID characteristicUuid,
             RxBleConnection connection) {
         return connection.setupNotification(characteristicUuid)
@@ -211,7 +215,7 @@ public class BleCommunicationService extends Service {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Observable<byte[]> prepareObservableToSetIndication(
+    private Observable<byte[]> observableToSetIndication(
             UUID characteristicUuid,
             RxBleConnection connection) {
         return connection.setupIndication(characteristicUuid)
@@ -223,74 +227,26 @@ public class BleCommunicationService extends Service {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-
-    public void communicationInitialization(RxBleConnection rxBleConnection) {
-        List<UUID> indicationCharacteristics = new ArrayList<>();
-        indicationCharacteristics.add(GattConstants.CLIENT_CHARACTERISTICS_CONFIGURATION);
-        indicationCharacteristics.add(GattConstants.BODY_COMPOSITION_MEASUREMENT);
-
-        /*
-        indicationCharacteristics.stream()
-                .map(uuid -> prepareObservableToSetIndication(uuid, rxBleConnection))
-                .map(observable -> observable.observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::onNotificationReceived, this::onNotificationSetupFailure))
-                .map(mCompositeDisposable::add);
-
-
-
-        List<UUID> notificationCharacteristics = new ArrayList<>();
-        notificationCharacteristics.add(GattConstants.DB_CHANGE_INCREMENT);
-        notificationCharacteristics.add(GattConstants.CUSTOM_FFF2_USER_LIST_CHARACTERISTIC);
-        notificationCharacteristics.add(GattConstants.CURRENT_TIME);
-
-        notificationCharacteristics.stream()
-                .map(uuid -> prepareObservableToSetNotification(uuid, mConnectionObservable))
-                .map(observable -> observable.observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::onNotificationReceived, this::onNotificationSetupFailure))
-                .map(mCompositeDisposable::add);
-                */
-
-        Observable<byte[]> indicationsObservable = prepareObservableToSetIndication(
-                GattConstants.USER_CONTROL_POINT, rxBleConnection);
-
-
-        String hex1 = "012348"; // create user with pin 2348 (9032 o 3290 en DEC)
-        Single<byte[]> writeCreateUser = prepareObservableToWriteCharacteristic(
-                GattConstants.USER_CONTROL_POINT,
-                hex1, rxBleConnection);
-
-        String hex2 = "02012348";
-        Single<byte[]> writeConsentUser = prepareObservableToWriteCharacteristic(
-                GattConstants.USER_CONTROL_POINT,
-                hex2, rxBleConnection);
-
-
-        prepareObservableToSetIndication(GattConstants.USER_CONTROL_POINT, rxBleConnection)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(bytes -> Timber.d("Success 1 %1$s",
-                        HexString.bytesToHex(bytes)),
-                        throwable -> Timber.e(throwable, "Error"));
-
-        rxBleConnection.writeCharacteristic(GattConstants.USER_CONTROL_POINT, getInputBytes(hex1))
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry()
-                .subscribe(bytes -> Timber.d("Success 2 %1$s",
-                        HexString.bytesToHex(bytes)),
-                        throwable -> Timber.e(throwable, "Error"));
-
-        /*
-        writeCreateUser
-                .flatMap(bytes -> indicationsObservable.firstOrError())
+    public Single<byte[]> communicationInitialization(RxBleConnection rxBleConnection) {
+        mRxBleConnection = rxBleConnection;
+        mConnectionState.postValue(Constants.INITIALIZING);
+        return singleToWrite(Constants.CURRENT_TIME, getCurrentTimeHex(), rxBleConnection)
+                .flatMap(bytes -> singleToWrite(Constants.CUSTOM_FFF1_UNIT_CHARACTERISTIC, Constants.BYTES_SET_KG, rxBleConnection))
+                .flatMap(bytes -> singleToRead(Constants.CURRENT_TIME, rxBleConnection))
                 .flatMap(bytes -> {
-                    Timber.d("bytes %1$s", bytes);
-                    return writeConsentUser;
+                    Timber.d("Date from scale is: %1$s",parseDateFromHex(bytesToHex(bytes)));
+                    return singleToRead(Constants.CUSTOM_FFF1_UNIT_CHARACTERISTIC, rxBleConnection);
                 })
-                .doOnSuccess(bytes -> indicationsObservable.firstOrError())
-                .doOnSuccess(bytes -> Timber.d("bytes read after contest %1$s", bytes))*/
+                .doOnSuccess((bytes) -> {
+                    Timber.d("Set to kg: %1$s", isSetToKilo(bytesToHex(bytes)));
+                    Timber.d("Finished initialization");
+                    mConnectionState.postValue(Constants.CONNECTED);
+                })
+                .doOnError(this::throwException);
     }
 
     private void onNotificationReceived(byte[] value) {
-        Timber.d("Read value: %1$s", HexString.bytesToHex(value));
+        Timber.d("Read value: %1$s", bytesToHex(value));
     }
 
     private void onNotificationSetupFailure(Throwable throwable) {
@@ -301,16 +257,16 @@ public class BleCommunicationService extends Service {
         return mIsScanning;
     }
 
-    public MutableLiveData<Boolean> isConnecting() {
-        return mIsConnecting;
-    }
-
-    public MutableLiveData<Boolean> isConnectedToScale() {
-        return mIsConnectedToScale;
+    public MutableLiveData<String> getConnectionState() {
+        return mConnectionState;
     }
 
     public MediatorLiveData<Boolean> isScanningOrConnecting() {
         return mIsScanningOrConnecting;
+    }
+
+    public MutableLiveData<String> getLoadingState() {
+        return mConnectionState;
     }
 
     @SuppressWarnings("unused")
@@ -339,13 +295,13 @@ public class BleCommunicationService extends Service {
         return super.onUnbind(intent);
     }
 
+    public Boolean isConnected() {
+        return mConnectionState.getValue().equals(Constants.CONNECTED);
+    }
+
     public class LocalBinder extends Binder {
         public BleCommunicationService getService() {
             return BleCommunicationService.this;
         }
-    }
-
-    private byte[] getInputBytes(String hexString) {
-        return HexString.hexToBytes(hexString);
     }
 }

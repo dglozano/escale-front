@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dglozano.escale.R;
@@ -28,6 +29,7 @@ import com.dglozano.escale.ble.BleCommunicationService;
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.ui.main.MainActivity;
+import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.LocationPermission;
 
 import javax.inject.Inject;
@@ -48,8 +50,6 @@ public class HomeFragment extends Fragment {
 
     private static final int SCAN_REQUEST_CODE = 42;
 
-    @BindView(R.id.loader_webview)
-    WebView mLoaderWebView;
     @BindView(R.id.layout_measurement)
     RelativeLayout mMeasurementLayout;
     @BindView(R.id.ble_connect_btn)
@@ -58,6 +58,12 @@ public class HomeFragment extends Fragment {
     RecyclerView mRecyclerViewMeasurements;
     @BindView(R.id.gauge)
     CustomGauge mCustomGauge;
+    @BindView(R.id.layout_loader)
+    RelativeLayout mLoaderLayout;
+    @BindView(R.id.loader_text)
+    TextView mLoaderText;
+    @BindView(R.id.loader_webview)
+    WebView mLoaderWebView;
 
     @BindString(R.string.connected)
     String mConnectedString;
@@ -123,7 +129,9 @@ public class HomeFragment extends Fragment {
     private void observeServiceLiveData() {
         Timber.d("Start observing Bluetooth Service data.");
         mBluetoothCommService.isScanningOrConnecting().observe(this, this::showLoader);
-        mBluetoothCommService.isConnectedToScale().observe(this, this::switchConnected);
+        mBluetoothCommService.getConnectionState().observe(this, this::switchConnected);
+        mBluetoothCommService.getLoadingState().observe(this,
+                (text) -> mLoaderText.setText(String.format("%1$s...", text)));
     }
 
     @Override
@@ -206,7 +214,7 @@ public class HomeFragment extends Fragment {
 
     @OnClick(R.id.ble_connect_btn)
     public void onConnectButtonClicked() {
-        Boolean isConnected = mBluetoothCommService.isConnectedToScale().getValue();
+        Boolean isConnected = mBluetoothCommService.isConnected();
         if (isConnected != null && isConnected) {
             if (mBleServiceIsBound) {
                 Timber.d("Pressed disconnect button. Triggering disconnection...");
@@ -231,7 +239,8 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void switchConnected(boolean connected) {
+    private void switchConnected(String state) {
+        boolean connected = state.equals(Constants.CONNECTED);
         if (connected) {
             Timber.d("Bluetooth BLE Connected. Changing Button color and text...");
             mConnectButton.setBackgroundColor(mColorPrimary);
@@ -249,10 +258,10 @@ public class HomeFragment extends Fragment {
         if (isScanningOrConnecting) {
             Timber.d("Bluetooth BLE Scan start. Showing loader...");
             mMeasurementLayout.setVisibility(View.GONE);
-            mLoaderWebView.setVisibility(View.VISIBLE);
+            mLoaderLayout.setVisibility(View.VISIBLE);
         } else {
             Timber.d("Bluetooth BLE Scan stop. Hiding loader...");
-            mLoaderWebView.setVisibility(View.GONE);
+            mLoaderLayout.setVisibility(View.GONE);
             mMeasurementLayout.setVisibility(View.VISIBLE);
         }
     }

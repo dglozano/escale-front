@@ -1,4 +1,4 @@
-package com.dglozano.escale.util;
+package com.dglozano.escale.ble;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
