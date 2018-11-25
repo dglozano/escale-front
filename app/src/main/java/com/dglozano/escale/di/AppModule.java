@@ -14,6 +14,7 @@ import com.dglozano.escale.di.annotation.DatabaseInfo;
 import com.dglozano.escale.util.Constants;
 import com.polidea.rxandroidble2.RxBleClient;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 import dagger.Module;
@@ -72,5 +73,10 @@ public class AppModule {
     @Provides
     SimpleDateFormat provideSimpleDateFormat() {
         return new SimpleDateFormat(Constants.SIMPLE_DATE_FORMAT);
+    }
+
+    @Provides
+    DecimalFormat provideDecimalFormat() {
+        return new DecimalFormat(Constants.DECIMAL_FORMAT);
     }
 }

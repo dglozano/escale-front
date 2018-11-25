@@ -17,10 +17,20 @@ public class Constants {
 
     // Date format
     public static final String SIMPLE_DATE_FORMAT = "dd-MM-yyyy HH:mm:ss EEEE";
+    public static final String DECIMAL_FORMAT = "#0.00";
 
     // Bytes
     public static final String BYTES_SET_KG = "FF00FFFF1E00FFFF";
     public static final String BYTES_SET_LB = "FF01FFFF1E00FFFF";
+
+    // Commands bluetooth
+    public static final String USER_CREATE_CMD = "01%1$s"; // PIN
+    public static final String USER_CREATE_LIMIT_ERROR = "200104";
+    public static final String USER_LOGIN_CMD = "02%1$s%2$s"; //INDEX, PIN
+    public static final String USER_LOGIN_ERROR = "200205";
+    public static final String USER_LOGIN_SUCCESS = "200201";
+
+
     /**
      * 1: User index
      * 2: Birth year (2 bytes)

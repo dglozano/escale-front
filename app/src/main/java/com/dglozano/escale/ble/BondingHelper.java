@@ -39,14 +39,14 @@ import timber.log.Timber;
  * 6- It will retry everything once if an error occur.
  * 7- The whole process, including the retry(), can have a time limit passed as a parameter.
  */
-public class BondingHelper {
+class BondingHelper {
 
     private static int DEFAULT_TIMEOUT = 30;
 
-    public static class BondingFailedException extends RuntimeException {
+    static class BondingFailedException extends RuntimeException {
     }
 
-    public static Completable bondWithDevice(final Context context, final RxBleDevice rxBleDevice) {
+    static Completable bondWithDevice(final Context context, final RxBleDevice rxBleDevice) {
         return bondWithDevice(context, rxBleDevice, DEFAULT_TIMEOUT, TimeUnit.SECONDS);
     }
 
@@ -55,7 +55,7 @@ public class BondingHelper {
      * Try to refactor the anonymous Broadcast Receivers
      * into an inner class that accepts a Predicate to decide when to complete
      */
-    public static Completable bondWithDevice(final Context context, final RxBleDevice rxBleDevice,
+    static Completable bondWithDevice(final Context context, final RxBleDevice rxBleDevice,
                                              long timeout, TimeUnit timeunit) {
         return removeBond(context, rxBleDevice.getBluetoothDevice())
                 .andThen(Completable.create(completion -> {

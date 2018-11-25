@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BluetoothInfo;
 import com.dglozano.escale.util.Constants;
@@ -35,13 +36,20 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static com.dglozano.escale.ble.CommunicationHelper.PinIndex;
+import static com.dglozano.escale.ble.CommunicationHelper.ScaleUserLimitExcedded;
 import static com.dglozano.escale.ble.CommunicationHelper.bytesToHex;
+import static com.dglozano.escale.ble.CommunicationHelper.flipBytes;
+import static com.dglozano.escale.ble.CommunicationHelper.generatePIN;
 import static com.dglozano.escale.ble.CommunicationHelper.getCurrentTimeHex;
 import static com.dglozano.escale.ble.CommunicationHelper.hexToBytes;
 import static com.dglozano.escale.ble.CommunicationHelper.isSetToKilo;
-import static com.dglozano.escale.ble.CommunicationHelper.parseDateFromHex;
+import static com.dglozano.escale.ble.CommunicationHelper.lastNBytes;
+import static com.dglozano.escale.ble.CommunicationHelper.parseDateStringFromHex;
+import static com.dglozano.escale.ble.CommunicationHelper.parseWeightMeasurementFromHex;
 
 @ApplicationScope
 public class BleCommunicationService extends Service {
@@ -59,6 +67,7 @@ public class BleCommunicationService extends Service {
     private CompositeDisposable mCompositeDisposable;
     private MutableLiveData<Boolean> mIsScanning;
     private MutableLiveData<String> mConnectionState;
+    private MutableLiveData<BodyMeasurement> mLastBodyMeasurement;
     private MediatorLiveData<Boolean> mIsScanningOrConnecting;
     private Observable<RxBleConnection> mConnectionObservable;
     private RxBleConnection mRxBleConnection;
@@ -73,8 +82,10 @@ public class BleCommunicationService extends Service {
         mCompositeDisposable = new CompositeDisposable();
         mIsScanning = new MutableLiveData<>();
         mConnectionState = new MutableLiveData<>();
+        mLastBodyMeasurement = new MutableLiveData<>();
         mIsScanning.setValue(false);
         mConnectionState.setValue(Constants.DISCONNECTED);
+        mLastBodyMeasurement.setValue(null);
         mIsScanningOrConnecting = new MediatorLiveData<>();
         prepareScanningOrConnectionMediator();
     }
@@ -141,16 +152,21 @@ public class BleCommunicationService extends Service {
                 BondingHelper.bondWithDevice(this, scaleDevice, 10, TimeUnit.SECONDS)
                         .andThen(Completable.fromAction(() -> mConnectionState.postValue(Constants.CONNECTING)))
                         .andThen(mConnectionObservable)
-                        .flatMapSingle(this::communicationInitialization)
-                        .flatMap(bytes -> createUserInScale())
-                        .flatMap(hexResponse -> loginUserInScale("020D", hexResponse.substring(hexResponse.length() - 2)))
+                        .flatMapSingle(rxBleConnection -> communicationInitialization(rxBleConnection)
+                                .flatMap(bytesIgnored -> hasScaleUsers(rxBleConnection))
+                                .flatMap(hasUsers -> createScaleUserIfNecessaryAndLogin(hasUsers, rxBleConnection))
+                                .flatMap(isLoginSuccessful -> triggerWeightMeasurement(rxBleConnection)) // TODO: ADD LOGIC TO PUT CREDENTEIALS
+                        )
                         .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io()) // TODO: Check this
                         .doFinally(this::disposeConnection)
                         .subscribe(hexResponse -> Timber.d("Final response %1$s", hexResponse), this::throwException);
     }
 
     private Observable<RxBleConnection> prepareObservableForConnection(RxBleDevice scaleDevice) {
-        return scaleDevice.establishConnection(false).observeOn(AndroidSchedulers.mainThread())
+        return scaleDevice
+                .establishConnection(false)
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(this::throwException);
     }
 
@@ -193,7 +209,6 @@ public class BleCommunicationService extends Service {
         }
     }
 
-
     private Single<byte[]> singleToWrite(
             UUID characteristicUuid,
             String hexString,
@@ -213,38 +228,15 @@ public class BleCommunicationService extends Service {
                 .doOnError(this::throwException);
     }
 
-    private Observable<byte[]> observableToSetNotification(
-            UUID characteristicUuid,
-            RxBleConnection connection) {
-        return connection.setupNotification(characteristicUuid)
-                .doOnNext(notificationObservable ->
-                        Timber.d(
-                                "Notification enabled in characteristic %1$s",
-                                characteristicUuid.toString()))
-                .flatMap(notificationObservable -> notificationObservable)
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    private Observable<byte[]> observableToSetIndication(
-            UUID characteristicUuid,
-            RxBleConnection connection) {
-        return connection.setupIndication(characteristicUuid)
-                .doOnNext(notificationObservable ->
-                        Timber.d(
-                                "Indication enabled in characteristic %1$s",
-                                characteristicUuid.toString()))
-                .flatMap(notificationObservable -> notificationObservable)
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
     public Single<byte[]> communicationInitialization(RxBleConnection rxBleConnection) {
         mRxBleConnection = rxBleConnection;
         mConnectionState.postValue(Constants.INITIALIZING);
-        return singleToWrite(Constants.CURRENT_TIME, getCurrentTimeHex(), rxBleConnection)
+        return rxBleConnection.discoverServices()
+                .flatMap(responseIgnored -> singleToWrite(Constants.CURRENT_TIME, getCurrentTimeHex(), rxBleConnection))
                 .flatMap(bytes -> singleToWrite(Constants.CUSTOM_FFF1_UNIT_CHARACTERISTIC, Constants.BYTES_SET_KG, rxBleConnection))
                 .flatMap(bytes -> singleToRead(Constants.CURRENT_TIME, rxBleConnection))
                 .flatMap(bytes -> {
-                    Timber.d("Date from scale is: %1$s", parseDateFromHex(bytesToHex(bytes)));
+                    Timber.d("Date from scale is: %1$s", parseDateStringFromHex(bytesToHex(bytes)));
                     return singleToRead(Constants.CUSTOM_FFF1_UNIT_CHARACTERISTIC, rxBleConnection);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -256,12 +248,29 @@ public class BleCommunicationService extends Service {
                 .doOnError(this::throwException);
     }
 
-    public Observable<String> createUserInScale() {
+    private Single<Boolean> createScaleUserIfNecessaryAndLogin(Boolean hasUsers, RxBleConnection rxBleConnection) {
+        Timber.d("HasUsers: %1$s", hasUsers);
+        boolean hasCredentials = true; //FIXME
+        return hasUsers && hasCredentials ?
+                loginUserInScale("00", "0000", rxBleConnection) :
+                createUserInScale(rxBleConnection)
+                        .flatMap(pinAndIndex -> loginUserInScale(pinAndIndex.index(), pinAndIndex.pin(), rxBleConnection));
+    }
+
+    public Single<PinIndex> createUserInScale(RxBleConnection rxBleConnection) {
+        String PIN = generatePIN(); // I need to flip these bytes to write it
+        String CMD = String.format(Constants.USER_CREATE_CMD, flipBytes(PIN)); // Command number to create
         return writeAndReadOnNotification(Constants.USER_CONTROL_POINT, Constants.USER_CONTROL_POINT,
-                "011234", true, mRxBleConnection)
+                CMD, true, rxBleConnection)
                 .take(1)
+                .flatMapSingle(hexResponse -> {
+                    if (hexResponse.equals(Constants.USER_CREATE_LIMIT_ERROR))
+                        throw new ScaleUserLimitExcedded();
+                    return Single.just(new PinIndex(lastNBytes(hexResponse, 2), PIN));
+                })
+                .singleOrError()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(hexResponse -> Timber.d("Response: %1$s", hexResponse))
+                .doOnSuccess(pair -> Timber.d("Index: %1$s , PIN: %2$s", pair.index(), pair.pin()))
                 .doOnError(this::throwException);
         // Set notification
         // Write byte
@@ -269,19 +278,47 @@ public class BleCommunicationService extends Service {
         // Wait for notification --> Succeded (return index), maxError, timeout
     }
 
-    public Observable<String> loginUserInScale(String PIN, String userIndex) {
-        String command = "02" + userIndex + PIN;
-        Timber.d("Login command: %1$s ", command);
+    public Single<Boolean> loginUserInScale(String userIndex, String PIN) {
+        return loginUserInScale(userIndex, PIN, mRxBleConnection);
+    }
+
+    public Single<Boolean> loginUserInScale(String userIndex, String PIN, RxBleConnection rxBleConnection) {
+        String CMD = String.format(Constants.USER_LOGIN_CMD, userIndex, flipBytes(PIN)); // Command number to create
+        Timber.d("Logging in Scale user. Login command: %1$s ", CMD);
         return writeAndReadOnNotification(Constants.USER_CONTROL_POINT, Constants.USER_CONTROL_POINT,
-                command, true, mRxBleConnection)
+                CMD, true, rxBleConnection)
                 .take(1)
+                .flatMapSingle(hexResponse -> Single.just(hexResponse.equals(Constants.USER_LOGIN_SUCCESS)))
+                .singleOrError()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(hexResponse -> Timber.d("Response: %1$s", hexResponse))
+                .doOnSuccess(hexResponse -> Timber.d("Response: %1$s", hexResponse))
                 .doOnError(this::throwException);
-        // Set notification
-        // Write byte
-        // Convert PIN
-        // Wait for notification --> Succeded (return index), maxError, timeout
+    }
+
+    public Single<Boolean> hasScaleUsers(RxBleConnection rxBleConnection) {
+        Timber.d("Checking if scale has users...");
+        return writeAndReadOnNotification(Constants.CUSTOM_FFF2_USER_LIST_CHARACTERISTIC, Constants.CUSTOM_FFF2_USER_LIST_CHARACTERISTIC,
+                "00", false, rxBleConnection)
+                .take(1)
+                .flatMapSingle(hexResponse -> Single.just(!hexResponse.equals("02")))
+                .singleOrError()
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess(hexResponse -> Timber.d("Response: %1$s", hexResponse))
+                .doOnError(this::throwException);
+    }
+
+    private Single<BodyMeasurement> triggerWeightMeasurement(RxBleConnection rxBleConnection) {
+        return writeAndReadOnNotification(Constants.CUSTOM_FFF4_ACTIVATE_SCALE_CHARACTERISTIC, Constants.WEIGHT_MEASUREMENT,
+                "00", true, rxBleConnection)
+                .take(1)
+                .flatMapSingle(hexResponse -> Single.just(parseWeightMeasurementFromHex(hexResponse)))
+                .singleOrError()
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess(bodyMeasurement -> {
+                    Timber.d("Response Weight: %1$s", bodyMeasurement.getWeight());
+                    mLastBodyMeasurement.postValue(bodyMeasurement);
+                })
+                .doOnError(this::throwException);
     }
 
     private Observable<String> writeAndReadOnNotification(UUID writeTo, UUID readOn,
@@ -298,16 +335,7 @@ public class BleCommunicationService extends Service {
                         notificationObservable.take(1),
                         (writtenBytes, responseBytes) -> bytesToHex(responseBytes)
                 )
-        ).observeOn(AndroidSchedulers.mainThread())
-                .doOnError(this::throwException);
-    }
-
-    private void onNotificationReceived(byte[] value) {
-        Timber.d("Read value: %1$s", bytesToHex(value));
-    }
-
-    private void onNotificationSetupFailure(Throwable throwable) {
-        Timber.e(throwable, "Error setting up notification.");
+        ).observeOn(AndroidSchedulers.mainThread()).doOnError(this::throwException);
     }
 
     public MutableLiveData<Boolean> isScanning() {
@@ -324,6 +352,10 @@ public class BleCommunicationService extends Service {
 
     public MutableLiveData<String> getLoadingState() {
         return mConnectionState;
+    }
+
+    public MutableLiveData<BodyMeasurement> getBodyMeasurement() {
+        return mLastBodyMeasurement;
     }
 
     @SuppressWarnings("unused")

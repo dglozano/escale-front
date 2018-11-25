@@ -28,4 +28,5 @@
     <string name="ble_error_try_again">Bluetooth error. Try again.</string>
     <string name="ble_scan_timeout">Scale not found after 10 s. Try Again...</string>
     <string name="loader_scanning">Scanning</string>
+    <string name="new_body_measurement">New body measurement</string>
 </resources>

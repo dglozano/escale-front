@@ -32,6 +32,9 @@ import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.LocationPermission;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+
 import javax.inject.Inject;
 
 import butterknife.BindColor;
@@ -64,6 +67,10 @@ public class HomeFragment extends Fragment {
     TextView mLoaderText;
     @BindView(R.id.loader_webview)
     WebView mLoaderWebView;
+    @BindView(R.id.weight_gauge_text)
+    TextView mWeightTexView;
+    @BindView(R.id.bmi_number_top)
+    TextView mBmiTextView;
 
     @BindString(R.string.connected)
     String mConnectedString;
@@ -94,6 +101,10 @@ public class HomeFragment extends Fragment {
     MainActivity mMainActivity;
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
+    @Inject
+    DecimalFormat decimalFormat;
+    @Inject
+    SimpleDateFormat dateFormat;
 
     private Unbinder mViewUnbinder;
     private HomeViewModel mHomeViewModel;
@@ -132,6 +143,15 @@ public class HomeFragment extends Fragment {
         mBluetoothCommService.getConnectionState().observe(this, this::switchConnected);
         mBluetoothCommService.getLoadingState().observe(this,
                 (text) -> mLoaderText.setText(String.format("%1$s...", text)));
+        mBluetoothCommService.getBodyMeasurement().observe(this, this::updateBodyMeasurement);
+    }
+
+    private void updateBodyMeasurement(BodyMeasurement bodyMeasurement) {
+        if (bodyMeasurement != null) {
+            Toast.makeText(mMainActivity, R.string.new_body_measurement, Toast.LENGTH_LONG).show();
+            mWeightTexView.setText(decimalFormat.format(bodyMeasurement.getWeight()));
+            mBmiTextView.setText(decimalFormat.format(bodyMeasurement.getBmi()));
+        }
     }
 
     @Override
