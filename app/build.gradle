@@ -3,6 +3,7 @@ plugins {
 }
 
 apply plugin: "com.android.application"
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 27
@@ -44,8 +45,12 @@ dependencies {
     def timber_version = "4.7.1"
     def rx_ble_version = "1.7.1"
     def rx_android_version = "2.1.0"
+    def firebase_version = "16.0.1"
+    def firebase_ui_version = "4.1.0"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.google.firebase:firebase-core:$firebase_version"
+    implementation "com.firebaseui:firebase-ui-auth:$firebase_ui_version"
     implementation "com.android.support:appcompat-v7:$android_version"
     implementation "com.android.support:support-v4:$android_version"
     implementation "com.android.support:design:$android_version"

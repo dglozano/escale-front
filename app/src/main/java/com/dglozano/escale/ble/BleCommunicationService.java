@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.BodyMeasurement;
+import com.dglozano.escale.db.entity.User;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BluetoothInfo;
 import com.dglozano.escale.util.Constants;
@@ -23,6 +24,8 @@ import com.polidea.rxandroidble2.scan.ScanFilter;
 import com.polidea.rxandroidble2.scan.ScanResult;
 import com.polidea.rxandroidble2.scan.ScanSettings;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -45,10 +48,14 @@ import static com.dglozano.escale.ble.CommunicationHelper.bytesToHex;
 import static com.dglozano.escale.ble.CommunicationHelper.flipBytes;
 import static com.dglozano.escale.ble.CommunicationHelper.generatePIN;
 import static com.dglozano.escale.ble.CommunicationHelper.getCurrentTimeHex;
+import static com.dglozano.escale.ble.CommunicationHelper.getHexBirthDate;
+import static com.dglozano.escale.ble.CommunicationHelper.getNextDbIncrement;
+import static com.dglozano.escale.ble.CommunicationHelper.getPhysicalActivity;
+import static com.dglozano.escale.ble.CommunicationHelper.getSexHex;
 import static com.dglozano.escale.ble.CommunicationHelper.hexToBytes;
 import static com.dglozano.escale.ble.CommunicationHelper.isSetToKilo;
 import static com.dglozano.escale.ble.CommunicationHelper.lastNBytes;
-import static com.dglozano.escale.ble.CommunicationHelper.parseDateStringFromHex;
+import static com.dglozano.escale.ble.CommunicationHelper.parseFullDateStringFromHex;
 import static com.dglozano.escale.ble.CommunicationHelper.parseWeightMeasurementFromHex;
 
 @ApplicationScope
@@ -153,9 +160,28 @@ public class BleCommunicationService extends Service {
                         .andThen(Completable.fromAction(() -> mConnectionState.postValue(Constants.CONNECTING)))
                         .andThen(mConnectionObservable)
                         .flatMapSingle(rxBleConnection -> communicationInitialization(rxBleConnection)
-                                .flatMap(bytesIgnored -> hasScaleUsers(rxBleConnection))
-                                .flatMap(hasUsers -> createScaleUserIfNecessaryAndLogin(hasUsers, rxBleConnection))
-                                .flatMap(isLoginSuccessful -> triggerWeightMeasurement(rxBleConnection)) // TODO: ADD LOGIC TO PUT CREDENTEIALS
+//                                        rxBleConnection.discoverServices().delay(600, TimeUnit.MILLISECONDS)
+//                                        .flatMap(bytesIgnored -> hasScaleUsers(rxBleConnection))
+                                // TODO: ADD LOGIC TO PUT CREDENTEIALS
+//                                .flatMap(hasUsers -> createScaleUserIfNecessaryAndLogin(hasUsers, rxBleConnection))
+//                                 TODO: ADD LOGIC IF FAILS LOGIN, TO CREATE USER
+//                                .flatMap(isLoginSuccesful -> triggerWeightMeasurement(rxBleConnection))
+//                                rxBleConnection.discoverServices().delay(600, TimeUnit.MILLISECONDS)
+                                .flatMap(responseIgnored -> createUserInScale(rxBleConnection)
+                                        .flatMap(pinAndIndex -> loginUserInScale(pinAndIndex.index(),
+                                                pinAndIndex.pin(), rxBleConnection))
+                                        .flatMap(loginStatus -> writeUserData(Calendar.getInstance().getTime(),
+                                                User.Gender.MALE, 3, rxBleConnection)
+                                                .flatMap(bytesIgnored -> Single.just(loginStatus)))
+                                        .doOnSuccess(couldConnect -> {
+                                            if (couldConnect) {
+                                                mConnectionState.postValue(Constants.CONNECTED);
+                                            } else {
+                                                mConnectionState.postValue(Constants.DISCONNECTED);
+                                            }
+                                        })
+                                )
+                                .flatMap(isLoginSuccesful -> triggerWeightMeasurement(rxBleConnection))
                         )
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io()) // TODO: Check this
@@ -231,35 +257,44 @@ public class BleCommunicationService extends Service {
     public Single<byte[]> communicationInitialization(RxBleConnection rxBleConnection) {
         mRxBleConnection = rxBleConnection;
         mConnectionState.postValue(Constants.INITIALIZING);
-        return rxBleConnection.discoverServices()
+        return rxBleConnection.discoverServices().delay(600, TimeUnit.MILLISECONDS)
                 .flatMap(responseIgnored -> singleToWrite(Constants.CURRENT_TIME, getCurrentTimeHex(), rxBleConnection))
                 .flatMap(bytes -> singleToWrite(Constants.CUSTOM_FFF1_UNIT_CHARACTERISTIC, Constants.BYTES_SET_KG, rxBleConnection))
-                .flatMap(bytes -> singleToRead(Constants.CURRENT_TIME, rxBleConnection))
-                .flatMap(bytes -> {
-                    Timber.d("Date from scale is: %1$s", parseDateStringFromHex(bytesToHex(bytes)));
-                    return singleToRead(Constants.CUSTOM_FFF1_UNIT_CHARACTERISTIC, rxBleConnection);
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess((bytes) -> {
-                    Timber.d("Set to kg: %1$s", isSetToKilo(bytesToHex(bytes)));
-                    Timber.d("Finished initialization");
-                    mConnectionState.postValue(Constants.CONNECTED);
-                })
                 .doOnError(this::throwException);
     }
 
+    //TODO: REFACTOR login status and create scenario
     private Single<Boolean> createScaleUserIfNecessaryAndLogin(Boolean hasUsers, RxBleConnection rxBleConnection) {
         Timber.d("HasUsers: %1$s", hasUsers);
         boolean hasCredentials = true; //FIXME
         return hasUsers && hasCredentials ?
-                loginUserInScale("00", "0000", rxBleConnection) :
+                loginUserInScale("00", "0000", rxBleConnection)
+                        .doOnSuccess(couldConnect -> {
+                            if (couldConnect) {
+                                mConnectionState.postValue(Constants.CONNECTED);
+                            } else {
+                                mConnectionState.postValue(Constants.DISCONNECTED);
+                            }
+                        }) :
                 createUserInScale(rxBleConnection)
-                        .flatMap(pinAndIndex -> loginUserInScale(pinAndIndex.index(), pinAndIndex.pin(), rxBleConnection));
+                        .flatMap(pinAndIndex -> loginUserInScale(pinAndIndex.index(),
+                                pinAndIndex.pin(), rxBleConnection))
+                        .flatMap(loginStatus -> writeUserData(Calendar.getInstance().getTime(),
+                                User.Gender.MALE, 3, rxBleConnection)
+                                .flatMap(bytesIgnored -> Single.just(loginStatus)))
+                        .doOnSuccess(couldConnect -> {
+                            if (couldConnect) {
+                                mConnectionState.postValue(Constants.CONNECTED);
+                            } else {
+                                mConnectionState.postValue(Constants.DISCONNECTED);
+                            }
+                        });
     }
 
     public Single<PinIndex> createUserInScale(RxBleConnection rxBleConnection) {
-        String PIN = generatePIN(); // I need to flip these bytes to write it
-        String CMD = String.format(Constants.USER_CREATE_CMD, flipBytes(PIN)); // Command number to create
+        String PIN = generatePIN();
+        String CMD = String.format(Constants.USER_CREATE_CMD, PIN); // Command number to create
+        mConnectionState.postValue(Constants.CREATING_USER);
         return writeAndReadOnNotification(Constants.USER_CONTROL_POINT, Constants.USER_CONTROL_POINT,
                 CMD, true, rxBleConnection)
                 .take(1)
@@ -272,10 +307,6 @@ public class BleCommunicationService extends Service {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess(pair -> Timber.d("Index: %1$s , PIN: %2$s", pair.index(), pair.pin()))
                 .doOnError(this::throwException);
-        // Set notification
-        // Write byte
-        // Convert PIN
-        // Wait for notification --> Succeded (return index), maxError, timeout
     }
 
     public Single<Boolean> loginUserInScale(String userIndex, String PIN) {
@@ -283,15 +314,37 @@ public class BleCommunicationService extends Service {
     }
 
     public Single<Boolean> loginUserInScale(String userIndex, String PIN, RxBleConnection rxBleConnection) {
-        String CMD = String.format(Constants.USER_LOGIN_CMD, userIndex, flipBytes(PIN)); // Command number to create
+        // Command number to create.
+        String CMD = String.format(Constants.USER_LOGIN_CMD, userIndex, PIN);
         Timber.d("Logging in Scale user. Login command: %1$s ", CMD);
+        mConnectionState.postValue(Constants.LOGGING_IN);
         return writeAndReadOnNotification(Constants.USER_CONTROL_POINT, Constants.USER_CONTROL_POINT,
                 CMD, true, rxBleConnection)
                 .take(1)
-                .flatMapSingle(hexResponse -> Single.just(hexResponse.equals(Constants.USER_LOGIN_SUCCESS)))
+                .flatMapSingle(hexResponse -> {
+                    if(!hexResponse.equals(Constants.USER_LOGIN_SUCCESS)) {
+                        throw new CommunicationHelper.LoginScaleUserFailed();
+                    }
+                    return Single.just(hexResponse.equals(Constants.USER_LOGIN_SUCCESS));
+                })
                 .singleOrError()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess(hexResponse -> Timber.d("Response: %1$s", hexResponse))
+                .doOnSuccess(couldConnect -> Timber.d("Logging in Response: %1$s", couldConnect))
+                .doOnError(this::throwException);
+    }
+
+    public Single<byte[]> writeUserData(Date dateOfBirth, User.Gender gender, int activity,
+                                        RxBleConnection rxBleConnection) {
+        Timber.d("Writing user data");
+        mConnectionState.postValue(Constants.SETTING_USER_DATA);
+        return singleToWrite(Constants.DATE_OF_BIRTH, getHexBirthDate(dateOfBirth), rxBleConnection)
+                .flatMap(bytesWritten -> singleToWrite(Constants.GENDER, getSexHex(gender), rxBleConnection))
+                .flatMap(bytesWritten -> singleToWrite(Constants.CUSTOM_FFF3_PH_ACTIVITY_CHARACTERISTIC,
+                        getPhysicalActivity(3), rxBleConnection))
+                .flatMap(bytesWritten -> singleToRead(Constants.DB_CHANGE_INCREMENT, rxBleConnection))
+                .flatMap(bytesRead -> singleToWrite(Constants.DB_CHANGE_INCREMENT,
+                        getNextDbIncrement(bytesToHex(bytesRead)), rxBleConnection))
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(this::throwException);
     }
 
@@ -333,7 +386,11 @@ public class BleCommunicationService extends Service {
                 (notificationObservable) -> Observable.combineLatest(
                         rxBleConnection.writeCharacteristic(writeTo, hexToBytes(hexString)).toObservable(),
                         notificationObservable.take(1),
-                        (writtenBytes, responseBytes) -> bytesToHex(responseBytes)
+                        (writtenBytes, responseBytes) -> {
+                            Timber.d("Wrote %1$s to %2$s - Response: %3$s",
+                                    bytesToHex(writtenBytes), writeTo.toString(), bytesToHex(responseBytes));
+                            return bytesToHex(responseBytes);
+                        }
                 )
         ).observeOn(AndroidSchedulers.mainThread()).doOnError(this::throwException);
     }

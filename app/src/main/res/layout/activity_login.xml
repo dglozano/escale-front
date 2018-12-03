@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/login_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.login.LoginActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/login_background_scale"
+        android:src="@drawable/login_gradient"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/login_root"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="@dimen/activity_vertical_margin">
+
+        <TextView
+            android:id="@+id/welcome_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/login_welcome_to_escale"
+            android:textColor="@color/colorBackground"
+            android:textAppearance="@android:style/TextAppearance.Material.Large" />
+
+        <TextView
+            android:id="@+id/login_instruction_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/welcome_text"
+            android:textColor="@color/colorBackground"
+            android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+            android:text="@string/login_first_time_message"
+            android:textAppearance="@android:style/TextAppearance.Material.Small" />
+
+        <EditText
+            android:id="@+id/login_email"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height"
+            android:layout_below="@id/login_instruction_text"
+            android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+            android:paddingStart="@dimen/padding_medium"
+            android:paddingEnd="@dimen/padding_medium"
+            android:background="@drawable/login_edittext_rounded"
+            android:hint="@string/email"
+            android:inputType="textEmailAddress"
+            android:padding="@dimen/padding_small"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small.Inverse"
+            android:textColorHint="@color/colorTextMedium"
+            android:textColor="@color/colorTextDark"/>
+
+        <EditText
+            android:id="@+id/login_password"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height"
+            android:layout_below="@id/login_email"
+            android:paddingStart="@dimen/padding_medium"
+            android:paddingEnd="@dimen/padding_medium"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:background="@drawable/login_edittext_rounded"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:padding="@dimen/padding_small"
+            android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+            android:textColorHint="@color/colorTextMedium"
+            android:textColor="@color/colorTextDark"/>
+
+        <Button
+            android:id="@+id/login_sign_in_button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height"
+            android:layout_below="@id/login_password"
+            android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+            android:background="@drawable/login_button_rounded"
+            android:text="@string/login_button_text"
+            android:textColor="@color/colorBackground"
+            android:textStyle="bold">
+        </Button>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/login_reset_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="@string/login_reset_password_text"
+        android:textAlignment="center"
+        android:textColor="@color/colorBackground"
+        app:layout_constraintBottom_toBottomOf="@id/login_root"
+
+        />
+</android.support.constraint.ConstraintLayout>

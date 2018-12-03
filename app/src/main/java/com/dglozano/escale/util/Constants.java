@@ -11,13 +11,16 @@ public class Constants {
     public static final String INITIALIZING = "Initializing";
     public static final String CONNECTED = "Connected";
     public static final String DISCONNECTED = "Disconnected";
+    public static final String CREATING_USER = "Creating user";
+    public static final String SETTING_USER_DATA = "Setting user data";
+    public static final String LOGGING_IN = "Logging in";
 
     // Scale name
     public static final String BF600 = "BF600";
 
     // Date format
     public static final String SIMPLE_DATE_FORMAT = "dd-MM-yyyy HH:mm:ss EEEE";
-    public static final String DECIMAL_FORMAT = "#0.00";
+    public static final String DECIMAL_FORMAT = "#0.0";
 
     // Bytes
     public static final String BYTES_SET_KG = "FF00FFFF1E00FFFF";

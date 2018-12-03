@@ -1,6 +1,7 @@
 package com.dglozano.escale.ble;
 
 import com.dglozano.escale.db.entity.BodyMeasurement;
+import com.dglozano.escale.db.entity.User;
 import com.dglozano.escale.util.Constants;
 
 import java.text.SimpleDateFormat;
@@ -52,31 +53,50 @@ class CommunicationHelper {
     static String getCurrentTimeHex() {
         String dateHex = Constants.DATE_SERVICE_FORMAT;
         Calendar calendar = Calendar.getInstance();
-        String year = flipBytes(toHex(calendar.get(Calendar.YEAR)));
-        String month = toHex(calendar.get(Calendar.MONTH));
-        String day = toHex(calendar.get(Calendar.DAY_OF_MONTH));
-        String hour = toHex(calendar.get(Calendar.HOUR_OF_DAY));
-        String min = toHex(calendar.get(Calendar.MINUTE));
-        String sec = toHex(calendar.get(Calendar.SECOND));
-        return String.format(dateHex, year, month, day, hour, min, sec);
+        String year = flipBytes(decToHex(calendar.get(Calendar.YEAR)));
+        String month = decToHex(calendar.get(Calendar.MONTH)+1);
+        String day = decToHex(calendar.get(Calendar.DAY_OF_MONTH));
+        String hour = decToHex(calendar.get(Calendar.HOUR_OF_DAY));
+        String min = decToHex(calendar.get(Calendar.MINUTE));
+        String sec = decToHex(calendar.get(Calendar.SECOND));
+        String finalDate = String.format(dateHex, year, month, day, hour, min, sec);
+        Timber.d("Date to be written %1$s", finalDate);
+        return finalDate;
     }
 
-    static String parseDateStringFromHex(String hexDate) {
-        return sdf.format(parseDateFromHex(hexDate));
+    static String getHexBirthDate(Date dateOfBirth) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dateOfBirth);
+        String yyyy = flipBytes(decToHex(calendar.get(Calendar.YEAR)));
+        String mm = decToHex(calendar.get(Calendar.MONTH)+1);
+        String dd = decToHex(calendar.get(Calendar.DAY_OF_MONTH));
+        return String.format("%s%s%s", yyyy, mm, dd);
     }
 
-    static Date parseDateFromHex(String hexDate) {
+    static String getSexHex(User.Gender gender) {
+        return gender == User.Gender.MALE ? "00" : "01";
+    }
+
+    static String getPhysicalActivity(int activity) {
+        return "0" + activity;
+    }
+
+    static String parseFullDateStringFromHex(String hexDate) {
+        return sdf.format(parseFullDateFromHex(hexDate));
+    }
+
+    static Date parseFullDateFromHex(String hexDate) {
         if(hexDate.length() > 14) {
             hexDate = hexDate.substring(0, 14);
-        } else {
-            throw new IllegalArgumentException("parseDateFromHex requires a minimum 14 char long (7 bytes) String parameter");
+        } else if (hexDate.length() < 14) {
+            throw new IllegalArgumentException("parseFullDateFromHex requires a minimum 14 char long (7 bytes) String parameter");
         }
-        int year = toDec(flipBytes(hexDate.substring(0, 4)));
-        int month = toDec(hexDate.substring(4, 6));
-        int day = toDec(hexDate.substring(6, 8));
-        int hour = toDec(hexDate.substring(8, 10));
-        int min = toDec(hexDate.substring(10, 12));
-        int sec = toDec(hexDate.substring(12, 14));
+        int year = hexToDec(flipBytes(hexDate.substring(0, 4)));
+        int month = hexToDec(hexDate.substring(4, 6)) -1;
+        int day = hexToDec(hexDate.substring(6, 8));
+        int hour = hexToDec(hexDate.substring(8, 10));
+        int min = hexToDec(hexDate.substring(10, 12));
+        int sec = hexToDec(hexDate.substring(12, 14));
         Calendar cal = new GregorianCalendar(year, month, day, hour, min, sec);
         return cal.getTime();
     }
@@ -84,10 +104,10 @@ class CommunicationHelper {
     //TODO: See what happens if bits in flag for timeunit, bmi and user index are off
     static BodyMeasurement parseWeightMeasurementFromHex(String hexWeight) {
         //TODO Read flags
-        float weight = toDec(flipBytes(hexWeight.substring(2, 6 ))) * 0.005f;
-        Date date = parseDateFromHex(hexWeight.substring(6,20));
+        float weight = hexToDec(flipBytes(hexWeight.substring(2, 6 ))) * 0.005f;
+        Date date = parseFullDateFromHex(hexWeight.substring(6,20));
         //TODO Read user index;
-        float bmi = toDec(flipBytes(hexWeight.substring(22,24))) * 0.1f;
+        float bmi = hexToDec(flipBytes(hexWeight.substring(22,26))) * 0.1f;
         //TODO Read user height;
         BodyMeasurement bodyMeasurement = new BodyMeasurement();
         bodyMeasurement.setWeight(weight);
@@ -112,15 +132,22 @@ class CommunicationHelper {
     }
 
     static String generatePIN() {
+        String firstTwoDigits = getRandomHex(38); //0x26
+        String lastTwoDigits = getRandomHex(255); //0xFF
+        // Max PIN is 0x26FF -> 9983 and min PIN is 0x0101 which is 257
+        // I write it flipped because the scale flipped it as well. So if I write 0xFF26
+        // The pin will be 0x26FF (9983)
+        return lastTwoDigits + firstTwoDigits;
+    }
+
+    static String getRandomHex(int bound) {
         Random rand = new Random();
-        int myRandomNumber = rand.nextInt(9999) + 1; //150
-        String hex = toHex(myRandomNumber); //96
-        hex = hex.length() == 2 ? "00" + hex : hex; //0096
-        return hex;
+        int randInt = rand.nextInt(bound) + 1;
+        return decToHex(randInt);
     }
 
     // Converts Dec to Hex and add 0 if there is an odd amount of digits
-    static String toHex(int dec) {
+    static String decToHex(int dec) {
 
         String hex = Integer.toHexString(dec);
 
@@ -131,8 +158,18 @@ class CommunicationHelper {
         return hex;
     }
 
-    static int toDec(String hex) {
+    static int hexToDec(String hex) {
         return Integer.parseInt(hex, 16);
+    }
+
+    static String getNextDbIncrement(String hex) {
+        int nextDbInt = hex.equals("FFFFFFFF") ? 0x1 : hexToDec(hex) + 0x1;
+        StringBuilder nextHex = new StringBuilder(decToHex(nextDbInt));
+        while(nextHex.length() < 8 ) {
+            nextHex.insert(0, "0");
+        }
+        Timber.d("Next Db Increment Int : %1$d - %2$s", nextDbInt, nextHex.toString());
+        return nextHex.toString();
     }
 
     static String lastNBytes(String hexString, int n) {
@@ -167,6 +204,10 @@ class CommunicationHelper {
     }
 
     static class ScaleUserLimitExcedded extends Exception {
+
+    }
+
+    static class LoginScaleUserFailed extends Exception {
 
     }
 }

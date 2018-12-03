@@ -99,7 +99,7 @@ class BondingHelper {
                 .retry() //I give the bonding process one more chance.
                 .timeout(timeout, timeunit)
                 .doOnError(throwable -> {
-                    Timber.e(throwable, "Timeout of %1$i %2$s during bonding process.",
+                    Timber.e(throwable, "Timeout of %1$d %2$s during bonding process.",
                             timeout, timeunit.toString());
                     throw new BondingFailedException();
                 });

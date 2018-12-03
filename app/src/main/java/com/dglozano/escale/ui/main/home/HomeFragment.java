@@ -1,5 +1,6 @@
 package com.dglozano.escale.ui.main.home;
 
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
@@ -34,6 +35,7 @@ import com.dglozano.escale.util.LocationPermission;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -45,6 +47,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
+import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import mehdi.sakout.fancybuttons.FancyButton;
 import pl.pawelkleczkowski.customgauge.CustomGauge;
 import timber.log.Timber;
@@ -109,6 +114,7 @@ public class HomeFragment extends Fragment {
     private Unbinder mViewUnbinder;
     private HomeViewModel mHomeViewModel;
     private boolean mHasClickedScan;
+    private MutableLiveData<Boolean> mutableLiveData = new MutableLiveData<Boolean>();
 
     private BleCommunicationService mBluetoothCommService;
     private boolean mBleServiceIsBound = false;
@@ -144,13 +150,20 @@ public class HomeFragment extends Fragment {
         mBluetoothCommService.getLoadingState().observe(this,
                 (text) -> mLoaderText.setText(String.format("%1$s...", text)));
         mBluetoothCommService.getBodyMeasurement().observe(this, this::updateBodyMeasurement);
+        mutableLiveData.setValue(false);
+        mutableLiveData.observe(this, (value) -> Timber.d("HOLA: %s", value));
+        Completable.complete()
+                .subscribeOn(Schedulers.io())
+                .delay(1000, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> mutableLiveData.setValue(true));
     }
 
     private void updateBodyMeasurement(BodyMeasurement bodyMeasurement) {
         if (bodyMeasurement != null) {
-            Toast.makeText(mMainActivity, R.string.new_body_measurement, Toast.LENGTH_LONG).show();
-            mWeightTexView.setText(decimalFormat.format(bodyMeasurement.getWeight()));
-            mBmiTextView.setText(decimalFormat.format(bodyMeasurement.getBmi()));
+            Toast.makeText(mMainActivity, "New Body Measurement " + dateFormat.format(bodyMeasurement.getDate()), Toast.LENGTH_LONG).show();
+            mWeightTexView.setText(decimalFormat.format(bodyMeasurement.getWeight()).replace(",", "."));
+            mBmiTextView.setText(decimalFormat.format(bodyMeasurement.getBmi()).replace(",", "."));
         }
     }
 

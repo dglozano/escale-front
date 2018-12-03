@@ -29,4 +29,14 @@
     <string name="ble_scan_timeout">Scale not found after 10 s. Try Again...</string>
     <string name="loader_scanning">Scanning</string>
     <string name="new_body_measurement">New body measurement</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="sign_in_cancelled">Sign in was cancelled</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="unknown_error">Unkown error</string>
+    <string name="password">Contraseña</string>
+    <string name="email">Email</string>
+    <string name="login_welcome_to_escale"><big>Bienvenido a <b><i>Escale</i></b>.</big></string>
+    <string name="login_button_text">Log In</string>
+    <string name="login_reset_password_text"><u>¿Olvidaste tu contraseña?</u></string>
+    <string name="login_first_time_message">Si es tu primera vez, busca en tu bandeja de entrada el mail de bienvenida con la contraseña inicial.</string>
 </resources>

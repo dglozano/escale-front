@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "222949710994",
+    "firebase_url": "https://escale-mobile.firebaseio.com",
+    "project_id": "escale-mobile",
+    "storage_bucket": "escale-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222949710994:android:bbd375d0735ece94",
+        "android_client_info": {
+          "package_name": "com.dglozano.escale"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "222949710994-eph6essp2kuesuu35grhnpvdb86k1dno.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dglozano.escale",
+            "certificate_hash": "45d5144cce2546d9a60738969eacdc7c0e0e8f69"
+          }
+        },
+        {
+          "client_id": "222949710994-jibf9qce6cakpdom8mpouk4754f46d78.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAftr47N89VhKqINS29EhuESu-O2Dj_zPM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "222949710994-jibf9qce6cakpdom8mpouk4754f46d78.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

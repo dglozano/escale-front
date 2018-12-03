@@ -28,8 +28,11 @@ import com.dglozano.escale.ui.main.diet.DietFragment;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
+import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.util.ExtraConstants;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -152,6 +155,13 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
+
+    @NonNull
+    public static Intent createIntent(@NonNull Context context, @Nullable IdpResponse response) {
+        return new Intent().setClass(context, MainActivity.class)
+                .putExtra(ExtraConstants.IDP_RESPONSE, response);
+    }
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
