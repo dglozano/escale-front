@@ -5,6 +5,7 @@
     <color name="colorPrimaryDark">#0277bd</color>
     <color name="colorPrimaryLight">#29b6f6</color>
     <color name="colorAccent">#1de9b6</color>
+    <color name="colorTextBlack">#202020</color>
     <color name="colorTextDark">#616161</color>
     <color name="colorText">#bdbdbd</color>
     <color name="colorTextMedium">#7e7e7e</color>
@@ -12,4 +13,5 @@
     <color name="colorStartGradientOverlay">#dd4797ba</color>
     <color name="colorCenterGradientOverlay">#de266580</color>
     <color name="colorEndGradientOverlay">#e7023246</color>
+    <color name="colorBlackOverlay">#e0313131</color>
 </resources>

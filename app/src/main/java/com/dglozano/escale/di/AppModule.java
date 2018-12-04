@@ -3,6 +3,7 @@ package com.dglozano.escale.di;
 import android.app.Application;
 import android.arch.persistence.room.Room;
 import android.content.Context;
+import android.widget.ProgressBar;
 
 import com.dglozano.escale.db.EscaleDatabase;
 import com.dglozano.escale.db.dao.BodyMeasurementDao;
@@ -12,6 +13,7 @@ import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BluetoothInfo;
 import com.dglozano.escale.di.annotation.DatabaseInfo;
 import com.dglozano.escale.util.Constants;
+import com.google.firebase.auth.FirebaseAuth;
 import com.polidea.rxandroidble2.RxBleClient;
 
 import java.text.DecimalFormat;
@@ -78,5 +80,10 @@ public class AppModule {
     @Provides
     DecimalFormat provideDecimalFormat() {
         return new DecimalFormat(Constants.DECIMAL_FORMAT);
+    }
+
+    @Provides
+    FirebaseAuth provideFirebaseAuth() {
+        return FirebaseAuth.getInstance();
     }
 }

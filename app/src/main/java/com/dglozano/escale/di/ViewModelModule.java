@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 
 import com.dglozano.escale.di.annotation.ViewModelKey;
+import com.dglozano.escale.ui.login.LoginActivityViewModel;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.home.HomeViewModel;
 
@@ -22,6 +23,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(HomeViewModel.class)
     abstract ViewModel bindHomeFragmentViewModel(HomeViewModel homeViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(LoginActivityViewModel.class)
+    abstract ViewModel bindLoginActivityViewModel(LoginActivityViewModel loginActivityViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory factory);

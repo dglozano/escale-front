@@ -39,4 +39,6 @@
     <string name="login_button_text">Log In</string>
     <string name="login_reset_password_text"><u>¿Olvidaste tu contraseña?</u></string>
     <string name="login_first_time_message">Si es tu primera vez, busca en tu bandeja de entrada el mail de bienvenida con la contraseña inicial.</string>
+    <string name="login_checking_credentials">Verificando credenciales...</string>
+    <string name="login_auth_failed">Authentication failed.</string>
 </resources>

@@ -1,27 +1,28 @@
 package com.dglozano.escale.ui.login;
 
-import android.content.Intent;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.databinding.ActivityLoginBinding;
 import com.dglozano.escale.ui.main.MainActivity;
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.ErrorCodes;
-import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
-
-import java.util.Arrays;
-import java.util.List;
+import com.google.firebase.auth.FirebaseUser;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
 public class LoginActivity extends AppCompatActivity {
@@ -30,83 +31,59 @@ public class LoginActivity extends AppCompatActivity {
 
     @BindView(R.id.login_root)
     View mRootView;
+    @BindView(R.id.login_progress_bar_container)
+    RelativeLayout mProgressBarContainer;
+
+
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
+    @Inject
+    FirebaseAuth mAuth;
+
+    private LoginActivityViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(LoginActivityViewModel.class);
+
+        // Inflate view and obtain an instance of the binding class.
+        ActivityLoginBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
+
+        // Assign the component to a property in the binding class.
+        binding.setViewmodel(mViewModel);
+
         ButterKnife.bind(this);
-
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+
+    @OnClick(R.id.login_sign_in_button)
     public void signIn() {
-        AuthUI.SignInIntentBuilder builder =  AuthUI.getInstance().createSignInIntentBuilder()
-//                .setTheme(getSelectedTheme())
-//                .setLogo(getSelectedLogo())
-                .setAvailableProviders(getSelectedProviders())
-                .setIsSmartLockEnabled(true);
-
-        startActivityForResult(builder.build(), RC_SIGN_IN);
+        showProgressDialog();
     }
 
-    private List<AuthUI.IdpConfig> getSelectedProviders() {
-        return Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder()
-                        .setRequireName(true)
-                        .setAllowNewAccounts(false)
-                        .build());
+    private void hideProgressDialog() {
+        if (mProgressBarContainer.getVisibility() == View.VISIBLE) {
+            mProgressBarContainer.setVisibility(View.GONE);
+        }
+    }
+
+    private void showProgressDialog() {
+        mProgressBarContainer.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-      /*  FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             startSignedInActivity(null);
             finish();
-        } else {
-            signIn();
-        }*/
-    }
-
-    private void handleSignInResponse(int resultCode, @Nullable Intent data) {
-        IdpResponse response = IdpResponse.fromResultIntent(data);
-
-        // Successfully signed in
-        if (resultCode == RESULT_OK) {
-            startSignedInActivity(response);
-            finish();
-        } else {
-            // Sign in failed
-            if (response == null) {
-                // User pressed back button
-                showSnackbar(R.string.sign_in_cancelled);
-                return;
-            }
-
-            if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
-                showSnackbar(R.string.no_internet_connection);
-                return;
-            }
-
-            showSnackbar(R.string.unknown_error);
-            Timber.e(response.getError(), "Sign-in error: ");
         }
     }
 
-    private void startSignedInActivity(@Nullable IdpResponse response) {
+    private void startSignedInActivity(@Nullable FirebaseUser response) {
         startActivity(MainActivity.createIntent(this, response));
     }
 

@@ -1,4 +1,9 @@
 package com.dglozano.escale.ui.login;
 
-public class LoginActivityModule {
+import dagger.Module;
+
+@Module
+public class LoginActivityModule
+{
+
 }

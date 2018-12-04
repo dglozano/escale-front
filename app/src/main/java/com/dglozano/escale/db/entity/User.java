@@ -13,15 +13,17 @@ public class User {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
+
     private String name;
     private String lastName;
     private String email;
-    private Gender gender;
-    private int scaleUserPin;
-    private int scaleUserIndex;
-    private int heightCentimeters;
-    private int physicalActivity;
-    private Date birthday;
+    // Token?
+//    private Gender gender;
+//    private int scaleUserPin;
+//    private int scaleUserIndex;
+//    private int heightCentimeters;
+//    private int physicalActivity;
+//    private Date birthday;
 
     public User() {
     }
@@ -61,10 +63,10 @@ public class User {
         cal.set(Calendar.DAY_OF_MONTH, day);
 
         User userTest = new User(0, name, lastName, email);
-        userTest.setBirthday(cal.getTime());
-        userTest.setGender(gender);
-        userTest.setHeightCentimeters(height);
-        userTest.setPhysicalActivity(activity);
+//        userTest.setBirthday(cal.getTime());
+//        userTest.setGender(gender);
+//        userTest.setHeightCentimeters(height);
+//        userTest.setPhysicalActivity(activity);
 
         return userTest;
     }
@@ -93,53 +95,53 @@ public class User {
         this.email = email;
     }
 
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public int getScaleUserPin() {
-        return scaleUserPin;
-    }
-
-    public void setScaleUserPin(int scaleUserPin) {
-        this.scaleUserPin = scaleUserPin;
-    }
-
-    public int getScaleUserIndex() {
-        return scaleUserIndex;
-    }
-
-    public void setScaleUserIndex(int scaleUserIndex) {
-        this.scaleUserIndex = scaleUserIndex;
-    }
-
-    public int getHeightCentimeters() {
-        return heightCentimeters;
-    }
-
-    public void setHeightCentimeters(int heightCentimeters) {
-        this.heightCentimeters = heightCentimeters;
-    }
-
-    public int getPhysicalActivity() {
-        return physicalActivity;
-    }
-
-    public void setPhysicalActivity(int physicalActivity) {
-        this.physicalActivity = physicalActivity;
-    }
-
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
+//    public Gender getGender() {
+//        return gender;
+//    }
+//
+//    public void setGender(Gender gender) {
+//        this.gender = gender;
+//    }
+//
+//    public int getScaleUserPin() {
+//        return scaleUserPin;
+//    }
+//
+//    public void setScaleUserPin(int scaleUserPin) {
+//        this.scaleUserPin = scaleUserPin;
+//    }
+//
+//    public int getScaleUserIndex() {
+//        return scaleUserIndex;
+//    }
+//
+//    public void setScaleUserIndex(int scaleUserIndex) {
+//        this.scaleUserIndex = scaleUserIndex;
+//    }
+//
+//    public int getHeightCentimeters() {
+//        return heightCentimeters;
+//    }
+//
+//    public void setHeightCentimeters(int heightCentimeters) {
+//        this.heightCentimeters = heightCentimeters;
+//    }
+//
+//    public int getPhysicalActivity() {
+//        return physicalActivity;
+//    }
+//
+//    public void setPhysicalActivity(int physicalActivity) {
+//        this.physicalActivity = physicalActivity;
+//    }
+//
+//    public Date getBirthday() {
+//        return birthday;
+//    }
+//
+//    public void setBirthday(Date birthday) {
+//        this.birthday = birthday;
+//    }
 
     public int getId() {
         return id;
