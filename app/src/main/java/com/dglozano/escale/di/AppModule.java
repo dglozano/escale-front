@@ -3,6 +3,7 @@ package com.dglozano.escale.di;
 import android.app.Application;
 import android.arch.persistence.room.Room;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.widget.ProgressBar;
 
 import com.dglozano.escale.db.EscaleDatabase;
@@ -10,10 +11,17 @@ import com.dglozano.escale.db.dao.BodyMeasurementDao;
 import com.dglozano.escale.db.dao.UserDao;
 import com.dglozano.escale.di.annotation.ApplicationContext;
 import com.dglozano.escale.di.annotation.ApplicationScope;
+import com.dglozano.escale.di.annotation.BaseUrl;
 import com.dglozano.escale.di.annotation.BluetoothInfo;
 import com.dglozano.escale.di.annotation.DatabaseInfo;
 import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.web.ApiServiceHolder;
+import com.dglozano.escale.web.CustomOkHttpAuthenticator;
+import com.dglozano.escale.web.EscaleRestApi;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.polidea.rxandroidble2.RxBleClient;
 
 import java.text.DecimalFormat;
@@ -21,6 +29,11 @@ import java.text.SimpleDateFormat;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module(includes = ViewModelModule.class)
 public class AppModule {
@@ -68,8 +81,13 @@ public class AppModule {
     @Provides
     @BluetoothInfo
     String provideScaleName() {
-        // TODO: Move to App Constants
         return Constants.BF600;
+    }
+
+    @Provides
+    @BaseUrl
+    String provideBaseUrl() {
+        return Constants.BASE_HEROKU_URL;
     }
 
     @Provides
@@ -83,7 +101,58 @@ public class AppModule {
     }
 
     @Provides
-    FirebaseAuth provideFirebaseAuth() {
-        return FirebaseAuth.getInstance();
+    @ApplicationScope
+    Gson provideGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
+        return gsonBuilder.create();
+    }
+
+    @Provides
+    @ApplicationScope
+    OkHttpClient provideOkhttpClient(HttpLoggingInterceptor httpLoggingInterceptor,
+                                     CustomOkHttpAuthenticator customAuthenticator) {
+        OkHttpClient.Builder client = new OkHttpClient.Builder();
+        client.addInterceptor(httpLoggingInterceptor);
+        client.authenticator(customAuthenticator);
+        return client.build();
+    }
+
+    @Provides
+    @ApplicationScope
+    HttpLoggingInterceptor provideHttpLoggingInterceptor() {
+        HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        return httpLoggingInterceptor;
+    }
+
+    @Provides
+    @ApplicationScope
+    Retrofit provideRetrofit(Gson gson, OkHttpClient okHttpClient, @BaseUrl String baseUrl) {
+        return new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .baseUrl(baseUrl)
+                .client(okHttpClient)
+                .build();
+    }
+
+    @Provides
+    @ApplicationScope
+    EscaleRestApi provideEscaleApi(Retrofit retrofit, ApiServiceHolder apiServiceHolder) {
+        EscaleRestApi escaleRestApi = retrofit.create(EscaleRestApi.class);
+        apiServiceHolder.setApiService(escaleRestApi);
+        return escaleRestApi;
+    }
+
+    @Provides
+    @ApplicationScope
+    SharedPreferences provideSharedPreferences(@ApplicationContext Context context) {
+        return context.getSharedPreferences("escalePref", Context.MODE_PRIVATE);
+    }
+
+    @Provides
+    @ApplicationScope
+    ApiServiceHolder provideApiServiceHolder() {
+        return new ApiServiceHolder();
     }
 }

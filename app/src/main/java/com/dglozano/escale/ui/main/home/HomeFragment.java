@@ -30,6 +30,7 @@ import com.dglozano.escale.ble.BleCommunicationService;
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.ui.main.MainActivity;
+import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.LocationPermission;
 
@@ -113,8 +114,8 @@ public class HomeFragment extends Fragment {
 
     private Unbinder mViewUnbinder;
     private HomeViewModel mHomeViewModel;
+    private MainActivityViewModel mMainActivityViewModel;
     private boolean mHasClickedScan;
-    private MutableLiveData<Boolean> mutableLiveData = new MutableLiveData<Boolean>();
 
     private BleCommunicationService mBluetoothCommService;
     private boolean mBleServiceIsBound = false;
@@ -150,13 +151,6 @@ public class HomeFragment extends Fragment {
         mBluetoothCommService.getLoadingState().observe(this,
                 (text) -> mLoaderText.setText(String.format("%1$s...", text)));
         mBluetoothCommService.getBodyMeasurement().observe(this, this::updateBodyMeasurement);
-        mutableLiveData.setValue(false);
-        mutableLiveData.observe(this, (value) -> Timber.d("HOLA: %s", value));
-        Completable.complete()
-                .subscribeOn(Schedulers.io())
-                .delay(1000, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> mutableLiveData.setValue(true));
     }
 
     private void updateBodyMeasurement(BodyMeasurement bodyMeasurement) {
@@ -186,6 +180,7 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
         mHomeViewModel = ViewModelProviders.of(this, mViewModelFactory).get(HomeViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 
     @Override

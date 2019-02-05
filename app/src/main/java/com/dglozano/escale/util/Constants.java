@@ -33,6 +33,10 @@ public class Constants {
     public static final String USER_LOGIN_ERROR = "200205";
     public static final String USER_LOGIN_SUCCESS = "200201";
 
+    // Web
+
+    public static final String BASE_HEROKU_URL = "https://escale-api.herokuapp.com/api/";
+
 
     /**
      * 1: User index

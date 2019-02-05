@@ -17,7 +17,7 @@ public interface UserDao {
     LiveData<List<User>> getAllUsers();
 
     @Query("SELECT * FROM User WHERE id == :id")
-    LiveData<User> getUserById(Integer id);
+    LiveData<User> getUserById(int id);
 
     @Delete
     void deleteUser(User user);

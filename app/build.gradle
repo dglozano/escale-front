@@ -70,6 +70,14 @@ dependencies {
     implementation "com.google.dagger:dagger-android-support:$dagger_version"
     implementation "com.polidea.rxandroidble2:rxandroidble:$rx_ble_version"
     implementation "io.reactivex.rxjava2:rxandroid:$rx_android_version"
+    implementation "com.google.code.gson:gson:2.8.2"
+    implementation "com.squareup.retrofit2:converter-gson:2.4.0"
+    implementation "com.squareup.okhttp3:okhttp:3.10.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:3.9.1"
+    implementation(group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.3.0') {
+        exclude module: 'okhttp'
+    }
+
     implementation "com.github.ittianyu:BottomNavigationViewEx:1.2.4"
     implementation "q.rorbin:badgeview:1.1.0"
     implementation "pl.pawelkleczkowski.customgauge:CustomGauge:1.0.3"

@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -21,19 +22,15 @@ import android.widget.TextView;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BleCommunicationService;
-import com.dglozano.escale.db.entity.User;
+import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.common.BottomBarAdapter;
 import com.dglozano.escale.ui.main.common.NoSwipePager;
 import com.dglozano.escale.ui.main.diet.DietFragment;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
-import com.firebase.ui.auth.IdpResponse;
-import com.firebase.ui.auth.util.ExtraConstants;
-import com.google.firebase.auth.FirebaseUser;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -69,6 +66,8 @@ public class MainActivity extends AppCompatActivity
     DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
+    @Inject
+    SharedPreferences sharedPreferences;
 
     private MainActivityViewModel mViewModel;
     private Badge mMessagesBadge;
@@ -100,6 +99,18 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainActivityViewModel.class);
 
+        Intent intent = getIntent();
+        int userId = intent.getIntExtra("user_id", -1);
+
+        if (userId != -1) {
+            // TODO
+            mViewModel.initUserWithId(userId);
+        } else {
+            //TODO show error in toast and go back to login, do not close app.
+
+            finish();
+        }
+
         setupDrawerLayout();
         setupBottomNav();
         addFragmentsToBottomNav();
@@ -119,9 +130,8 @@ public class MainActivity extends AppCompatActivity
     private void observeUserData() {
         TextView navUsername = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_name);
         TextView navEmail = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_mail);
-        mViewModel.getAllUsers().observe(this, users -> {
-            if (users != null && !users.isEmpty()) {
-                User user = users.get(0);
+        mViewModel.getLoggedUser().observe(this, user -> {
+            if (user != null) {
                 navUsername.setText(String.format("%1$s %2$s", user.getName(), user.getLastName()));
                 navEmail.setText(user.getEmail());
             }
@@ -157,13 +167,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @NonNull
-    public static Intent createIntent(@NonNull Context context, @Nullable FirebaseUser response) {
-        return new Intent().setClass(context, MainActivity.class)
-                .putExtra(ExtraConstants.USER, response);
-    }
-
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -178,9 +181,12 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_logout) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("loggedUserId", -1);
+            editor.apply();
+            startActivity(intent);
 
         }
 

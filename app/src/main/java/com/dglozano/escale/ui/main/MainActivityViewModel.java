@@ -6,22 +6,24 @@ import android.arch.lifecycle.ViewModel;
 import com.dglozano.escale.db.entity.User;
 import com.dglozano.escale.repository.UserRepository;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 public class MainActivityViewModel extends ViewModel {
 
-    private LiveData<User> loggedUser;
     private UserRepository mUserRepository;
+    private LiveData<User> mLoggedUser;
 
     @Inject
     public MainActivityViewModel(UserRepository userRepository) {
         mUserRepository = userRepository;
     }
 
-    //FIXME no hace falta uno para todos los users
-    public LiveData<List<User>> getAllUsers() {
-        return mUserRepository.getAllUsers();
+    public void initUserWithId(int userId) {
+        //TODO
+        mLoggedUser = mUserRepository.getUserById(userId);
+    }
+
+    public LiveData<User> getLoggedUser() {
+        return mLoggedUser;
     }
 }
