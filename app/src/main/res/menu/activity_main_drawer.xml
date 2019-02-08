@@ -5,30 +5,25 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/drawer_ic_menu_camera"
-            android:title="Import" />
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/drawer_ic_menu_profile"
+            android:title="@string/drawer_option_profile" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/drawer_ic_menu_gallery"
-            android:title="Gallery" />
+            android:id="@+id/nav_doctor_info"
+            android:icon="@drawable/drawer_ic_menu_doctor_info"
+            android:title="@string/drawer_option_doctor" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/drawer_ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/drawer_ic_menu_settings"
+            android:title="@string/drawer_option_settings" />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/drawer_ic_menu_manage"
-            android:title="Tools" />
+            android:id="@+id/nav_help"
+            android:icon="@drawable/drawer_ic_menu_help"
+            android:title="@string/drawer_option_help" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/drawer_ic_menu_logout"
+            android:title="@string/drawer_option_logout" />
     </group>
-
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_logout"
-                android:icon="@drawable/drawer_ic_menu_logout"
-                android:title="Salir" />
-        </menu>
-    </item>
 
 </menu>

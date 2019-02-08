@@ -33,7 +33,7 @@ public class CustomOkHttpAuthenticator implements Authenticator {
         if (response.code() == 401) {
             String refreshToken = sharedPreferences.getString("refreshToken", null);
 
-            if (refreshToken == null) {
+            if (refreshToken == null || refreshToken.equals(response.request().header("refreshToken"))) {
                 return null;
             }
 
@@ -48,7 +48,7 @@ public class CustomOkHttpAuthenticator implements Authenticator {
                 String newToken = refreshResponse.headers().get("token");
                 String newRefreshToken = refreshResponse.headers().get("refreshToken");
 
-                updateSharedPreferencesWithNewTokens(newToken, refreshToken);
+                updateSharedPreferencesWithNewTokens(newToken, newRefreshToken);
 
                 return response.request().newBuilder()
                             .header("token", newToken)

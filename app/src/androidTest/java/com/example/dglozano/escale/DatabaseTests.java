@@ -7,7 +7,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.db.EscaleDatabase;
-import com.dglozano.escale.db.entity.User;
+import com.dglozano.escale.db.entity.Patient;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,7 +18,7 @@ import org.junit.runner.RunWith;
 import java.util.List;
 
 import static com.dglozano.escale.db.entity.BodyMeasurement.createMockBodyMeasurementForUser;
-import static com.dglozano.escale.db.entity.User.createMockUser;
+import static com.dglozano.escale.db.entity.Patient.createMockUser;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
@@ -51,20 +51,20 @@ public class DatabaseTests {
 
     @Test
     public void userInsertTest() {
-        User userTest = createMockUser();
+        Patient patientTest = createMockUser();
 
-        Integer userId = mDatabase.userDao().insertUser(userTest).intValue();
-        userTest.setId(userId);
+        Integer userId = mDatabase.userDao().save(patientTest).intValue();
+        patientTest.setId(userId);
 
-        User returnedUser = mDatabase.userDao().getUserById(userId);
+        Patient returnedPatient = mDatabase.userDao().getPatientById(userId);
 
-        assertThat(returnedUser, equalTo(userTest));
+        assertThat(returnedPatient, equalTo(patientTest));
     }
 
     @Test
     public void bodyMeasurementInsertTest() {
-        User userTest = createMockUser();
-        Integer userId = mDatabase.userDao().insertUser(userTest).intValue();
+        Patient patientTest = createMockUser();
+        Integer userId = mDatabase.userDao().save(patientTest).intValue();
 
         BodyMeasurement bodyMeasurementTest = createMockBodyMeasurementForUser(userId);
         Integer bodyMeasurementId = mDatabase.bodyMeasurementDao()
@@ -81,11 +81,11 @@ public class DatabaseTests {
 
     @Test
     public void getAllBodyMeasurements() {
-        User userTest1 = createMockUser();
-        User userTest2 = createMockUser();
+        Patient patientTest1 = createMockUser();
+        Patient patientTest2 = createMockUser();
 
-        Integer userId1 = mDatabase.userDao().insertUser(userTest1).intValue();
-        Integer userId2 = mDatabase.userDao().insertUser(userTest2).intValue();
+        Integer userId1 = mDatabase.userDao().save(patientTest1).intValue();
+        Integer userId2 = mDatabase.userDao().save(patientTest2).intValue();
 
         BodyMeasurement bodyMeasurementTest1 = createMockBodyMeasurementForUser(userId1);
         BodyMeasurement bodyMeasurementTest2 = createMockBodyMeasurementForUser(userId1);
@@ -112,11 +112,11 @@ public class DatabaseTests {
 
     @Test
     public void getAllBodyMeasurementsOfUser() {
-        User userTest1 = createMockUser();
-        User userTest2 = createMockUser();
+        Patient patientTest1 = createMockUser();
+        Patient patientTest2 = createMockUser();
 
-        Integer userId1 = mDatabase.userDao().insertUser(userTest1).intValue();
-        Integer userId2 = mDatabase.userDao().insertUser(userTest2).intValue();
+        Integer userId1 = mDatabase.userDao().save(patientTest1).intValue();
+        Integer userId2 = mDatabase.userDao().save(patientTest2).intValue();
 
         BodyMeasurement bodyMeasurementTest1 = createMockBodyMeasurementForUser(userId1);
         BodyMeasurement bodyMeasurementTest2 = createMockBodyMeasurementForUser(userId1);

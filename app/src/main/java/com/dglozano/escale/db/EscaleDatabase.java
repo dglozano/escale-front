@@ -5,15 +5,15 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 
 import com.dglozano.escale.db.dao.BodyMeasurementDao;
-import com.dglozano.escale.db.dao.UserDao;
+import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.db.entity.BodyMeasurement;
-import com.dglozano.escale.db.entity.User;
+import com.dglozano.escale.db.entity.Patient;
 
-@Database(entities = {BodyMeasurement.class, User.class}, version = 4, exportSchema = false)
+@Database(entities = {BodyMeasurement.class, Patient.class}, version = 6, exportSchema = false)
 @TypeConverters(DatabaseConverters.class)
 public abstract class EscaleDatabase extends RoomDatabase {
 
     public abstract BodyMeasurementDao bodyMeasurementDao();
 
-    public abstract UserDao userDao();
+    public abstract PatientDao userDao();
 }

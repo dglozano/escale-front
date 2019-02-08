@@ -1,5 +1,6 @@
 package com.dglozano.escale.web;
 
+import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.web.dto.BodyMeasurementDTO;
 import com.dglozano.escale.web.dto.Credentials;
 import com.dglozano.escale.web.dto.LoginResponse;
@@ -23,12 +24,12 @@ public interface EscaleRestApi {
     Call<LoginResponse> refreshToken(@Header("refreshToken") String refreshToken);
 
     @GET("patients/{id}")
-    Call<PatientDTO> getPatientById(@Path("id") Long patientId, @Header("token") String token);
+    Call<PatientDTO> getPatientById(@Path("id") int patientId);
 
     @GET("patients/{id}/measurements")
-    Call<List<BodyMeasurementDTO>> getAllBodyMeasurement(@Path("id") Long patientId, @Header("token") String token);
+    Call<List<BodyMeasurementDTO>> getAllBodyMeasurement(@Path("id") int patientId);
 
     @GET("patients/{id}/last-measurement")
-    Call<BodyMeasurementDTO> getLastBodyMeasurement(@Path("id") Long patientId, @Header("token") String token);
+    Call<BodyMeasurementDTO> getLastBodyMeasurement(@Path("id") int patientId);
 
 }

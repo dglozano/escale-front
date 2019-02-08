@@ -2,7 +2,7 @@ package com.dglozano.escale.db;
 
 import android.arch.persistence.room.TypeConverter;
 
-import com.dglozano.escale.db.entity.User;
+import com.dglozano.escale.db.entity.Patient;
 
 import java.util.Date;
 
@@ -18,12 +18,12 @@ public class DatabaseConverters {
     }
 
     @TypeConverter
-    public Integer genderToInt(User.Gender gender) {
-        return gender.equals(User.Gender.MALE) ? 0 : 1;
+    public Integer genderToInt(Patient.Gender gender) {
+        return gender.equals(Patient.Gender.MALE) ? 0 : 1;
     }
 
     @TypeConverter
-    public User.Gender intToGender(Integer integer) {
-        return integer == 0 ? User.Gender.MALE : User.Gender.FEMALE;
+    public Patient.Gender intToGender(Integer integer) {
+        return integer == 0 ? Patient.Gender.MALE : Patient.Gender.FEMALE;
     }
 }

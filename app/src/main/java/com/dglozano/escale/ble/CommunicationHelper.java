@@ -1,7 +1,7 @@
 package com.dglozano.escale.ble;
 
 import com.dglozano.escale.db.entity.BodyMeasurement;
-import com.dglozano.escale.db.entity.User;
+import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.util.Constants;
 
 import java.text.SimpleDateFormat;
@@ -73,8 +73,8 @@ class CommunicationHelper {
         return String.format("%s%s%s", yyyy, mm, dd);
     }
 
-    static String getSexHex(User.Gender gender) {
-        return gender == User.Gender.MALE ? "00" : "01";
+    static String getSexHex(Patient.Gender gender) {
+        return gender == Patient.Gender.MALE ? "00" : "01";
     }
 
     static String getPhysicalActivity(int activity) {

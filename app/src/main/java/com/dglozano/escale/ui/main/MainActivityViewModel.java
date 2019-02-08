@@ -3,27 +3,27 @@ package com.dglozano.escale.ui.main;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.dglozano.escale.db.entity.User;
-import com.dglozano.escale.repository.UserRepository;
+import com.dglozano.escale.db.entity.Patient;
+import com.dglozano.escale.repository.PatientRepository;
 
 import javax.inject.Inject;
 
 public class MainActivityViewModel extends ViewModel {
 
-    private UserRepository mUserRepository;
-    private LiveData<User> mLoggedUser;
+    private PatientRepository mPatientRepository;
+    private LiveData<Patient> mLoggedUser;
 
     @Inject
-    public MainActivityViewModel(UserRepository userRepository) {
-        mUserRepository = userRepository;
+    public MainActivityViewModel(PatientRepository patientRepository) {
+        mPatientRepository = patientRepository;
     }
 
     public void initUserWithId(int userId) {
         //TODO
-        mLoggedUser = mUserRepository.getUserById(userId);
+        mLoggedUser = mPatientRepository.getPatientById(userId);
     }
 
-    public LiveData<User> getLoggedUser() {
+    public LiveData<Patient> getLoggedPatient() {
         return mLoggedUser;
     }
 }

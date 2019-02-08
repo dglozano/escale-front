@@ -4,11 +4,10 @@ import android.app.Application;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.widget.ProgressBar;
 
 import com.dglozano.escale.db.EscaleDatabase;
 import com.dglozano.escale.db.dao.BodyMeasurementDao;
-import com.dglozano.escale.db.dao.UserDao;
+import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.di.annotation.ApplicationContext;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BaseUrl;
@@ -18,7 +17,7 @@ import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.web.ApiServiceHolder;
 import com.dglozano.escale.web.CustomOkHttpAuthenticator;
 import com.dglozano.escale.web.EscaleRestApi;
-import com.google.firebase.auth.FirebaseAuth;
+import com.dglozano.escale.web.HeaderTokenInterceptor;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,7 +28,6 @@ import java.text.SimpleDateFormat;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -55,7 +53,7 @@ public class AppModule {
 
     @Provides
     @ApplicationScope
-    UserDao provideUserDao(EscaleDatabase db) {
+    PatientDao provideUserDao(EscaleDatabase db) {
         return db.userDao();
     }
 
@@ -104,16 +102,17 @@ public class AppModule {
     @ApplicationScope
     Gson provideGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
         return gsonBuilder.create();
     }
 
     @Provides
     @ApplicationScope
     OkHttpClient provideOkhttpClient(HttpLoggingInterceptor httpLoggingInterceptor,
-                                     CustomOkHttpAuthenticator customAuthenticator) {
+                                     CustomOkHttpAuthenticator customAuthenticator,
+                                     HeaderTokenInterceptor headerTokenInterceptor) {
         OkHttpClient.Builder client = new OkHttpClient.Builder();
         client.addInterceptor(httpLoggingInterceptor);
+        client.addNetworkInterceptor(headerTokenInterceptor);
         client.authenticator(customAuthenticator);
         return client.build();
     }

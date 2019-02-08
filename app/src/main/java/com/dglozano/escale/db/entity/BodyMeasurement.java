@@ -12,7 +12,7 @@ import java.util.Random;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@Entity(foreignKeys = @ForeignKey(entity = User.class,
+@Entity(foreignKeys = @ForeignKey(entity = Patient.class,
         parentColumns = "id",
         childColumns = "userId",
         onDelete = CASCADE))

@@ -34,12 +34,12 @@ public class Constants {
     public static final String USER_LOGIN_SUCCESS = "200201";
 
     // Web
-
     public static final String BASE_HEROKU_URL = "https://escale-api.herokuapp.com/api/";
+    public static final int FRESH_TIMEOUT = 30;
 
 
     /**
-     * 1: User index
+     * 1: Patient index
      * 2: Birth year (2 bytes)
      * 3: Birth month
      * 4: Birth day
@@ -157,7 +157,7 @@ public class Constants {
     public static final UUID REFERENCE_TIME_INFO =
             UUID.fromString("00002A14-0000-1000-8000-00805F9B34FB");
 
-    // User Data service
+    // Patient Data service
     public static final UUID USER_DATA_SERVICE =
             UUID.fromString("0000181C-0000-1000-8000-00805F9B34FB");
     public static final UUID DATE_OF_BIRTH =

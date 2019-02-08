@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.BodyMeasurement;
-import com.dglozano.escale.db.entity.User;
+import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BluetoothInfo;
 import com.dglozano.escale.util.Constants;
@@ -45,7 +45,6 @@ import timber.log.Timber;
 import static com.dglozano.escale.ble.CommunicationHelper.PinIndex;
 import static com.dglozano.escale.ble.CommunicationHelper.ScaleUserLimitExcedded;
 import static com.dglozano.escale.ble.CommunicationHelper.bytesToHex;
-import static com.dglozano.escale.ble.CommunicationHelper.flipBytes;
 import static com.dglozano.escale.ble.CommunicationHelper.generatePIN;
 import static com.dglozano.escale.ble.CommunicationHelper.getCurrentTimeHex;
 import static com.dglozano.escale.ble.CommunicationHelper.getHexBirthDate;
@@ -53,9 +52,7 @@ import static com.dglozano.escale.ble.CommunicationHelper.getNextDbIncrement;
 import static com.dglozano.escale.ble.CommunicationHelper.getPhysicalActivity;
 import static com.dglozano.escale.ble.CommunicationHelper.getSexHex;
 import static com.dglozano.escale.ble.CommunicationHelper.hexToBytes;
-import static com.dglozano.escale.ble.CommunicationHelper.isSetToKilo;
 import static com.dglozano.escale.ble.CommunicationHelper.lastNBytes;
-import static com.dglozano.escale.ble.CommunicationHelper.parseFullDateStringFromHex;
 import static com.dglozano.escale.ble.CommunicationHelper.parseWeightMeasurementFromHex;
 
 @ApplicationScope
@@ -171,7 +168,7 @@ public class BleCommunicationService extends Service {
                                         .flatMap(pinAndIndex -> loginUserInScale(pinAndIndex.index(),
                                                 pinAndIndex.pin(), rxBleConnection))
                                         .flatMap(loginStatus -> writeUserData(Calendar.getInstance().getTime(),
-                                                User.Gender.MALE, 3, rxBleConnection)
+                                                Patient.Gender.MALE, 3, rxBleConnection)
                                                 .flatMap(bytesIgnored -> Single.just(loginStatus)))
                                         .doOnSuccess(couldConnect -> {
                                             if (couldConnect) {
@@ -280,7 +277,7 @@ public class BleCommunicationService extends Service {
                         .flatMap(pinAndIndex -> loginUserInScale(pinAndIndex.index(),
                                 pinAndIndex.pin(), rxBleConnection))
                         .flatMap(loginStatus -> writeUserData(Calendar.getInstance().getTime(),
-                                User.Gender.MALE, 3, rxBleConnection)
+                                Patient.Gender.MALE, 3, rxBleConnection)
                                 .flatMap(bytesIgnored -> Single.just(loginStatus)))
                         .doOnSuccess(couldConnect -> {
                             if (couldConnect) {
@@ -333,7 +330,7 @@ public class BleCommunicationService extends Service {
                 .doOnError(this::throwException);
     }
 
-    public Single<byte[]> writeUserData(Date dateOfBirth, User.Gender gender, int activity,
+    public Single<byte[]> writeUserData(Date dateOfBirth, Patient.Gender gender, int activity,
                                         RxBleConnection rxBleConnection) {
         Timber.d("Writing user data");
         mConnectionState.postValue(Constants.SETTING_USER_DATA);

@@ -1,5 +1,6 @@
 package com.dglozano.escale.ui.main;
 
+import android.app.ActivityOptions;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
@@ -18,10 +19,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
 import android.widget.TextView;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BleCommunicationService;
+import com.dglozano.escale.ui.common.BaseActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.common.BottomBarAdapter;
 import com.dglozano.escale.ui.main.common.NoSwipePager;
@@ -43,7 +47,7 @@ import q.rorbin.badgeview.Badge;
 import q.rorbin.badgeview.QBadgeView;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MessagesFragment.OnFragmentInteractionListener,
         HasSupportFragmentInjector {
@@ -92,6 +96,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Enable transitions
+//        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -102,12 +109,10 @@ public class MainActivity extends AppCompatActivity
         Intent intent = getIntent();
         int userId = intent.getIntExtra("user_id", -1);
 
-        if (userId != -1) {
-            // TODO
+        if(userId != -1) {
             mViewModel.initUserWithId(userId);
         } else {
-            //TODO show error in toast and go back to login, do not close app.
-
+            //TODO show error
             finish();
         }
 
@@ -115,7 +120,7 @@ public class MainActivity extends AppCompatActivity
         setupBottomNav();
         addFragmentsToBottomNav();
 
-        // Updates User data in Drawer if it changes
+        // Updates Patient data in Drawer if it changes
         observeUserData();
     }
 
@@ -130,9 +135,9 @@ public class MainActivity extends AppCompatActivity
     private void observeUserData() {
         TextView navUsername = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_name);
         TextView navEmail = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_mail);
-        mViewModel.getLoggedUser().observe(this, user -> {
+        mViewModel.getLoggedPatient().observe(this, user -> {
             if (user != null) {
-                navUsername.setText(String.format("%1$s %2$s", user.getName(), user.getLastName()));
+                navUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
                 navEmail.setText(user.getEmail());
             }
         });
@@ -173,21 +178,21 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_profile) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_doctor_info) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_settings) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_help) {
 
         } else if (id == R.id.nav_logout) {
             Intent intent = new Intent(this, LoginActivity.class);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt("loggedUserId", -1);
+            editor.clear();
             editor.apply();
-            startActivity(intent);
-
+            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+            finish();
         }
 
         mDrawer.closeDrawer(GravityCompat.START);
@@ -228,5 +233,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public AndroidInjector<Fragment> supportFragmentInjector() {
         return fragmentDispatchingAndroidInjector;
+    }
+
+    @Override
+    protected View getRootLayout() {
+        return findViewById(android.R.id.content);
     }
 }

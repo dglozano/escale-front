@@ -9,7 +9,7 @@ import dagger.Provides;
 public class MainActivityModule {
 
     @Provides
-    BottomBarAdapter provideFeedPagerAdapter(MainActivity activity) {
+    BottomBarAdapter provideBottomBarAdapter(MainActivity activity) {
         return new BottomBarAdapter(activity.getSupportFragmentManager());
     }
 }
