@@ -10,7 +10,7 @@ public class NoSwipePager extends ViewPager {
 
     public NoSwipePager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.enabled = true;
+        this.enabled = false;
     }
 
     @Override
