@@ -4,22 +4,18 @@ import android.app.Activity;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.transition.Slide;
-import android.view.Gravity;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityChangePasswordBinding;
-import com.dglozano.escale.databinding.ActivityLoginBinding;
-import com.dglozano.escale.ui.login.LoginActivityViewModel;
 import com.dglozano.escale.web.EscaleRestApi;
-import com.dglozano.escale.web.dto.LoginResponse;
+
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -42,6 +38,7 @@ public class ChangePasswordActivity extends BaseActivity {
     @Inject
     EscaleRestApi escaleRestApi;
 
+    private boolean isForcedToChangePassword;
     private ChangePasswordActivityViewModel mViewModel;
 
     @Override
@@ -60,12 +57,42 @@ public class ChangePasswordActivity extends BaseActivity {
 
         Intent intent = getIntent();
         int userId = intent.getIntExtra("user_id", -1);
+        isForcedToChangePassword = intent.getBooleanExtra("forced_to_change_pass", false);
 
-        if(userId == -1) {
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        if (userId == -1) {
             finish();
         } else {
             mViewModel.setUserId(userId);
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        if (isForcedToChangePassword) {
+            showYouMustChangePasswordDialog();
+            return false;
+        } else {
+            finish();
+            return true;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isForcedToChangePassword) {
+            showYouMustChangePasswordDialog();
+        } else {
+            finish();
+        }
+    }
+
+    private void showYouMustChangePasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        builder.setMessage(getString(R.string.must_change_password_error_msg_dialog))
+                .setNeutralButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     @OnClick(R.id.change_password_btn)

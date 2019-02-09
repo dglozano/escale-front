@@ -52,4 +52,6 @@
     <string name="change_password_canceled_msg">No has cambiado tu contraseña. Recuerda que puedes cambiarla ingresando a tu perfil.</string>
     <string name="snackbar_password_change_success_msg">La password se ha cambiado correctamente.</string>
     <string name="change_password_title">Cambiar contraseña</string>
+    <string name="dialog_change_password">Bienvenido! Parece que es la primera vez que utilizas tu cuenta de Escale, por lo que aún tienes tu contraseña inicial. Presiona OK para cambiarla por tu contraseña definitiva.</string>
+    <string name="must_change_password_error_msg_dialog">Por cuestiones de seguridad, usted debe modificar su contraseña inicial.</string>
 </resources>

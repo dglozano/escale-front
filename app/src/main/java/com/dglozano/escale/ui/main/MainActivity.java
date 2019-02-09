@@ -18,6 +18,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BleCommunicationService;
+import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.ui.common.BaseActivity;
 import com.dglozano.escale.ui.common.ChangePasswordActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
@@ -112,7 +114,7 @@ public class MainActivity extends BaseActivity
         Intent intent = getIntent();
         int userId = intent.getIntExtra("user_id", -1);
 
-        if(userId != -1) {
+        if (userId != -1) {
             mViewModel.initUserWithId(userId);
         } else {
             //TODO show error
@@ -142,10 +144,8 @@ public class MainActivity extends BaseActivity
             if (user != null) {
                 navUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
                 navEmail.setText(user.getEmail());
-                if(!user.hasChangedDefaultPassword()) {
-                    Intent intent = new Intent(this, ChangePasswordActivity.class);
-                    intent.putExtra("user_id", user.getId());
-                    startActivityForResult(intent, CHANGE_PASSWORD_CODE);
+                if (!user.hasChangedDefaultPassword()) {
+                    showChangePasswordDialog(user);
                 }
             }
         });
@@ -216,6 +216,20 @@ public class MainActivity extends BaseActivity
                 .bindTarget(mBnv.getBottomNavigationItemView(position));
     }
 
+    private void showChangePasswordDialog(Patient user) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        builder.setTitle(getString(R.string.change_password_title))
+                .setMessage(getString(R.string.dialog_change_password))
+                .setNeutralButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                .setOnDismissListener(dialog -> {
+                    Intent intent = new Intent(this, ChangePasswordActivity.class);
+                    intent.putExtra("user_id", user.getId());
+                    intent.putExtra("forced_to_change_pass", true);
+                    startActivityForResult(intent, CHANGE_PASSWORD_CODE);
+                })
+                .show();
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -252,7 +266,7 @@ public class MainActivity extends BaseActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == CHANGE_PASSWORD_CODE) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 showSnackbarWithDuration(R.string.snackbar_password_change_success_msg, Snackbar.LENGTH_SHORT);
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 showSnackbarWithOkDismiss(R.string.change_password_canceled_msg);
