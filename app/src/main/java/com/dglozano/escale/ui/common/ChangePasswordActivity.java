@@ -13,6 +13,9 @@ import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityChangePasswordBinding;
+import com.dglozano.escale.db.dao.PatientDao;
+import com.dglozano.escale.repository.PatientRepository;
+import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.web.EscaleRestApi;
 
 import java.util.Objects;
@@ -37,6 +40,10 @@ public class ChangePasswordActivity extends BaseActivity {
     ViewModelProvider.Factory mViewModelFactory;
     @Inject
     EscaleRestApi escaleRestApi;
+    @Inject
+    PatientDao patientDao;
+    @Inject
+    AppExecutors executors;
 
     private boolean isForcedToChangePassword;
     private ChangePasswordActivityViewModel mViewModel;
@@ -90,7 +97,8 @@ public class ChangePasswordActivity extends BaseActivity {
 
     private void showYouMustChangePasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
-        builder.setMessage(getString(R.string.must_change_password_error_msg_dialog))
+        builder.setTitle(getString(R.string.dialog_title_error))
+                .setMessage(getString(R.string.must_change_password_error_msg_dialog))
                 .setNeutralButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
                 .show();
     }
