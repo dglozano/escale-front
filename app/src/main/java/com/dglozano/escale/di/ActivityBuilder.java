@@ -1,5 +1,7 @@
 package com.dglozano.escale.di;
 
+import com.dglozano.escale.ui.common.ChangePasswordActivity;
+import com.dglozano.escale.ui.common.ChangePasswordActivityModule;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.login.LoginActivityModule;
 import com.dglozano.escale.ui.main.MainActivity;
@@ -22,4 +24,9 @@ public abstract class ActivityBuilder {
             LoginActivityModule.class
     })
     public abstract LoginActivity bindLoginActivity();
+
+    @ContributesAndroidInjector(modules = {
+            ChangePasswordActivityModule.class
+    })
+    public abstract ChangePasswordActivity bindChangePasswordActivity();
 }

@@ -43,4 +43,13 @@
     <string name="drawer_option_settings">Configuración</string>
     <string name="drawer_option_help">Ayuda</string>
     <string name="drawer_option_logout">Salir</string>
+    <string name="change_pass_instructions">Ingrese su contraseña actual seguido de su nueva contraseña.\n\nLa nueva contraseña debe tener <b>como mínimo 8 caracteres</b>, incluir <b>al menos una letra minúscula</b> y por lo menos <b>un dígito</b>.
+    </string>
+    <string name="current_password">Contraseña actual</string>
+    <string name="new_password">Nueva contraseña</string>
+    <string name="new_password_repeat">Repita su nueva contraseña</string>
+    <string name="change_password_button">Cambiar contraseña</string>
+    <string name="change_password_canceled_msg">No has cambiado tu contraseña. Recuerda que puedes cambiarla ingresando a tu perfil.</string>
+    <string name="snackbar_password_change_success_msg">La password se ha cambiado correctamente.</string>
+    <string name="change_password_title">Cambiar contraseña</string>
 </resources>

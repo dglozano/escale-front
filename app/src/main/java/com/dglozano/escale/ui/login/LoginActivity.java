@@ -34,8 +34,6 @@ import timber.log.Timber;
 
 public class LoginActivity extends BaseActivity {
 
-    private static final int RC_SIGN_IN = 100;
-
     @BindView(R.id.login_root)
     View mRootView;
     @BindView(R.id.login_progress_bar_container)

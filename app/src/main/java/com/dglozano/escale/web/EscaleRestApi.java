@@ -2,6 +2,7 @@ package com.dglozano.escale.web;
 
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.web.dto.BodyMeasurementDTO;
+import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.Credentials;
 import com.dglozano.escale.web.dto.LoginResponse;
 import com.dglozano.escale.web.dto.PatientDTO;
@@ -31,5 +32,10 @@ public interface EscaleRestApi {
 
     @GET("patients/{id}/last-measurement")
     Call<BodyMeasurementDTO> getLastBodyMeasurement(@Path("id") int patientId);
+
+    @POST("users/{id}/password_change")
+    Call<Void> changePassword(@Body ChangePasswordDataDTO changePasswordData, @Path("id") int userId);
+
+
 
 }

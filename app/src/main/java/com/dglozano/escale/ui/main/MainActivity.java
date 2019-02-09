@@ -1,5 +1,6 @@
 package com.dglozano.escale.ui.main;
 
+import android.app.Activity;
 import android.app.ActivityOptions;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
@@ -12,11 +13,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BleCommunicationService;
 import com.dglozano.escale.ui.common.BaseActivity;
+import com.dglozano.escale.ui.common.ChangePasswordActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.common.BottomBarAdapter;
 import com.dglozano.escale.ui.main.common.NoSwipePager;
@@ -51,6 +53,8 @@ public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MessagesFragment.OnFragmentInteractionListener,
         HasSupportFragmentInjector {
+
+    private static final int CHANGE_PASSWORD_CODE = 123;
 
     // Binding views with Butterknife
     @BindView(R.id.bnve)
@@ -138,6 +142,11 @@ public class MainActivity extends BaseActivity
             if (user != null) {
                 navUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
                 navEmail.setText(user.getEmail());
+                if(!user.hasChangedDefaultPassword()) {
+                    Intent intent = new Intent(this, ChangePasswordActivity.class);
+                    intent.putExtra("user_id", user.getId());
+                    startActivityForResult(intent, CHANGE_PASSWORD_CODE);
+                }
             }
         });
     }
@@ -237,5 +246,17 @@ public class MainActivity extends BaseActivity
     @Override
     protected View getRootLayout() {
         return findViewById(android.R.id.content);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == CHANGE_PASSWORD_CODE) {
+            if(resultCode == Activity.RESULT_OK){
+                showSnackbarWithDuration(R.string.snackbar_password_change_success_msg, Snackbar.LENGTH_SHORT);
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                showSnackbarWithOkDismiss(R.string.change_password_canceled_msg);
+            }
+        }
     }
 }
