@@ -43,9 +43,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.common.ChangePasswordActivity"
-            android:label="@string/change_password_title">
-        </activity>
+        <activity
+            android:name=".ui.common.ChangePasswordActivity"
+            android:label="@string/change_password_title"></activity>
+        <activity android:name=".ui.common.NoInternetActivity"></activity>
     </application>
 
 </manifest>

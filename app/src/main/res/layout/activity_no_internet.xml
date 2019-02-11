@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.common.NoInternetActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_vertical_margin"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/no_internet_image"
+            android:layout_width="72dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_no_internet" />
+
+        <TextView
+            android:id="@+id/no_internet_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/no_internet_image"
+            android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+            android:text="@string/no_internet_text"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textColor="@color/colorTextDark" />
+
+        <Button
+            android:id="@+id/no_internet_try_again_btn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height"
+            android:layout_below="@id/no_internet_text"
+            android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+            android:background="@drawable/login_button_rounded"
+            android:text="@string/try_again"
+            android:textColor="@color/colorBackground"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/no_internet_progress_bar_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBlackOverlay"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/no_internet_progress_bar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorAccent" />
+
+    </RelativeLayout>
+</android.support.constraint.ConstraintLayout>

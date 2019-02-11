@@ -16,7 +16,7 @@ import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityLoginBinding;
-import com.dglozano.escale.ui.common.BaseActivity;
+import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.LoginResponse;
@@ -74,15 +74,15 @@ public class LoginActivity extends BaseActivity {
 
         // Check if there is a user logged in the app.
         int loggedUserId = sharedPreferences.getInt("loggedUserId", -1);
+        Timber.d("Logged User Id: %s", loggedUserId);
         if (loggedUserId != -1) {
-            startMainActivity(loggedUserId);
+            startMainActivity();
         }
         // If the loggedUserId in SharedPreferences is -1, then no user is logged in. Proceed.
     }
 
-    private void startMainActivity(int loggedUserId) {
+    private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("user_id", loggedUserId);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         finish();
     }
@@ -111,7 +111,7 @@ public class LoginActivity extends BaseActivity {
                     editor.putString("refreshToken", newRefreshToken);
                     editor.putInt("loggedUserId", loggedUserId);
                     editor.apply();
-                    startMainActivity(loggedUserId);
+                    startMainActivity();
                 } else {
                     hideProgressDialog();
                     Timber.d("Login error - Response code is not 200 (Bad Credentials)");

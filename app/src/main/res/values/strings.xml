@@ -55,4 +55,7 @@
     <string name="dialog_change_password">¡Bienvenido! Parece que es la primera vez que utilizas tu cuenta de Escale, por lo que aún tienes tu contraseña inicial.\n\nPresiona ACEPTAR para cambiarla.</string>
     <string name="dialog_title_error">Ups!</string>
     <string name="must_change_password_error_msg_dialog">Por cuestiones de seguridad, usted debe modificar su contraseña inicial.</string>
+    <string name="no_internet_text">Ups! Parece que has perdido la conexión a Internet. Asegurate de estar conectado y vuelve a intentarlo.</string>
+    <string name="try_again">Reintentar</string>
+    <string name="snackbar_no_connection_detected">No se ha detectado conexión a Internet.\nIntente nuevamente.</string>
 </resources>

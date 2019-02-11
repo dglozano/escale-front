@@ -28,7 +28,7 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BleCommunicationService;
 import com.dglozano.escale.db.entity.Patient;
-import com.dglozano.escale.ui.common.BaseActivity;
+import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.common.ChangePasswordActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.common.BottomBarAdapter;
@@ -103,7 +103,6 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -111,8 +110,8 @@ public class MainActivity extends BaseActivity
         setSupportActionBar(mToolbar);
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainActivityViewModel.class);
 
-        Intent intent = getIntent();
-        int userId = intent.getIntExtra("user_id", -1);
+        // Check if there is a user logged in the app.
+        int userId = sharedPreferences.getInt("loggedUserId", -1);
 
         if (userId != -1) {
             mViewModel.initUserWithId(userId);

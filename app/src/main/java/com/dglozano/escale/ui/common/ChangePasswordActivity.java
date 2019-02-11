@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
 import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityChangePasswordBinding;
 import com.dglozano.escale.db.dao.PatientDao;
-import com.dglozano.escale.repository.PatientRepository;
+import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.web.EscaleRestApi;
 

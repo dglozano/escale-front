@@ -13,6 +13,8 @@ public class MainActivityViewModel extends ViewModel {
     private PatientRepository mPatientRepository;
     private LiveData<Patient> mLoggedUser;
 
+    public MainActivityViewModel(){}
+
     @Inject
     public MainActivityViewModel(PatientRepository patientRepository) {
         mPatientRepository = patientRepository;
