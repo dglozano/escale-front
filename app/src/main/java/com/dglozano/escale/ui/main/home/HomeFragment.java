@@ -1,6 +1,5 @@
 package com.dglozano.escale.ui.main.home;
 
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
@@ -36,7 +35,6 @@ import com.dglozano.escale.util.LocationPermission;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -48,9 +46,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
-import io.reactivex.Completable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import mehdi.sakout.fancybuttons.FancyButton;
 import pl.pawelkleczkowski.customgauge.CustomGauge;
 import timber.log.Timber;
@@ -133,6 +128,7 @@ public class HomeFragment extends Fragment {
         public void onServiceDisconnected(ComponentName name) {
             Timber.d("onServiceDisconnected(). Unbinding Bluetooth Service.");
             mBleServiceIsBound = false;
+            mBluetoothCommService = null;
         }
     };
 
@@ -165,6 +161,7 @@ public class HomeFragment extends Fragment {
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -180,7 +177,6 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
         mHomeViewModel = ViewModelProviders.of(this, mViewModelFactory).get(HomeViewModel.class);
-        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 
     @Override

@@ -27,6 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
+import timber.log.Timber;
 
 public class LoginActivity extends BaseActivity {
 
@@ -65,13 +66,12 @@ public class LoginActivity extends BaseActivity {
 
         // Set an exit transition
         Slide slide = new Slide();
-        slide.setSlideEdge(Gravity.LEFT);
+        slide.setSlideEdge(Gravity.START);
         getWindow().setEnterTransition(slide);
-        getWindow().setExitTransition(slide);
 
         ButterKnife.bind(this);
 
-        mViewModel.getLoggedUserId().observe(this, this::onLoggedUserChange);
+        mViewModel.getUserIdChangeEvent().observe(this, this::onLoggedUserChange);
         mViewModel.getLoading().observe(this, this::onLoadingStateChange);
         mViewModel.getErrorEvent().observe(this, this::onErrorEventFired);
     }
@@ -92,8 +92,9 @@ public class LoginActivity extends BaseActivity {
         return findViewById(android.R.id.content);
     }
 
-    private void onLoggedUserChange(Long id) {
-        if (id != null && id != -1) {
+    private void onLoggedUserChange(Event<Long> idEvent) {
+        Timber.d("Id onLoggedUserChange %s", idEvent.peekContent());
+        if (!idEvent.hasBeenHandled() && idEvent.handleContent() != -1L) {
             startMainActivity();
         }
     }
@@ -108,7 +109,7 @@ public class LoginActivity extends BaseActivity {
 
     private void onErrorEventFired(Event<Integer> errorEvent) {
         if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.getContentIfNoThandled());
+            showSnackbarWithOkDismiss(errorEvent.handleContent());
         }
     }
 }

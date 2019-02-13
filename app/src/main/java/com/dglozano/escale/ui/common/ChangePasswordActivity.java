@@ -73,7 +73,7 @@ public class ChangePasswordActivity extends BaseActivity {
 
     private void onErrorEventFired(Event<Integer> errorEvent) {
         if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.getContentIfNoThandled());
+            showSnackbarWithOkDismiss(errorEvent.handleContent());
         }
     }
 

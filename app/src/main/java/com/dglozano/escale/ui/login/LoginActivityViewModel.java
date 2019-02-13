@@ -2,6 +2,7 @@ package com.dglozano.escale.ui.login;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 
 import com.dglozano.escale.R;
@@ -23,6 +24,7 @@ public class LoginActivityViewModel extends ViewModel {
     public MutableLiveData<String> errorPassword;
     private final CompositeDisposable disposables;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
+    private final LiveData<Event<Long>> mUserIdChangeEvent;
     private final MutableLiveData<Boolean> mLoading;
     private PatientRepository mPatientRepository;
 
@@ -34,6 +36,7 @@ public class LoginActivityViewModel extends ViewModel {
         disposables = new CompositeDisposable();
         mErrorEvent = new MutableLiveData<>();
         mLoading = new MutableLiveData<>();
+        mUserIdChangeEvent = Transformations.map(mPatientRepository.getLoggedUserId(), Event::new);
         mLoading.postValue(false);
     }
 
@@ -42,8 +45,8 @@ public class LoginActivityViewModel extends ViewModel {
         return true;
     }
 
-    public LiveData<Long> getLoggedUserId() {
-        return mPatientRepository.getLoggedUserId();
+    public LiveData<Event<Long>> getUserIdChangeEvent() {
+        return mUserIdChangeEvent;
     }
 
     public LiveData<Boolean> getLoading() {
@@ -64,7 +67,6 @@ public class LoginActivityViewModel extends ViewModel {
                     .subscribe(
                             () -> {}, // Do nothing on complete. After updating sharedPrefs it will trigger the rest
                             throwable -> {
-                                Timber.e(throwable, "Error login ");
                                 mLoading.postValue(false);
                                 if(throwable instanceof BadCredentialsException) {
                                     mErrorEvent.postValue(new Event<>(R.string.login_error_bad_credentials));

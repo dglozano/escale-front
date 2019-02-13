@@ -1,5 +1,6 @@
 package com.dglozano.escale.repository;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.content.SharedPreferences;
@@ -19,6 +20,7 @@ import com.dglozano.escale.web.dto.Credentials;
 import com.dglozano.escale.web.dto.LoginResponse;
 
 import java.util.Calendar;
+import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 
@@ -38,6 +40,7 @@ public class PatientRepository {
     private AppExecutors mAppExecutors;
     private SharedPreferences mSharedPreferences;
     private LiveData<Long> mLoggedUserId;
+    private LiveData<Patient> mLoggedPatient;
 
     @Inject
     public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi,
@@ -48,6 +51,7 @@ public class PatientRepository {
         mSharedPreferences = sharedPreferences;
         mLoggedUserId = new SharedPreferencesLiveData.SharedPreferenceLongLiveData(mSharedPreferences,
                 Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
+        mLoggedPatient = Transformations.switchMap(mLoggedUserId, this::getPatientById);
     }
 
     public LiveData<Patient> getPatientById(Long userId) {
@@ -56,7 +60,7 @@ public class PatientRepository {
     }
 
     public LiveData<Patient> getLoggedPatient() {
-        return Transformations.switchMap(mLoggedUserId, this::getPatientById);
+        return mLoggedPatient;
     }
 
     public LiveData<Long> getLoggedUserId() {
@@ -109,6 +113,8 @@ public class PatientRepository {
                 });
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressLint("CheckResult")
     private void refreshPatient(final Long userId) {
         mPatientDao.hasUser(userId, FRESH_TIMEOUT)
                 .map(freshInt -> freshInt == 1)
@@ -119,14 +125,19 @@ public class PatientRepository {
                         return Maybe.empty();
                     }
                 })
-                .doOnComplete(() -> Timber.d("Completed refreshing user with id %s without ApiCall", userId))
                 .flatMapSingle(patientDTO -> {
                     Timber.d("Retrieved user with id %s from Api", userId);
                     Patient patient = new Patient(patientDTO, Calendar.getInstance().getTime());
                     return Single.fromCallable(() -> mPatientDao.save(patient));
                 })
                 .subscribeOn(Schedulers.io())
-                .subscribe();
+                .subscribe(onSuccess -> Timber.d("Success refresh"), e -> {
+                    if(e instanceof NoSuchElementException) {
+                        Timber.d("Success refresh without calling Api");
+                    } else {
+                        Timber.e(e);
+                    }
+                });
     }
 
 }

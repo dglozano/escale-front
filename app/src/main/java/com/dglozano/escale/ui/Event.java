@@ -14,7 +14,7 @@ public class Event<T> {
         return hasBeenHandled;
     }
 
-    public T getContentIfNoThandled() {
+    public T handleContent() {
         if(hasBeenHandled) {
             return null;
         } else {

@@ -27,7 +27,6 @@ import android.widget.TextView;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BleCommunicationService;
-import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.common.ChangePasswordActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
@@ -37,6 +36,7 @@ import com.dglozano.escale.ui.main.diet.DietFragment;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
+import com.dglozano.escale.util.Constants;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import javax.inject.Inject;
@@ -83,6 +83,7 @@ public class MainActivity extends BaseActivity
     private Badge mMessagesBadge;
     private BleCommunicationService mBluetoothCommService;
     private boolean mBleServiceIsBound = false;
+    private AlertDialog activeDialog = null;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -116,6 +117,15 @@ public class MainActivity extends BaseActivity
 
         // Updates Patient data in Drawer if it changes
         observeUserData();
+        observeChangeDialogEvent();
+    }
+
+    private void observeChangeDialogEvent() {
+        mViewModel.watchMustChangePassword().observe(this, mustChangePassEvent -> {
+            if (mustChangePassEvent != null && !mustChangePassEvent.hasBeenHandled() && mustChangePassEvent.handleContent()) {
+                activeDialog = showChangePasswordDialog();
+            }
+        });
     }
 
     private void setupDrawerLayout() {
@@ -133,9 +143,6 @@ public class MainActivity extends BaseActivity
             if (user != null) {
                 navUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
                 navEmail.setText(user.getEmail());
-                if (!user.hasChangedDefaultPassword()) {
-                    showChangePasswordDialog(user);
-                }
             }
         });
     }
@@ -186,6 +193,7 @@ public class MainActivity extends BaseActivity
         } else if (id == R.id.nav_logout) {
             Intent intent = new Intent(this, LoginActivity.class);
             SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
             editor.clear();
             editor.apply();
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
@@ -205,9 +213,9 @@ public class MainActivity extends BaseActivity
                 .bindTarget(mBnv.getBottomNavigationItemView(position));
     }
 
-    private void showChangePasswordDialog(Patient user) {
+    private AlertDialog showChangePasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
-        builder.setTitle(getString(R.string.change_password_title))
+        return builder.setTitle(getString(R.string.change_password_title))
                 .setMessage(getString(R.string.dialog_change_password))
                 .setPositiveButton(R.string.change_password_title, (dialog, which) -> {
                     Intent intent = new Intent(this, ChangePasswordActivity.class);
@@ -233,6 +241,15 @@ public class MainActivity extends BaseActivity
             unbindService(mServiceConnection);
         }
         super.onStop();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (activeDialog != null) {
+            activeDialog.dismiss();
+            activeDialog = null;
+        }
     }
 
     @Override
