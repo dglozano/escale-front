@@ -21,6 +21,7 @@ import com.dglozano.escale.web.HeaderTokenInterceptor;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.polidea.rxandroidble2.RxBleClient;
 
 import java.text.DecimalFormat;
@@ -130,6 +131,7 @@ public class AppModule {
     Retrofit provideRetrofit(Gson gson, OkHttpClient okHttpClient, @BaseUrl String baseUrl) {
         return new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(baseUrl)
                 .client(okHttpClient)
                 .build();

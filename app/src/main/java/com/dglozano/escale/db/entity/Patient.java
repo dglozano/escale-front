@@ -13,7 +13,7 @@ import java.util.Date;
 public class Patient {
 
     @PrimaryKey
-    private int id;
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
@@ -31,7 +31,7 @@ public class Patient {
     }
 
     @Ignore
-    public Patient(Integer id, String firstName, String lastName, String email) {
+    public Patient(Long id, String firstName, String lastName, String email) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -86,7 +86,7 @@ public class Patient {
         this.email = email;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -159,7 +159,7 @@ public class Patient {
                 && otherPatient.email.equals(this.email);
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 

@@ -110,16 +110,6 @@ public class MainActivity extends BaseActivity
         setSupportActionBar(mToolbar);
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainActivityViewModel.class);
 
-        // Check if there is a user logged in the app.
-        int userId = sharedPreferences.getInt("loggedUserId", -1);
-
-        if (userId != -1) {
-            mViewModel.initUserWithId(userId);
-        } else {
-            //TODO show error
-            finish();
-        }
-
         setupDrawerLayout();
         setupBottomNav();
         addFragmentsToBottomNav();
@@ -219,13 +209,12 @@ public class MainActivity extends BaseActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
         builder.setTitle(getString(R.string.change_password_title))
                 .setMessage(getString(R.string.dialog_change_password))
-                .setNeutralButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
-                .setOnDismissListener(dialog -> {
+                .setPositiveButton(R.string.change_password_title, (dialog, which) -> {
                     Intent intent = new Intent(this, ChangePasswordActivity.class);
-                    intent.putExtra("user_id", user.getId());
                     intent.putExtra("forced_to_change_pass", true);
                     startActivityForResult(intent, CHANGE_PASSWORD_CODE);
                 })
+                .setCancelable(false)
                 .show();
     }
 
@@ -239,11 +228,11 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onStop() {
-        super.onStop();
         Timber.d("onStop(). Unbinding Bluetooth Service.");
         if (mBleServiceIsBound) {
             unbindService(mServiceConnection);
         }
+        super.onStop();
     }
 
     @Override

@@ -6,17 +6,15 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityChangePasswordBinding;
-import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.ui.BaseActivity;
-import com.dglozano.escale.util.AppExecutors;
-import com.dglozano.escale.web.EscaleRestApi;
+import com.dglozano.escale.ui.Event;
 
 import java.util.Objects;
 
@@ -26,24 +24,20 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timber.log.Timber;
 
 public class ChangePasswordActivity extends BaseActivity {
 
     @BindView(R.id.change_password_progress_bar_container)
     RelativeLayout mProgressBarContainer;
+    @BindView(R.id.current_password_input)
+    EditText mCurrentPasswordInput;
+    @BindView(R.id.new_password_input)
+    EditText mNewPasswordEditInput;
+    @BindView(R.id.new_password_repeat_input)
+    EditText mNewPasswordRepeatInput;
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
-    @Inject
-    EscaleRestApi escaleRestApi;
-    @Inject
-    PatientDao patientDao;
-    @Inject
-    AppExecutors executors;
 
     private boolean isForcedToChangePassword;
     private ChangePasswordActivityViewModel mViewModel;
@@ -63,15 +57,31 @@ public class ChangePasswordActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        int userId = intent.getIntExtra("user_id", -1);
         isForcedToChangePassword = intent.getBooleanExtra("forced_to_change_pass", false);
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        if (userId == -1) {
-            finish();
+        mViewModel.getLoading().observe(this, this::onLoadingStateChange);
+        mViewModel.getErrorEvent().observe(this, this::onErrorEventFired);
+        mViewModel.getSuccessEvent().observe(this, this::onSuccessEventFired);
+    }
+
+    private void onSuccessEventFired(Event<Long> successEvent) {
+        setResult(Activity.RESULT_OK);
+        finish();
+    }
+
+    private void onErrorEventFired(Event<Integer> errorEvent) {
+        if (errorEvent != null && !errorEvent.hasBeenHandled()) {
+            showSnackbarWithOkDismiss(errorEvent.getContentIfNoThandled());
+        }
+    }
+
+    private void onLoadingStateChange(Boolean isLoading) {
+        if (isLoading != null && isLoading) {
+            mProgressBarContainer.setVisibility(View.VISIBLE);
         } else {
-            mViewModel.setUserId(userId);
+            mProgressBarContainer.setVisibility(View.GONE);
         }
     }
 
@@ -88,55 +98,25 @@ public class ChangePasswordActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (isForcedToChangePassword) {
-            showYouMustChangePasswordDialog();
-        } else {
-            finish();
-        }
+        if (isForcedToChangePassword) showYouMustChangePasswordDialog();
+        else finish();
     }
 
     private void showYouMustChangePasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
         builder.setTitle(getString(R.string.dialog_title_error))
                 .setMessage(getString(R.string.must_change_password_error_msg_dialog))
-                .setNeutralButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
     @OnClick(R.id.change_password_btn)
     public void changePassword() {
-        showProgressDialog();
-        Call<Void> changePasswordRseponseCall = escaleRestApi.changePassword(
-                mViewModel.getChangePasswordData(),
-                mViewModel.getUserId());
-        changePasswordRseponseCall.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (response.code() == 200) {
-                    setResult(Activity.RESULT_OK);
-                    finish();
-                } else {
-                    hideProgressDialog();
-                    Timber.d("Change password error - Response code is not 200 (Error)");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                hideProgressDialog();
-                Timber.d(t, "Change password error - OnFailure");
-            }
-        });
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressBarContainer.getVisibility() == View.VISIBLE) {
-            mProgressBarContainer.setVisibility(View.GONE);
-        }
-    }
-
-    private void showProgressDialog() {
-        mProgressBarContainer.setVisibility(View.VISIBLE);
+        mViewModel.hitChangePassword(
+                mCurrentPasswordInput.getText().toString(),
+                mNewPasswordEditInput.getText().toString(),
+                mNewPasswordRepeatInput.getText().toString()
+        );
     }
 
     @Override

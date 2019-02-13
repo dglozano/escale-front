@@ -13,6 +13,7 @@ import okhttp3.Authenticator;
 import okhttp3.Request;
 import okhttp3.Route;
 import retrofit2.Call;
+import timber.log.Timber;
 
 public class CustomOkHttpAuthenticator implements Authenticator {
 
@@ -30,10 +31,14 @@ public class CustomOkHttpAuthenticator implements Authenticator {
         if (escaleRestApiHolder.getApiService() == null) {
             return null;
         }
+        Timber.d("OkHttpAuthenticator starting method authenticate");
         if (response.code() == 401) {
+            Timber.d("OkHttpAuthenticator - ERROR 401");
             String refreshToken = sharedPreferences.getString("refreshToken", null);
-
-            if (refreshToken == null || refreshToken.equals(response.request().header("refreshToken"))) {
+            String refreshTokenRequest = response.request().header("refreshToken");
+            Timber.d("OkHttpAuthenticator - refreshToken in SharedPref %s", refreshToken);
+            Timber.d("OkHttpAuthenticator - refreshToken in Request %s", refreshTokenRequest);
+            if (refreshToken == null || refreshToken.equals(refreshTokenRequest)) {
                 return null;
             }
 
@@ -47,6 +52,9 @@ public class CustomOkHttpAuthenticator implements Authenticator {
             if (refreshResponse != null && refreshResponse.code() == 200) {
                 String newToken = refreshResponse.headers().get("token");
                 String newRefreshToken = refreshResponse.headers().get("refreshToken");
+
+                Timber.d("OkHttpAuthenticator - new token %s", newToken);
+                Timber.d("OkHttpAuthenticator - new refreshToken %s", newRefreshToken);
 
                 updateSharedPreferencesWithNewTokens(newToken, newRefreshToken);
 

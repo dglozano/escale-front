@@ -11,21 +11,13 @@ import javax.inject.Inject;
 public class MainActivityViewModel extends ViewModel {
 
     private PatientRepository mPatientRepository;
-    private LiveData<Patient> mLoggedUser;
-
-    public MainActivityViewModel(){}
 
     @Inject
     public MainActivityViewModel(PatientRepository patientRepository) {
         mPatientRepository = patientRepository;
     }
 
-    public void initUserWithId(int userId) {
-        //TODO
-        mLoggedUser = mPatientRepository.getPatientById(userId);
-    }
-
     public LiveData<Patient> getLoggedPatient() {
-        return mLoggedUser;
+        return mPatientRepository.getLoggedPatient();
     }
 }

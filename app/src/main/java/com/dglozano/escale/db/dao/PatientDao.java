@@ -11,13 +11,15 @@ import com.dglozano.escale.db.entity.Patient;
 
 import java.util.List;
 
+import io.reactivex.Single;
+
 @Dao
 public interface PatientDao {
     @Query("SELECT * FROM Patient")
     LiveData<List<Patient>> getAllUsers();
 
     @Query("SELECT * FROM Patient WHERE id == :id")
-    LiveData<Patient> getPatientById(int id);
+    LiveData<Patient> getPatientById(Long id);
 
     @Delete
     void deleteUser(Patient patient);
@@ -30,5 +32,5 @@ public interface PatientDao {
     void deleteAll();
 
     @Query("SELECT COUNT(*) FROM Patient WHERE id == :id AND lastUpdate >= :timeout")
-    int hasUser(int id, long timeout);
+    Single<Integer> hasUser(Long id, long timeout);
 }

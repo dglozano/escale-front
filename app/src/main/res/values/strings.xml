@@ -52,10 +52,11 @@
     <string name="change_password_canceled_msg">No has cambiado tu contraseña. Recuerda que puedes cambiarla ingresando a tu perfil.</string>
     <string name="snackbar_password_change_success_msg">La password se ha cambiado correctamente.</string>
     <string name="change_password_title">Cambiar contraseña</string>
-    <string name="dialog_change_password">¡Bienvenido! Parece que es la primera vez que utilizas tu cuenta de Escale, por lo que aún tienes tu contraseña inicial.\n\nPresiona ACEPTAR para cambiarla.</string>
+    <string name="dialog_change_password">¡Bienvenido! Parece que es la primera vez que utilizas tu cuenta de Escale, por lo que debes cambiar tu contraseña inicial.</string>
     <string name="dialog_title_error">Ups!</string>
     <string name="must_change_password_error_msg_dialog">Por cuestiones de seguridad, usted debe modificar su contraseña inicial.</string>
     <string name="no_internet_text">Ups! Parece que has perdido la conexión a Internet. Asegurate de estar conectado y vuelve a intentarlo.</string>
     <string name="try_again">Reintentar</string>
     <string name="snackbar_no_connection_detected">No se ha detectado conexión a Internet.\nIntente nuevamente.</string>
+    <string name="change_password_error_snackbar">No pudimos cambiar la contraseña. Revisa los datos e intenta nuevamente.</string>
 </resources>

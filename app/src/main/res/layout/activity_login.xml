@@ -69,7 +69,6 @@
                     android:padding="@dimen/padding_small"
                     android:paddingStart="@dimen/padding_medium"
                     android:paddingEnd="@dimen/padding_medium"
-                    android:text="@={viewmodel.email}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small.Inverse"
                     android:textColor="@color/colorTextBlack"
                     android:textColorHint="@color/colorTextDark" />
@@ -95,7 +94,6 @@
                     android:padding="@dimen/padding_small"
                     android:paddingStart="@dimen/padding_medium"
                     android:paddingEnd="@dimen/padding_medium"
-                    android:text="@={viewmodel.password}"
                     android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
                     android:textColor="@color/colorTextBlack"
                     android:textColorHint="@color/colorTextDark" />

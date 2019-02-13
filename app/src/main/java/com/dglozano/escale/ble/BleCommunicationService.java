@@ -326,7 +326,7 @@ public class BleCommunicationService extends Service {
                 })
                 .singleOrError()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess(couldConnect -> Timber.d("Logging in Response: %1$s", couldConnect))
+                .doOnSuccess(couldConnect -> Timber.d("Logging in Resource: %1$s", couldConnect))
                 .doOnError(this::throwException);
     }
 
@@ -353,7 +353,7 @@ public class BleCommunicationService extends Service {
                 .flatMapSingle(hexResponse -> Single.just(!hexResponse.equals("02")))
                 .singleOrError()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess(hexResponse -> Timber.d("Response: %1$s", hexResponse))
+                .doOnSuccess(hexResponse -> Timber.d("Resource: %1$s", hexResponse))
                 .doOnError(this::throwException);
     }
 
@@ -365,7 +365,7 @@ public class BleCommunicationService extends Service {
                 .singleOrError()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess(bodyMeasurement -> {
-                    Timber.d("Response Weight: %1$s", bodyMeasurement.getWeight());
+                    Timber.d("Resource Weight: %1$s", bodyMeasurement.getWeight());
                     mLastBodyMeasurement.postValue(bodyMeasurement);
                 })
                 .doOnError(this::throwException);
@@ -384,7 +384,7 @@ public class BleCommunicationService extends Service {
                         rxBleConnection.writeCharacteristic(writeTo, hexToBytes(hexString)).toObservable(),
                         notificationObservable.take(1),
                         (writtenBytes, responseBytes) -> {
-                            Timber.d("Wrote %1$s to %2$s - Response: %3$s",
+                            Timber.d("Wrote %1$s to %2$s - Resource: %3$s",
                                     bytesToHex(writtenBytes), writeTo.toString(), bytesToHex(responseBytes));
                             return bytesToHex(responseBytes);
                         }

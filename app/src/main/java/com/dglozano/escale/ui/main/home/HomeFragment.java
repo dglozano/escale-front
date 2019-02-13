@@ -218,11 +218,11 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onStop() {
-        super.onStop();
         Timber.d("onStop(). Unbinding Bluetooth Service.");
         if (mBleServiceIsBound) {
             mMainActivity.unbindService(mServiceConnection);
         }
+        super.onStop();
     }
 
     @Override

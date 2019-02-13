@@ -1,20 +1,31 @@
 package com.dglozano.escale.repository;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
+import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.util.AppExecutors;
+import com.dglozano.escale.util.BadCredentialsException;
+import com.dglozano.escale.util.ChangePasswordException;
+import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.NotAPatientException;
+import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
-import com.dglozano.escale.web.dto.PatientDTO;
+import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
+import com.dglozano.escale.web.dto.Credentials;
+import com.dglozano.escale.web.dto.LoginResponse;
 
-import java.io.IOException;
 import java.util.Calendar;
 
 import javax.inject.Inject;
 
-import retrofit2.Response;
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.dglozano.escale.util.Constants.FRESH_TIMEOUT;
@@ -25,43 +36,97 @@ public class PatientRepository {
     private PatientDao mPatientDao;
     private EscaleRestApi mEscaleRestApi;
     private AppExecutors mAppExecutors;
+    private SharedPreferences mSharedPreferences;
+    private LiveData<Long> mLoggedUserId;
 
     @Inject
-    public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi, AppExecutors executors) {
+    public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi,
+                             AppExecutors executors, SharedPreferences sharedPreferences) {
         mPatientDao = patientDao;
         mEscaleRestApi = escaleRestApi;
         mAppExecutors = executors;
+        mSharedPreferences = sharedPreferences;
+        mLoggedUserId = new SharedPreferencesLiveData.SharedPreferenceLongLiveData(mSharedPreferences,
+                Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
     }
 
-    public LiveData<Patient> getPatientById(int userId) {
-        refreshUser(userId);
+    public LiveData<Patient> getPatientById(Long userId) {
+        refreshPatient(userId);
         return mPatientDao.getPatientById(userId);
     }
 
-    private void refreshUser(final int userId) {
-        // Runs in a background thread.
-        mAppExecutors.getDiskIO().execute(() -> {
-            // Check if user data was fetched recently.
-            boolean userExists = mPatientDao.hasUser(userId, FRESH_TIMEOUT) != 0;
-            Timber.d("Does user exist and is fresh? " + userExists);
-            if (!userExists) {
-                // Refreshes the data.
-                Response<PatientDTO> response = null;
-                try {
-                    response = mEscaleRestApi.getPatientById(userId).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
+    public LiveData<Patient> getLoggedPatient() {
+        return Transformations.switchMap(mLoggedUserId, this::getPatientById);
+    }
+
+    public LiveData<Long> getLoggedUserId() {
+        return mLoggedUserId;
+    }
+
+    public Completable loginPatient(String email, String password) {
+        return mEscaleRestApi.login(new Credentials(email, password)).flatMapCompletable(response -> {
+            LoginResponse loginResponseBody = response.body();
+            if (response.code() == 200 && loginResponseBody != null) {
+                if (loginResponseBody.getUserType() != 2) {
+                    // If the user had proper Credentials, but it is not a Patient,
+                    // he can't use the mobile app.
+                    throw new NotAPatientException();
                 }
-
-                // TODO
-                // Check for errors here.
-
-                Patient patient = new Patient(response.body(), Calendar.getInstance().getTime());
-
-                // Updates the database. The LiveData object automatically
-                // refreshes, so we don't need to do anything else here.
-                mPatientDao.save(patient);
+                Long loggedUserId = loginResponseBody.getId();
+                String newToken = response.headers().get(Constants.TOKEN_HEADER_KEY);
+                String newRefreshToken = response.headers().get(Constants.REFRESH_TOKEN_HEADER_KEY);
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putString(Constants.TOKEN_SHARED_PREF, newToken);
+                editor.putString(Constants.REFRESH_TOKEN_SHARED_PREF, newRefreshToken);
+                editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, loggedUserId);
+                editor.apply();
+                return Completable.complete();
+            } else {
+                Timber.d("Login error - Resource code is not 200 (Bad Credentials)");
+                throw new BadCredentialsException();
             }
         });
     }
+
+    public Single<Long> changePassword(String currentPassword,
+                                              String newPassword,
+                                              String newPasswordRepeat) {
+        Long userId = getLoggedUserId().getValue() == null ? -1L : getLoggedUserId().getValue();
+        return mEscaleRestApi.changePassword(
+                new ChangePasswordDataDTO(currentPassword,
+                        newPassword, newPasswordRepeat), userId)
+                .flatMap(changePasswordResponse -> {
+                    if (changePasswordResponse.code() == 200) {
+                        return mEscaleRestApi.getPatientById(userId);
+                    } else {
+                        Timber.d("Error change password, check");
+                        throw new ChangePasswordException();
+                    }
+                })
+                .flatMap(patientDTO -> {
+                    Patient patient = new Patient(patientDTO, Calendar.getInstance().getTime());
+                    return Single.fromCallable(() -> mPatientDao.save(patient));
+                });
+    }
+
+    private void refreshPatient(final Long userId) {
+        mPatientDao.hasUser(userId, FRESH_TIMEOUT)
+                .map(freshInt -> freshInt == 1)
+                .flatMapMaybe(hasFreshUser -> {
+                    if (!hasFreshUser) {
+                        return Maybe.fromSingle(mEscaleRestApi.getPatientById(userId));
+                    } else {
+                        return Maybe.empty();
+                    }
+                })
+                .doOnComplete(() -> Timber.d("Completed refreshing user with id %s without ApiCall", userId))
+                .flatMapSingle(patientDTO -> {
+                    Timber.d("Retrieved user with id %s from Api", userId);
+                    Patient patient = new Patient(patientDTO, Calendar.getInstance().getTime());
+                    return Single.fromCallable(() -> mPatientDao.save(patient));
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe();
+    }
+
 }

@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class PatientDTO {
 
-    private int id;
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
@@ -22,11 +22,11 @@ public class PatientDTO {
     public PatientDTO() {
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -2,21 +2,21 @@ package com.dglozano.escale.web.dto;
 
 public class LoginResponse {
 
-    private int id;
+    private Long id;
     private String email;
     private int userType;
 
-    public LoginResponse(int id, String email, int userType) {
+    public LoginResponse(Long id, String email, int userType) {
         this.id = id;
         this.email = email;
         this.userType = userType;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

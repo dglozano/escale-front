@@ -53,7 +53,7 @@ public class DatabaseTests {
     public void userInsertTest() {
         Patient patientTest = createMockUser();
 
-        Integer userId = mDatabase.userDao().save(patientTest).intValue();
+        Long userId = mDatabase.userDao().save(patientTest).intValue();
         patientTest.setId(userId);
 
         Patient returnedPatient = mDatabase.userDao().getPatientById(userId);

@@ -36,7 +36,13 @@ public class Constants {
     // Web
     public static final String BASE_HEROKU_URL = "https://escale-api.herokuapp.com/api/";
     public static final int FRESH_TIMEOUT = 30;
+    public static final String TOKEN_HEADER_KEY = "token";
+    public static final String REFRESH_TOKEN_HEADER_KEY = "refreshToken";
 
+    //Shared Prefrences keys
+    public static final String LOGGED_USER_ID_SHARED_PREF = "loggedUserId";
+    public static final String TOKEN_SHARED_PREF = "token";
+    public static final String REFRESH_TOKEN_SHARED_PREF = "refreshToken";
 
     /**
      * 1: Patient index
