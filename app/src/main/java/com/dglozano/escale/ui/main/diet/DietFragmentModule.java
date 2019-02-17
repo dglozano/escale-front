@@ -1,10 +1,6 @@
 package com.dglozano.escale.ui.main.diet;
 
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-
-import com.dglozano.escale.ui.main.MainActivity;
+import android.support.v4.app.FragmentManager;
 
 import dagger.Module;
 import dagger.Provides;
@@ -12,18 +8,19 @@ import dagger.Provides;
 @Module
 public class DietFragmentModule {
 
-    @Provides
-    LinearLayoutManager provideLinearLayoutManager(DietFragment fragment) {
-        return new LinearLayoutManager(fragment.getActivity());
-    }
+//    @Provides
+//    static List<Fragment> provideFragmentList(CurrentDietFragment currentDietFragment, NewsFragment ) {
+//        List<Fragment> fragments = new ArrayList<>();
+//        fragments.add(home);
+//        fragments.add(news);
+//        fragments.add(moments);
+//        fragments.add(wallet);
+//        fragments.add(personal);
+//        return fragments;
+//    }
 
     @Provides
-    DividerItemDecoration provideDividerItemDecoration(MainActivity mainActivity) {
-        return new DividerItemDecoration(mainActivity, LinearLayoutManager.VERTICAL);
-    }
-
-    @Provides
-    DefaultItemAnimator provideDefaultItemAnimator() {
-        return new DefaultItemAnimator();
+    static FragmentManager provideFragmentManager(DietFragment dietFragment) {
+        return dietFragment.getChildFragmentManager();
     }
 }

@@ -11,7 +11,6 @@ import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.DietDTO;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,13 +37,22 @@ public class DietRepository {
 
     public LiveData<List<Diet>> getDietsOfPatientWithId(Long patientId) {
         refreshDiets(patientId);
-        return mDietDao.getAllDietsOfUserWithId(patientId);
+        return mDietDao.getAllDietsOfUserWithIdAsLiveData(patientId);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressLint("CheckResult")
     private void refreshDiets(final Long patientId) {
-        mEscaleRestApi.getDiets(patientId)
+        refreshDietsCompletable(patientId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(() -> Timber.d("Success refresh diets"), e -> {
+                        Timber.e(e, "Failed refresh diets");
+                });
+    }
+
+    public Completable refreshDietsCompletable(Long patientId) {
+        return mEscaleRestApi.getDiets(patientId)
                 .flatMapCompletable(dietsApi -> {
                     Timber.d("Retrieved diets for user with id %s from Api", patientId);
                     dietsApi.stream()
@@ -60,25 +68,17 @@ public class DietRepository {
                                     .map(DietDTO::getUuid)
                                     .collect(Collectors.toSet());
 
-                    List<Diet> dietsInDatabase = mDietDao.getAllDietsOfUserWithId(patientId)
-                            .getValue();
+                    List<Diet> dietsInDatabase= mDietDao.getAllDietsOfUserWithId(patientId);
+
 
                     if(dietsInDatabase != null) {
                         dietsInDatabase
                                 .stream()
                                 .filter(diet -> !dietUuids.contains(diet.getId()))
-                                .forEach(diet -> {
-                                    Timber.d("Deleting diet from DB %s", diet.getId());
-                                    mDietDao.deleteDiet(diet);
-                                });
+                                .forEach(diet -> mDietDao.deleteDiet(diet));
                     }
 
                     return Completable.complete();
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(() -> Timber.d("Success refresh diets"), e -> {
-                        Timber.e(e, "Failed refresh diets");
                 });
     }
 }

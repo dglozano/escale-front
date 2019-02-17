@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.main.diet;
+package com.dglozano.escale.ui.main.diet.all;
 
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -22,7 +22,7 @@ import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DietListAdapter extends RecyclerView.Adapter<DietListAdapter.DietViewHolder> {
+public class AllDietsListAdapter extends RecyclerView.Adapter<AllDietsListAdapter.DietViewHolder> {
 
     @Inject
     SimpleDateFormat simpleDateFormat;
@@ -36,7 +36,7 @@ public class DietListAdapter extends RecyclerView.Adapter<DietListAdapter.DietVi
     private List<Diet> mDietsList;
 
     @Inject
-    public DietListAdapter(MainActivity mainActivity) {
+    public AllDietsListAdapter(MainActivity mainActivity) {
         ButterKnife.bind(this, mainActivity);
     }
 

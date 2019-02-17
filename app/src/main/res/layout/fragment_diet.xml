@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/colorBackground"
+    android:background="@color/almostWhite"
     tools:context="com.dglozano.escale.ui.main.diet.DietFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view_diets"
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/diets_current_or_all_tablayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:elevation="10dp"
+        app:tabIndicatorColor="@color/colorAccent"
+        app:tabMaxWidth="0dp"
+        app:tabMode="fixed"
+        app:tabSelectedTextColor="@color/almostWhite"
+        app:tabTextColor="@color/disabledTabLightBlue" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/diet_view_pager_tabs"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:layout_marginTop="?android:attr/actionBarSize" />
 </RelativeLayout>

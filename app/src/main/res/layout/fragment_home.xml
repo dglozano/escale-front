@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fancy="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_home_id"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/colorBackground"
+    android:background="@color/almostWhite"
     tools:context="com.dglozano.escale.ui.main.home.HomeFragment">
 
     <ProgressBar
@@ -159,7 +160,7 @@
                 fancy:fb_radiusTopLeft="@dimen/radius"
                 fancy:fb_radiusTopRight="@dimen/radius"
                 fancy:fb_text="DESCONECTADO"
-                fancy:fb_textColor="@color/colorBackground" />
+                fancy:fb_textColor="@color/almostWhite" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_measurements"
@@ -187,7 +188,7 @@
             android:layout_height="100dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:background="@color/colorBackground"
+            android:background="@color/almostWhite"
             android:visibility="visible" />
 
         <TextView

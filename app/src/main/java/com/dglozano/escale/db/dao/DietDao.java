@@ -14,7 +14,10 @@ import java.util.List;
 public interface DietDao {
 
     @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC")
-    LiveData<List<Diet>> getAllDietsOfUserWithId(Long userId);
+    LiveData<List<Diet>> getAllDietsOfUserWithIdAsLiveData(Long userId);
+
+    @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC")
+    List<Diet> getAllDietsOfUserWithId(Long userId);
 
     @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC LIMIT 1")
     LiveData<Diet> getCurrenDietOfUserWithId(Long userId);

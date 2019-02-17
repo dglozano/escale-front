@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/login_welcome_to_escale"
                 android:textAppearance="@android:style/TextAppearance.Material.Large"
-                android:textColor="@color/colorBackground" />
+                android:textColor="@color/almostWhite" />
 
             <TextView
                 android:id="@+id/login_instruction_text"
@@ -47,7 +47,7 @@
                 android:layout_marginTop="@dimen/activity_vertical_margin_medium"
                 android:text="@string/login_first_time_message"
                 android:textAppearance="@android:style/TextAppearance.Material.Small"
-                android:textColor="@color/colorBackground" />
+                android:textColor="@color/almostWhite" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/login_email_inputlayout"
@@ -108,7 +108,7 @@
                 android:layout_marginTop="@dimen/activity_vertical_margin_medium"
                 android:background="@drawable/login_button_rounded"
                 android:text="@string/login_button_text"
-                android:textColor="@color/colorBackground"
+                android:textColor="@color/almostWhite"
                 android:textStyle="bold" />
 
         </RelativeLayout>
@@ -122,7 +122,7 @@
             android:focusable="true"
             android:text="@string/login_reset_password_text"
             android:textAlignment="center"
-            android:textColor="@color/colorBackground"
+            android:textColor="@color/almostWhite"
             app:layout_constraintBottom_toBottomOf="@id/login_root" />
 
         <RelativeLayout

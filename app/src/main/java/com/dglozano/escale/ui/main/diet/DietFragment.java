@@ -6,19 +6,19 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.repository.DietRepository;
-import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
+import com.dglozano.escale.ui.main.diet.all.AllDietsFragment;
+import com.dglozano.escale.ui.main.diet.all.AllDietsViewModel;
+import com.dglozano.escale.ui.main.diet.current.CurrentDietFragment;
 
 import javax.inject.Inject;
 
@@ -31,27 +31,21 @@ import timber.log.Timber;
 
 public class DietFragment extends Fragment {
 
-    @BindView(R.id.recycler_view_diets)
-    RecyclerView mRecyclerViewDiets;
+    @BindView(R.id.diet_view_pager_tabs)
+    ViewPager mTabsViewPager;
+    @BindView(R.id.diets_current_or_all_tablayout)
+    TabLayout mTabLayout;
 
-    @Inject
-    LinearLayoutManager mLayoutManager;
-    @Inject
-    DietListAdapter mDietListAdapter;
-    @Inject
-    DefaultItemAnimator mDefaultItemAnimator;
-    @Inject
-    DividerItemDecoration mDividerItemDecoration;
-    @Inject
-    DietRepository dietRepository;
-    @Inject
-    MainActivity mMainActivity;
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
+    @Inject
+    DietTabAdapter mTabsAdapter;
 
     private Unbinder mViewUnbinder;
-    private DietViewModel mDietViewModel;
     private MainActivityViewModel mMainActivityViewModel;
+
+    private boolean started = false;
+    private boolean visible = false;
 
     public DietFragment() {
         // Required empty public constructor
@@ -67,38 +61,48 @@ public class DietFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_diet, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
+
+        setupViewPager(mTabsViewPager);
+        mTabLayout.setupWithViewPager(mTabsViewPager);
         return view;
     }
 
+    private void setupViewPager(ViewPager viewPager) {
+        mTabsAdapter.addFragment(new CurrentDietFragment(), getString(R.string.current_diet_title));
+        mTabsAdapter.addFragment(new AllDietsFragment(), getString(R.string.all_diets_title));
+        viewPager.setAdapter(mTabsAdapter);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        this.visible = isVisibleToUser;
+
+        if(this.started) {
+            mMainActivityViewModel.toogleAppBarShadow(!this.visible);
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.started = false;
+    }
 
     @Override
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
+        this.started = true;
         mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        mMainActivityViewModel.toogleAppBarShadow(!this.visible);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
-        mDietViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DietViewModel.class);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mRecyclerViewDiets.setHasFixedSize(true);
-        mRecyclerViewDiets.setLayoutManager(mLayoutManager);
-        mRecyclerViewDiets.setItemAnimator(mDefaultItemAnimator);
-        mRecyclerViewDiets.addItemDecoration(mDividerItemDecoration);
-        mRecyclerViewDiets.setAdapter(mDietListAdapter);
-        mDietViewModel.getDietsOfLoggedPatient().observe(this, diets -> {
-            if(diets != null && !diets.isEmpty()) {
-                mDietListAdapter.setItems(diets);
-            } else {
-                Timber.d("No diets yet");
-            }
-        });
     }
 
     @Override

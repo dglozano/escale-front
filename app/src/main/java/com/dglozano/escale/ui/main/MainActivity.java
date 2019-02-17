@@ -12,11 +12,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -68,6 +71,8 @@ public class MainActivity extends BaseActivity
     Toolbar mToolbar;
     @BindView(R.id.fragment_viewpager)
     NoSwipePager mNoSwipePager;
+    @BindView(R.id.app_bar_layout)
+    AppBarLayout mAppBarLayout;
 
     @Inject
     BottomBarAdapter mPagerAdapter;
@@ -117,6 +122,13 @@ public class MainActivity extends BaseActivity
         // Updates Patient data in Drawer if it changes
         observeUserData();
         observeChangeDialogEvent();
+        mViewModel.shouldShowAppBarShadow().observe(this, toggleShadow -> {
+            if(toggleShadow != null && !toggleShadow) {
+                setElevationOfAppBar(0f);
+            } else {
+                setElevationOfAppBar(10f);
+            }
+        });
     }
 
     private void observeChangeDialogEvent() {
@@ -280,5 +292,13 @@ public class MainActivity extends BaseActivity
                 showSnackbarWithOkDismiss(R.string.change_password_canceled_msg);
             }
         }
+    }
+
+    private void setElevationOfAppBar(float elevation) {
+        ActionBar actionBar= getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setElevation(elevation);
+        }
+        ViewCompat.setElevation(mAppBarLayout, elevation);
     }
 }

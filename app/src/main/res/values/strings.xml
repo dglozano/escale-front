@@ -64,4 +64,7 @@
     <string name="yes">Si</string>
     <string name="no">No</string>
     <string name="drawer_option_home">Principal</string>
+    <string name="no_diets_text">Parece que aún no se te ha asignado ninguna dieta. Comunicate con tu doctor para solicitar una.</string>
+    <string name="current_diet_title">Actual</string>
+    <string name="all_diets_title">Todas</string>
 </resources>

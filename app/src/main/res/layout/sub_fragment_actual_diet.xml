@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/current_diet_swipe_refresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.github.barteksc.pdfviewer.PDFView
+            android:id="@+id/actual_diet_pdf_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
+        <RelativeLayout
+            android:id="@+id/no_current_diet_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="@dimen/activity_vertical_margin_medium"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/no_current_diet_img"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_diet_empty_icon" />
+
+            <TextView
+                android:id="@+id/no_current_diet_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/no_current_diet_img"
+                android:layout_marginTop="@dimen/activity_vertical_margin_big"
+                android:text="@string/no_diets_text"
+                android:textAlignment="center"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                android:textColor="@color/colorTextDark" />
+        </RelativeLayout>
+    </FrameLayout>
+
+</android.support.v4.widget.SwipeRefreshLayout>

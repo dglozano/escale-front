@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorBackground">#fafafa</color>
+    <color name="almostWhite">#fafafa</color>
+    <color name="disabledTabLightBlue">#cfd8dc</color>
     <color name="colorPrimary">#03a9f4</color>
     <color name="colorPrimaryDark">#0277bd</color>
     <color name="colorPrimaryLight">#29b6f6</color>
