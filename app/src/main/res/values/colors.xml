@@ -7,7 +7,8 @@
     <color name="colorAccent">#1de9b6</color>
     <color name="colorTextBlack">#202020</color>
     <color name="colorTextDark">#616161</color>
-    <color name="colorText">#bdbdbd</color>
+    <color name="gray">#757575</color>
+    <color name="lightGray">#bdbdbd</color>
     <color name="colorStartGradientOverlay">#dd4797ba</color>
     <color name="colorCenterGradientOverlay">#de266580</color>
     <color name="colorEndGradientOverlay">#e7023246</color>

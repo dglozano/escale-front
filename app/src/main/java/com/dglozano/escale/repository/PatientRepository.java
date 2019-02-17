@@ -63,7 +63,7 @@ public class PatientRepository {
         return mLoggedPatient;
     }
 
-    public LiveData<Long> getLoggedUserId() {
+    public LiveData<Long> getLoggedPatientIdAsLiveData() {
         return mLoggedUserId;
     }
 
@@ -95,7 +95,7 @@ public class PatientRepository {
     public Single<Long> changePassword(String currentPassword,
                                               String newPassword,
                                               String newPasswordRepeat) {
-        Long userId = getLoggedUserId().getValue() == null ? -1L : getLoggedUserId().getValue();
+        Long userId = getLoggedPatientIdAsLiveData().getValue() == null ? -1L : getLoggedPatientIdAsLiveData().getValue();
         return mEscaleRestApi.changePassword(
                 new ChangePasswordDataDTO(currentPassword,
                         newPassword, newPasswordRepeat), userId)
@@ -138,6 +138,17 @@ public class PatientRepository {
                         Timber.e(e);
                     }
                 });
+    }
+
+    public void logout() {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
+        editor.clear();
+        editor.apply();
+    }
+
+    public Long getLoggedPatiendId() {
+        return mSharedPreferences.getLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
     }
 
 }

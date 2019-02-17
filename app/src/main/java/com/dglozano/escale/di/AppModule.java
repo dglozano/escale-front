@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.EscaleDatabase;
 import com.dglozano.escale.db.dao.BodyMeasurementDao;
+import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.di.annotation.ApplicationContext;
 import com.dglozano.escale.di.annotation.ApplicationScope;
@@ -16,9 +17,9 @@ import com.dglozano.escale.di.annotation.DatabaseInfo;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.web.ApiServiceHolder;
 import com.dglozano.escale.web.CustomOkHttpAuthenticator;
+import com.dglozano.escale.web.DateDeserializer;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.HeaderTokenInterceptor;
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -26,6 +27,7 @@ import com.polidea.rxandroidble2.RxBleClient;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import dagger.Module;
 import dagger.Provides;
@@ -62,6 +64,12 @@ public class AppModule {
     @ApplicationScope
     BodyMeasurementDao provideBodyMeasurementDao(EscaleDatabase db) {
         return db.bodyMeasurementDao();
+    }
+
+    @Provides
+    @ApplicationScope
+    DietDao provideDietDao(EscaleDatabase db) {
+        return db.dietDao();
     }
 
     @Provides
@@ -103,6 +111,7 @@ public class AppModule {
     @ApplicationScope
     Gson provideGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Date.class, new DateDeserializer());
         return gsonBuilder.create();
     }
 

@@ -85,7 +85,7 @@ public class HomeFragment extends Fragment {
 
     @BindColor(R.color.colorPrimary)
     int mColorPrimary;
-    @BindColor(R.color.colorText)
+    @BindColor(R.color.lightGray)
     int mColorText;
 
     @Inject
@@ -191,7 +191,7 @@ public class HomeFragment extends Fragment {
         mRecyclerViewMeasurements.setAdapter(mMeasurementListAdapter);
 
         //TODO Borrar
-        BodyMeasurement mBodyMeasurement = BodyMeasurement.createMockBodyMeasurementForUser(7);
+        BodyMeasurement mBodyMeasurement = BodyMeasurement.createMockBodyMeasurementForUser(7L);
         mMeasurementListAdapter.addItems(MeasurementItem.getMeasurementList(mBodyMeasurement));
 
         mCustomGauge.setValue(1000);

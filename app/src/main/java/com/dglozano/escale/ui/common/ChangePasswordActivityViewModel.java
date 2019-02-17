@@ -7,7 +7,6 @@ import android.arch.lifecycle.ViewModel;
 import com.dglozano.escale.R;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.ui.Event;
-import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 
 import javax.inject.Inject;
 
@@ -57,7 +56,10 @@ public class ChangePasswordActivityViewModel extends ViewModel {
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe((d) -> mLoading.postValue(true))
                     .subscribe(
-                            onSuccess -> mSuccessEvent.postValue(new Event<>(onSuccess)),
+                            onSuccess -> {
+                                mSuccessEvent.postValue(new Event<>(onSuccess));
+                                mLoading.postValue(false);
+                            },
                             onError -> {
                                 mLoading.postValue(false);
                                 mErrorEvent.postValue(new Event<>(R.string.change_password_error_snackbar));

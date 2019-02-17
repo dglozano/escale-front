@@ -59,4 +59,9 @@
     <string name="try_again">Reintentar</string>
     <string name="snackbar_no_connection_detected">No se ha detectado conexión a Internet.\nIntente nuevamente.</string>
     <string name="change_password_error_snackbar">No pudimos cambiar la contraseña. Revisa los datos e intenta nuevamente.</string>
+    <string name="logout_title">Cerrar sesion</string>
+    <string name="confirm_logout_msg">¿Está seguro que desea salir?</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="drawer_option_home">Principal</string>
 </resources>

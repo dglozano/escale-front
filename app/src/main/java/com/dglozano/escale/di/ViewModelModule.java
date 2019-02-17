@@ -7,6 +7,7 @@ import com.dglozano.escale.di.annotation.ViewModelKey;
 import com.dglozano.escale.ui.common.ChangePasswordActivityViewModel;
 import com.dglozano.escale.ui.login.LoginActivityViewModel;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
+import com.dglozano.escale.ui.main.diet.DietViewModel;
 import com.dglozano.escale.ui.main.home.HomeViewModel;
 
 import dagger.Binds;
@@ -24,6 +25,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(HomeViewModel.class)
     abstract ViewModel bindHomeFragmentViewModel(HomeViewModel homeViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(DietViewModel.class)
+    abstract ViewModel bindDietFragmentViewModel(DietViewModel dietViewModel);
 
     @Binds
     @IntoMap

@@ -23,7 +23,7 @@ public class BodyMeasurement {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private int userId;
+    private Long userId;
     private Date date;
     private float weight;
     private float bmi;
@@ -37,14 +37,14 @@ public class BodyMeasurement {
     }
 
     @Ignore
-    private BodyMeasurement(int id, int userId, Date date, float weight) {
+    private BodyMeasurement(int id, Long userId, Date date, float weight) {
         this.id = id;
         this.userId = userId;
         this.date = date;
         this.weight = weight;
     }
 
-    public static BodyMeasurement createMockBodyMeasurementForUser(Integer userId) {
+    public static BodyMeasurement createMockBodyMeasurementForUser(Long userId) {
         Random r = new Random();
         Float weight = r.nextInt(51) + 60f;
         Float bmi = r.nextInt(30) + 10f;
@@ -136,11 +136,11 @@ public class BodyMeasurement {
         this.muscles = muscles;
     }
 
-    public int getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

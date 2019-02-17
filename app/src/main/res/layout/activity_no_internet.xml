@@ -9,7 +9,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/activity_vertical_margin"
+        android:padding="@dimen/activity_vertical_margin_medium"
         android:visibility="visible"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/no_internet_image"
-            android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+            android:layout_marginTop="@dimen/activity_vertical_margin_big"
             android:text="@string/no_internet_text"
             android:textAlignment="center"
             android:textAppearance="@android:style/TextAppearance.Material.Medium"
@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/height"
             android:layout_below="@id/no_internet_text"
-            android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+            android:layout_marginTop="@dimen/activity_vertical_margin_big"
             android:background="@drawable/login_button_rounded"
             android:text="@string/try_again"
             android:textColor="@color/colorBackground"

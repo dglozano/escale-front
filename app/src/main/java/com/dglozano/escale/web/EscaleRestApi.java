@@ -3,12 +3,14 @@ package com.dglozano.escale.web;
 import com.dglozano.escale.web.dto.BodyMeasurementDTO;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.Credentials;
+import com.dglozano.escale.web.dto.DietDTO;
 import com.dglozano.escale.web.dto.LoginResponse;
 import com.dglozano.escale.web.dto.PatientDTO;
 
 import java.util.List;
 
 import io.reactivex.Single;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.Body;
@@ -33,6 +35,12 @@ public interface EscaleRestApi {
 
     @GET("patients/{id}/last-measurement")
     Call<BodyMeasurementDTO> getLastBodyMeasurement(@Path("id") int patientId);
+
+    @GET("patients/{id}/diets")
+    Single<List<DietDTO>> getDiets(@Path("id") Long patientId);
+
+    @GET("diets/{id}")
+    Single<ResponseBody> downloadDiet(@Path("id") String dietId);
 
     @POST("users/{id}/password_change")
     Single<Response<Void>> changePassword(@Body ChangePasswordDataDTO changePasswordData, @Path("id") Long userId);

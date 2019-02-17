@@ -19,7 +19,7 @@ public class Constants {
     public static final String BF600 = "BF600";
 
     // Date format
-    public static final String SIMPLE_DATE_FORMAT = "dd-MM-yyyy HH:mm:ss EEEE";
+    public static final String SIMPLE_DATE_FORMAT = "dd-MM-yyyy HH:mm";
     public static final String DECIMAL_FORMAT = "#0.0";
 
     // Bytes

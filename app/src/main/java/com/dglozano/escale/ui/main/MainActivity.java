@@ -36,7 +36,6 @@ import com.dglozano.escale.ui.main.diet.DietFragment;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
-import com.dglozano.escale.util.Constants;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import javax.inject.Inject;
@@ -122,8 +121,13 @@ public class MainActivity extends BaseActivity
 
     private void observeChangeDialogEvent() {
         mViewModel.watchMustChangePassword().observe(this, mustChangePassEvent -> {
-            if (mustChangePassEvent != null && !mustChangePassEvent.hasBeenHandled() && mustChangePassEvent.handleContent()) {
-                activeDialog = showChangePasswordDialog();
+            if (mustChangePassEvent != null && !mustChangePassEvent.hasBeenHandled()) {
+                if (mustChangePassEvent.peekContent() && activeDialog == null) {
+                    activeDialog = showChangePasswordDialog();
+                } else if (!mustChangePassEvent.peekContent() && activeDialog != null) {
+                    activeDialog.dismiss();
+                    activeDialog = null;
+                }
             }
         });
     }
@@ -187,15 +191,13 @@ public class MainActivity extends BaseActivity
         } else if (id == R.id.nav_doctor_info) {
 
         } else if (id == R.id.nav_settings) {
-
+            Intent intent = new Intent(this, ChangePasswordActivity.class);
+            startActivityForResult(intent, CHANGE_PASSWORD_CODE);
         } else if (id == R.id.nav_help) {
 
         } else if (id == R.id.nav_logout) {
             Intent intent = new Intent(this, LoginActivity.class);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
-            editor.clear();
-            editor.apply();
+            mViewModel.logout();
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
             finish();
         }
@@ -220,6 +222,7 @@ public class MainActivity extends BaseActivity
                 .setPositiveButton(R.string.change_password_title, (dialog, which) -> {
                     Intent intent = new Intent(this, ChangePasswordActivity.class);
                     intent.putExtra("forced_to_change_pass", true);
+                    mViewModel.handleMustChangePasswordEvent();
                     startActivityForResult(intent, CHANGE_PASSWORD_CODE);
                 })
                 .setCancelable(false)

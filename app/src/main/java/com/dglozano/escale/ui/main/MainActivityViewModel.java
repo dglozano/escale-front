@@ -8,6 +8,8 @@ import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.ui.Event;
 
+import java.util.Objects;
+
 import javax.inject.Inject;
 
 public class MainActivityViewModel extends ViewModel {
@@ -33,8 +35,11 @@ public class MainActivityViewModel extends ViewModel {
         return mMustChangePassword;
     }
 
-//    mMustChangePasswordEvent = Transformations.map(Transformations.map(mLoggedPatient,
-//    Patient::hasChangedDefaultPassword),
-//    hasChangedDefaultPassword -> new Event<>(!hasChangedDefaultPassword)
+    public void handleMustChangePasswordEvent() {
+        Objects.requireNonNull(mMustChangePassword.getValue()).handleContent();
+    }
 
+    public void logout() {
+        mPatientRepository.logout();
+    }
 }

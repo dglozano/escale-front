@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:background="@color/colorBackground"
     tools:context="com.dglozano.escale.ui.main.diet.DietFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_diets"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="diet"
-        android:textAlignment="center" />
-
-</FrameLayout>
+        android:scrollbars="vertical" />
+</RelativeLayout>

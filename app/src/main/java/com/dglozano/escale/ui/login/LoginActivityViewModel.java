@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import timber.log.Timber;
 
 public class LoginActivityViewModel extends ViewModel {
 
@@ -36,7 +35,7 @@ public class LoginActivityViewModel extends ViewModel {
         disposables = new CompositeDisposable();
         mErrorEvent = new MutableLiveData<>();
         mLoading = new MutableLiveData<>();
-        mUserIdChangeEvent = Transformations.map(mPatientRepository.getLoggedUserId(), Event::new);
+        mUserIdChangeEvent = Transformations.map(mPatientRepository.getLoggedPatientIdAsLiveData(), Event::new);
         mLoading.postValue(false);
     }
 

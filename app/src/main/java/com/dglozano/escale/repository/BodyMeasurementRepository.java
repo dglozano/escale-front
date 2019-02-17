@@ -25,7 +25,7 @@ public class BodyMeasurementRepository {
         return mBodyMeasurementDao.getAllBodyMeasurement();
     }
 
-    public LiveData<List<BodyMeasurement>> getAllBodyMeasurementsOfUser(int userId) {
+    public LiveData<List<BodyMeasurement>> getAllBodyMeasurementsOfUser(Long userId) {
         return mBodyMeasurementDao.getAllBodyMeasurementByUserId(userId);
     }
 
