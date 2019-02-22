@@ -8,14 +8,9 @@ import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
-import timber.log.Timber;
 
 public class CurrentDietViewModel extends ViewModel {
 

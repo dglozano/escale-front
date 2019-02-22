@@ -18,6 +18,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Streaming;
 
 public interface EscaleRestApi {
 
@@ -39,8 +40,9 @@ public interface EscaleRestApi {
     @GET("patients/{id}/diets")
     Single<List<DietDTO>> getDiets(@Path("id") Long patientId);
 
-    @GET("diets/{id}")
-    Single<ResponseBody> downloadDiet(@Path("id") String dietId);
+    @Streaming
+    @GET("diets/download/{uuid}")
+    Single<ResponseBody> downloadDiet(@Path("uuid") String dietId);
 
     @POST("users/{id}/password_change")
     Single<Response<Void>> changePassword(@Body ChangePasswordDataDTO changePasswordData, @Path("id") Long userId);

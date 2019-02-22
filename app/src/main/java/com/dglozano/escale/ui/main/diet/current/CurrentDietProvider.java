@@ -1,8 +1,5 @@
 package com.dglozano.escale.ui.main.diet.current;
 
-import com.dglozano.escale.ui.main.diet.all.AllDietsFragment;
-import com.dglozano.escale.ui.main.diet.all.AllDietsModule;
-
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 

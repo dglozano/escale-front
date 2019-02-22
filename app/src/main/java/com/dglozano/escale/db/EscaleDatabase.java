@@ -11,7 +11,7 @@ import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.db.entity.Patient;
 
-@Database(entities = {BodyMeasurement.class, Patient.class, Diet.class}, version = 7, exportSchema = false)
+@Database(entities = {BodyMeasurement.class, Patient.class, Diet.class}, version = 8, exportSchema = false)
 @TypeConverters(DatabaseConverters.class)
 public abstract class EscaleDatabase extends RoomDatabase {
 

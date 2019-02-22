@@ -67,4 +67,10 @@
     <string name="no_diets_text">Parece que aún no se te ha asignado ninguna dieta. Comunicate con tu doctor para solicitar una.</string>
     <string name="current_diet_title">Actual</string>
     <string name="all_diets_title">Todas</string>
+    <string name="error_diet_not_downloaded_yet">Debes descargar la dieta antes de poder visualizarla</string>
+    <string name="error_diet_download_generic">Ups! Hubo un error al intentar descargar la dieta.</string>
+    <string name="error_diet_cancel_download_generic">Ups! Hubo un error al intentar cancelar la descarga.</string>
+    <string name="error_diet_delete_generic">Ups! Hubo un error al intentar borrar la dieta</string>
+    <string name="open_diet_pdf">Abrir dieta</string>
+    <string name="error_open_pdf_install_viewer">Ups! Parece que no tienes un lector de PDF. Instala uno y prueba de nuevo.</string>
 </resources>

@@ -1,11 +1,15 @@
-package com.dglozano.escale.ui.main.diet.all;
+package com.dglozano.escale.ui.main.diet.old;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -18,10 +22,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.repository.DietRepository;
-import com.dglozano.escale.ui.main.MainActivity;
-import com.dglozano.escale.ui.main.MainActivityViewModel;
-import com.dglozano.escale.ui.main.diet.DietTabAdapter;
+import com.dglozano.escale.db.entity.Diet;
 
 import javax.inject.Inject;
 
@@ -31,7 +32,7 @@ import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
-public class AllDietsFragment extends Fragment {
+public class OldDietsFragment extends Fragment {
 
     @BindView(R.id.recycler_view_diets)
     RecyclerView mRecyclerViewDiets;
@@ -43,7 +44,7 @@ public class AllDietsFragment extends Fragment {
     @Inject
     LinearLayoutManager mLayoutManager;
     @Inject
-    AllDietsListAdapter mAllDietsListAdapter;
+    OldDietsListAdapter mOldDietsListAdapter;
     @Inject
     DefaultItemAnimator mDefaultItemAnimator;
     @Inject
@@ -52,21 +53,21 @@ public class AllDietsFragment extends Fragment {
     ViewModelProvider.Factory mViewModelFactory;
 
     private Unbinder mViewUnbinder;
-    private AllDietsViewModel mAllDietsViewModel;
+    private OldDietsViewModel mOldDietsViewModel;
 
-    public AllDietsFragment() {
+    public OldDietsFragment() {
         // Required empty public constructor
     }
 
-    public static AllDietsFragment newInstance() {
-        return new AllDietsFragment();
+    public static OldDietsFragment newInstance() {
+        return new OldDietsFragment();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.sub_fragment_all_diets_list, container, false);
+        View view = inflater.inflate(R.layout.sub_fragment_old_diets_list, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
         return view;
     }
@@ -81,17 +82,30 @@ public class AllDietsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
-        mAllDietsViewModel = ViewModelProviders.of(this, mViewModelFactory).get(AllDietsViewModel.class);
+        mOldDietsViewModel = ViewModelProviders.of(getActivity(), mViewModelFactory).get(OldDietsViewModel.class);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         setupRecyclerList();
-        mAllDietsViewModel.getRefreshingListStatus().observe(this, isRefreshing -> {
+        mOldDietsViewModel.getRefreshingListStatus().observe(this, isRefreshing -> {
             mSwipeRefreshLayout.setRefreshing(isRefreshing != null && isRefreshing);
         });
+        mOldDietsViewModel.getShowPdfEvent().observe(this, pdfEvent -> {
+            Timber.d("Pdf event fired");
+            if (pdfEvent != null && !pdfEvent.hasBeenHandled()) {
+                Intent intent = new Intent(getActivity(), OldDietPdfViewActivity.class);
+                intent.putExtra("diet_file_path", pdfEvent.handleContent().getAbsolutePath());
+                startActivity(intent);
+            }
+        });
+        mOldDietsViewModel.getErrorEvent().observe(this, errorEvent -> {
+            if (errorEvent != null && errorEvent.peekContent() != null && !errorEvent.hasBeenHandled())
+                Snackbar.make(getActivity().findViewById(android.R.id.content),
+                        errorEvent.handleContent(), Snackbar.LENGTH_SHORT).show();
+        });
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            mAllDietsViewModel.refreshDiets();
+            mOldDietsViewModel.refreshDiets();
         });
     }
 
@@ -100,11 +114,18 @@ public class AllDietsFragment extends Fragment {
         mRecyclerViewDiets.setLayoutManager(mLayoutManager);
         mRecyclerViewDiets.setItemAnimator(mDefaultItemAnimator);
         mRecyclerViewDiets.addItemDecoration(mDividerItemDecoration);
-        mRecyclerViewDiets.setAdapter(mAllDietsListAdapter);
-        mAllDietsViewModel.getDietsOfLoggedPatient().observe(this, diets -> {
-            if(diets != null) {
-                mAllDietsListAdapter.setItems(diets);
-                if(diets.isEmpty()) {
+        mOldDietsListAdapter.setDietClickListener(new OldDietsListAdapter.DietClickListener() {
+            @Override
+            public void onClick(Diet diet) {
+                mOldDietsViewModel.openOldDietFile(diet);
+            }
+        });
+        mRecyclerViewDiets.setAdapter(mOldDietsListAdapter);
+        mOldDietsViewModel.getDietsOfLoggedPatient().observe(this, diets -> {
+            if (diets != null) {
+                diets.forEach(diet -> Timber.d("Diet %s - Status %s", diet.getFileName(), diet.getFileStatus()));
+                mOldDietsListAdapter.setItems(diets);
+                if (diets.isEmpty()) {
                     mRecyclerViewDiets.setVisibility(View.GONE);
                     mDietsEmptyLayout.setVisibility(View.VISIBLE);
                 } else {

@@ -7,8 +7,8 @@ import com.dglozano.escale.ui.login.LoginActivityModule;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityModule;
 import com.dglozano.escale.ui.main.diet.DietFragmentProvider;
-import com.dglozano.escale.ui.main.diet.all.AllDietsProvider;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietProvider;
+import com.dglozano.escale.ui.main.diet.old.OldDietsProvider;
 import com.dglozano.escale.ui.main.home.HomeFragmentProvider;
 
 import dagger.Module;
@@ -21,7 +21,7 @@ public abstract class ActivityBuilder {
             MainActivityModule.class,
             HomeFragmentProvider.class,
             DietFragmentProvider.class,
-            AllDietsProvider.class,
+            OldDietsProvider.class,
             CurrentDietProvider.class
     })
     public abstract MainActivity bindMainActivity();

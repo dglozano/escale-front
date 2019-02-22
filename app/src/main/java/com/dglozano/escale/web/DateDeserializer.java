@@ -15,18 +15,25 @@ import timber.log.Timber;
 
 public class DateDeserializer implements JsonDeserializer<Date> {
 
+    private static final String[] DATE_FORMATS = new String[] {
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",
+            "yyyy-MM-dd"
+    };
+
     @Override
     public Date deserialize(JsonElement element, Type arg1, JsonDeserializationContext arg2) throws JsonParseException {
         String date = element.getAsString();
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        for(String format : DATE_FORMATS) {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-        try {
-            return format.parse(date);
-        } catch (ParseException exp) {
-            Timber.e(exp);
-            return null;
+            try {
+                return sdf.parse(date);
+            } catch (ParseException exp) {
+                Timber.e(exp);
+            }
         }
+        return null;
     }
 }

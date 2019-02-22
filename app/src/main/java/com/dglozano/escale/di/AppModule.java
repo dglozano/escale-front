@@ -25,9 +25,11 @@ import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.polidea.rxandroidble2.RxBleClient;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import dagger.Module;
 import dagger.Provides;
@@ -44,6 +46,12 @@ public class AppModule {
     @ApplicationScope
     Context provideContext(Application application) {
         return application;
+    }
+
+    @Provides
+    @ApplicationScope
+    File getRootDirectory(@ApplicationContext Context context) {
+        return context.getFilesDir();
     }
 
     @Provides
@@ -121,6 +129,9 @@ public class AppModule {
                                      CustomOkHttpAuthenticator customAuthenticator,
                                      HeaderTokenInterceptor headerTokenInterceptor) {
         OkHttpClient.Builder client = new OkHttpClient.Builder();
+        client.connectTimeout(15, TimeUnit.SECONDS);
+        client.readTimeout(15, TimeUnit.SECONDS);
+        client.writeTimeout(15, TimeUnit.SECONDS);
         client.addInterceptor(httpLoggingInterceptor);
         client.addNetworkInterceptor(headerTokenInterceptor);
         client.authenticator(customAuthenticator);

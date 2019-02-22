@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -45,8 +46,9 @@
         </activity>
         <activity
             android:name=".ui.common.ChangePasswordActivity"
-            android:label="@string/change_password_title"></activity>
-        <activity android:name=".ui.common.NoInternetActivity"></activity>
+            android:label="@string/change_password_title" />
+        <activity android:name=".ui.common.NoInternetActivity" />
+        <activity android:name=".ui.main.diet.old.OldDietPdfViewActivity"></activity>
     </application>
 
 </manifest>

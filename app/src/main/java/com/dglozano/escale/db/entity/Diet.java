@@ -6,6 +6,7 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.web.dto.DietDTO;
 import com.google.gson.annotations.SerializedName;
 
@@ -27,6 +28,7 @@ public class Diet {
     private Date startDate;
     private long size;
     private FileStatus fileStatus;
+    private int downloadId;
 
     public Diet() {
 
@@ -40,6 +42,15 @@ public class Diet {
         this.fileName = dietDTO.getFileName();
         this.userId = userId;
         this.fileStatus = FileStatus.NOT_DOWNLOADED;
+        this.downloadId = -1;
+    }
+
+    public int getDownloadId() {
+        return downloadId;
+    }
+
+    public void setDownloadId(int downloadId) {
+        this.downloadId = downloadId;
     }
 
     public String getFileName() {
@@ -80,6 +91,8 @@ public class Diet {
 
     public void setFileStatus(FileStatus fileStatus) {
         this.fileStatus = fileStatus;
+        if(fileStatus.equals(FileStatus.NOT_DOWNLOADED))
+            this.downloadId = -1;
     }
 
     public long getSize() {
@@ -88,6 +101,14 @@ public class Diet {
 
     public void setSize(long size) {
         this.size = size;
+    }
+
+    public String getDownloadUri() {
+        return Constants.BASE_HEROKU_URL + "diets/download/" + getId();
+    }
+
+    public String getLocalFileName() {
+        return this.id + this.fileName;
     }
 
     public enum FileStatus {

@@ -1,21 +1,19 @@
-package com.dglozano.escale.ui.main.diet.all;
+package com.dglozano.escale.ui.main.diet.old;
 
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 
 import com.dglozano.escale.ui.main.MainActivity;
-import com.dglozano.escale.ui.main.diet.DietFragment;
 
 import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class AllDietsModule {
+public class OldDietsModule {
 
     @Provides
-    LinearLayoutManager provideLinearLayoutManager(AllDietsFragment fragment) {
+    LinearLayoutManager provideLinearLayoutManager(OldDietsFragment fragment) {
         return new LinearLayoutManager(fragment.getActivity());
     }
 

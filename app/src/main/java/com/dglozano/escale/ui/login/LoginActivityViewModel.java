@@ -6,10 +6,10 @@ import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.exception.BadCredentialsException;
+import com.dglozano.escale.exception.NotAPatientException;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.ui.Event;
-import com.dglozano.escale.util.BadCredentialsException;
-import com.dglozano.escale.util.NotAPatientException;
 
 import javax.inject.Inject;
 

@@ -7,8 +7,8 @@ import com.dglozano.escale.di.annotation.ViewModelKey;
 import com.dglozano.escale.ui.common.ChangePasswordActivityViewModel;
 import com.dglozano.escale.ui.login.LoginActivityViewModel;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
-import com.dglozano.escale.ui.main.diet.all.AllDietsViewModel;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietViewModel;
+import com.dglozano.escale.ui.main.diet.old.OldDietsViewModel;
 import com.dglozano.escale.ui.main.home.HomeViewModel;
 
 import dagger.Binds;
@@ -29,8 +29,8 @@ public abstract class ViewModelModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(AllDietsViewModel.class)
-    abstract ViewModel bindAllDietsViewModel(AllDietsViewModel allDietsViewModel);
+    @ViewModelKey(OldDietsViewModel.class)
+    abstract ViewModel bindOldDietsViewModel(OldDietsViewModel oldDietsViewModel);
 
     @Binds
     @IntoMap
@@ -47,7 +47,6 @@ public abstract class ViewModelModule {
     @ViewModelKey(ChangePasswordActivityViewModel.class)
     abstract ViewModel bindChangePasswordActivityViewModel(
             ChangePasswordActivityViewModel changePasswordActivityViewModel);
-
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory factory);
