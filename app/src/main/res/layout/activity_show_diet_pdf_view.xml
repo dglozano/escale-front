@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/almostWhite"
-    tools:context=".ui.main.diet.old.OldDietPdfActivity">
+    tools:context=".ui.main.diet.show.ShowDietPdfActivity">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -14,10 +14,9 @@
         android:background="@drawable/diet_shadow_pdf">
 
         <com.github.barteksc.pdfviewer.PDFView
-            android:id="@+id/old_diet_pdf_view"
+            android:id="@+id/show_diet_pdf_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
     </FrameLayout>
 
 

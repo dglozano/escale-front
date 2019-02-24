@@ -10,10 +10,10 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class OldDietsModule {
+public class AllDietsModule {
 
     @Provides
-    LinearLayoutManager provideLinearLayoutManager(OldDietsFragment fragment) {
+    LinearLayoutManager provideLinearLayoutManager(AllDietsFragment fragment) {
         return new LinearLayoutManager(fragment.getActivity());
     }
 

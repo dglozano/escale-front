@@ -17,7 +17,7 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietFragment;
-import com.dglozano.escale.ui.main.diet.old.OldDietsFragment;
+import com.dglozano.escale.ui.main.diet.old.AllDietsFragment;
 
 import javax.inject.Inject;
 
@@ -68,7 +68,7 @@ public class DietFragment extends Fragment {
 
     private void setupViewPager(ViewPager viewPager) {
         mTabsAdapter.addFragment(new CurrentDietFragment(), getString(R.string.current_diet_title));
-        mTabsAdapter.addFragment(new OldDietsFragment(), getString(R.string.old_diets_title));
+        mTabsAdapter.addFragment(new AllDietsFragment(), getString(R.string.all_diets_title));
         viewPager.setAdapter(mTabsAdapter);
     }
 

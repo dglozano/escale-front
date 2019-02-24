@@ -22,7 +22,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class OldDietsViewModel extends ViewModel {
+public class AllDietsViewModel extends ViewModel {
 
     private PatientRepository mPatientRepository;
     private DietRepository mDietRepository;
@@ -33,7 +33,7 @@ public class OldDietsViewModel extends ViewModel {
     private CompositeDisposable disposables;
 
     @Inject
-    public OldDietsViewModel(PatientRepository patientRepository,
+    public AllDietsViewModel(PatientRepository patientRepository,
                              DietRepository dietRepository
     ) {
         disposables = new CompositeDisposable();

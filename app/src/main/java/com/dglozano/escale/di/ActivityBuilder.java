@@ -8,9 +8,9 @@ import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityModule;
 import com.dglozano.escale.ui.main.diet.DietFragmentProvider;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietProvider;
-import com.dglozano.escale.ui.main.diet.old.OldDietPdfActivity;
-import com.dglozano.escale.ui.main.diet.old.OldDietPdfModule;
-import com.dglozano.escale.ui.main.diet.old.OldDietsProvider;
+import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivity;
+import com.dglozano.escale.ui.main.diet.show.ShowDietPdfModule;
+import com.dglozano.escale.ui.main.diet.old.AllDietsProvider;
 import com.dglozano.escale.ui.main.home.HomeFragmentProvider;
 
 import dagger.Module;
@@ -23,7 +23,7 @@ public abstract class ActivityBuilder {
             MainActivityModule.class,
             HomeFragmentProvider.class,
             DietFragmentProvider.class,
-            OldDietsProvider.class,
+            AllDietsProvider.class,
             CurrentDietProvider.class
     })
     public abstract MainActivity bindMainActivity();
@@ -39,7 +39,7 @@ public abstract class ActivityBuilder {
     public abstract ChangePasswordActivity bindChangePasswordActivity();
 
     @ContributesAndroidInjector(modules = {
-            OldDietPdfModule.class
+            ShowDietPdfModule.class
     })
-    public abstract OldDietPdfActivity bindOldDietPdfActivity();
+    public abstract ShowDietPdfActivity bindShowDietPdfActivity();
 }

@@ -49,7 +49,7 @@
             android:name=".ui.common.ChangePasswordActivity"
             android:label="@string/change_password_title" />
         <activity android:name=".ui.common.NoInternetActivity" />
-        <activity android:name=".ui.main.diet.old.OldDietPdfActivity"></activity>
+        <activity android:name=".ui.main.diet.show.ShowDietPdfActivity"></activity>
     </application>
 
 </manifest>

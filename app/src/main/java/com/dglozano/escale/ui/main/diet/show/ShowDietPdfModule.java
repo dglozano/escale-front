@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.main.diet.old;
+package com.dglozano.escale.ui.main.diet.show;
 
 import com.dglozano.escale.ui.main.diet.CustomPdfScrollHandle;
 
@@ -6,10 +6,10 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class OldDietPdfModule {
+public class ShowDietPdfModule {
 
     @Provides
-    CustomPdfScrollHandle provideScrollHandle(OldDietPdfActivity activity) {
+    CustomPdfScrollHandle provideScrollHandle(ShowDietPdfActivity activity) {
         return new CustomPdfScrollHandle(activity);
     }
 }

@@ -8,8 +8,8 @@ import com.dglozano.escale.ui.common.ChangePasswordActivityViewModel;
 import com.dglozano.escale.ui.login.LoginActivityViewModel;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietViewModel;
-import com.dglozano.escale.ui.main.diet.old.OldDietPdfActivityViewModel;
-import com.dglozano.escale.ui.main.diet.old.OldDietsViewModel;
+import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivityViewModel;
+import com.dglozano.escale.ui.main.diet.old.AllDietsViewModel;
 import com.dglozano.escale.ui.main.home.HomeViewModel;
 
 import dagger.Binds;
@@ -25,8 +25,8 @@ public abstract class ViewModelModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(OldDietPdfActivityViewModel.class)
-    abstract ViewModel bindOlDietPdfAcctivityViewModel(OldDietPdfActivityViewModel olldDietPdfActivityViewModel);
+    @ViewModelKey(ShowDietPdfActivityViewModel.class)
+    abstract ViewModel bindShowDietPdfAcctivityViewModel(ShowDietPdfActivityViewModel showDietPdfActivityViewModel);
 
     @Binds
     @IntoMap
@@ -35,8 +35,8 @@ public abstract class ViewModelModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(OldDietsViewModel.class)
-    abstract ViewModel bindOldDietsViewModel(OldDietsViewModel oldDietsViewModel);
+    @ViewModelKey(AllDietsViewModel.class)
+    abstract ViewModel bindAllDietsViewModel(AllDietsViewModel allDietsViewModel);
 
     @Binds
     @IntoMap

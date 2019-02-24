@@ -1,7 +1,6 @@
 package com.dglozano.escale.ui.main.diet.old;
 
 import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -27,11 +26,8 @@ import javax.inject.Inject;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import dagger.android.support.AndroidSupportInjection;
-import timber.log.Timber;
 
-public class OldDietsListAdapter extends RecyclerView.Adapter<OldDietsListAdapter.DietViewHolder> {
+public class AllDietsListAdapter extends RecyclerView.Adapter<AllDietsListAdapter.DietViewHolder> {
 
     @Inject
     SimpleDateFormat simpleDateFormat;
@@ -46,13 +42,13 @@ public class OldDietsListAdapter extends RecyclerView.Adapter<OldDietsListAdapte
 
     private List<Diet> mDietsList;
     private DietClickListener mClickListener;
-    private OldDietsViewModel mOldDietsViewModel;
+    private AllDietsViewModel mAllDietsViewModel;
     private Context mContext;
 
     @Inject
-    public OldDietsListAdapter(MainActivity mainActivity, OldDietsViewModel oldDietsViewModel) {
+    public AllDietsListAdapter(MainActivity mainActivity, AllDietsViewModel allDietsViewModel) {
         this.mContext = mainActivity;
-        this.mOldDietsViewModel = oldDietsViewModel;
+        this.mAllDietsViewModel = allDietsViewModel;
         ButterKnife.bind(this, mainActivity);
     }
 
@@ -118,23 +114,31 @@ public class OldDietsListAdapter extends RecyclerView.Adapter<OldDietsListAdapte
             holder.mDietFileName.setText(diet.getFileName());
             holder.mDietStartDate.setText(String.format("Empezada el %shs.",
                     simpleDateFormat.format(diet.getStartDate())));
-            switch (diet.getFileStatus()) {
-                case NOT_DOWNLOADED:
-                    holder.mDietBtnImageView.setVisibility(View.VISIBLE);
-                    holder.mProgressBar.setVisibility(View.INVISIBLE);
-                    holder.mDietBtnImageView.setImageDrawable(downloadIcon);
-                    break;
-                case DOWNLOADING:
-                    holder.mDietBtnImageView.setVisibility(View.GONE);
-                    holder.mProgressBar.setVisibility(View.VISIBLE);
-                    holder.mDietBtnImageView.setImageDrawable(cancelDownloadIcon);
-                    break;
-                case DOWNLOADED:
-                    holder.mDietBtnImageView.setVisibility(View.VISIBLE);
-                    holder.mProgressBar.setVisibility(View.INVISIBLE);
-                    holder.mDietBtnImageView.setImageDrawable(deleteIcon);
-                    break;
+            if(position != 0) {
+                // If it is not the current diet, then show the action button.
+                switch (diet.getFileStatus()) {
+                    case NOT_DOWNLOADED:
+                        holder.mDietBtnImageView.setVisibility(View.VISIBLE);
+                        holder.mProgressBar.setVisibility(View.INVISIBLE);
+                        holder.mDietBtnImageView.setImageDrawable(downloadIcon);
+                        break;
+                    case DOWNLOADING:
+                        holder.mDietBtnImageView.setVisibility(View.GONE);
+                        holder.mProgressBar.setVisibility(View.VISIBLE);
+                        holder.mDietBtnImageView.setImageDrawable(cancelDownloadIcon);
+                        break;
+                    case DOWNLOADED:
+                        holder.mDietBtnImageView.setVisibility(View.VISIBLE);
+                        holder.mProgressBar.setVisibility(View.INVISIBLE);
+                        holder.mDietBtnImageView.setImageDrawable(deleteIcon);
+                        break;
+                }
+            } else {
+                holder.mProgressBar.setVisibility(
+                        diet.getFileStatus().equals(Diet.FileStatus.DOWNLOADING) ? View.VISIBLE : View.GONE);
+                holder.mDietBtnImageView.setVisibility(View.GONE);
             }
+
             holder.mDietBtnImageView.setOnClickListener(dietHolderDownloadBtnListener(diet));
         }
     }
@@ -147,7 +151,7 @@ public class OldDietsListAdapter extends RecyclerView.Adapter<OldDietsListAdapte
                     startDownload(diet);
                     break;
                 case DOWNLOADED:
-                    mOldDietsViewModel.deleteDownload(diet);
+                    mAllDietsViewModel.deleteDownload(diet);
                     break;
                 case DOWNLOADING:
                     // TODO: add cancel download?
@@ -161,7 +165,7 @@ public class OldDietsListAdapter extends RecyclerView.Adapter<OldDietsListAdapte
                 DownloadService.class);
         startIntent.putExtra("diet-uuid", diet.getId());
         diet.setFileStatus(Diet.FileStatus.DOWNLOADING);
-        mOldDietsViewModel.updateDiet(diet);
+        mAllDietsViewModel.updateDiet(diet);
         mContext.startService(startIntent);
     }
 
