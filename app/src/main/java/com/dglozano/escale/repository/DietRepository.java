@@ -7,6 +7,7 @@ import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.di.annotation.ApplicationScope;
+import com.dglozano.escale.di.annotation.RootFileDirectory;
 import com.dglozano.escale.exception.DietDownloadStateException;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.FileUtil;
@@ -35,7 +36,7 @@ public class DietRepository {
 
     @Inject
     public DietRepository(EscaleRestApi escaleRestApi, PatientDao patientDao,
-                          DietDao dietDao, File fileDirectory, AppExecutors appExecutors) {
+                          DietDao dietDao,@RootFileDirectory File fileDirectory, AppExecutors appExecutors) {
         mPatientDao = patientDao;
         mEscaleRestApi = escaleRestApi;
         mDietDao = dietDao;
@@ -90,41 +91,32 @@ public class DietRepository {
                 });
     }
 
-    public Completable download(Diet diet) throws DietDownloadStateException {
-        if (diet.getFileStatus().equals(Diet.FileStatus.NOT_DOWNLOADED)) {
-            return mEscaleRestApi.downloadDiet(diet.getId())
-                    .flatMapCompletable(responseBody -> {
-                        Timber.d("Server contacted and has file");
-                        boolean writtenToDisk = FileUtil.writeResponseBodyToDisk(responseBody,
-                                mFileDirectory,
-                                diet.getLocalFileName());
-                        Timber.d("File download was a success? %s", writtenToDisk);
-                        if (writtenToDisk) {
-                            diet.setFileStatus(Diet.FileStatus.DOWNLOADED);
-                            mDietDao.updateDiet(diet);
-                        } else {
-                            diet.setFileStatus(Diet.FileStatus.NOT_DOWNLOADED);
-                            mDietDao.updateDiet(diet);
-                        }
-                        return Completable.complete();
-                    }).doOnSubscribe(disposable -> {
-                        Timber.d("Changing status to downloading");
-                        diet.setFileStatus(Diet.FileStatus.DOWNLOADING);
-                        mDietDao.updateDiet(diet);
-                    });
-        } else {
-            throw new DietDownloadStateException("La dieta ya esta descargada o descargandose.");
-        }
-    }
-
-    public void cancelDownload(Diet diet) throws DietDownloadStateException {
-        if (diet.getFileStatus().equals(Diet.FileStatus.DOWNLOADING)) {
-            Timber.d("Canceling download of file %s", diet.getLocalFileName());
-            // TODO
-        } else {
-            throw new DietDownloadStateException("No se puede cancelar la descarga porque la dieta no estaba descargandose.");
-        }
-    }
+//    public Completable download(Diet diet) throws DietDownloadStateException {
+//        if (diet.getFileStatus().equals(Diet.FileStatus.NOT_DOWNLOADED)) {
+//            return mEscaleRestApi.downloadDiet(diet.getId())
+//                    .flatMapCompletable(responseBody -> {
+//                        Timber.d("Server contacted and has file");
+//                        boolean writtenToDisk = FileUtil.writeResponseBodyToDisk(responseBody,
+//                                mFileDirectory,
+//                                diet.getLocalFileName());
+//                        Timber.d("File download was a success? %s", writtenToDisk);
+//                        if (writtenToDisk) {
+//                            diet.setFileStatus(Diet.FileStatus.DOWNLOADED);
+//                            mDietDao.updateDiet(diet);
+//                        } else {
+//                            diet.setFileStatus(Diet.FileStatus.NOT_DOWNLOADED);
+//                            mDietDao.updateDiet(diet);
+//                        }
+//                        return Completable.complete();
+//                    }).doOnSubscribe(disposable -> {
+//                        Timber.d("Changing status to downloading");
+//                        diet.setFileStatus(Diet.FileStatus.DOWNLOADING);
+//                        mDietDao.updateDiet(diet);
+//                    });
+//        } else {
+//            throw new DietDownloadStateException("La dieta ya esta descargada o descargandose.");
+//        }
+//    }
 
     public void deleteDownload(Diet diet) throws DietDownloadStateException {
         File file = getDietPdfFile(diet);
@@ -140,8 +132,16 @@ public class DietRepository {
         if (diet.getFileStatus().equals(Diet.FileStatus.DOWNLOADED)) {
             return new File(mFileDirectory.getPath(), diet.getLocalFileName());
         } else {
-            throw new DietDownloadStateException("No se pudo eliminar la dieta porque no se encontraba descargada.");
+            throw new DietDownloadStateException("La dieta no se encuentra descargada.");
         }
     }
 
+    public void updateDiet(Diet diet) {
+        mAppExecutors.getDiskIO().execute(() -> mDietDao.updateDiet(diet));
+    }
+
+    public LiveData<Diet> getCurrentDiet(Long loggedPatiendId) {
+        refreshDiets(loggedPatiendId);
+        return mDietDao.getCurrenDietOfUserWithIdAsLiveData(loggedPatiendId);
+    }
 }

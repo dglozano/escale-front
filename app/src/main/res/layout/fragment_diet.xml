@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:elevation="10dp"
+        android:elevation="0dp"
         app:tabIndicatorColor="@color/colorAccent"
         app:tabMaxWidth="0dp"
         app:tabMode="fixed"
@@ -23,7 +23,7 @@
 
     <android.support.v4.view.ViewPager
         android:id="@+id/diet_view_pager_tabs"
+        android:layout_below="@id/diets_current_or_all_tablayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?android:attr/actionBarSize" />
+        android:layout_height="match_parent" />
 </RelativeLayout>

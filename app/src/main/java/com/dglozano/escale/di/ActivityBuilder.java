@@ -8,6 +8,8 @@ import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityModule;
 import com.dglozano.escale.ui.main.diet.DietFragmentProvider;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietProvider;
+import com.dglozano.escale.ui.main.diet.old.OldDietPdfActivity;
+import com.dglozano.escale.ui.main.diet.old.OldDietPdfModule;
 import com.dglozano.escale.ui.main.diet.old.OldDietsProvider;
 import com.dglozano.escale.ui.main.home.HomeFragmentProvider;
 
@@ -35,4 +37,9 @@ public abstract class ActivityBuilder {
             ChangePasswordActivityModule.class
     })
     public abstract ChangePasswordActivity bindChangePasswordActivity();
+
+    @ContributesAndroidInjector(modules = {
+            OldDietPdfModule.class
+    })
+    public abstract OldDietPdfActivity bindOldDietPdfActivity();
 }

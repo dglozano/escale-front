@@ -11,6 +11,8 @@ import android.arch.persistence.room.Update;
 import com.dglozano.escale.db.entity.Diet;
 
 import java.util.List;
+import java.util.Optional;
+
 @Dao
 public interface DietDao {
 
@@ -21,10 +23,13 @@ public interface DietDao {
     List<Diet> getAllDietsOfUserWithId(Long userId);
 
     @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC LIMIT 1")
-    LiveData<Diet> getCurrenDietOfUserWithId(Long userId);
+    LiveData<Diet> getCurrenDietOfUserWithIdAsLiveData(Long userId);
+
+    @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC LIMIT 1")
+    Optional<Diet> getCurrenDietOfUserWithId(Long userId);
 
     @Query("SELECT * FROM Diet WHERE id == :id")
-    Diet getDietById(String id);
+    Optional<Diet> getDietById(String id);
 
     @Update
     void updateDiet(Diet diet);

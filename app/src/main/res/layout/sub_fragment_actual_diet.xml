@@ -8,11 +8,29 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.github.barteksc.pdfviewer.PDFView
-            android:id="@+id/actual_diet_pdf_view"
+        <RelativeLayout
+            android:id="@+id/actual_diet_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"/>
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:background="@drawable/diet_shadow_pdf"
+            android:visibility="gone">
+
+            <com.github.barteksc.pdfviewer.PDFView
+                android:id="@+id/actual_diet_pdf_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
+            <ProgressBar
+                android:id="@+id/actual_diet_pfd_loader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="visible"/>
+
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/no_current_diet_layout"

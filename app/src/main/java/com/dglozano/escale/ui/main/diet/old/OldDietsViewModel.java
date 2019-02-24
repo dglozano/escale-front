@@ -10,6 +10,7 @@ import com.dglozano.escale.exception.DietDownloadStateException;
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.ui.Event;
+import com.dglozano.escale.util.AppExecutors;
 
 import java.io.File;
 import java.util.List;
@@ -79,36 +80,16 @@ public class OldDietsViewModel extends ViewModel {
         disposables.clear();
     }
 
+    public void updateDiet(Diet diet) {
+        mDietRepository.updateDiet(diet);
+    }
+
     public void openOldDietFile(Diet diet) {
-        Timber.d("Diet %s clicked", diet.getFileName());
         try {
             File pdf = mDietRepository.getDietPdfFile(diet);
-            Timber.d("Posting show pdf event for file %s", pdf.getAbsolutePath());
             mShowPdfEvent.postValue(new Event<>(pdf));
         } catch (DietDownloadStateException e) {
-            mErrorEvent.postValue(new Event<>(R.string.error_diet_download_generic));
-        }
-    }
-
-    public void startDownload(Diet diet) {
-        try {
-            disposables.add(mDietRepository.download(diet)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(() -> Timber.d("Completed download of diet %s", diet.getFileName()),
-                            onError -> Timber.e(onError, "Error downloading diet %s", diet.getFileName())));
-        } catch (DietDownloadStateException e) {
-            Timber.e(e);
-            mErrorEvent.postValue(new Event<>(R.string.error_diet_download_generic));
-        }
-    }
-
-    public void cancelDownload(Diet diet) {
-        try {
-            mDietRepository.cancelDownload(diet);
-        } catch (DietDownloadStateException e) {
-            Timber.e(e);
-            mErrorEvent.postValue(new Event<>(R.string.error_diet_cancel_download_generic));
+            mErrorEvent.postValue(new Event<>(R.string.error_diet_not_downloaded_yet));
         }
     }
 

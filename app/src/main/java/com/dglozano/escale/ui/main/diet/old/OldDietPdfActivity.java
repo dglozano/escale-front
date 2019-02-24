@@ -1,30 +1,47 @@
 package com.dglozano.escale.ui.main.diet.old;
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.ui.main.MainActivityViewModel;
+import com.dglozano.escale.ui.main.diet.CustomPdfScrollHandle;
 import com.github.barteksc.pdfviewer.PDFView;
-import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
 
 import java.io.File;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dagger.android.AndroidInjection;
 
-public class OldDietPdfViewActivity extends AppCompatActivity {
+public class OldDietPdfActivity extends AppCompatActivity {
 
-    @BindView(R.id.diet_pdf_view)
+    @BindView(R.id.old_diet_pdf_view)
     PDFView pdfView;
+
+    @Inject
+    CustomPdfScrollHandle mScrollHandle;
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
+
+    private OldDietPdfActivityViewModel mViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_old_diet_pdf_view);
         ButterKnife.bind(this);
+
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(OldDietPdfActivityViewModel.class);
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
@@ -33,11 +50,11 @@ public class OldDietPdfViewActivity extends AppCompatActivity {
         File pdf = new File(filepath);
 
         pdfView.fromFile(pdf)
-                .swipeHorizontal(true)
+                .scrollHandle(mScrollHandle)
                 .pageSnap(true)
                 .autoSpacing(true)
                 .pageFling(true)
-                .pageFitPolicy(FitPolicy.BOTH)
+                .pageFitPolicy(FitPolicy.WIDTH)
                 .load();
     }
 

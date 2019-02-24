@@ -28,6 +28,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name=".ble.BleCommunicationService" />
+        <service android:name=".web.DownloadService" />
 
         <activity
             android:name=".ui.login.LoginActivity"
@@ -48,7 +49,7 @@
             android:name=".ui.common.ChangePasswordActivity"
             android:label="@string/change_password_title" />
         <activity android:name=".ui.common.NoInternetActivity" />
-        <activity android:name=".ui.main.diet.old.OldDietPdfViewActivity"></activity>
+        <activity android:name=".ui.main.diet.old.OldDietPdfActivity"></activity>
     </application>
 
 </manifest>

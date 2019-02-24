@@ -3,6 +3,7 @@ package com.dglozano.escale.ui.main.diet.current;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,10 +12,15 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.db.entity.Diet;
+import com.dglozano.escale.ui.main.diet.CustomPdfScrollHandle;
+import com.dglozano.escale.web.DownloadService;
 import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.util.FitPolicy;
 
 import javax.inject.Inject;
 
@@ -31,9 +37,15 @@ public class CurrentDietFragment extends Fragment {
     RelativeLayout mNoCurrentDietLayout;
     @BindView(R.id.current_diet_swipe_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.actual_diet_layout)
+    RelativeLayout mPdfHolderLayout;
+    @BindView(R.id.actual_diet_pfd_loader)
+    ProgressBar mDietPdfProgressBar;
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
+    @Inject
+    CustomPdfScrollHandle mScrollHandle;
 
     private Unbinder mViewUnbinder;
     private CurrentDietViewModel mViewModel;
@@ -72,17 +84,51 @@ public class CurrentDietFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mViewModel.getCurrentDiet().observe(this, currentDiet -> {
             if (currentDiet == null) {
-                mPdfView.setVisibility(View.GONE);
+                mPdfHolderLayout.setVisibility(View.GONE);
                 mNoCurrentDietLayout.setVisibility(View.VISIBLE);
+                mSwipeRefreshLayout.setEnabled(true);
             } else {
+                mSwipeRefreshLayout.setEnabled(false);
                 mNoCurrentDietLayout.setVisibility(View.GONE);
-                mPdfView.setVisibility(View.VISIBLE);
+                mPdfHolderLayout.setVisibility(View.VISIBLE);
+                switch (currentDiet.getFileStatus()) {
+                    case DOWNLOADED:
+                        mDietPdfProgressBar.setVisibility(View.GONE);
+                        mPdfView.setVisibility(View.VISIBLE);
+                        mPdfView.fromFile(mViewModel.getDietFile(currentDiet))
+                                .scrollHandle(mScrollHandle)
+                                .pageSnap(true)
+                                .autoSpacing(true)
+                                .pageFling(true)
+                                .pageFitPolicy(FitPolicy.WIDTH)
+                                .load();
+                        break;
+                    case DOWNLOADING:
+                        mDietPdfProgressBar.setVisibility(View.VISIBLE);
+                        mPdfView.setVisibility(View.GONE);
+                        break;
+                    case NOT_DOWNLOADED:
+                        mDietPdfProgressBar.setVisibility(View.VISIBLE);
+                        mPdfView.setVisibility(View.GONE);
+                        Intent startIntent = new Intent(getActivity(), DownloadService.class);
+                        startIntent.putExtra("diet-uuid", currentDiet.getId());
+                        currentDiet.setFileStatus(Diet.FileStatus.DOWNLOADING);
+                        mViewModel.updateDiet(currentDiet);
+                        getActivity().startService(startIntent);
+                        break;
+                }
             }
         });
-        mViewModel.getRefreshingListStatus().observe(this, isRefreshing -> {
-            mSwipeRefreshLayout.setRefreshing(isRefreshing != null && isRefreshing);
-        });
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+        mViewModel.getRefreshingListStatus().
+
+                observe(this, isRefreshing ->
+
+                {
+                    mSwipeRefreshLayout.setRefreshing(isRefreshing != null && isRefreshing);
+                });
+        mSwipeRefreshLayout.setOnRefreshListener(() ->
+
+        {
             mViewModel.refreshCurrentDiet();
         });
     }

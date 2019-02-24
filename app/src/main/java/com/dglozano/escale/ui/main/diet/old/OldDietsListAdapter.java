@@ -2,6 +2,8 @@ package com.dglozano.escale.ui.main.diet.old;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.ui.main.MainActivity;
+import com.dglozano.escale.web.DownloadService;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -44,9 +47,11 @@ public class OldDietsListAdapter extends RecyclerView.Adapter<OldDietsListAdapte
     private List<Diet> mDietsList;
     private DietClickListener mClickListener;
     private OldDietsViewModel mOldDietsViewModel;
+    private Context mContext;
 
     @Inject
     public OldDietsListAdapter(MainActivity mainActivity, OldDietsViewModel oldDietsViewModel) {
+        this.mContext = mainActivity;
         this.mOldDietsViewModel = oldDietsViewModel;
         ButterKnife.bind(this, mainActivity);
     }
@@ -139,7 +144,7 @@ public class OldDietsListAdapter extends RecyclerView.Adapter<OldDietsListAdapte
         return v -> {
             switch (diet.getFileStatus()) {
                 case NOT_DOWNLOADED:
-                    mOldDietsViewModel.startDownload(diet);
+                    startDownload(diet);
                     break;
                 case DOWNLOADED:
                     mOldDietsViewModel.deleteDownload(diet);
@@ -149,6 +154,15 @@ public class OldDietsListAdapter extends RecyclerView.Adapter<OldDietsListAdapte
                     break;
             }
         };
+    }
+
+    private void startDownload(Diet diet) {
+        Intent startIntent = new Intent(mContext,
+                DownloadService.class);
+        startIntent.putExtra("diet-uuid", diet.getId());
+        diet.setFileStatus(Diet.FileStatus.DOWNLOADING);
+        mOldDietsViewModel.updateDiet(diet);
+        mContext.startService(startIntent);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

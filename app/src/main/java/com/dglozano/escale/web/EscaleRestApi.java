@@ -42,7 +42,7 @@ public interface EscaleRestApi {
 
     @Streaming
     @GET("diets/download/{uuid}")
-    Single<ResponseBody> downloadDiet(@Path("uuid") String dietId);
+    Call<ResponseBody> downloadDiet(@Path("uuid") String dietId);
 
     @POST("users/{id}/password_change")
     Single<Response<Void>> changePassword(@Body ChangePasswordDataDTO changePasswordData, @Path("id") Long userId);

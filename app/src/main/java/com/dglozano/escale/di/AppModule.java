@@ -14,6 +14,7 @@ import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BaseUrl;
 import com.dglozano.escale.di.annotation.BluetoothInfo;
 import com.dglozano.escale.di.annotation.DatabaseInfo;
+import com.dglozano.escale.di.annotation.RootFileDirectory;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.web.ApiServiceHolder;
 import com.dglozano.escale.web.CustomOkHttpAuthenticator;
@@ -50,6 +51,7 @@ public class AppModule {
 
     @Provides
     @ApplicationScope
+    @RootFileDirectory
     File getRootDirectory(@ApplicationContext Context context) {
         return context.getFilesDir();
     }
