@@ -9,7 +9,7 @@ public class SendChatMessageDTO {
     public SendChatMessageDTO() {
     }
 
-    public SendChatMessageDTO(Date sentDate, String message) {
+    public SendChatMessageDTO(String message, Date sentDate) {
         this.sentDate = sentDate;
         this.message = message;
     }

@@ -2,12 +2,14 @@
 <resources>
     <color name="almostWhite">#fafafa</color>
     <color name="disabledTabLightBlue">#cfd8dc</color>
+    <color name="colorPrimaryTransparent">#CC0277bd</color>
     <color name="colorPrimary">#03a9f4</color>
     <color name="colorPrimaryDark">#0277bd</color>
     <color name="colorPrimaryLight">#29b6f6</color>
     <color name="colorAccent">#1de9b6</color>
     <color name="colorTextBlack">#202020</color>
     <color name="colorTextDark">#616161</color>
+    <color name="lightGrayTransparent">#CCbdbdbd</color>
     <color name="gray">#757575</color>
     <color name="lightGray">#bdbdbd</color>
     <color name="colorStartGradientOverlay">#dd4797ba</color>

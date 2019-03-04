@@ -6,6 +6,7 @@ import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.util.LongSparseArray;
 
+import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Chat;
 import com.dglozano.escale.db.entity.ChatMessage;
 import com.dglozano.escale.db.entity.Patient;
@@ -18,15 +19,20 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class MessagesViewModel extends ViewModel {
 
     private PatientRepository mPatientRepository;
+    private boolean copyMenuVisible;
     private ChatRepository mChatRepository;
     private final LiveData<List<ChatMessage>> mPatientMessages;
     private final LiveData<List<MessageImpl>> mPatientMessagesImpl;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
+    private final MutableLiveData<Boolean> mIsSending;
     private final LiveData<List<Chat>> mChat;
     private final LongSparseArray<AuthorImpl> mChatParticipants;
     private CompositeDisposable disposables;
@@ -49,6 +55,8 @@ public class MessagesViewModel extends ViewModel {
                         msg.getSentDate())
                 )
                 .collect(Collectors.toList()));
+        mIsSending = new MutableLiveData<>();
+        mIsSending.postValue(false);
     }
 
     private void setChatParticipants() {
@@ -62,8 +70,38 @@ public class MessagesViewModel extends ViewModel {
         return mPatientMessagesImpl;
     }
 
+    public void sendMessage(String message) {
+        disposables.add(mChatRepository.sendMessage(message, mPatientRepository.getLoggedPatient().getValue())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(d -> mIsSending.postValue(true))
+                .subscribe(() -> mIsSending.postValue(false),
+                        error -> {
+                            Timber.e(error, "Error sending message");
+                            mIsSending.postValue(false);
+                            mErrorEvent.postValue(new Event<>(R.string.error_sending_message));
+                        })
+        );
+    }
+
     @Override
     protected void onCleared() {
         disposables.clear();
+    }
+
+    public LiveData<Boolean> observeSendingStatus() {
+        return mIsSending;
+    }
+
+    public LiveData<Event<Integer>> getErrorEvent() {
+        return mErrorEvent;
+    }
+
+    public void setCopyMenuVisible(boolean b) {
+        copyMenuVisible = b;
+    }
+
+    public boolean isCopyMenuVisible() {
+        return copyMenuVisible;
     }
 }

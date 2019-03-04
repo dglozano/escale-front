@@ -9,11 +9,14 @@ import com.dglozano.escale.db.dao.UserChatJoinDao;
 import com.dglozano.escale.db.dao.UserDao;
 import com.dglozano.escale.db.entity.Chat;
 import com.dglozano.escale.db.entity.ChatMessage;
+import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.db.entity.UserChatJoin;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.web.EscaleRestApi;
+import com.dglozano.escale.web.dto.SendChatMessageDTO;
 
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -50,7 +53,7 @@ public class ChatRepository {
 
     public LiveData<Long> getChatIdOfPatient(Long loggedPatiendId) {
         refreshChatsOfUser(loggedPatiendId);
-        return mUserChatJoinDao.getChatOfLoggedPatient(loggedPatiendId);
+        return mUserChatJoinDao.getChatOfLoggedPatientAsLiveData(loggedPatiendId);
     }
 
     public LiveData<List<ChatMessage>> getMessagesOfChatWithId(Long chatId) {
@@ -90,7 +93,8 @@ public class ChatRepository {
                 .flatMapObservable(Observable::fromIterable)
                 .filter(chatDTO -> mChatDao.chatExists(chatDTO.getId()) != 1)
                 .flatMapSingle(chatDTO -> {
-                    return Single.fromCallable(() -> {Chat chat = new Chat(chatDTO.getId());
+                    return Single.fromCallable(() -> {
+                        Chat chat = new Chat(chatDTO.getId());
                         Timber.d("Inserting chat from API %s", chatDTO.getId());
                         mChatDao.insert(chat);
                         return chatDTO;
@@ -98,7 +102,7 @@ public class ChatRepository {
                 })
                 .flatMapCompletable(chatDTO -> {
                     return Completable.fromCallable(() -> {
-                        for(Long id : chatDTO.getParticipantsIds()) {
+                        for (Long id : chatDTO.getParticipantsIds()) {
                             Timber.d("Inserting chatjoin %s - %s", id, chatDTO.getId());
                             mUserChatJoinDao.insert(new UserChatJoin(id, chatDTO.getId()));
                         }
@@ -124,15 +128,31 @@ public class ChatRepository {
                 });
     }
 
-    public Completable createChat(Long otherUserId) {
+    public Single<Long> createChat(Long otherUserId) {
         return mEscaleRestApi.createChatForLoggedUser(otherUserId)
-                .flatMapCompletable(chatDTO -> {
+                .flatMap(chatDTO -> {
                     Timber.d("Created chat for logged user with other user %s. Chat id %s", otherUserId, chatDTO.getId());
                     Chat chat = new Chat(chatDTO.getId());
                     mChatDao.insert(chat);
                     chatDTO.getParticipantsIds().forEach(participantId -> {
                         mUserChatJoinDao.insert(new UserChatJoin(participantId, chat.getId()));
                     });
+                    return Single.just(chat.getId());
+                });
+    }
+
+    public Completable sendMessage(String message, Patient patient) {
+        return mUserChatJoinDao.getChatOfLoggedPatient(patient.getId())
+                .flatMap(chatId -> {
+                    if (chatId.isPresent()) {
+                        return Single.just(chatId.get());
+                    } else {
+                        return createChat(patient.getDoctorId());
+                    }
+                }).flatMap(chatId -> mEscaleRestApi.sendChatMessage(chatId,
+                        new SendChatMessageDTO(message, Calendar.getInstance().getTime())))
+                .flatMapCompletable(msgDTO -> {
+                    mChatMessageDao.insertChatMessage(new ChatMessage(msgDTO, msgDTO.getChatId()));
                     return Completable.complete();
                 });
     }

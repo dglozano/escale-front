@@ -26,6 +26,7 @@ import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.web.ApiServiceHolder;
 import com.dglozano.escale.web.CustomOkHttpAuthenticator;
 import com.dglozano.escale.web.DateDeserializer;
+import com.dglozano.escale.web.DateSerializer;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.HeaderTokenInterceptor;
 import com.google.gson.Gson;
@@ -161,6 +162,7 @@ public class AppModule {
     Gson provideGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Date.class, new DateDeserializer());
+        gsonBuilder.registerTypeAdapter(Date.class, new DateSerializer());
         return gsonBuilder.create();
     }
 

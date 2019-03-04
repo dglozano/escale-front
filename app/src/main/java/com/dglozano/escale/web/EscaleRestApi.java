@@ -54,7 +54,7 @@ public interface EscaleRestApi {
     Single<List<ChatMessageDTO>> getChatMessages(@Path("id") Long chatId);
 
     @POST("chats/{id}/messages")
-    Single<Response<Void>> sendChatMessage(@Path("id") Long chatId, @Body SendChatMessageDTO chatMessageDTO);
+    Single<ChatMessageDTO> sendChatMessage(@Path("id") Long chatId, @Body SendChatMessageDTO chatMessageDTO);
 
     @Streaming
     @GET("diets/download/{uuid}")

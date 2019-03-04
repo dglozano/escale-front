@@ -41,6 +41,10 @@ import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
+import net.cachapa.expandablelayout.ExpandableLayout;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -72,6 +76,8 @@ public class MainActivity extends BaseActivity
     NoSwipePager mNoSwipePager;
     @BindView(R.id.app_bar_layout)
     AppBarLayout mAppBarLayout;
+    @BindView(R.id.expandable_bnve)
+    ExpandableLayout mExpandableBottomBar;
 
     @Inject
     BottomBarAdapter mPagerAdapter;
@@ -123,7 +129,17 @@ public class MainActivity extends BaseActivity
         observeChangeDialogEvent();
         observeAppBarShadowState();
         observeNumberOfUnreadMessages();
+        KeyboardVisibilityEvent.setEventListener(this,
+                isOpen -> {
+                    // some code depending on keyboard visiblity status
+                    if(isOpen)
+                        mExpandableBottomBar.collapse(true);
+                    else
+                        mExpandableBottomBar.expand(true);
+                });
     }
+
+
 
     private void observeAppBarShadowState() {
         mViewModel.shouldShowAppBarShadow().observe(this, toggleShadow -> {
@@ -185,8 +201,7 @@ public class MainActivity extends BaseActivity
         mBnv.setTextVisibility(false);
         mBnv.setIconSizeAt(0, 28, 28);
         //TODO REMOVE
-        mMessagesBadge = addBadgeAt(3, 0);
-        mMessagesBadge.setBadgeNumber(12);
+        mViewModel.setNumberOfUnreadMessages(12);
     }
 
     private void addFragmentsToBottomNav() {

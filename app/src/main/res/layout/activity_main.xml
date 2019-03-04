@@ -13,19 +13,30 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
-            android:id="@+id/bnve"
+        <net.cachapa.expandablelayout.ExpandableLayout
+            android:id="@+id/expandable_bnve"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@android:color/white"
-            app:menu="@menu/activity_main_foot_nav" />
+            android:elevation="10dp"
+            app:el_duration="500"
+            app:el_expanded="true">
+
+            <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+                android:id="@+id/bnve"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                app:menu="@menu/activity_main_foot_nav" />
+
+        </net.cachapa.expandablelayout.ExpandableLayout>
+
 
         <com.dglozano.escale.ui.main.common.NoSwipePager
             android:id="@+id/fragment_viewpager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/bnve"
+            android:layout_above="@id/expandable_bnve"
             android:paddingTop="?android:attr/actionBarSize" />
 
         <include

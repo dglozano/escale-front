@@ -75,4 +75,10 @@
     <string name="error_open_pdf_install_viewer">Ups! Parece que no tienes un lector de PDF. Instala uno y prueba de nuevo.</string>
     <string name="old_diets_title">Anteriores</string>
     <string name="send_message_hint">Escribe un mensaje</string>
+    <string name="error_sending_message">No se pudo enviar el mensaje. Intente nuevamente.</string>
+    <string name="copy">Copiar</string>
+    <string name="add_body_measurement">Nuevo peso</string>
+    <string name="add_body_measurement_with_scale">Agregar peso con balanza</string>
+    <string name="add_body_measurement_manually">Agregar peso manualmente</string>
+    <string name="copied">Copiado al portapapeles</string>
 </resources>

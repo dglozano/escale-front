@@ -7,18 +7,24 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.db.entity.ChatMessage;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
+import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
+
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -32,6 +38,10 @@ public class MessagesFragment extends Fragment {
 
     @BindView(R.id.messages_list)
     MessagesList mMessagesList;
+    @BindView(R.id.messages_input)
+    MessageInput mMessageInput;
+    @BindView(R.id.messages_progress_bar)
+    ProgressBar mProgressBarSend;
 
     MessagesListAdapter<MessageImpl> mMessagesListAdapter;
     @Inject
@@ -58,18 +68,77 @@ public class MessagesFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_messages, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
+        setHasOptionsMenu(true);
 
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        setupRecyclerList();
+        setupMessagesList();
+        setupSendListener();
+        setupSendingStatusObserver();
+        setupErrorEventObserver();
     }
 
-    private void setupRecyclerList() {
+    private void setupErrorEventObserver() {
+        mMessagesViewModel.getErrorEvent().observe(this, errorEvent -> {
+            if (errorEvent != null && errorEvent.peekContent() != null && !errorEvent.hasBeenHandled())
+                Toast.makeText(getActivity(), errorEvent.handleContent(), Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void setupSendingStatusObserver() {
+        mMessagesViewModel.observeSendingStatus().observe(this, isSending -> {
+            if (isSending != null) {
+                mProgressBarSend.setVisibility(isSending ? View.VISIBLE : View.GONE);
+            } else {
+                mProgressBarSend.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.messages_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        MenuItem item = menu.findItem(R.id.menu_messages_copy);
+        item.setVisible(mMessagesViewModel.isCopyMenuVisible());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.menu_messages_copy) {
+            mMessagesListAdapter.copySelectedMessagesText(getActivity(), message -> {
+                String createdAt = new SimpleDateFormat("d/M/yy H:mm", Locale.getDefault())
+                        .format(message.getCreatedAt());
+
+                return String.format(Locale.getDefault(), "[%s] %s: %s ",
+                        createdAt, message.getUser().getName(), message.getText());
+            }, false);
+            Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
+    }
+
+    private void setupSendListener() {
+        mMessageInput.setInputListener(input -> {
+            //validate and send message
+            mMessagesViewModel.sendMessage(input.toString());
+            return true;
+        });
+    }
+
+    private void setupMessagesList() {
         String senderId = mMainActivityViewModel.getLoggedPatient().getValue().getId().toString();
         mMessagesListAdapter = new MessagesListAdapter<>(senderId, null);
+        mMessagesListAdapter.enableSelectionMode(count -> {
+            mMessagesViewModel.setCopyMenuVisible(count > 0);
+            getActivity().invalidateOptionsMenu();
+        });
         mMessagesList.setAdapter(mMessagesListAdapter);
         mMessagesViewModel.getMessagesOfPatientChat().observe(this, messages -> {
             if (messages != null) {
@@ -85,7 +154,7 @@ public class MessagesFragment extends Fragment {
 
         this.visible = isVisibleToUser;
 
-        if(this.started) {
+        if (this.started) {
             mMainActivityViewModel.setNumberOfUnreadMessages(0);
         }
     }
@@ -94,6 +163,8 @@ public class MessagesFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         this.started = false;
+        this.mMessagesListAdapter.unselectAllItems();
+        mMessagesViewModel.setCopyMenuVisible(false);
     }
 
     @Override
