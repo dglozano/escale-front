@@ -18,17 +18,20 @@ public class MainActivityViewModel extends ViewModel {
     private PatientRepository mPatientRepository;
     private final LiveData<Event<Boolean>> mMustChangePassword;
     private final MutableLiveData<Boolean> mToogleAppBarShadow;
+    private final MutableLiveData<Integer> mNumberOfUnreadMessages;
     private final LiveData<Patient> mLoggedPatient;
 
     @Inject
     public MainActivityViewModel(PatientRepository patientRepository) {
         mToogleAppBarShadow = new MutableLiveData<>();
+        mNumberOfUnreadMessages = new MutableLiveData<>();
         mPatientRepository = patientRepository;
         mLoggedPatient = mPatientRepository.getLoggedPatient();
         mMustChangePassword = Transformations.map(mLoggedPatient,
                 patient -> new Event<>(patient != null && !patient.hasChangedDefaultPassword())
         );
         mToogleAppBarShadow.postValue(true);
+        mNumberOfUnreadMessages.postValue(0);
     }
 
     public LiveData<Patient> getLoggedPatient() {
@@ -51,7 +54,15 @@ public class MainActivityViewModel extends ViewModel {
         return mToogleAppBarShadow;
     }
 
+    public LiveData<Integer> getNumberOfUnreadMessages() {
+        return mNumberOfUnreadMessages;
+    }
+
     public void toogleAppBarShadow(boolean toogleAppBarShadow) {
         mToogleAppBarShadow.postValue(toogleAppBarShadow);
+    }
+
+    public void setNumberOfUnreadMessages(Integer unreadMessages) {
+        mNumberOfUnreadMessages.postValue(unreadMessages);
     }
 }

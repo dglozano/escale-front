@@ -53,10 +53,10 @@ public class DatabaseTests {
     public void userInsertTest() {
         Patient patientTest = createMockUser();
 
-        Long userId = mDatabase.userDao().save(patientTest).intValue();
+        Long userId = mDatabase.patientDao().save(patientTest).intValue();
         patientTest.setId(userId);
 
-        Patient returnedPatient = mDatabase.userDao().getPatientById(userId);
+        Patient returnedPatient = mDatabase.patientDao().getPatientById(userId);
 
         assertThat(returnedPatient, equalTo(patientTest));
     }
@@ -64,7 +64,7 @@ public class DatabaseTests {
     @Test
     public void bodyMeasurementInsertTest() {
         Patient patientTest = createMockUser();
-        Long userId = mDatabase.userDao().save(patientTest).intValue();
+        Long userId = mDatabase.patientDao().save(patientTest).intValue();
 
         BodyMeasurement bodyMeasurementTest = createMockBodyMeasurementForUser(userId);
         Integer bodyMeasurementId = mDatabase.bodyMeasurementDao()
@@ -84,8 +84,8 @@ public class DatabaseTests {
         Patient patientTest1 = createMockUser();
         Patient patientTest2 = createMockUser();
 
-        Long userId1 = mDatabase.userDao().save(patientTest1).intValue();
-        Long userId2 = mDatabase.userDao().save(patientTest2).intValue();
+        Long userId1 = mDatabase.patientDao().save(patientTest1).intValue();
+        Long userId2 = mDatabase.patientDao().save(patientTest2).intValue();
 
         BodyMeasurement bodyMeasurementTest1 = createMockBodyMeasurementForUser(userId1);
         BodyMeasurement bodyMeasurementTest2 = createMockBodyMeasurementForUser(userId1);
@@ -115,8 +115,8 @@ public class DatabaseTests {
         Patient patientTest1 = createMockUser();
         Patient patientTest2 = createMockUser();
 
-        Long userId1 = mDatabase.userDao().save(patientTest1).intValue();
-        Long userId2 = mDatabase.userDao().save(patientTest2).intValue();
+        Long userId1 = mDatabase.patientDao().save(patientTest1).intValue();
+        Long userId2 = mDatabase.patientDao().save(patientTest2).intValue();
 
         BodyMeasurement bodyMeasurementTest1 = createMockBodyMeasurementForUser(userId1);
         BodyMeasurement bodyMeasurementTest2 = createMockBodyMeasurementForUser(userId1);

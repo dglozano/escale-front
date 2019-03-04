@@ -55,7 +55,6 @@ import timber.log.Timber;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        MessagesFragment.OnFragmentInteractionListener,
         HasSupportFragmentInjector {
 
     private static final int CHANGE_PASSWORD_CODE = 123;
@@ -84,7 +83,7 @@ public class MainActivity extends BaseActivity
     SharedPreferences sharedPreferences;
 
     private MainActivityViewModel mViewModel;
-    private Badge mMessagesBadge;
+    private Badge mMessagesBadge = null;
     private BleCommunicationService mBluetoothCommService;
     private boolean mBleServiceIsBound = false;
     private AlertDialog activeDialog = null;
@@ -122,11 +121,27 @@ public class MainActivity extends BaseActivity
         // Updates Patient data in Drawer if it changes
         observeUserData();
         observeChangeDialogEvent();
+        observeAppBarShadowState();
+        observeNumberOfUnreadMessages();
+    }
+
+    private void observeAppBarShadowState() {
         mViewModel.shouldShowAppBarShadow().observe(this, toggleShadow -> {
             if(toggleShadow != null && !toggleShadow) {
                 setElevationOfAppBar(0f);
             } else {
                 setElevationOfAppBar(10f);
+            }
+        });
+    }
+
+    private void observeNumberOfUnreadMessages() {
+        mViewModel.getNumberOfUnreadMessages().observe(this, unreadMessages -> {
+            if(mMessagesBadge == null) {
+                mMessagesBadge = addBadgeAt(3, 0);
+            }
+            if(unreadMessages != null) {
+                mMessagesBadge.setBadgeNumber(unreadMessages);
             }
         });
     }
@@ -169,8 +184,9 @@ public class MainActivity extends BaseActivity
         mBnv.enableItemShiftingMode(false);
         mBnv.setTextVisibility(false);
         mBnv.setIconSizeAt(0, 28, 28);
+        //TODO REMOVE
         mMessagesBadge = addBadgeAt(3, 0);
-        mMessagesBadge.setBadgeNumber(10);
+        mMessagesBadge.setBadgeNumber(12);
     }
 
     private void addFragmentsToBottomNav() {
@@ -265,11 +281,6 @@ public class MainActivity extends BaseActivity
             activeDialog.dismiss();
             activeDialog = null;
         }
-    }
-
-    @Override
-    public void onMessagesRead() {
-        mMessagesBadge.setBadgeNumber(0);
     }
 
     @Override

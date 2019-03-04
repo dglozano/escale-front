@@ -11,6 +11,7 @@ import com.dglozano.escale.ui.main.diet.current.CurrentDietViewModel;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivityViewModel;
 import com.dglozano.escale.ui.main.diet.old.AllDietsViewModel;
 import com.dglozano.escale.ui.main.home.HomeViewModel;
+import com.dglozano.escale.ui.main.messages.MessagesViewModel;
 
 import dagger.Binds;
 import dagger.Module;
@@ -37,6 +38,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(AllDietsViewModel.class)
     abstract ViewModel bindAllDietsViewModel(AllDietsViewModel allDietsViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MessagesViewModel.class)
+    abstract ViewModel bindMessagesViewModel(MessagesViewModel messagesViewModel);
 
     @Binds
     @IntoMap

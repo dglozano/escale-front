@@ -7,8 +7,15 @@ import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.EscaleDatabase;
 import com.dglozano.escale.db.dao.BodyMeasurementDao;
+import com.dglozano.escale.db.dao.ChatDao;
+import com.dglozano.escale.db.dao.ChatMessageDao;
 import com.dglozano.escale.db.dao.DietDao;
+import com.dglozano.escale.db.dao.DoctorDao;
 import com.dglozano.escale.db.dao.PatientDao;
+import com.dglozano.escale.db.dao.UserChatJoinDao;
+import com.dglozano.escale.db.dao.UserDao;
+import com.dglozano.escale.db.entity.AppUser;
+import com.dglozano.escale.db.entity.UserChatJoin;
 import com.dglozano.escale.di.annotation.ApplicationContext;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BaseUrl;
@@ -39,7 +46,9 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-@Module(includes = ViewModelModule.class)
+@Module(includes = {
+        ViewModelModule.class,
+})
 public class AppModule {
 
     @Provides
@@ -47,13 +56,6 @@ public class AppModule {
     @ApplicationScope
     Context provideContext(Application application) {
         return application;
-    }
-
-    @Provides
-    @ApplicationScope
-    @RootFileDirectory
-    File getRootDirectory(@ApplicationContext Context context) {
-        return context.getFilesDir();
     }
 
     @Provides
@@ -66,14 +68,44 @@ public class AppModule {
 
     @Provides
     @ApplicationScope
-    PatientDao provideUserDao(EscaleDatabase db) {
-        return db.userDao();
+    PatientDao providePatientDao(EscaleDatabase db) {
+        return db.patientDao();
     }
 
     @Provides
     @ApplicationScope
     BodyMeasurementDao provideBodyMeasurementDao(EscaleDatabase db) {
         return db.bodyMeasurementDao();
+    }
+
+    @Provides
+    @ApplicationScope
+    UserDao provideUserDao(EscaleDatabase db) {
+        return db.userDao();
+    }
+
+    @Provides
+    @ApplicationScope
+    ChatDao provideChatDao(EscaleDatabase db) {
+        return db.chatDao();
+    }
+
+    @Provides
+    @ApplicationScope
+    ChatMessageDao provideChatMessageDao(EscaleDatabase db) {
+        return db.chatMessageDao();
+    }
+
+    @Provides
+    @ApplicationScope
+    DoctorDao provideDoctorDao(EscaleDatabase db) {
+        return db.doctorDao();
+    }
+
+    @Provides
+    @ApplicationScope
+    UserChatJoinDao provideUserChatJoinDao(EscaleDatabase db) {
+        return db.userChatJoinDao();
     }
 
     @Provides
@@ -87,6 +119,13 @@ public class AppModule {
     String provideDatabaseName() {
         // TODO: Move to App Constants
         return "escale.db";
+    }
+
+    @Provides
+    @ApplicationScope
+    @RootFileDirectory
+    File getRootDirectory(@ApplicationContext Context context) {
+        return context.getFilesDir();
     }
 
     @Provides

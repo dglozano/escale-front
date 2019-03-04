@@ -17,7 +17,7 @@ public class PatientDTO {
     private int physicalActivity;
     private Date birthday;
     private boolean changedDefaultPassword;
-    private int doctorId;
+    private DoctorDTO doctor;
 
     public PatientDTO() {
     }
@@ -110,12 +110,12 @@ public class PatientDTO {
         this.changedDefaultPassword = changedDefaultPassword;
     }
 
-    public int getDoctorId() {
-        return doctorId;
+    public DoctorDTO getDoctorDTO() {
+        return doctor;
     }
 
-    public void setDoctorId(int doctorId) {
-        this.doctorId = doctorId;
+    public void setDoctorDTO(DoctorDTO doctor) {
+        this.doctor = doctor;
     }
 
     @Override

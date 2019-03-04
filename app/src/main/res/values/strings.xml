@@ -74,4 +74,5 @@
     <string name="open_diet_pdf">Abrir dieta</string>
     <string name="error_open_pdf_install_viewer">Ups! Parece que no tienes un lector de PDF. Instala uno y prueba de nuevo.</string>
     <string name="old_diets_title">Anteriores</string>
+    <string name="send_message_hint">Escribe un mensaje</string>
 </resources>

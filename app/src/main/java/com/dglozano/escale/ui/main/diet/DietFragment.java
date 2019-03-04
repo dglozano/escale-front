@@ -27,7 +27,6 @@ import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
-
 public class DietFragment extends Fragment {
 
     @BindView(R.id.diet_view_pager_tabs)
@@ -96,12 +95,6 @@ public class DietFragment extends Fragment {
         this.started = true;
         mMainActivityViewModel = ViewModelProviders.of((MainActivity) context).get(MainActivityViewModel.class);
         mMainActivityViewModel.toogleAppBarShadow(!this.visible);
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Timber.d("onCreate().");
     }
 
     @Override

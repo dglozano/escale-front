@@ -5,7 +5,11 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.content.SharedPreferences;
 
+import com.dglozano.escale.db.dao.DoctorDao;
 import com.dglozano.escale.db.dao.PatientDao;
+import com.dglozano.escale.db.dao.UserDao;
+import com.dglozano.escale.db.entity.AppUser;
+import com.dglozano.escale.db.entity.Doctor;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.exception.BadCredentialsException;
@@ -36,6 +40,7 @@ import static com.dglozano.escale.util.Constants.FRESH_TIMEOUT;
 public class PatientRepository {
 
     private PatientDao mPatientDao;
+    private DoctorDao mDoctorDao;
     private EscaleRestApi mEscaleRestApi;
     private AppExecutors mAppExecutors;
     private SharedPreferences mSharedPreferences;
@@ -43,8 +48,12 @@ public class PatientRepository {
     private LiveData<Patient> mLoggedPatient;
 
     @Inject
-    public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi,
+    UserDao mUserDao;
+
+    @Inject
+    public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi, DoctorDao doctorDao,
                              AppExecutors executors, SharedPreferences sharedPreferences) {
+        mDoctorDao = doctorDao;
         mPatientDao = patientDao;
         mEscaleRestApi = escaleRestApi;
         mAppExecutors = executors;
@@ -126,10 +135,22 @@ public class PatientRepository {
                     }
                 })
                 .flatMapSingle(patientDTO -> {
-                    Timber.d("Retrieved user with id %s from Api", userId);
-                    Patient patient = new Patient(patientDTO, Calendar.getInstance().getTime());
-                    return Single.fromCallable(() -> mPatientDao.save(patient));
+                    Timber.d("Retrieved user with id %s from Api. Saving to db...", userId);
+                    return Single.fromCallable(() -> {
+                        Doctor doctor = new Doctor(patientDTO.getDoctorDTO(), Calendar.getInstance().getTime());
+                        AppUser user = new AppUser(doctor);
+                        mUserDao.save(user);
+                        mDoctorDao.save(doctor);
+                        Timber.d("Saving doctor with id %s ", doctor.getId());
+                        return patientDTO;
+                    });
                 })
+                .flatMap(patientDTO -> Single.fromCallable(() -> {
+                    Patient patient = new Patient(patientDTO, Calendar.getInstance().getTime());
+                    AppUser user = new AppUser(patient);
+                    mUserDao.save(user);
+                    return mPatientDao.save(patient);
+                }))
                 .subscribeOn(Schedulers.io())
                 .subscribe(onSuccess -> Timber.d("Success refresh"), e -> {
                     if(e instanceof NoSuchElementException) {

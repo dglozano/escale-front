@@ -1,6 +1,7 @@
 package com.dglozano.escale.db.entity;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
@@ -9,14 +10,14 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
-@Entity
-public class Patient {
+import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-    @PrimaryKey
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String email;
+@Entity(foreignKeys = @ForeignKey(entity = Doctor.class,
+        parentColumns = "id",
+        childColumns = "doctorId",
+        onDelete = CASCADE))
+public class Patient extends AppUser {
+
     private Gender gender;
     private int scaleUserPin;
     private int scaleUserIndex;
@@ -24,70 +25,26 @@ public class Patient {
     private int physicalActivity;
     private Date birthday;
     private boolean changedDefaultPassword;
-    private int doctorId;
-    private Date lastUpdate;
+    private Long doctorId;
 
     public Patient() {
     }
 
     @Ignore
-    public Patient(Long id, String firstName, String lastName, String email) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-    }
-
-    @Ignore
     public Patient(PatientDTO patientDTO, Date timestamp) {
-        this.id = patientDTO.getId();
-        this.firstName = patientDTO.getFirstName();
-        this.lastName = patientDTO.getLastName();
-        this.email = patientDTO.getEmail();
+        super(patientDTO.getId(),
+                patientDTO.getFirstName(),
+                patientDTO.getLastName(),
+                patientDTO.getEmail(),
+                timestamp);
         this.gender = patientDTO.getGender();
         this.scaleUserIndex = patientDTO.getScaleUserIndex();
         this.scaleUserPin = patientDTO.getScaleUserPin();
         this.heightInCm = patientDTO.getHeightInCm();
         this.physicalActivity = patientDTO.getPhysicalActivity();
         this.birthday = patientDTO.getBirthday();
+        this.doctorId = patientDTO.getDoctorDTO().getId();
         this.changedDefaultPassword = patientDTO.hasChangedDefaultPassword();
-        this.lastUpdate = timestamp;
-    }
-
-    public boolean hasChangedDefaultPassword() {
-        return changedDefaultPassword;
-    }
-
-    public void setChangedDefaultPassword(boolean changedDefaultPassword) {
-        this.changedDefaultPassword = changedDefaultPassword;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Gender getGender() {
@@ -138,11 +95,11 @@ public class Patient {
         this.birthday = birthday;
     }
 
-    public int getDoctorId() {
+    public Long getDoctorId() {
         return doctorId;
     }
 
-    public void setDoctorId(int doctorId) {
+    public void setDoctorId(Long doctorId) {
         this.doctorId = doctorId;
     }
 
@@ -159,16 +116,12 @@ public class Patient {
                 && otherPatient.email.equals(this.email);
     }
 
-    public Long getId() {
-        return id;
+    public boolean hasChangedDefaultPassword() {
+        return changedDefaultPassword;
     }
 
-    public Date getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(Date lastUpdate) {
-        this.lastUpdate = lastUpdate;
+    public void setChangedDefaultPassword(boolean changedDefaultPassword) {
+        this.changedDefaultPassword = changedDefaultPassword;
     }
 
     @Override
@@ -180,10 +133,9 @@ public class Patient {
                 "   email: %s \n" +
                 "   userindex: %s \n" +
                 "   gender: %s \n" +
-                "   changedpass: %s \n" +
                 "   height: %s \n" +
                 "   physicalactivity: %s \n" +
-                "}", id, firstName, lastName, email,scaleUserIndex,gender,changedDefaultPassword, heightInCm, physicalActivity);
+                "}", id, firstName, lastName, email,scaleUserIndex,gender, heightInCm, physicalActivity);
     }
 
     public enum Gender {
