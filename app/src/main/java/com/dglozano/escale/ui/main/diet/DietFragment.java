@@ -42,9 +42,6 @@ public class DietFragment extends Fragment {
     private Unbinder mViewUnbinder;
     private MainActivityViewModel mMainActivityViewModel;
 
-    private boolean started = false;
-    private boolean visible = false;
-
     public DietFragment() {
         // Required empty public constructor
     }
@@ -72,29 +69,10 @@ public class DietFragment extends Fragment {
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        this.visible = isVisibleToUser;
-
-        if(this.started) {
-            mMainActivityViewModel.toogleAppBarShadow(!this.visible);
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        this.started = false;
-    }
-
-    @Override
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
-        this.started = true;
         mMainActivityViewModel = ViewModelProviders.of((MainActivity) context).get(MainActivityViewModel.class);
-        mMainActivityViewModel.toogleAppBarShadow(!this.visible);
     }
 
     @Override

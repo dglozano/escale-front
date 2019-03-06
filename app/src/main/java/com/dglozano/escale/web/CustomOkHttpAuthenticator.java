@@ -3,6 +3,7 @@ package com.dglozano.escale.web;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
+import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.web.dto.LoginResponse;
 
 import java.io.IOException;
@@ -70,8 +71,8 @@ public class CustomOkHttpAuthenticator implements Authenticator {
 
     private void updateSharedPreferencesWithNewTokens(String accessToken, String refreshToken) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("token", accessToken);
-        editor.putString("refreshToken", refreshToken);
+        editor.putString(Constants.TOKEN_SHARED_PREF, accessToken);
+        editor.putString(Constants.REFRESH_TOKEN_SHARED_PREF, refreshToken);
         editor.apply();
     }
 }

@@ -42,6 +42,7 @@ public class ChatMessage {
         this.sentDate = sentDate;
     }
 
+    @Ignore
     public ChatMessage(ChatMessageDTO dto, Long chatId) {
         this(dto.getId(), chatId, dto.getSenderId(), dto.getMessage(), dto.getSentDate());
     }

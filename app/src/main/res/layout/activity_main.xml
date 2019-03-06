@@ -8,7 +8,9 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
+
     <RelativeLayout
+        android:id="@+id/main_activity_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -44,6 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </RelativeLayout>
+
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"

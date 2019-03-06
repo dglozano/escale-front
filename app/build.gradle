@@ -48,12 +48,10 @@ dependencies {
     def timber_version = "4.7.1"
     def rx_ble_version = "1.7.1"
     def rx_android_version = "2.1.0"
-    def firebase_version = "16.0.1"
-    def firebase_ui_version = "4.1.0"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.google.firebase:firebase-core:$firebase_version"
-    implementation "com.firebaseui:firebase-ui-auth:$firebase_ui_version"
+    implementation "com.google.firebase:firebase-core:16.0.7"
+    implementation "com.google.firebase:firebase-messaging:17.4.0"
     implementation "com.android.support:appcompat-v7:$android_version"
     implementation "com.android.support:support-v4:$android_version"
     implementation "com.android.support:design:$android_version"
@@ -73,6 +71,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:$rx_android_version"
     implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.1"
     implementation "net.cachapa.expandablelayout:expandablelayout:2.9.2"
+    implementation "com.squareup.retrofit2:converter-scalars:2.1.0"
 
     implementation "com.github.stfalcon:chatkit:0.3.3"
     implementation "com.github.barteksc:android-pdf-viewer:3.1.0-beta.1"

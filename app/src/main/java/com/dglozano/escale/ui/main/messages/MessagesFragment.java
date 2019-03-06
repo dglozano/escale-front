@@ -51,9 +51,6 @@ public class MessagesFragment extends Fragment {
     private MainActivityViewModel mMainActivityViewModel;
     private MessagesViewModel mMessagesViewModel;
 
-    private boolean started = false;
-    private boolean visible = false;
-
     public MessagesFragment() {
         // Required empty public constructor
     }
@@ -149,20 +146,8 @@ public class MessagesFragment extends Fragment {
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        this.visible = isVisibleToUser;
-
-        if (this.started) {
-            mMainActivityViewModel.setNumberOfUnreadMessages(0);
-        }
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
-        this.started = false;
         this.mMessagesListAdapter.unselectAllItems();
         mMessagesViewModel.setCopyMenuVisible(false);
     }
@@ -171,9 +156,7 @@ public class MessagesFragment extends Fragment {
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
-        this.started = true;
         mMainActivityViewModel = ViewModelProviders.of((MainActivity) context).get(MainActivityViewModel.class);
-        mMainActivityViewModel.setNumberOfUnreadMessages(0);
     }
 
     @Override

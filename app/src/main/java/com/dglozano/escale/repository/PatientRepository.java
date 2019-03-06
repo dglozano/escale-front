@@ -35,6 +35,9 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.dglozano.escale.util.Constants.FRESH_TIMEOUT;
+import static com.dglozano.escale.util.Constants.IS_FIREBASE_TOKEN_SENT_SHARED_PREF;
+import static com.dglozano.escale.util.Constants.REFRESH_TOKEN_SHARED_PREF;
+import static com.dglozano.escale.util.Constants.TOKEN_SHARED_PREF;
 
 @ApplicationScope
 public class PatientRepository {
@@ -45,6 +48,7 @@ public class PatientRepository {
     private AppExecutors mAppExecutors;
     private SharedPreferences mSharedPreferences;
     private LiveData<Long> mLoggedUserId;
+    private LiveData<String> mFirebaseDeviceToken;
     private LiveData<Patient> mLoggedPatient;
 
     @Inject
@@ -60,6 +64,8 @@ public class PatientRepository {
         mSharedPreferences = sharedPreferences;
         mLoggedUserId = new SharedPreferencesLiveData.SharedPreferenceLongLiveData(mSharedPreferences,
                 Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
+        mFirebaseDeviceToken = new SharedPreferencesLiveData.SharedPreferenceStringLiveData(mSharedPreferences,
+                Constants.FIREBASE_TOKEN_SHARED_PREF, "");
         mLoggedPatient = Transformations.switchMap(mLoggedUserId, this::getPatientById);
     }
 
@@ -161,10 +167,20 @@ public class PatientRepository {
                 });
     }
 
+    public LiveData<String> getFirebaseDeviceToken() {
+        return mFirebaseDeviceToken;
+    }
+
+    public Boolean isFirebaseTokenSent() {
+        return mSharedPreferences.getBoolean(Constants.IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
+    }
+
     public void logout() {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
-        editor.clear();
+        editor.remove(TOKEN_SHARED_PREF);
+        editor.remove(REFRESH_TOKEN_SHARED_PREF);
+        editor.putBoolean(IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
         editor.apply();
     }
 

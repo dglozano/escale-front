@@ -67,7 +67,7 @@ public abstract class SharedPreferencesLiveData<T> extends LiveData<T> {
         }
     }
 
-    public class SharedPreferenceStringLiveData extends SharedPreferencesLiveData<String> {
+    public static class SharedPreferenceStringLiveData extends SharedPreferencesLiveData<String> {
 
         public SharedPreferenceStringLiveData(SharedPreferences prefs, String key, String defValue) {
             super(prefs, key, defValue);

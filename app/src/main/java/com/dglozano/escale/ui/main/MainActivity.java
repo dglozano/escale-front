@@ -18,6 +18,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,6 +27,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dglozano.escale.R;
@@ -39,11 +42,11 @@ import com.dglozano.escale.ui.main.diet.DietFragment;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
+import com.dglozano.escale.web.FirebaseTokenSenderService;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import javax.inject.Inject;
 
@@ -94,21 +97,7 @@ public class MainActivity extends BaseActivity
     private boolean mBleServiceIsBound = false;
     private AlertDialog activeDialog = null;
 
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder binder) {
-            Timber.d("onServiceConnected(). Bluetooth Service is Bound.");
-            mBleServiceIsBound = true;
-            BleCommunicationService.LocalBinder localBinder = (BleCommunicationService.LocalBinder) binder;
-            mBluetoothCommService = localBinder.getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Timber.d("onServiceDisconnected(). Unbinding Bluetooth Service.");
-            mBleServiceIsBound = false;
-        }
-    };
+    private ServiceConnection mServiceConnection = new MyServiceConnection();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,46 +106,81 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        setSupportActionBar(mToolbar);
+
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainActivityViewModel.class);
+
+        setSupportActionBar(mToolbar);
+
+        int currentFragmentPosition = 0;
+        if (getIntent().getExtras() != null) {
+            currentFragmentPosition = Integer.parseInt(getIntent().getExtras().getString("show-fragment", "0"));
+        }
 
         setupDrawerLayout();
         setupBottomNav();
-        addFragmentsToBottomNav();
+        addFragmentsToBottomNav(currentFragmentPosition);
 
-        // Updates Patient data in Drawer if it changes
+        onKeyboardVisibilityEvent();
+
         observeUserData();
         observeChangeDialogEvent();
-        observeAppBarShadowState();
         observeNumberOfUnreadMessages();
+        observerFirebaseTokenUpdate();
+        observeCurrentFragmentPosition();
+    }
+
+    private void observeCurrentFragmentPosition() {
+        mViewModel.getPositionOfCurrentFragment().observe(this, posFragment -> {
+            if (posFragment != null) {
+                switch (posFragment) {
+                    case 0: // HOME
+                        setElevationOfAppBar(10f);
+                        break;
+                    case 1: // STATS
+                        setElevationOfAppBar(10f);
+                        break;
+                    case 2: // DIETS
+                        setElevationOfAppBar(0f);
+                        break;
+                    case 3: // MESSAGES
+                        setElevationOfAppBar(10f);
+                        mViewModel.markMessagesAsRead();
+                        break;
+                }
+            }
+        });
+    }
+
+    private void observerFirebaseTokenUpdate() {
+        mViewModel.getFirebaseToken().observe(this, token -> {
+            Long patientId = mViewModel.getLoggedPatientId();
+            if (token != null && !token.isEmpty() && !mViewModel.isFirebaseTokenSent() && patientId != -1L) {
+                Timber.d("Sending token %s to server for user %s", token, patientId);
+                Intent startIntent = new Intent(this, FirebaseTokenSenderService.class);
+                startIntent.putExtra("token", token);
+                startIntent.putExtra("patientId", patientId);
+                startService(startIntent);
+            }
+        });
+    }
+
+    private void onKeyboardVisibilityEvent() {
         KeyboardVisibilityEvent.setEventListener(this,
                 isOpen -> {
                     // some code depending on keyboard visiblity status
-                    if(isOpen)
+                    if (isOpen)
                         mExpandableBottomBar.collapse(true);
                     else
                         mExpandableBottomBar.expand(true);
                 });
     }
 
-
-
-    private void observeAppBarShadowState() {
-        mViewModel.shouldShowAppBarShadow().observe(this, toggleShadow -> {
-            if(toggleShadow != null && !toggleShadow) {
-                setElevationOfAppBar(0f);
-            } else {
-                setElevationOfAppBar(10f);
-            }
-        });
-    }
-
     private void observeNumberOfUnreadMessages() {
         mViewModel.getNumberOfUnreadMessages().observe(this, unreadMessages -> {
-            if(mMessagesBadge == null) {
+            if (mMessagesBadge == null) {
                 mMessagesBadge = addBadgeAt(3, 0);
             }
-            if(unreadMessages != null) {
+            if (unreadMessages != null) {
                 mMessagesBadge.setBadgeNumber(unreadMessages);
             }
         });
@@ -200,18 +224,34 @@ public class MainActivity extends BaseActivity
         mBnv.enableItemShiftingMode(false);
         mBnv.setTextVisibility(false);
         mBnv.setIconSizeAt(0, 28, 28);
-        //TODO REMOVE
-        mViewModel.setNumberOfUnreadMessages(12);
     }
 
-    private void addFragmentsToBottomNav() {
+    private void addFragmentsToBottomNav(int currentFragmentPosition) {
         mNoSwipePager.setPagingEnabled(false);
+        mNoSwipePager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Timber.d("New fragment position %s", position);
+                mViewModel.setPositionOfCurrentFragment(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         mPagerAdapter.addFragments(HomeFragment.newInstance());
         mPagerAdapter.addFragments(StatsFragment.newInstance());
         mPagerAdapter.addFragments(DietFragment.newInstance());
         mPagerAdapter.addFragments(MessagesFragment.newInstance());
         mNoSwipePager.setAdapter(mPagerAdapter);
         mBnv.setupWithViewPager(mNoSwipePager);
+        mNoSwipePager.setCurrentItem(currentFragmentPosition);
     }
 
     @Override
@@ -278,6 +318,7 @@ public class MainActivity extends BaseActivity
         Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
         Intent intent = new Intent(this, BleCommunicationService.class);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        mViewModel.refreshMessages();
     }
 
     @Override
@@ -321,10 +362,26 @@ public class MainActivity extends BaseActivity
     }
 
     private void setElevationOfAppBar(float elevation) {
-        ActionBar actionBar= getSupportActionBar();
-        if(actionBar != null) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
             actionBar.setElevation(elevation);
         }
         ViewCompat.setElevation(mAppBarLayout, elevation);
+    }
+
+    private class MyServiceConnection implements ServiceConnection {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            Timber.d("onServiceConnected(). Bluetooth Service is Bound.");
+            mBleServiceIsBound = true;
+            BleCommunicationService.LocalBinder localBinder = (BleCommunicationService.LocalBinder) binder;
+            mBluetoothCommService = localBinder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Timber.d("onServiceDisconnected(). Unbinding Bluetooth Service.");
+            mBleServiceIsBound = false;
+        }
     }
 }

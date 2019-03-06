@@ -3,6 +3,8 @@ package com.dglozano.escale.web;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
+import com.dglozano.escale.util.Constants;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -22,7 +24,7 @@ public class HeaderTokenInterceptor implements Interceptor {
 
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
-        String token = sharedPreferences.getString("token", "");
+        String token = sharedPreferences.getString(Constants.TOKEN_SHARED_PREF, "");
         Request request = chain.request();
         if (request.url().encodedPath().contains("auth/login")
                 || request.url().encodedPath().contains("auth/refresh")) {
@@ -30,7 +32,7 @@ public class HeaderTokenInterceptor implements Interceptor {
         }
 
         Request newRequest = request.newBuilder()
-                .addHeader("token", token)
+                .addHeader(Constants.TOKEN_HEADER_KEY, token)
                 .build();
 
         return chain.proceed(newRequest);

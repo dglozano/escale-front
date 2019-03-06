@@ -41,4 +41,10 @@ public interface UserChatJoinDao {
             "WHERE user_chat_join.userId=:patientId " +
             "LIMIT 1")
     Single<Optional<Long>> getChatOfLoggedPatient(final Long patientId);
+
+    @Query("SELECT id FROM chat INNER JOIN user_chat_join " +
+            "ON chat.id=user_chat_join.chatId " +
+            "WHERE user_chat_join.userId=:patientId " +
+            "LIMIT 1")
+    Maybe<Long> getChatOfLoggedPatientAsMaybe(final Long patientId);
 }

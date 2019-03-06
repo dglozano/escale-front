@@ -14,8 +14,6 @@ import com.dglozano.escale.db.dao.DoctorDao;
 import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.db.dao.UserChatJoinDao;
 import com.dglozano.escale.db.dao.UserDao;
-import com.dglozano.escale.db.entity.AppUser;
-import com.dglozano.escale.db.entity.UserChatJoin;
 import com.dglozano.escale.di.annotation.ApplicationContext;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BaseUrl;
@@ -46,6 +44,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Module(includes = {
         ViewModelModule.class,
@@ -193,6 +192,7 @@ public class AppModule {
     @ApplicationScope
     Retrofit provideRetrofit(Gson gson, OkHttpClient okHttpClient, @BaseUrl String baseUrl) {
         return new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(baseUrl)

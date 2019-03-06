@@ -17,7 +17,7 @@ import io.reactivex.Completable;
 @Dao
 public interface ChatDao {
     @Insert
-    void insert(Chat chat);
+    Long insert(Chat chat);
 
     @Query("SELECT * FROM Chat WHERE id == :id")
     Optional<Chat> getChatById(Long id);

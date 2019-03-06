@@ -16,12 +16,19 @@ import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.SendChatMessageDTO;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.NoSuchElementException;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
@@ -35,15 +42,18 @@ public class ChatRepository {
     private UserChatJoinDao mUserChatJoinDao;
     private EscaleRestApi mEscaleRestApi;
     private AppExecutors mAppExecutors;
+    private PatientRepository mPatientRepository;
 
     @Inject
     public ChatRepository(ChatMessageDao dao, EscaleRestApi api, AppExecutors executors,
-                          UserDao userDao, UserChatJoinDao userChatJoinDao, ChatDao chatDao) {
+                          UserDao userDao, UserChatJoinDao userChatJoinDao, ChatDao chatDao,
+                          PatientRepository patientRepository) {
         this.mAppExecutors = executors;
         this.mChatMessageDao = dao;
         this.mEscaleRestApi = api;
         this.mChatDao = chatDao;
         this.mUserChatJoinDao = userChatJoinDao;
+        this.mPatientRepository = patientRepository;
     }
 
     public LiveData<List<Chat>> getAllChatsOfUser(Long userId) {
@@ -69,11 +79,15 @@ public class ChatRepository {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressLint("CheckResult")
     private void refreshChatsOfUser(final Long userId) {
-        refreshChatsCompletable(userId)
+        refreshChatsOfUserAsMaybe(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .subscribe(() -> Timber.d("Success refresh chats"), e -> {
-                    Timber.e(e, "Failed refresh chats");
+                .subscribe((chatId) -> Timber.d("Success refresh chats. New chat %s", chatId), e -> {
+                    if(e instanceof NoSuchElementException){
+                        Timber.d("No chats for user yet");
+                    } else {
+                        Timber.e(e, "Failed refresh chats");
+                    }
                 });
     }
 
@@ -111,20 +125,52 @@ public class ChatRepository {
                 });
     }
 
+    public Maybe<Long> refreshChatsOfUserAsMaybe(Long userId) {
+        return mEscaleRestApi.getChatOfUser(userId)
+                .flatMapMaybe(list -> {
+                    if (list == null || list.isEmpty())
+                        return Maybe.empty();
+                    else
+                        return Maybe.just(list.get(0));
+                })
+                .filter(chatDTO -> mChatDao.chatExists(chatDTO.getId()) != 1)
+                .map(chatDTO -> {
+                    Chat chat = new Chat(chatDTO.getId());
+                    Timber.d("Inserting chat from API %s", chatDTO.getId());
+                    mChatDao.insert(chat);
+                    return chatDTO;
+                })
+                .map(chatDTO -> {
+                    for (Long id : chatDTO.getParticipantsIds()) {
+                        Timber.d("Inserting chatjoin %s - %s", id, chatDTO.getId());
+                        mUserChatJoinDao.insert(new UserChatJoin(id, chatDTO.getId()));
+                    }
+                    return chatDTO.getId();
+                });
+    }
+
 
     public Completable refreshMessagesCompletable(Long chatId) {
+        return refreshMessagesAndCount(chatId)
+                .flatMapCompletable(messagesAdded -> {
+                    Timber.d("Got %s new messages from API", messagesAdded);
+                    return Completable.complete();
+                });
+    }
+
+    public Single<Integer> refreshMessagesAndCount(Long chatId) {
         return mEscaleRestApi.getChatMessages(chatId)
-                .flatMapCompletable(messagesApi -> {
+                .map(messagesApi -> {
                     Timber.d("Retrieved messages for chat with id %s from Api", chatId);
-                    messagesApi.stream()
+                    List<ChatMessage> newMessagesToAdd = messagesApi.stream()
                             .filter(messageDTO -> mChatMessageDao.chatMessageExists(messageDTO.getId()) != 1)
                             .map(msgApi -> new ChatMessage(msgApi, chatId))
-                            .forEach(chatMessage -> {
-                                Timber.d("Inserting chatMessage from API %s", chatMessage.getId());
-                                mChatMessageDao.insertChatMessage(chatMessage);
-                            });
-
-                    return Completable.complete();
+                            .collect(Collectors.toList());
+                    newMessagesToAdd.forEach(chatMessage -> {
+                        Timber.d("Inserting chatMessage from API %s", chatMessage.getId());
+                        mChatMessageDao.insertChatMessage(chatMessage);
+                    });
+                    return newMessagesToAdd.size();
                 });
     }
 
@@ -155,5 +201,42 @@ public class ChatRepository {
                     mChatMessageDao.insertChatMessage(new ChatMessage(msgDTO, msgDTO.getChatId()));
                     return Completable.complete();
                 });
+    }
+
+    public Completable saveMessageOnReceivedFromDoctor(Long id, Long chatIdInMessage, Long sender_id,
+                                                       String msg, String dateString) {
+        Long patientId = mPatientRepository.getLoggedPatiendId();
+        return mUserChatJoinDao.getChatOfLoggedPatient(patientId)
+                .flatMap(chatIdOpt -> {
+                    if (chatIdOpt.isPresent()) {
+                        return Single.just(chatIdOpt.get());
+                    } else {
+                        return Single.fromCallable(() -> {
+                            Chat chat = new Chat(chatIdInMessage);
+                            mChatDao.insert(chat);
+                            mUserChatJoinDao.insert(new UserChatJoin(patientId, chatIdInMessage));
+                            mUserChatJoinDao.insert(new UserChatJoin(sender_id, chatIdInMessage));
+                            return chatIdInMessage;
+                        });
+                    }
+                })
+                .flatMapCompletable(chatId -> {
+                    if (!chatId.equals(chatIdInMessage)) {
+                        throw new Exception(String.format("The chat id received in the message (%s)" +
+                                " does not match local chat id (%s) of patient.", chatId, chatIdInMessage));
+                    }
+                    String format = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+                    SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
+                    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    Date date = sdf.parse(dateString);
+                    mChatMessageDao.insertChatMessage(new ChatMessage(id, chatId, sender_id, msg, date));
+                    return Completable.complete();
+                });
+    }
+
+    public Single<Integer> refreshMessagesAndCountOfPatientWithId(Long patientId) {
+        return mUserChatJoinDao.getChatOfLoggedPatient(patientId)
+                .map(chatId -> chatId.orElseGet(() -> refreshChatsOfUserAsMaybe(patientId).blockingGet()))
+                .flatMap(this::refreshMessagesAndCount);
     }
 }

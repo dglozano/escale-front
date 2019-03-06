@@ -6,6 +6,7 @@ import com.dglozano.escale.web.dto.ChatDTO;
 import com.dglozano.escale.web.dto.ChatMessageDTO;
 import com.dglozano.escale.web.dto.Credentials;
 import com.dglozano.escale.web.dto.DietDTO;
+import com.dglozano.escale.web.dto.FirebaseTokenUpdateDTO;
 import com.dglozano.escale.web.dto.LoginResponse;
 import com.dglozano.escale.web.dto.PatientDTO;
 import com.dglozano.escale.web.dto.SendChatMessageDTO;
@@ -62,4 +63,7 @@ public interface EscaleRestApi {
 
     @POST("users/{id}/password_change")
     Single<Response<Void>> changePassword(@Body ChangePasswordDataDTO changePasswordData, @Path("id") Long userId);
+
+    @POST("users/{id}/firebase_token")
+    Call<Void> updateToken(@Path("id") Long userId, @Body FirebaseTokenUpdateDTO token);
 }
