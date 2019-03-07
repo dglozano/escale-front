@@ -10,7 +10,6 @@ import com.dglozano.escale.exception.DietDownloadStateException;
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.ui.Event;
-import com.dglozano.escale.util.AppExecutors;
 
 import java.io.File;
 import java.util.List;
@@ -63,11 +62,11 @@ public class AllDietsViewModel extends ViewModel {
     }
 
     public void refreshDiets() {
-        disposables.add(mDietRepository.refreshDietsCompletable(mPatientRepository.getLoggedPatiendId())
+        disposables.add(mDietRepository.refreshDietsSingle(mPatientRepository.getLoggedPatiendId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(d -> mIsRefreshingDietsList.postValue(true))
-                .subscribe(() -> mIsRefreshingDietsList.postValue(false),
+                .subscribe((newDiets) -> mIsRefreshingDietsList.postValue(false),
                         error -> {
                             Timber.e(error, "Error refreshing diets");
                             mIsRefreshingDietsList.postValue(false);

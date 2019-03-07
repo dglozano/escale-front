@@ -2,6 +2,7 @@ package com.dglozano.escale.ui.main;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.app.NotificationManager;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
@@ -81,7 +82,11 @@ public class MainActivity extends BaseActivity
     AppBarLayout mAppBarLayout;
     @BindView(R.id.expandable_bnve)
     ExpandableLayout mExpandableBottomBar;
+    @BindView(R.id.main_activity_progress_bar)
+    ProgressBar mMainProgressBar;
 
+    @Inject
+    NotificationManager mNotificationManager;
     @Inject
     BottomBarAdapter mPagerAdapter;
     @Inject
@@ -93,6 +98,7 @@ public class MainActivity extends BaseActivity
 
     private MainActivityViewModel mViewModel;
     private Badge mMessagesBadge = null;
+    private Badge mNewDietsBadge = null;
     private BleCommunicationService mBluetoothCommService;
     private boolean mBleServiceIsBound = false;
     private AlertDialog activeDialog = null;
@@ -111,22 +117,47 @@ public class MainActivity extends BaseActivity
 
         setSupportActionBar(mToolbar);
 
-        int currentFragmentPosition = 0;
+        int openFragmentInPosition = 0;
         if (getIntent().getExtras() != null) {
-            currentFragmentPosition = Integer.parseInt(getIntent().getExtras().getString("show-fragment", "0"));
+            openFragmentInPosition = handleFirebaseIntent();
         }
 
         setupDrawerLayout();
         setupBottomNav();
-        addFragmentsToBottomNav(currentFragmentPosition);
+        addFragmentsToBottomNav(openFragmentInPosition);
 
         onKeyboardVisibilityEvent();
 
+        observeIsRefreshing();
         observeUserData();
         observeChangeDialogEvent();
         observeNumberOfUnreadMessages();
         observerFirebaseTokenUpdate();
         observeCurrentFragmentPosition();
+        observeNewDietNotification();
+    }
+
+    private void observeIsRefreshing() {
+        mViewModel.isRefreshing().observe(this, isRefreshing -> {
+            Timber.d("Refreshing status %s", isRefreshing);
+            if(isRefreshing != null) {
+                mMainProgressBar.setVisibility(isRefreshing ? View.VISIBLE : View.GONE);
+                mNoSwipePager.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
+            }
+        });
+    }
+
+    private int handleFirebaseIntent() {
+        int openFragment = 0;
+        String msgType = getIntent().getExtras().getString("type");
+        if (msgType != null) {
+            if (msgType.equals("new_message")) {
+                openFragment = 3;
+            } else if (msgType.equals("new_diet")) {
+                openFragment = 2;
+            }
+        }
+        return openFragment;
     }
 
     private void observeCurrentFragmentPosition() {
@@ -141,6 +172,7 @@ public class MainActivity extends BaseActivity
                         break;
                     case 2: // DIETS
                         setElevationOfAppBar(0f);
+                        mViewModel.markNewDietAsSeen(true);
                         break;
                     case 3: // MESSAGES
                         setElevationOfAppBar(10f);
@@ -182,6 +214,22 @@ public class MainActivity extends BaseActivity
             }
             if (unreadMessages != null) {
                 mMessagesBadge.setBadgeNumber(unreadMessages);
+            }
+        });
+    }
+
+    private void observeNewDietNotification() {
+        mViewModel.observeIfHasUnseenNewDiets().observe(this, hasNewDiet -> {
+            if (mNewDietsBadge == null) {
+                mNewDietsBadge = addBadgeAt(2, 0);
+            }
+            Timber.d("new diet observable triggered %s", hasNewDiet != null ? hasNewDiet : "null");
+            if (hasNewDiet != null && hasNewDiet
+                    && mViewModel.getPositionOfCurrentFragment().getValue() != null
+                    && !mViewModel.getPositionOfCurrentFragment().getValue().equals(2)) {
+                mNewDietsBadge.setBadgeText("!");
+            } else {
+                mNewDietsBadge.setBadgeNumber(0);
             }
         });
     }
@@ -318,7 +366,8 @@ public class MainActivity extends BaseActivity
         Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
         Intent intent = new Intent(this, BleCommunicationService.class);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        mViewModel.refreshMessages();
+        mViewModel.refreshData();
+        mNotificationManager.cancelAll();
     }
 
     @Override

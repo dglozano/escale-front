@@ -33,4 +33,7 @@ public interface PatientDao {
 
     @Query("SELECT COUNT(*) FROM Patient WHERE id == :id AND lastUpdate >= :timeout")
     Single<Integer> hasUser(Long id, long timeout);
+
+    @Query("SELECT * FROM Patient WHERE id == :id AND lastUpdate >= :timeout")
+    Single<Patient> getUserIfFresh(Long id, long timeout);
 }

@@ -78,10 +78,6 @@ public class LoginActivity extends BaseActivity {
 
     private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
-        if(getIntent().getExtras() != null) {
-            Timber.d("Adding firebase extras");
-            intent.putExtras(getIntent().getExtras());
-        }
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         finish();
     }

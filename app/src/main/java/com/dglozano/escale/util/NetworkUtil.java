@@ -55,12 +55,11 @@ public class NetworkUtil {
                 return (urlc.getResponseCode() == 204 &&
                         urlc.getContentLength() == 0);
             } else {
-                Thread.sleep(1000);
                 return false;
             }
         })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(Schedulers.io());
     }
 
     public static boolean isNetworkAvailable(Context context) {

@@ -35,6 +35,7 @@ public class Constants {
 
     // Web
     public static final String BASE_HEROKU_URL = "https://escale-api.herokuapp.com/api/";
+    public static final String BASE_LOCALHOST_URL = "http://192.168.0.65:8080/api/";
     public static final int FRESH_TIMEOUT = 30;
     public static final String TOKEN_HEADER_KEY = "token";
     public static final String REFRESH_TOKEN_HEADER_KEY = "refreshToken";
@@ -187,4 +188,5 @@ public class Constants {
     public static final UUID CHARACTERISTIC_USER_DESCRIPTION =
             UUID.fromString("00002901-0000-1000-8000-00805F9B34FB");
     public static final String UNREAD_MESSAGES_SHARED_PREF = "unreadMessages";
+    public static final String HAS_NEW_UNREAD_DIET = "unseenDiets";
 }

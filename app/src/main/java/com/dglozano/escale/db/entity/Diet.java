@@ -35,14 +35,19 @@ public class Diet {
     }
 
     @Ignore
-    public Diet(DietDTO dietDTO, Long userId) {
-        this.id = dietDTO.getUuid();
-        this.startDate = dietDTO.getStartDate();
-        this.size = dietDTO.getSize();
-        this.fileName = dietDTO.getFileName();
-        this.userId = userId;
+    public Diet(Long patientId, @NonNull String uuid, String fileName, Date date, Long size) {
+        this.id = uuid;
+        this.fileName = fileName;
+        this.startDate = date;
+        this.size = size;
+        this.userId = patientId;
         this.fileStatus = FileStatus.NOT_DOWNLOADED;
         this.downloadId = -1;
+    }
+
+    @Ignore
+    public Diet(DietDTO dietDTO, Long userId) {
+        this(userId, dietDTO.getUuid(), dietDTO.getFileName(), dietDTO.getStartDate(), dietDTO.getSize());
     }
 
     public int getDownloadId() {

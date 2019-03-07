@@ -21,8 +21,12 @@ import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.Credentials;
+import com.dglozano.escale.web.dto.FirebaseTokenUpdateDTO;
 import com.dglozano.escale.web.dto.LoginResponse;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.NoSuchElementException;
 
@@ -35,15 +39,18 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.dglozano.escale.util.Constants.FRESH_TIMEOUT;
+import static com.dglozano.escale.util.Constants.HAS_NEW_UNREAD_DIET;
 import static com.dglozano.escale.util.Constants.IS_FIREBASE_TOKEN_SENT_SHARED_PREF;
 import static com.dglozano.escale.util.Constants.REFRESH_TOKEN_SHARED_PREF;
 import static com.dglozano.escale.util.Constants.TOKEN_SHARED_PREF;
+import static com.dglozano.escale.util.Constants.UNREAD_MESSAGES_SHARED_PREF;
 
 @ApplicationScope
 public class PatientRepository {
 
     private PatientDao mPatientDao;
     private DoctorDao mDoctorDao;
+    private UserDao mUserDao;
     private EscaleRestApi mEscaleRestApi;
     private AppExecutors mAppExecutors;
     private SharedPreferences mSharedPreferences;
@@ -52,11 +59,9 @@ public class PatientRepository {
     private LiveData<Patient> mLoggedPatient;
 
     @Inject
-    UserDao mUserDao;
-
-    @Inject
     public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi, DoctorDao doctorDao,
-                             AppExecutors executors, SharedPreferences sharedPreferences) {
+                             UserDao userDao, AppExecutors executors, SharedPreferences sharedPreferences) {
+        this.mUserDao = userDao;
         mDoctorDao = doctorDao;
         mPatientDao = patientDao;
         mEscaleRestApi = escaleRestApi;
@@ -70,7 +75,7 @@ public class PatientRepository {
     }
 
     public LiveData<Patient> getPatientById(Long userId) {
-        refreshPatient(userId);
+//        if(userId != -1L) refreshPatient(userId);
         return mPatientDao.getPatientById(userId);
     }
 
@@ -128,10 +133,10 @@ public class PatientRepository {
                 });
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @SuppressLint("CheckResult")
-    private void refreshPatient(final Long userId) {
-        mPatientDao.hasUser(userId, FRESH_TIMEOUT)
+//    @SuppressWarnings("ResultOfMethodCallIgnored")
+//    @SuppressLint("CheckResult")
+    public Single<Long> refreshPatient(final Long userId) {
+        return mPatientDao.hasUser(userId, FRESH_TIMEOUT)
                 .map(freshInt -> freshInt == 1)
                 .flatMapMaybe(hasFreshUser -> {
                     if (!hasFreshUser) {
@@ -156,15 +161,15 @@ public class PatientRepository {
                     AppUser user = new AppUser(patient);
                     mUserDao.save(user);
                     return mPatientDao.save(patient);
-                }))
-                .subscribeOn(Schedulers.io())
-                .subscribe(onSuccess -> Timber.d("Success refresh"), e -> {
-                    if(e instanceof NoSuchElementException) {
-                        Timber.d("Success refresh without calling Api");
-                    } else {
-                        Timber.e(e);
-                    }
-                });
+                }));
+//                .subscribeOn(Schedulers.io())
+//                .subscribe(onSuccess -> Timber.d("Success refresh"), e -> {
+//                    if(e instanceof NoSuchElementException) {
+//                        Timber.d("Success refresh without calling Api");
+//                    } else {
+//                        Timber.e(e);
+//                    }
+//                });
     }
 
     public LiveData<String> getFirebaseDeviceToken() {
@@ -176,11 +181,19 @@ public class PatientRepository {
     }
 
     public void logout() {
+//        try {
+//            mEscaleRestApi.updateToken(getLoggedPatiendId(), new FirebaseTokenUpdateDTO(""));
+//            FirebaseInstanceId.getInstance().deleteInstanceId();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
         editor.remove(TOKEN_SHARED_PREF);
         editor.remove(REFRESH_TOKEN_SHARED_PREF);
         editor.putBoolean(IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
+        editor.putBoolean(HAS_NEW_UNREAD_DIET, false);
+        editor.putInt(UNREAD_MESSAGES_SHARED_PREF, 0);
         editor.apply();
     }
 

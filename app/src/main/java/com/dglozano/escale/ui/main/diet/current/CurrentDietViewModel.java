@@ -54,11 +54,11 @@ public class CurrentDietViewModel extends ViewModel {
     }
 
     public void refreshCurrentDiet() {
-        disposables.add(mDietRepository.refreshDietsCompletable(mPatientRepository.getLoggedPatiendId())
+        disposables.add(mDietRepository.refreshDietsSingle(mPatientRepository.getLoggedPatiendId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(d -> mIsRefreshingDietsList.postValue(true))
-                .subscribe(() -> mIsRefreshingDietsList.postValue(false),
+                .subscribe((newDiets) -> mIsRefreshingDietsList.postValue(false),
                         error -> {
                             Timber.e(error, "Error refreshing diets");
                             mIsRefreshingDietsList.postValue(false);

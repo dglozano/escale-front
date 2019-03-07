@@ -1,6 +1,7 @@
 package com.dglozano.escale.di;
 
 import android.app.Application;
+import android.app.NotificationManager;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -115,6 +116,12 @@ public class AppModule {
     }
 
     @Provides
+    @ApplicationScope
+    NotificationManager provideNotificationManager(@ApplicationContext Context context) {
+        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    }
+
+    @Provides
     @DatabaseInfo
     String provideDatabaseName() {
         // TODO: Move to App Constants
@@ -143,7 +150,7 @@ public class AppModule {
     @Provides
     @BaseUrl
     String provideBaseUrl() {
-        return Constants.BASE_HEROKU_URL;
+        return Constants.BASE_LOCALHOST_URL;
     }
 
     @Provides

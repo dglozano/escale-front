@@ -43,7 +43,7 @@ public abstract class SharedPreferencesLiveData<T> extends LiveData<T> {
     }
 
 
-    public class SharedPreferenceBooleanLiveData extends SharedPreferencesLiveData<Boolean> {
+    public static class SharedPreferenceBooleanLiveData extends SharedPreferencesLiveData<Boolean> {
 
         public SharedPreferenceBooleanLiveData(SharedPreferences prefs, String key, Boolean defValue) {
             super(prefs, key, defValue);

@@ -2,6 +2,7 @@ package com.dglozano.escale.repository;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
+import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.dao.ChatDao;
 import com.dglozano.escale.db.dao.ChatMessageDao;
@@ -13,6 +14,8 @@ import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.db.entity.UserChatJoin;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.util.AppExecutors;
+import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.SendChatMessageDTO;
 
@@ -43,17 +46,28 @@ public class ChatRepository {
     private EscaleRestApi mEscaleRestApi;
     private AppExecutors mAppExecutors;
     private PatientRepository mPatientRepository;
+    private LiveData<Integer> mNumberOfUnreadMessagesSharedPref;
+    private SharedPreferences mSharedPreferences;
 
     @Inject
     public ChatRepository(ChatMessageDao dao, EscaleRestApi api, AppExecutors executors,
                           UserDao userDao, UserChatJoinDao userChatJoinDao, ChatDao chatDao,
-                          PatientRepository patientRepository) {
+                          PatientRepository patientRepository, SharedPreferences sharedPreferences) {
+        this.mSharedPreferences = sharedPreferences;
         this.mAppExecutors = executors;
         this.mChatMessageDao = dao;
         this.mEscaleRestApi = api;
         this.mChatDao = chatDao;
         this.mUserChatJoinDao = userChatJoinDao;
         this.mPatientRepository = patientRepository;
+
+        mNumberOfUnreadMessagesSharedPref = new SharedPreferencesLiveData.SharedPreferenceIntLiveData(
+                mSharedPreferences,
+                Constants.UNREAD_MESSAGES_SHARED_PREF, 0);
+    }
+
+    public LiveData<Integer> getNumberOfUnreadMessages() {
+        return mNumberOfUnreadMessagesSharedPref;
     }
 
     public LiveData<List<Chat>> getAllChatsOfUser(Long userId) {
@@ -83,7 +97,7 @@ public class ChatRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe((chatId) -> Timber.d("Success refresh chats. New chat %s", chatId), e -> {
-                    if(e instanceof NoSuchElementException){
+                    if (e instanceof NoSuchElementException) {
                         Timber.d("No chats for user yet");
                     } else {
                         Timber.e(e, "Failed refresh chats");

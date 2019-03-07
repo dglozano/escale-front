@@ -3,6 +3,8 @@ package com.dglozano.escale.web;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.repository.ChatRepository;
+import com.dglozano.escale.repository.DietRepository;
+import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.Constants;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -20,6 +22,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     SharedPreferences sharedPreferences;
     @Inject
     ChatRepository chatRepository;
+    @Inject
+    DietRepository dietRepository;
+    @Inject
+    PatientRepository patientRepository;
 
     private CompositeDisposable disposables;
 
@@ -62,25 +68,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Timber.d("Message data payload: %s", remoteMessage.getData());
             String type = remoteMessage.getData().get("type");
             if (type.equals("new_message")) {
-                Long id = Long.parseLong(remoteMessage.getData().get("id"));
-                Long chat_id = Long.parseLong(remoteMessage.getData().get("chat_id"));
-                String msg = remoteMessage.getData().get("msg");
-                Long sender_id = Long.parseLong(remoteMessage.getData().get("sender_id"));
-                String date = remoteMessage.getData().get("date");
-                disposables.add(chatRepository
-                        .saveMessageOnReceivedFromDoctor(id, chat_id, sender_id, msg, date)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(Schedulers.io())
-                        .subscribe(() -> {
-                                    Timber.d("Received message from firebase and saved successfully");
-                                    Integer current = sharedPreferences.getInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0 );
-                                    Timber.d("Current amount of unread messages %s", current);
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, current + 1);
-                                    editor.apply();
-                                },
-                                Timber::e)
-                );
+                handleNewMessageNotification(remoteMessage);
+            } else if (type.equals("new_diet")) {
+                handleNewDietNotification(remoteMessage);
+            } else if(type.equals("delete_diet")) {
+                handleDeleteDietNotification(remoteMessage);
             }
         }
 
@@ -88,5 +80,58 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (remoteMessage.getNotification() != null) {
             Timber.d("Message Notification Body: %s", remoteMessage.getNotification().getBody());
         }
+    }
+
+    private void handleDeleteDietNotification(RemoteMessage remoteMessage) {
+        String uuid = remoteMessage.getData().get("uuid");
+        disposables.add(dietRepository
+                .deleteDietByUuid(uuid)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(() -> Timber.d("Received delete diet command from firebase and removed successfully"),
+                        Timber::e)
+        );
+    }
+
+    private void handleNewDietNotification(RemoteMessage remoteMessage) {
+        String uuid = remoteMessage.getData().get("uuid");
+        String fileName = remoteMessage.getData().get("file_name");
+        String fileType = remoteMessage.getData().get("file_type");
+        String startDate = remoteMessage.getData().get("date");
+        Long size = Long.parseLong(remoteMessage.getData().get("size"));
+        disposables.add(dietRepository
+                .saveDietOnNotified(patientRepository.getLoggedPatiendId(), uuid, fileName, startDate, size)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(() -> {
+                            Timber.d("Received diet from firebase and saved successfully");
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putBoolean(Constants.HAS_NEW_UNREAD_DIET, true);
+                            editor.apply();
+                        },
+                        Timber::e)
+        );
+    }
+
+    private void handleNewMessageNotification(RemoteMessage remoteMessage) {
+        Long id = Long.parseLong(remoteMessage.getData().get("id"));
+        Long chat_id = Long.parseLong(remoteMessage.getData().get("chat_id"));
+        String msg = remoteMessage.getData().get("msg");
+        Long sender_id = Long.parseLong(remoteMessage.getData().get("sender_id"));
+        String date = remoteMessage.getData().get("date");
+        disposables.add(chatRepository
+                .saveMessageOnReceivedFromDoctor(id, chat_id, sender_id, msg, date)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(() -> {
+                            Timber.d("Received message from firebase and saved successfully");
+                            Integer current = sharedPreferences.getInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0);
+                            Timber.d("Current amount of unread messages %s", current);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, current + 1);
+                            editor.apply();
+                        },
+                        Timber::e)
+        );
     }
 }
