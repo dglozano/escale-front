@@ -33,7 +33,7 @@
         </net.cachapa.expandablelayout.ExpandableLayout>
 
 
-        <com.dglozano.escale.ui.main.common.NoSwipePager
+        <com.dglozano.escale.ui.main.NoSwipePager
             android:id="@+id/fragment_viewpager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

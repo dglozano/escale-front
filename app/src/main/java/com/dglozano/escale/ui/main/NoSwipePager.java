@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.main.common;
+package com.dglozano.escale.ui.main;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

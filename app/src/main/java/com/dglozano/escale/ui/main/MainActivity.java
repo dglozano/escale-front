@@ -29,7 +29,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dglozano.escale.R;
@@ -37,8 +36,6 @@ import com.dglozano.escale.ble.BleCommunicationService;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.common.ChangePasswordActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
-import com.dglozano.escale.ui.main.common.BottomBarAdapter;
-import com.dglozano.escale.ui.main.common.NoSwipePager;
 import com.dglozano.escale.ui.main.diet.DietFragment;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;

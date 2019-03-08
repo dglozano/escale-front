@@ -72,6 +72,7 @@ dependencies {
     implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.1"
     implementation "net.cachapa.expandablelayout:expandablelayout:2.9.2"
     implementation "com.squareup.retrofit2:converter-scalars:2.1.0"
+    implementation "com.github.PhilJay:MPAndroidChart:v3.1.0-alpha"
 
     implementation "com.github.stfalcon:chatkit:0.3.3"
     implementation "com.github.barteksc:android-pdf-viewer:3.1.0-beta.1"

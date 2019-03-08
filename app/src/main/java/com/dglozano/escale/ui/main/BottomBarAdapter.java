@@ -1,9 +1,10 @@
-package com.dglozano.escale.ui.main.common;
+package com.dglozano.escale.ui.main;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import com.dglozano.escale.ui.main.MainActivity;
+import com.dglozano.escale.ui.main.SmartFragmentStatePagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

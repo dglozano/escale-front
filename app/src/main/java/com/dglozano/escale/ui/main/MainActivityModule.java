@@ -1,7 +1,5 @@
 package com.dglozano.escale.ui.main;
 
-import com.dglozano.escale.ui.main.common.BottomBarAdapter;
-
 import dagger.Module;
 import dagger.Provides;
 
