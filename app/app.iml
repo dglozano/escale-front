@@ -181,6 +181,7 @@
     <orderEntry type="library" name="Gradle: com.github.ittianyu:BottomNavigationViewEx-1.2.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: android.arch.core:core-testing-1.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.github.barteksc:pdfium-android-1.9.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.PhilJay:MPAndroidChart:v3.0.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.jakewharton.rxrelay2:rxrelay:2.1.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks-16.0.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.objenesis:objenesis:2.5@jar" level="project" />
@@ -223,9 +224,7 @@
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-core-3.0.2" level="project" />
     <orderEntry type="library" name="Gradle: com.android.databinding:baseLibrary:3.2.1@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.databinding:adapters-3.2.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.PhilJay:MPAndroidChart-v3.1.0-alpha" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12@jar" level="project" />
-    <orderEntry type="library" name="Gradle: androidx.annotation:annotation:1.0.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.persistence:db-1.1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-idling-resource-3.0.2" level="project" />
     <orderEntry type="library" name="Gradle: io.reactivex.rxjava2:rxjava:2.2.2@jar" level="project" />

@@ -13,6 +13,7 @@ import com.dglozano.escale.ui.main.diet.show.ShowDietPdfModule;
 import com.dglozano.escale.ui.main.diet.old.AllDietsProvider;
 import com.dglozano.escale.ui.main.home.HomeFragmentProvider;
 import com.dglozano.escale.ui.main.messages.MessagesProvider;
+import com.dglozano.escale.ui.main.stats.StatsProvider;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
@@ -26,7 +27,8 @@ public abstract class ActivityBuilder {
             DietFragmentProvider.class,
             AllDietsProvider.class,
             CurrentDietProvider.class,
-            MessagesProvider.class
+            MessagesProvider.class,
+            StatsProvider.class
     })
     public abstract MainActivity bindMainActivity();
 
