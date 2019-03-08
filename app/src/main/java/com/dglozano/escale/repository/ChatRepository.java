@@ -147,7 +147,11 @@ public class ChatRepository {
                     else
                         return Maybe.just(list.get(0));
                 })
-                .filter(chatDTO -> mChatDao.chatExists(chatDTO.getId()) != 1)
+                .filter(chatDTO -> {
+                    Boolean noExiste = mChatDao.chatExists(chatDTO.getId()) != 1;
+                    Timber.d("noExiste %s", noExiste);
+                    return noExiste;
+                })
                 .map(chatDTO -> {
                     Chat chat = new Chat(chatDTO.getId());
                     Timber.d("Inserting chat from API %s", chatDTO.getId());

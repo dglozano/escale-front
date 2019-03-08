@@ -5,15 +5,19 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.support.annotation.NonNull;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
 @Entity(tableName = "user_chat_join",
         primaryKeys = { "userId", "chatId" },
         foreignKeys = {
                 @ForeignKey(entity = AppUser.class,
                         parentColumns = "id",
-                        childColumns = "userId"),
+                        childColumns = "userId",
+                        onDelete = CASCADE),
                 @ForeignKey(entity = Chat.class,
                         parentColumns = "id",
-                        childColumns = "chatId")
+                        childColumns = "chatId",
+                        onDelete = CASCADE)
         })
 public class UserChatJoin {
     @NonNull

@@ -10,12 +10,15 @@ import com.dglozano.escale.exception.BadCredentialsException;
 import com.dglozano.escale.exception.NotAPatientException;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.ui.Event;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class LoginActivityViewModel extends ViewModel {
 
@@ -64,10 +67,11 @@ public class LoginActivityViewModel extends ViewModel {
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe((d) -> mLoading.postValue(true))
                     .subscribe(
-                            () -> {}, // Do nothing on complete. After updating sharedPrefs it will trigger the rest
+                            () -> {
+                            }, // Do nothing on complete. After updating sharedPrefs it will trigger the rest
                             throwable -> {
                                 mLoading.postValue(false);
-                                if(throwable instanceof BadCredentialsException) {
+                                if (throwable instanceof BadCredentialsException) {
                                     mErrorEvent.postValue(new Event<>(R.string.login_error_bad_credentials));
                                 } else if (throwable instanceof NotAPatientException) {
                                     mErrorEvent.postValue(new Event<>(R.string.login_error_not_patient));
@@ -84,5 +88,15 @@ public class LoginActivityViewModel extends ViewModel {
     @Override
     protected void onCleared() {
         disposables.clear();
+    }
+
+    public void askForNewFirebaseToken() {
+        disposables.add(Completable.fromCallable(() -> {
+            Timber.d("Deleting firebase token");
+            FirebaseInstanceId.getInstance().deleteInstanceId();
+            return Completable.complete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(() -> Timber.d("Deleted firebase token succesfully"), Timber::e));
     }
 }

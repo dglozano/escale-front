@@ -81,4 +81,5 @@
     <string name="add_body_measurement_with_scale">Agregar peso con balanza</string>
     <string name="add_body_measurement_manually">Agregar peso manualmente</string>
     <string name="copied">Copiado al portapapeles</string>
+    <string name="logout_error">Ups! No pudimos desloguearte. Intente nuevamente más tarde.</string>
 </resources>

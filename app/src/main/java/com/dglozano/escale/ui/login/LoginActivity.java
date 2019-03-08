@@ -20,6 +20,7 @@ import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.Event;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.web.EscaleRestApi;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import javax.inject.Inject;
 
@@ -69,6 +70,11 @@ public class LoginActivity extends BaseActivity {
         Slide slide = new Slide();
         slide.setSlideEdge(Gravity.START);
         getWindow().setEnterTransition(slide);
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null && extras.getBoolean(MainActivity.ASK_NEW_FIREBASE_TOKEN, false)) {
+            mViewModel.askForNewFirebaseToken();
+        }
 
         ButterKnife.bind(this);
         mViewModel.getUserIdChangeEvent().observe(this, this::onLoggedUserChange);

@@ -66,6 +66,7 @@ public class MainActivity extends BaseActivity
         HasSupportFragmentInjector {
 
     private static final int CHANGE_PASSWORD_CODE = 123;
+    public static final String ASK_NEW_FIREBASE_TOKEN = "ask_new_firebase_token";
 
     // Binding views with Butterknife
     @BindView(R.id.bnve)
@@ -133,16 +134,26 @@ public class MainActivity extends BaseActivity
         observerFirebaseTokenUpdate();
         observeCurrentFragmentPosition();
         observeNewDietNotification();
+        observeErrorEvent();
 
         addFragmentsToBottomNav(openFragmentInPosition);
 
         mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
     }
 
+    private void observeErrorEvent() {
+        mViewModel.getErrorEvent().observe(this, errorEvent -> {
+            if (errorEvent != null && !errorEvent.hasBeenHandled()) {
+                showSnackbarWithDuration(errorEvent.handleContent(), Snackbar.LENGTH_SHORT);
+            }
+        });
+    }
+
+
     private void observeIsRefreshing() {
         mViewModel.isRefreshing().observe(this, isRefreshing -> {
             Timber.d("Refreshing status %s", isRefreshing);
-            if(isRefreshing != null) {
+            if (isRefreshing != null) {
                 mMainProgressBar.setVisibility(isRefreshing ? View.VISIBLE : View.GONE);
                 mNoSwipePager.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
             }
@@ -160,6 +171,14 @@ public class MainActivity extends BaseActivity
             }
         }
         return openFragment;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        for (int i = 0; i < mNavigationView.getMenu().size(); i++) {
+            mNavigationView.getMenu().getItem(i).setChecked(false);
+        }
     }
 
     private void observeCurrentFragmentPosition() {
@@ -314,7 +333,6 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
@@ -330,8 +348,9 @@ public class MainActivity extends BaseActivity
         } else if (id == R.id.nav_help) {
 
         } else if (id == R.id.nav_logout) {
-            Intent intent = new Intent(this, LoginActivity.class);
             mViewModel.logout();
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra(ASK_NEW_FIREBASE_TOKEN, true);
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
             finish();
         }
@@ -339,6 +358,8 @@ public class MainActivity extends BaseActivity
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 
     // Add notifications' number to bottomNav icon at position
     private Badge addBadgeAt(int position, int number) {

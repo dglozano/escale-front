@@ -13,6 +13,7 @@ import com.dglozano.escale.web.dto.SendChatMessageDTO;
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -68,5 +69,5 @@ public interface EscaleRestApi {
     Call<Void> updateToken(@Path("id") Long userId, @Body FirebaseTokenUpdateDTO token);
 
     @POST("users/{id}/firebase_token")
-    Call<Void> deleteToken(@Path("id") Long userId);
+    Completable deleteToken(@Path("id") Long userId);
 }

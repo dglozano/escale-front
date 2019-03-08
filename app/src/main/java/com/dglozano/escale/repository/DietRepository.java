@@ -63,24 +63,13 @@ public class DietRepository {
     }
 
     public LiveData<List<Diet>> getDietsOfPatientWithId(Long patientId) {
-//        refreshDiets(patientId);
         return mDietDao.getAllDietsOfUserWithIdAsLiveData(patientId);
     }
 
     public LiveData<Diet> getCurrentDiet(Long loggedPatiendId) {
-//        refreshDiets(loggedPatiendId);
         return mDietDao.getCurrenDietOfUserWithIdAsLiveData(loggedPatiendId);
     }
 
-
-//    private void refreshDiets(final Long patientId) {
-//        refreshDietsCompletable(patientId)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(Schedulers.io())
-//                .subscribe(() -> Timber.d("Success refresh diets"), e -> {
-//                    Timber.e(e, "Failed refresh diets");
-//                });
-//    }
 
     public Single<Integer> refreshDietsSingle(Long patientId) {
         return mEscaleRestApi.getDiets(patientId)

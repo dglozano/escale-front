@@ -7,6 +7,7 @@ import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.content.SharedPreferences;
 
+import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
@@ -35,6 +36,8 @@ public class MainActivityViewModel extends ViewModel {
     private final MutableLiveData<Integer> positionOfCurrentFragment;
     private final SharedPreferences mSharedPreferences;
     private final CompositeDisposable disposables;
+    private final MutableLiveData<Event<Integer>> mErrorEvent;
+
     private MediatorLiveData<Boolean> mIsRefreshing;
     private MutableLiveData<Boolean> mIsRefreshingDiets;
     private MutableLiveData<Boolean> mIsRefreshingMessages;
@@ -44,114 +47,18 @@ public class MainActivityViewModel extends ViewModel {
     public MainActivityViewModel(PatientRepository patientRepository,
                                  SharedPreferences sharedPreferences,
                                  ChatRepository chatRepository, DietRepository dietRepository) {
-        mDietRepository = dietRepository;
         disposables = new CompositeDisposable();
+        mDietRepository = dietRepository;
+        mPatientRepository = patientRepository;
         mChatRepository = chatRepository;
         mSharedPreferences = sharedPreferences;
+        mErrorEvent = new MutableLiveData<>();
         positionOfCurrentFragment = new MutableLiveData<>();
         positionOfCurrentFragment.postValue(0);
-        mPatientRepository = patientRepository;
         mLoggedPatient = mPatientRepository.getLoggedPatient();
         setupRefreshingObservable();
         setupMustChangePasswordObservable();
         setupUnreadMessagesObservable();
-    }
-
-    private void setupRefreshingObservable() {
-        mIsRefreshing = new MediatorLiveData<>();
-        mIsRefreshing.setValue(true);
-        mIsRefreshingMessages = new MutableLiveData<>();
-        mIsRefreshingPatient = new MutableLiveData<>();
-        mIsRefreshingDiets = new MutableLiveData<>();
-        mIsRefreshingMessages.setValue(false);
-        mIsRefreshingPatient.setValue(false);
-        mIsRefreshingDiets.setValue(false);
-
-        mIsRefreshing.addSource(mIsRefreshingDiets, isRefreshingDiets ->
-                mIsRefreshing.postValue(isRefreshingDiets ||
-                        mIsRefreshingMessages.getValue() ||
-                        mIsRefreshingPatient.getValue()));
-        mIsRefreshing.addSource(mIsRefreshingMessages, isRefreshingMessages ->
-                mIsRefreshing.postValue(isRefreshingMessages ||
-                        mIsRefreshingDiets.getValue() ||
-                        mIsRefreshingPatient.getValue()));
-        mIsRefreshing.addSource(mIsRefreshingPatient, isRefreshingPatient ->
-                mIsRefreshing.postValue(isRefreshingPatient ||
-                        mIsRefreshingDiets.getValue() ||
-                        mIsRefreshingMessages.getValue())
-        );
-    }
-
-    public MediatorLiveData<Boolean> isRefreshing() {
-        return mIsRefreshing;
-    }
-
-    private void setupMustChangePasswordObservable() {
-        mMustChangePassword = Transformations.map(mLoggedPatient,
-                patient -> new Event<>(patient != null && !patient.hasChangedDefaultPassword())
-        );
-    }
-
-    private void setupUnreadMessagesObservable() {
-        mNumberOfUnreadMessages = Transformations.map(mChatRepository.getNumberOfUnreadMessages(), unreadMsg -> {
-            if (positionOfCurrentFragment.getValue() != null
-                    && positionOfCurrentFragment.getValue() == 3
-                    && unreadMsg > 0) {
-                markMessagesAsRead();
-                return 0;
-            }
-            return unreadMsg;
-        });
-    }
-
-    public LiveData<Integer> getPositionOfCurrentFragment() {
-        return positionOfCurrentFragment;
-    }
-
-    public void setPositionOfCurrentFragment(int positionOfCurrentFragment) {
-        this.positionOfCurrentFragment.postValue(positionOfCurrentFragment);
-    }
-
-    public LiveData<Patient> getLoggedPatient() {
-        return mLoggedPatient;
-    }
-
-    public LiveData<Event<Boolean>> watchMustChangePassword() {
-        return mMustChangePassword;
-    }
-
-    public void handleMustChangePasswordEvent() {
-        Objects.requireNonNull(mMustChangePassword.getValue()).handleContent();
-    }
-
-    public void logout() {
-        mPatientRepository.logout();
-    }
-
-    public LiveData<Integer> getNumberOfUnreadMessages() {
-        return mNumberOfUnreadMessages;
-    }
-
-
-    public LiveData<String> getFirebaseToken() {
-        return mPatientRepository.getFirebaseDeviceToken();
-    }
-
-    public Boolean isFirebaseTokenSent() {
-        return mPatientRepository.isFirebaseTokenSent();
-    }
-
-    public Long getLoggedPatientId() {
-        return mPatientRepository.getLoggedPatiendId();
-    }
-
-    public void markMessagesAsRead() {
-        mSharedPreferences.edit().putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0).apply();
-    }
-
-    public void addUnreadMessages(int newUnread) {
-        int currentUnread = mSharedPreferences.getInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0);
-        mSharedPreferences.edit().putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, currentUnread + newUnread).apply();
     }
 
     public void refreshData() {
@@ -212,6 +119,107 @@ public class MainActivityViewModel extends ViewModel {
                     }
                     mIsRefreshingMessages.postValue(false);
                 }));
+    }
+
+    private void setupRefreshingObservable() {
+        mIsRefreshing = new MediatorLiveData<>();
+        mIsRefreshing.setValue(true);
+        mIsRefreshingMessages = new MutableLiveData<>();
+        mIsRefreshingPatient = new MutableLiveData<>();
+        mIsRefreshingDiets = new MutableLiveData<>();
+        mIsRefreshingMessages.setValue(false);
+        mIsRefreshingPatient.setValue(false);
+        mIsRefreshingDiets.setValue(false);
+
+        mIsRefreshing.addSource(mIsRefreshingDiets, isRefreshingDiets ->
+                mIsRefreshing.postValue(isRefreshingDiets ||
+                        mIsRefreshingMessages.getValue() ||
+                        mIsRefreshingPatient.getValue()));
+        mIsRefreshing.addSource(mIsRefreshingMessages, isRefreshingMessages ->
+                mIsRefreshing.postValue(isRefreshingMessages ||
+                        mIsRefreshingDiets.getValue() ||
+                        mIsRefreshingPatient.getValue()));
+        mIsRefreshing.addSource(mIsRefreshingPatient, isRefreshingPatient ->
+                mIsRefreshing.postValue(isRefreshingPatient ||
+                        mIsRefreshingDiets.getValue() ||
+                        mIsRefreshingMessages.getValue())
+        );
+    }
+
+    public void logout() {
+        mPatientRepository.logout();
+    }
+
+    private void setupMustChangePasswordObservable() {
+        mMustChangePassword = Transformations.map(mLoggedPatient,
+                patient -> new Event<>(patient != null && !patient.hasChangedDefaultPassword())
+        );
+    }
+
+    private void setupUnreadMessagesObservable() {
+        mNumberOfUnreadMessages = Transformations.map(mChatRepository.getNumberOfUnreadMessages(), unreadMsg -> {
+            if (positionOfCurrentFragment.getValue() != null
+                    && positionOfCurrentFragment.getValue() == 3
+                    && unreadMsg > 0) {
+                markMessagesAsRead();
+                return 0;
+            }
+            return unreadMsg;
+        });
+    }
+
+    public LiveData<Integer> getPositionOfCurrentFragment() {
+        return positionOfCurrentFragment;
+    }
+
+    public void setPositionOfCurrentFragment(int positionOfCurrentFragment) {
+        this.positionOfCurrentFragment.postValue(positionOfCurrentFragment);
+    }
+
+    public MediatorLiveData<Boolean> isRefreshing() {
+        return mIsRefreshing;
+    }
+
+    public LiveData<Patient> getLoggedPatient() {
+        return mLoggedPatient;
+    }
+
+    public LiveData<Event<Boolean>> watchMustChangePassword() {
+        return mMustChangePassword;
+    }
+
+    public void handleMustChangePasswordEvent() {
+        Objects.requireNonNull(mMustChangePassword.getValue()).handleContent();
+    }
+
+    public LiveData<Event<Integer>> getErrorEvent() {
+        return mErrorEvent;
+    }
+
+    public LiveData<Integer> getNumberOfUnreadMessages() {
+        return mNumberOfUnreadMessages;
+    }
+
+
+    public LiveData<String> getFirebaseToken() {
+        return mPatientRepository.getFirebaseDeviceToken();
+    }
+
+    public Boolean isFirebaseTokenSent() {
+        return mPatientRepository.isFirebaseTokenSent();
+    }
+
+    public Long getLoggedPatientId() {
+        return mPatientRepository.getLoggedPatiendId();
+    }
+
+    public void markMessagesAsRead() {
+        mSharedPreferences.edit().putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0).apply();
+    }
+
+    public void addUnreadMessages(int newUnread) {
+        int currentUnread = mSharedPreferences.getInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0);
+        mSharedPreferences.edit().putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, currentUnread + newUnread).apply();
     }
 
     public void markNewDietAsSeen(Boolean hasBeenSeen) {

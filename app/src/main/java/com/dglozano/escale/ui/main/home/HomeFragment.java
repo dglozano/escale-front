@@ -116,23 +116,7 @@ public class HomeFragment extends Fragment {
 
     private BleCommunicationService mBluetoothCommService;
     private boolean mBleServiceIsBound = false;
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder binder) {
-            Timber.d("onServiceConnected(). Bluetooth Service is Bound.");
-            mBleServiceIsBound = true;
-            BleCommunicationService.LocalBinder localBinder = (BleCommunicationService.LocalBinder) binder;
-            mBluetoothCommService = localBinder.getService();
-            observeServiceLiveData();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Timber.d("onServiceDisconnected(). Unbinding Bluetooth Service.");
-            mBleServiceIsBound = false;
-            mBluetoothCommService = null;
-        }
-    };
+    private ServiceConnection mServiceConnection = new MyServiceConnection();
 
     public HomeFragment() {
         // Required empty public constructor
@@ -297,6 +281,24 @@ public class HomeFragment extends Fragment {
             Timber.d("Bluetooth BLE Scan stop. Hiding loader...");
             mLoaderLayout.setVisibility(View.GONE);
             mMeasurementLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class MyServiceConnection implements ServiceConnection {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            Timber.d("onServiceConnected(). Bluetooth Service is Bound.");
+            mBleServiceIsBound = true;
+            BleCommunicationService.LocalBinder localBinder = (BleCommunicationService.LocalBinder) binder;
+            mBluetoothCommService = localBinder.getService();
+            observeServiceLiveData();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Timber.d("onServiceDisconnected(). Unbinding Bluetooth Service.");
+            mBleServiceIsBound = false;
+            mBluetoothCommService = null;
         }
     }
 }

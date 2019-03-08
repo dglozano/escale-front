@@ -1,11 +1,11 @@
 package com.dglozano.escale.repository;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
+import android.arch.persistence.room.RoomDatabase;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 
+import com.dglozano.escale.db.EscaleDatabase;
 import com.dglozano.escale.db.dao.DoctorDao;
 import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.db.dao.UserDao;
@@ -13,33 +13,27 @@ import com.dglozano.escale.db.entity.AppUser;
 import com.dglozano.escale.db.entity.Doctor;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
+import com.dglozano.escale.di.annotation.RootFileDirectory;
 import com.dglozano.escale.exception.BadCredentialsException;
 import com.dglozano.escale.exception.ChangePasswordException;
 import com.dglozano.escale.exception.NotAPatientException;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.FileUtil;
 import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.Credentials;
-import com.dglozano.escale.web.dto.FirebaseTokenUpdateDTO;
 import com.dglozano.escale.web.dto.LoginResponse;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.iid.FirebaseInstanceId;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.Calendar;
-import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import timber.log.Timber;
 
 import static com.dglozano.escale.util.Constants.FRESH_TIMEOUT;
@@ -61,13 +55,18 @@ public class PatientRepository {
     private LiveData<Long> mLoggedUserId;
     private LiveData<String> mFirebaseDeviceToken;
     private LiveData<Patient> mLoggedPatient;
+    private EscaleDatabase mRoomDatabase;
+    private File mRootFileDirectory;
 
     @Inject
     public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi, DoctorDao doctorDao,
-                             UserDao userDao, AppExecutors executors, SharedPreferences sharedPreferences) {
-        this.mUserDao = userDao;
+                             UserDao userDao, AppExecutors executors, SharedPreferences sharedPreferences,
+                             EscaleDatabase roomDatabase, @RootFileDirectory File rootFileDirectory) {
+        mRootFileDirectory = rootFileDirectory;
+        mUserDao = userDao;
         mDoctorDao = doctorDao;
         mPatientDao = patientDao;
+        mRoomDatabase = roomDatabase;
         mEscaleRestApi = escaleRestApi;
         mAppExecutors = executors;
         mSharedPreferences = sharedPreferences;
@@ -121,8 +120,8 @@ public class PatientRepository {
     }
 
     public Single<Long> changePassword(String currentPassword,
-                                              String newPassword,
-                                              String newPasswordRepeat) {
+                                       String newPassword,
+                                       String newPasswordRepeat) {
         Long userId = getLoggedPatientIdAsLiveData().getValue() == null ? -1L : getLoggedPatientIdAsLiveData().getValue();
         return mEscaleRestApi.changePassword(
                 new ChangePasswordDataDTO(currentPassword,
@@ -179,24 +178,20 @@ public class PatientRepository {
     }
 
     public void logout() {
-        mEscaleRestApi.deleteToken(getLoggedPatiendId()).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                Timber.d("Firebase token deleted after logging out");
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Timber.e("ERROR - Firebase could not be deleted after logging out");
-            }
+        mAppExecutors.getDiskIO().execute(() -> {
+            Timber.d("Clearing preferences");
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
+            editor.remove(TOKEN_SHARED_PREF);
+            editor.remove(REFRESH_TOKEN_SHARED_PREF);
+            editor.putBoolean(IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
+            editor.putBoolean(HAS_NEW_UNREAD_DIET, false);
+            editor.putInt(UNREAD_MESSAGES_SHARED_PREF, 0);
+            editor.apply();
+            Timber.d("Clearing db");
+            mRoomDatabase.clearAllTables();
+            Timber.d("Clearing files");
+            FileUtil.deleteContentOfRootDirectory(mRootFileDirectory);
         });
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
-        editor.remove(TOKEN_SHARED_PREF);
-        editor.remove(REFRESH_TOKEN_SHARED_PREF);
-        editor.putBoolean(IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
-        editor.putBoolean(HAS_NEW_UNREAD_DIET, false);
-        editor.putInt(UNREAD_MESSAGES_SHARED_PREF, 0);
-        editor.apply();
     }
 }

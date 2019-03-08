@@ -14,7 +14,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @Entity(foreignKeys = {
         @ForeignKey(entity = AppUser.class,
                 parentColumns = "id",
-                childColumns = "userId"),
+                childColumns = "userId",
+                onDelete = CASCADE),
         @ForeignKey(entity = Chat.class,
                 parentColumns = "id",
                 childColumns = "chatId",

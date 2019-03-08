@@ -59,4 +59,15 @@ public class FileUtil {
         }
     }
 
+    public static void deleteContentOfRootDirectory(File mRootFileDirectory) {
+        for (File child : mRootFileDirectory.listFiles())
+            deleteRecursive(child);
+    }
+
+    private static void deleteRecursive(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory())
+            for (File child : fileOrDirectory.listFiles())
+                deleteRecursive(child);
+        Timber.d("Deleted file %s ? %s", fileOrDirectory.getName(), fileOrDirectory.delete());
+    }
 }

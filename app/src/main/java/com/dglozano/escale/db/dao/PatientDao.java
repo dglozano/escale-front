@@ -36,4 +36,7 @@ public interface PatientDao {
 
     @Query("SELECT * FROM Patient WHERE id == :id AND lastUpdate >= :timeout")
     Single<Patient> getUserIfFresh(Long id, long timeout);
+
+    @Query("DELETE FROM Patient WHERE id == :loggedPatiendId")
+    void deleteUserById(Long loggedPatiendId);
 }
