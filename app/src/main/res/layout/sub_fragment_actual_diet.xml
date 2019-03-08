@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="@dimen/activity_vertical_margin_medium"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/no_current_diet_img"
@@ -60,5 +60,4 @@
                 android:textColor="@color/colorTextDark" />
         </RelativeLayout>
     </FrameLayout>
-
 </android.support.v4.widget.SwipeRefreshLayout>
