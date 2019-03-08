@@ -66,4 +66,7 @@ public interface EscaleRestApi {
 
     @POST("users/{id}/firebase_token")
     Call<Void> updateToken(@Path("id") Long userId, @Body FirebaseTokenUpdateDTO token);
+
+    @POST("users/{id}/firebase_token")
+    Call<Void> deleteToken(@Path("id") Long userId);
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 import com.dglozano.escale.db.dao.DoctorDao;
 import com.dglozano.escale.db.dao.PatientDao;
@@ -36,6 +37,9 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
 import static com.dglozano.escale.util.Constants.FRESH_TIMEOUT;
@@ -75,9 +79,13 @@ public class PatientRepository {
     }
 
     public LiveData<Patient> getPatientById(Long userId) {
-//        if(userId != -1L) refreshPatient(userId);
         return mPatientDao.getPatientById(userId);
     }
+
+    public Long getLoggedPatiendId() {
+        return mSharedPreferences.getLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
+    }
+
 
     public LiveData<Patient> getLoggedPatient() {
         return mLoggedPatient;
@@ -133,8 +141,6 @@ public class PatientRepository {
                 });
     }
 
-//    @SuppressWarnings("ResultOfMethodCallIgnored")
-//    @SuppressLint("CheckResult")
     public Single<Long> refreshPatient(final Long userId) {
         return mPatientDao.hasUser(userId, FRESH_TIMEOUT)
                 .map(freshInt -> freshInt == 1)
@@ -162,14 +168,6 @@ public class PatientRepository {
                     mUserDao.save(user);
                     return mPatientDao.save(patient);
                 }));
-//                .subscribeOn(Schedulers.io())
-//                .subscribe(onSuccess -> Timber.d("Success refresh"), e -> {
-//                    if(e instanceof NoSuchElementException) {
-//                        Timber.d("Success refresh without calling Api");
-//                    } else {
-//                        Timber.e(e);
-//                    }
-//                });
     }
 
     public LiveData<String> getFirebaseDeviceToken() {
@@ -181,12 +179,17 @@ public class PatientRepository {
     }
 
     public void logout() {
-//        try {
-//            mEscaleRestApi.updateToken(getLoggedPatiendId(), new FirebaseTokenUpdateDTO(""));
-//            FirebaseInstanceId.getInstance().deleteInstanceId();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        mEscaleRestApi.deleteToken(getLoggedPatiendId()).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                Timber.d("Firebase token deleted after logging out");
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Timber.e("ERROR - Firebase could not be deleted after logging out");
+            }
+        });
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
         editor.remove(TOKEN_SHARED_PREF);
@@ -196,9 +199,4 @@ public class PatientRepository {
         editor.putInt(UNREAD_MESSAGES_SHARED_PREF, 0);
         editor.apply();
     }
-
-    public Long getLoggedPatiendId() {
-        return mSharedPreferences.getLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
-    }
-
 }

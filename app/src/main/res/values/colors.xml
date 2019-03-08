@@ -16,4 +16,5 @@
     <color name="colorCenterGradientOverlay">#de266580</color>
     <color name="colorEndGradientOverlay">#e7023246</color>
     <color name="colorBlackOverlay">#e0313131</color>
+    <color name="colorPrimaryDarkTransparent">#a9023246</color>
 </resources>

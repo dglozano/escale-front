@@ -115,16 +115,14 @@ public class MainActivity extends BaseActivity
 
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainActivityViewModel.class);
 
-        setSupportActionBar(mToolbar);
-
         int openFragmentInPosition = 0;
         if (getIntent().getExtras() != null) {
             openFragmentInPosition = handleFirebaseIntent();
         }
 
+        setSupportActionBar(mToolbar);
         setupDrawerLayout();
         setupBottomNav();
-        addFragmentsToBottomNav(openFragmentInPosition);
 
         onKeyboardVisibilityEvent();
 
@@ -135,6 +133,10 @@ public class MainActivity extends BaseActivity
         observerFirebaseTokenUpdate();
         observeCurrentFragmentPosition();
         observeNewDietNotification();
+
+        addFragmentsToBottomNav(openFragmentInPosition);
+
+        mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
     }
 
     private void observeIsRefreshing() {
@@ -171,6 +173,7 @@ public class MainActivity extends BaseActivity
                         setElevationOfAppBar(10f);
                         break;
                     case 2: // DIETS
+
                         setElevationOfAppBar(0f);
                         mViewModel.markNewDietAsSeen(true);
                         break;
@@ -363,11 +366,11 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
+        mViewModel.refreshData();
+        mNotificationManager.cancelAll();
         Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
         Intent intent = new Intent(this, BleCommunicationService.class);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        mViewModel.refreshData();
-        mNotificationManager.cancelAll();
     }
 
     @Override

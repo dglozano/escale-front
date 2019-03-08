@@ -97,8 +97,8 @@ public class DietRepository {
                             });
 
                     Set<String> dietUuids =
-                            newDietsToAdd.stream()
-                                    .map(Diet::getId)
+                            dietsApi.stream()
+                                    .map(DietDTO::getUuid)
                                     .collect(Collectors.toSet());
 
                     List<Diet> dietsInDatabase = mDietDao.getAllDietsOfUserWithId(patientId);

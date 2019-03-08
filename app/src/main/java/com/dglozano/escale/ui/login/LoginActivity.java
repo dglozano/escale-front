@@ -51,6 +51,7 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme_NoActionBar);
         // Enable transitions
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
 
@@ -70,7 +71,6 @@ public class LoginActivity extends BaseActivity {
         getWindow().setEnterTransition(slide);
 
         ButterKnife.bind(this);
-
         mViewModel.getUserIdChangeEvent().observe(this, this::onLoggedUserChange);
         mViewModel.getLoading().observe(this, this::onLoadingStateChange);
         mViewModel.getErrorEvent().observe(this, this::onErrorEventFired);
@@ -78,7 +78,7 @@ public class LoginActivity extends BaseActivity {
 
     private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+        startActivity(intent);
         finish();
     }
 

@@ -59,6 +59,7 @@ public class MainActivityViewModel extends ViewModel {
 
     private void setupRefreshingObservable() {
         mIsRefreshing = new MediatorLiveData<>();
+        mIsRefreshing.setValue(true);
         mIsRefreshingMessages = new MutableLiveData<>();
         mIsRefreshingPatient = new MutableLiveData<>();
         mIsRefreshingDiets = new MutableLiveData<>();
@@ -184,11 +185,12 @@ public class MainActivityViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(numberOfNewDiets -> {
-                            markNewDietAsSeen(numberOfNewDiets == 0);
+                            if (numberOfNewDiets != 0) {
+                                markNewDietAsSeen(false);
+                            }
                             mIsRefreshingDiets.postValue(false);
                         },
                         error -> {
-                            markNewDietAsSeen(true);
                             Timber.e(error, "Error refreshing diets");
                             mIsRefreshingDiets.postValue(false);
                         })
@@ -212,8 +214,8 @@ public class MainActivityViewModel extends ViewModel {
                 }));
     }
 
-    public void markNewDietAsSeen(Boolean seen) {
-        mSharedPreferences.edit().putBoolean(Constants.HAS_NEW_UNREAD_DIET, !seen).apply();
+    public void markNewDietAsSeen(Boolean hasBeenSeen) {
+        mSharedPreferences.edit().putBoolean(Constants.HAS_NEW_UNREAD_DIET, !hasBeenSeen).apply();
     }
 
     public LiveData<Boolean> observeIfHasUnseenNewDiets() {

@@ -150,7 +150,7 @@ public class AppModule {
     @Provides
     @BaseUrl
     String provideBaseUrl() {
-        return Constants.BASE_HEROKU_URL;
+        return Constants.BASE_LOCALHOST_URL;
     }
 
     @Provides
