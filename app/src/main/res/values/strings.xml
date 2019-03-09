@@ -82,4 +82,7 @@
     <string name="add_body_measurement_manually">Agregar peso manualmente</string>
     <string name="copied">Copiado al portapapeles</string>
     <string name="logout_error">Ups! No pudimos desloguearte. Intente nuevamente más tarde.</string>
+    <string name="no_stats_yet_text_in_chart">Aún no tienes ningun pesaje cargado</string>
+    <string name="show_filter_stats">Ver Filtros</string>
+    <string name="hide_filter_stats">OCULTAR FILTROS</string>
 </resources>

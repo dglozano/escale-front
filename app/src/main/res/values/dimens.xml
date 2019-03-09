@@ -9,6 +9,7 @@
     <dimen name="padding_small">8dp</dimen>
     <dimen name="padding_medium">16dp</dimen>
     <dimen name="height">46dp</dimen>
+    <dimen name="height_small">24dp</dimen>
     <dimen name="radius">6dp</dimen>
     <dimen name="radius_medium">10dp</dimen>
     <dimen name="radius_full">50dp</dimen>

@@ -3,34 +3,39 @@ package com.dglozano.escale.ui.main.stats;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ToggleButton;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.cachapa.expandablelayout.ExpandableLayout;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
-import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
+import co.ceryle.radiorealbutton.RadioRealButtonGroup;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
@@ -38,6 +43,12 @@ public class StatsFragment extends Fragment {
 
     @BindView(R.id.stats_line_chart)
     LineChart mLineChart;
+    @BindView(R.id.expandable_filters_stats)
+    ExpandableLayout mFiltersExpandable;
+    @BindView(R.id.toggle_show_filter_button)
+    ToggleButton mShowFiltersToggle;
+    @BindView(R.id.stats_filter_radio_group)
+    RadioRealButtonGroup statsFilterRadioGroup;
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -68,32 +79,74 @@ public class StatsFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        BodyMeasurement[] bodyMeasurements = new BodyMeasurement[] {
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-        };
 
+        mStatsViewModel.getEntriesForChart().observe(this, entriesList -> {
+            if(entriesList != null) {
+                float firstDate = !entriesList.isEmpty() ? entriesList.get(0).getX() : 0f;
+                LineDataSet dataSet = new LineDataSet(entriesList, mStatsViewModel.getSelectedStat().toString());
+                dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.colorTextDark));
+                dataSet.setCircleColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                dataSet.setCircleHoleRadius(1.5f);
+                dataSet.setValueTextSize(8f);
+                dataSet.setLineWidth(1.5f);
+                dataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+                dataSet.setValueFormatter((value, entry, dataSetIndex, viewPortHandler) ->
+                        entry.getX() == firstDate ? "" : value + "");
 
-        List<Entry> entries = new ArrayList<Entry>();
+                LineData lineData = new LineData(dataSet);
 
-        int i =0;
-        for (BodyMeasurement data : bodyMeasurements) {
+                mLineChart.setData(lineData);
+                mLineChart.notifyDataSetChanged();
+                mLineChart.invalidate();
+            }
+        });
 
-            // turn your data into Entry objects
-            entries.add(new Entry(i++, data.getWeight()));
-        }
+        mStatsViewModel.getFilterExpansionState().observe(this, expanded -> {
+            mFiltersExpandable.setExpanded(expanded == null ? true : expanded);
+        });
 
-        LineDataSet dataSet = new LineDataSet(entries, "Weight"); // add entries to dataset
-        dataSet.setColor(R.color.blue);
-        dataSet.setValueTextColor(R.color.black); // styling, ...
+        statsFilterRadioGroup.setOnClickedButtonListener((button, position) -> {
+            mStatsViewModel.setSelectedStat(position);
+        });
 
-        LineData lineData = new LineData(dataSet);
-        mLineChart.setData(lineData);
-        mLineChart.invalidate(); // refresh
+        setupLineChart();
+    }
+
+    private void setupLineChart() {
+        mLineChart.setNoDataText(getString(R.string.no_stats_yet_text_in_chart));
+        mLineChart.setNoDataTextColor(ContextCompat.getColor(getContext(), R.color.lightGray));
+
+        Description description = new Description();
+        description.setText("");
+        mLineChart.setDescription(description);
+
+        mLineChart.getXAxis().setDrawGridLines(false);
+        mLineChart.getXAxis().setLabelRotationAngle(-30f);
+        mLineChart.getXAxis().setAxisLineWidth(1.5f);
+        mLineChart.getXAxis().setAxisLineColor(ContextCompat.getColor(getContext(), R.color.lightGray));
+        mLineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        mLineChart.getXAxis().setSpaceMin(5f);
+        mLineChart.getXAxis().setSpaceMax(5f);
+        mLineChart.getXAxis().setValueFormatter((value, axis) -> {
+            Date d = new Date(Float.valueOf(value).longValue());
+            return new SimpleDateFormat("dd-MM", Locale.getDefault()).format(d);
+        });
+
+        mLineChart.getAxisLeft().setAxisLineWidth(1.5f);
+        mLineChart.getAxisLeft().setAxisLineColor(ContextCompat.getColor(getContext(), R.color.lightGray));
+        mLineChart.getAxisLeft().setDrawGridLines(false);
+
+        mLineChart.getAxisRight().setEnabled(false);
+        mLineChart.getLegend().setEnabled(false);
+        mLineChart.setTouchEnabled(false);
+
+        mLineChart.invalidate();
+    }
+
+    @OnClick(R.id.toggle_show_filter_button)
+    public void onShowFiltersToggleClick(View view) {
+        mStatsViewModel.toggleFiltersExpansion();
     }
 
     @Override
