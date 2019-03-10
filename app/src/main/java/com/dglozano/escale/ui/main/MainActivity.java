@@ -116,6 +116,8 @@ public class MainActivity extends BaseActivity
         int openFragmentInPosition = 0;
         if (getIntent().getExtras() != null) {
             openFragmentInPosition = handleFirebaseIntent();
+            if(openFragmentInPosition == 2 )
+                setElevationOfAppBar(0f);
         }
 
         setSupportActionBar(mToolbar);
@@ -153,6 +155,7 @@ public class MainActivity extends BaseActivity
             if (isRefreshing != null) {
                 mMainProgressBar.setVisibility(isRefreshing ? View.VISIBLE : View.GONE);
                 mNoSwipePager.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
+                mExpandableBottomBar.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
             }
         });
     }
@@ -189,7 +192,6 @@ public class MainActivity extends BaseActivity
                         setElevationOfAppBar(10f);
                         break;
                     case 2: // DIETS
-
                         setElevationOfAppBar(0f);
                         mViewModel.markNewDietAsSeen(true);
                         break;

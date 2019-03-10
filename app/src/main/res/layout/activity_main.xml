@@ -21,6 +21,7 @@
             android:layout_alignParentBottom="true"
             android:background="@android:color/white"
             android:elevation="10dp"
+            android:visibility="gone"
             app:el_duration="700"
             app:el_expanded="true">
 

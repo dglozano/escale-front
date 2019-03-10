@@ -206,7 +206,7 @@ public class ChatRepository {
     }
 
     public Completable sendMessage(String message, Patient patient) {
-        return mUserChatJoinDao.getChatOfLoggedPatient(patient.getId())
+        return mUserChatJoinDao.getChatOfLoggedPatientAsOptional(patient.getId())
                 .flatMap(chatId -> {
                     if (chatId.isPresent()) {
                         return Single.just(chatId.get());
@@ -224,7 +224,7 @@ public class ChatRepository {
     public Completable saveMessageOnReceivedFromDoctor(Long id, Long chatIdInMessage, Long sender_id,
                                                        String msg, String dateString) {
         Long patientId = mPatientRepository.getLoggedPatiendId();
-        return mUserChatJoinDao.getChatOfLoggedPatient(patientId)
+        return mUserChatJoinDao.getChatOfLoggedPatientAsOptional(patientId)
                 .flatMap(chatIdOpt -> {
                     if (chatIdOpt.isPresent()) {
                         return Single.just(chatIdOpt.get());
@@ -253,8 +253,9 @@ public class ChatRepository {
     }
 
     public Single<Integer> refreshMessagesAndCountOfPatientWithId(Long patientId) {
-        return mUserChatJoinDao.getChatOfLoggedPatient(patientId)
-                .map(chatId -> chatId.orElseGet(() -> refreshChatsOfUserAsMaybe(patientId).blockingGet()))
+        return mUserChatJoinDao.getChatOfLoggedPatientAsMaybe(patientId)
+                .switchIfEmpty(refreshChatsOfUserAsMaybe(patientId))
+                .toSingle()
                 .flatMap(this::refreshMessagesAndCount);
     }
 }
