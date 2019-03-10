@@ -24,6 +24,8 @@ public class DateDeserializer implements JsonDeserializer<Date> {
     public Date deserialize(JsonElement element, Type arg1, JsonDeserializationContext arg2) throws JsonParseException {
         String date = element.getAsString();
 
+        int parsingErrors = 0;
+        ParseException e = null;
         for(String format : DATE_FORMATS) {
             SimpleDateFormat sdf = new SimpleDateFormat(format);
             sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -31,8 +33,14 @@ public class DateDeserializer implements JsonDeserializer<Date> {
             try {
                 return sdf.parse(date);
             } catch (ParseException exp) {
-                Timber.e(exp);
+                parsingErrors++;
+                Timber.d("Tried to desarialize date %s with %s formats out of %s possibles",
+                        date, parsingErrors, DATE_FORMATS.length);
+                e = exp;
             }
+        }
+        if(parsingErrors == DATE_FORMATS.length) {
+            Timber.e(e);
         }
         return null;
     }
