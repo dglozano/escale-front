@@ -53,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/login_instruction_text"
-                android:layout_marginTop="@dimen/activity_vertical_margin_big"
+                android:layout_marginTop="@dimen/activity_vertical_margin_very_big"
                 app:error="@{viewmodel.errorEmail}"
                 app:errorEnabled="true"
                 app:hintEnabled="false">
@@ -116,7 +116,7 @@
             android:id="@+id/login_reset_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/activity_vertical_margin_big"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_very_big"
             android:clickable="true"
             android:focusable="true"
             android:text="@string/login_reset_password_text"

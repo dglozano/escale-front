@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/diets_empty_img"
-                android:layout_marginTop="@dimen/activity_vertical_margin_big"
+                android:layout_marginTop="@dimen/activity_vertical_margin_very_big"
                 android:text="@string/no_diets_text"
                 android:textAlignment="center"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium"

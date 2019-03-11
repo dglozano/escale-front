@@ -2,13 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fancy="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_home_id"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:background="@color/almostWhite"
-    tools:context="com.dglozano.escale.ui.main.home.HomeFragment">
+    android:background="@color/almostWhite">
 
     <ProgressBar
         style="?android:attr/progressBarStyle"
@@ -16,6 +13,19 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="gone" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_measurement_floating_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/home_ic_menu_add_weight_manually"
+        app:backgroundTint="@color/colorPrimaryLight" />
 
     <RelativeLayout
         android:id="@+id/layout_measurement"
@@ -27,9 +37,9 @@
             android:id="@+id/layout_top_measurement"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin_medium"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_vertical_margin_big"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_big"
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="0dp">
@@ -142,11 +152,12 @@
         </android.support.constraint.ConstraintLayout>
 
         <RelativeLayout
+            android:id="@+id/measurements_list_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/layout_top_measurement"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_vertical_margin_big"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_big"
             android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
             android:background="@drawable/home_shadow_listview">
 
@@ -165,6 +176,7 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_measurements"
+                android:layout_above="@id/home_last_row"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/ble_connect_btn"
@@ -172,6 +184,44 @@
                 android:paddingStart="@dimen/padding_small"
                 android:paddingEnd="@dimen/padding_small"
                 android:scrollbars="vertical" />
+
+            <RelativeLayout
+                android:id="@+id/home_last_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/last_row_background">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true">
+
+                    <ImageView
+                        android:id="@+id/home_last_row_image_view"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+                        android:visibility="visible"
+                        app:srcCompat="@drawable/ic_calendar" />
+
+                    <TextView
+                        android:id="@+id/home_last_row_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="@dimen/activity_vertical_margin_very_small"
+                        android:layout_toEndOf="@id/home_last_row_image_view"
+                        android:text="27/02/2019 a las 15:23hs"
+                        android:textAppearance="@android:style/TextAppearance.Material"
+                        android:textColor="@color/almostWhite"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 

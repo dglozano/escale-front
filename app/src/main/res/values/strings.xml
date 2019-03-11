@@ -85,4 +85,5 @@
     <string name="no_stats_yet_text_in_chart">Aún no tienes ningun pesaje cargado</string>
     <string name="show_filter_stats">Ver Filtros</string>
     <string name="hide_filter_stats">OCULTAR FILTROS</string>
+    <string name="no_body_measurement_yet">No tienes tienen pesaje cargado aún.</string>
 </resources>

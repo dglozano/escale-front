@@ -1,14 +1,11 @@
 package com.dglozano.escale.ui.main.home;
 
-import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.BodyMeasurement;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import butterknife.BindString;
 
 public class MeasurementItem {
 
@@ -32,12 +29,18 @@ public class MeasurementItem {
     static List<MeasurementItem> getMeasurementList(Optional<BodyMeasurement> bodyMeasurement) {
         DecimalFormat df = new DecimalFormat("###,###.##");
         List<MeasurementItem> measurementItemList = new ArrayList<>();
-        String weight = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getWeight()), Unit.KG) : "-";
-        String water = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getWater()), Unit.PERCENTAGE) : "-";
-        String fat = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getFat()), Unit.PERCENTAGE) : "-";
-        String bones = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getBones()), Unit.KG) : "-";
-        String bmi = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getBmi()), Unit.NO_UNIT) : "-";
-        String muscles = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getMuscles()), Unit.PERCENTAGE) : "-";
+        String weight = bodyMeasurement.isPresent() ? String.format("%s %s",
+                df.format(bodyMeasurement.get().getWeight()), Unit.KG) : "-";
+        String water = bodyMeasurement.isPresent() ? String.format("%s %s",
+                df.format(bodyMeasurement.get().getWater()), Unit.PERCENTAGE) : "-";
+        String fat = bodyMeasurement.isPresent() ? String.format("%s %s",
+                df.format(bodyMeasurement.get().getFat()), Unit.PERCENTAGE) : "-";
+        String bones = bodyMeasurement.isPresent() ? String.format("%s %s",
+                df.format(bodyMeasurement.get().getBones()), Unit.KG) : "-";
+        String bmi = bodyMeasurement.isPresent() ? String.format("%s %s",
+                df.format(bodyMeasurement.get().getBmi()), Unit.NO_UNIT) : "-";
+        String muscles = bodyMeasurement.isPresent() ? String.format("%s %s",
+                df.format(bodyMeasurement.get().getMuscles()), Unit.PERCENTAGE) : "-";
 
         measurementItemList.add(new MeasurementItem(
                 ICON_RESOURCE_WEIGHT,

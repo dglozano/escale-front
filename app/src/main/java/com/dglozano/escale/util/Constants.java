@@ -5,21 +5,21 @@ import java.util.UUID;
 public class Constants {
 
     // State
-    public static final String SCANNING = "Scanning";
-    public static final String BONDING = "Bonding";
-    public static final String CONNECTING = "Connecting";
-    public static final String INITIALIZING = "Initializing";
-    public static final String CONNECTED = "Connected";
-    public static final String DISCONNECTED = "Disconnected";
-    public static final String CREATING_USER = "Creating user";
-    public static final String SETTING_USER_DATA = "Setting user data";
-    public static final String LOGGING_IN = "Logging in";
+    public static final String SCANNING = "Escaneando";
+    public static final String BONDING = "Emparejando";
+    public static final String CONNECTING = "Conectando";
+    public static final String INITIALIZING = "Inicializando";
+    public static final String CONNECTED = "Conectado";
+    public static final String DISCONNECTED = "Desconectado";
+    public static final String CREATING_USER = "Creando usuario";
+    public static final String SETTING_USER_DATA = "Seteando datos del usuario";
+    public static final String LOGGING_IN = "Logueando usuario";
 
     // Scale name
     public static final String BF600 = "BF600";
 
     // Date format
-    public static final String SIMPLE_DATE_FORMAT = "dd-MM-yyyy HH:mm";
+    public static final String SIMPLE_DATE_FORMAT = "dd/MM/yyyy HH:mm";
     public static final String DECIMAL_FORMAT = "#0.0";
 
     // Bytes

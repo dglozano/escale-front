@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -22,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,6 +79,12 @@ public class HomeFragment extends Fragment {
     TextView mBmiTextView;
     @BindView(R.id.fat_number_top)
     TextView mFatTextView;
+    @BindView(R.id.home_last_row_image_view)
+    ImageView mLastRowImageView;
+    @BindView(R.id.home_last_row_text)
+    TextView mLastRowText;
+    @BindView(R.id.add_measurement_floating_button)
+    FloatingActionButton mAddMeasurementButton;
 
     @BindString(R.string.connected)
     String mConnectedString;
@@ -154,7 +162,6 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
-        setHasOptionsMenu(true);
         return view;
     }
 
@@ -164,13 +171,6 @@ public class HomeFragment extends Fragment {
         Timber.d("onCreate().");
         mHomeViewModel = ViewModelProviders.of(this, mViewModelFactory).get(HomeViewModel.class);
     }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.home_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -188,10 +188,14 @@ public class HomeFragment extends Fragment {
                 mWeightTexView.setText("-");
                 mBmiTextView.setText("-");
                 mFatTextView.setText("-");
+                mLastRowImageView.setVisibility(View.GONE);
+                mLastRowText.setText(R.string.no_body_measurement_yet);
             } else {
                 mWeightTexView.setText(formatDecimal(bodyMeasurement.get().getWeight()));
                 mBmiTextView.setText(formatDecimal(bodyMeasurement.get().getBmi()));
                 mFatTextView.setText(formatDecimal(bodyMeasurement.get().getFat()));
+                mLastRowImageView.setVisibility(View.VISIBLE);
+                mLastRowText.setText(String.format("%shs", dateFormat.format(bodyMeasurement.get().getDate())));
             }
             mMeasurementListAdapter.addItems(MeasurementItem.getMeasurementList(
                     bodyMeasurement == null ? Optional.empty() : bodyMeasurement));
@@ -273,11 +277,13 @@ public class HomeFragment extends Fragment {
             mConnectButton.setBackgroundColor(mColorPrimary);
             mConnectButton.setText(mConnectedString.toUpperCase());
             mConnectButton.setIconResource(mBleConnectedIconDrawable);
+            mAddMeasurementButton.setImageResource(R.drawable.home_ic_menu_add_weight_scale);
         } else {
             Timber.d("Bluetooth BLE Disconnected. Changing Button color and text...");
             mConnectButton.setBackgroundColor(mColorText);
             mConnectButton.setText(mDisconnectedString.toUpperCase());
             mConnectButton.setIconResource(mBleDisonnectedIconDrawable);
+            mAddMeasurementButton.setImageResource(R.drawable.home_ic_menu_add_weight_manually);
         }
     }
 
