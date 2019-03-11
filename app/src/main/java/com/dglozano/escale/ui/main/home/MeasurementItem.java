@@ -1,9 +1,14 @@
 package com.dglozano.escale.ui.main.home;
 
+import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.BodyMeasurement;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import butterknife.BindString;
 
 public class MeasurementItem {
 
@@ -15,48 +20,48 @@ public class MeasurementItem {
     static final int ICON_RESOURCE_MUSCLES = 6;
 
     private int iconResource;
-    private float value;
-    private Unit unit;
+    private String formattedValue;
     private MeasurementName name;
 
-    private MeasurementItem(int iconResource, float value, Unit unit, MeasurementName name) {
+    private MeasurementItem(int iconResource, String formattedValue, MeasurementName name) {
         this.iconResource = iconResource;
-        this.value = value;
-        this.unit = unit;
+        this.formattedValue = formattedValue;
         this.name = name;
     }
 
-    static List<MeasurementItem> getMeasurementList(BodyMeasurement bodyMeasurement) {
+    static List<MeasurementItem> getMeasurementList(Optional<BodyMeasurement> bodyMeasurement) {
+        DecimalFormat df = new DecimalFormat("###,###.##");
         List<MeasurementItem> measurementItemList = new ArrayList<>();
+        String weight = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getWeight()), Unit.KG) : "-";
+        String water = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getWater()), Unit.PERCENTAGE) : "-";
+        String fat = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getFat()), Unit.PERCENTAGE) : "-";
+        String bones = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getBones()), Unit.KG) : "-";
+        String bmi = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getBmi()), Unit.NO_UNIT) : "-";
+        String muscles = bodyMeasurement.isPresent() ? String.format("%s %s", df.format(bodyMeasurement.get().getMuscles()), Unit.PERCENTAGE) : "-";
+
         measurementItemList.add(new MeasurementItem(
                 ICON_RESOURCE_WEIGHT,
-                bodyMeasurement.getWeight(),
-                MeasurementItem.Unit.KG,
+                weight,
                 MeasurementItem.MeasurementName.WEIGHT));
         measurementItemList.add(new MeasurementItem(
                 ICON_RESOURCE_WATER,
-                bodyMeasurement.getWater(),
-                MeasurementItem.Unit.PERCENTAGE,
+                water,
                 MeasurementItem.MeasurementName.WATER));
         measurementItemList.add(new MeasurementItem(
                 ICON_RESOURCE_FAT,
-                bodyMeasurement.getFat(),
-                MeasurementItem.Unit.PERCENTAGE,
+                fat,
                 MeasurementItem.MeasurementName.FAT));
         measurementItemList.add(new MeasurementItem(
                 ICON_RESOURCE_BONES,
-                bodyMeasurement.getBones(),
-                MeasurementItem.Unit.KG,
+                bones,
                 MeasurementItem.MeasurementName.BONES));
         measurementItemList.add(new MeasurementItem(
                 ICON_RESOURCE_BMI,
-                bodyMeasurement.getBmi(),
-                MeasurementItem.Unit.NO_UNIT,
+                bmi,
                 MeasurementItem.MeasurementName.BMI));
         measurementItemList.add(new MeasurementItem(
                 ICON_RESOURCE_MUSCLES,
-                bodyMeasurement.getMuscles(),
-                MeasurementItem.Unit.PERCENTAGE,
+                muscles,
                 MeasurementItem.MeasurementName.MUSCLES));
         return measurementItemList;
     }
@@ -65,20 +70,12 @@ public class MeasurementItem {
         return iconResource;
     }
 
-    public float getValue() {
-        return value;
+    public String getFormattedValue() {
+        return formattedValue;
     }
 
-    public void setValue(float value) {
-        this.value = value;
-    }
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public void setUnit(Unit unit) {
-        this.unit = unit;
+    public void setFormattedValue(String value) {
+        this.formattedValue = value;
     }
 
     public MeasurementName getName() {

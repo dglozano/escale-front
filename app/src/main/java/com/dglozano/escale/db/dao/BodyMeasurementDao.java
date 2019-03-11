@@ -9,7 +9,12 @@ import android.arch.persistence.room.Query;
 
 import com.dglozano.escale.db.entity.BodyMeasurement;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 @Dao
 public interface BodyMeasurementDao {
@@ -19,15 +24,23 @@ public interface BodyMeasurementDao {
     @Query("SELECT * FROM BodyMeasurement WHERE userId == :userId ORDER BY date DESC")
     LiveData<List<BodyMeasurement>> getAllBodyMeasurementByUserId(Long userId);
 
+    @Query("SELECT * FROM BodyMeasurement WHERE userId == :userId ORDER BY date DESC LIMIT :limit")
+    LiveData<List<BodyMeasurement>> getLastBodyMeasurementsOfUserWithId(Long userId, Integer limit);
+
     @Query("SELECT * FROM BodyMeasurement WHERE userId == :userId ORDER BY date DESC LIMIT 1")
-    LiveData<BodyMeasurement> getLastBodyMeasurementOfUserWithId(Integer userId);
+    LiveData<Optional<BodyMeasurement>> getLastBodyMeasurementOfUserWithIdOptional(Long userId);
+
+    @Query("SELECT date FROM BodyMeasurement WHERE userId == :userId ORDER BY date DESC LIMIT 1")
+    Single<Optional<Date>> getDateOfLastBodyMeasurement(Long userId);
 
     @Query("SELECT * FROM BodyMeasurement WHERE id == :id")
     BodyMeasurement getBodyMeasurementById(Integer id);
 
-    //FIXME: Borrar REPLACE cuando entre en produccion
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insertBodyMeasurement(BodyMeasurement bodyMeasurement);
+
+    @Query("SELECT COUNT(*) FROM BodyMeasurement WHERE id == :id")
+    Integer measurementExists(Long id);
 
     @Delete
     void deleteBodyMeasurement(BodyMeasurement bodyMeasurement);

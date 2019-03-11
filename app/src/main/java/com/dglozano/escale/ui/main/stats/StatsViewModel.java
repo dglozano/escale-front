@@ -1,21 +1,22 @@
 package com.dglozano.escale.ui.main.stats;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.ui.Event;
+import com.dglozano.escale.util.Constants;
 import com.github.mikephil.charting.data.Entry;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -30,60 +31,15 @@ public class StatsViewModel extends ViewModel {
     private BodyMeasurementRepository mMeasurementsRepository;
     private CompositeDisposable disposables;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
-    private final LiveData<List<Entry>> mChartEntriesList;
+    private final LiveData<List<BodyMeasurement>> mBodyMeasurementList;
     private final MutableLiveData<StatFilter> mSelectedStat;
     private final MutableLiveData<Boolean> mFilterExpandedState;
-    private List<Entry> weightEntries;
-    private List<Entry> waterEntries;
-    private List<Entry> fatEntries;
-    private List<Entry> bonesEntries;
-    private List<Entry> imcEntries;
-    private List<Entry> muscleEntries;
+    private final MediatorLiveData<List<Entry>> mChartEntriesList;
 
     @Inject
     public StatsViewModel(BodyMeasurementRepository bodyMeasurementRepository,
                           PatientRepository patientRepository) {
         mPatientRepository = patientRepository;
-
-        // TODO: BORRAR
-        BodyMeasurement[] bodyMeasurements = new BodyMeasurement[]{
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-                BodyMeasurement.createMockBodyMeasurementForUser(mPatientRepository.getLoggedPatiendId()),
-        };
-
-        Arrays.sort(bodyMeasurements, (o1, o2) ->
-                o1.getDate().before(o2.getDate()) ? -1 : o2.getDate().before(o1.getDate()) ? 1 : 0);
-
-
-        weightEntries = new ArrayList<>();
-        waterEntries = new ArrayList<>();
-        fatEntries = new ArrayList<>();
-        bonesEntries = new ArrayList<>();
-        imcEntries = new ArrayList<>();
-        muscleEntries = new ArrayList<>();
-
-
-        for (BodyMeasurement data : bodyMeasurements) {
-            weightEntries.add(new Entry(data.getDate().getTime(), data.getWeight()));
-            fatEntries.add(new Entry(data.getDate().getTime(), data.getFat()));
-            imcEntries.add(new Entry(data.getDate().getTime(), data.getBmi()));
-            waterEntries.add(new Entry(data.getDate().getTime(), data.getWater()));
-            bonesEntries.add(new Entry(data.getDate().getTime(), data.getBones()));
-            muscleEntries.add(new Entry(data.getDate().getTime(), data.getMuscles()));
-        }
-
         mMeasurementsRepository = bodyMeasurementRepository;
         disposables = new CompositeDisposable();
         mErrorEvent = new MutableLiveData<>();
@@ -94,24 +50,46 @@ public class StatsViewModel extends ViewModel {
         mSelectedStat = new MutableLiveData<>();
         mSelectedStat.postValue(WEIGHT);
 
-        mChartEntriesList = Transformations.map(mSelectedStat, stat -> {
-            switch (stat) {
-                case WEIGHT:
-                    return weightEntries;
-                case FAT:
-                    return fatEntries;
-                case IMC:
-                    return imcEntries;
-                case BONES:
-                    return bonesEntries;
-                case WATER:
-                    return waterEntries;
-                case MUSCLE:
-                    return muscleEntries;
-                default:
-                    return weightEntries;
-            }
+        mBodyMeasurementList = mMeasurementsRepository.getLastBodyMeasurementsOfUserWithId(
+                patientRepository.getLoggedPatiendId(),
+                Constants.BODY_MEASUREMENTS_DEFAULT_LIMIT);
+
+        mChartEntriesList = new MediatorLiveData<>();
+        mChartEntriesList.addSource(mBodyMeasurementList, newList -> {
+            mChartEntriesList.postValue(getEntriesListFromMeasurement(newList, getSelectedStat()));
         });
+        mChartEntriesList.addSource(getSelectedStatAsLiveData(), statFilter -> {
+            mChartEntriesList.postValue(getEntriesListFromMeasurement(mBodyMeasurementList.getValue(), statFilter == null ? WEIGHT : statFilter));
+        });
+    }
+
+    private List<Entry> getEntriesListFromMeasurement(List<BodyMeasurement> bodyMeasurements, StatFilter selectedFilter) {
+        List<Entry> list = bodyMeasurements == null ? Collections.emptyList() :
+                bodyMeasurements.stream()
+                        .map(bodyMeasurement -> {
+                            float yData = bodyMeasurement.getWeight();
+                            switch (selectedFilter) {
+                                case MUSCLE:
+                                    yData = bodyMeasurement.getMuscles();
+                                    break;
+                                case WATER:
+                                    yData = bodyMeasurement.getWater();
+                                    break;
+                                case BONES:
+                                    yData = bodyMeasurement.getBones();
+                                    break;
+                                case IMC:
+                                    yData = bodyMeasurement.getBmi();
+                                    break;
+                                case FAT:
+                                    yData = bodyMeasurement.getFat();
+                                    break;
+                            }
+                            return new Entry(bodyMeasurement.getDate().getTime(), yData);
+                        })
+                        .collect(Collectors.toList());
+        Collections.reverse(list);
+        return list;
     }
 
     @Override
@@ -123,7 +101,7 @@ public class StatsViewModel extends ViewModel {
         return mErrorEvent;
     }
 
-    public LiveData<List<Entry>> getEntriesForChart() {
+    public LiveData<List<Entry>> getChartEntries() {
         return mChartEntriesList;
     }
 
@@ -135,8 +113,12 @@ public class StatsViewModel extends ViewModel {
         mSelectedStat.postValue(valueOf(position));
     }
 
+    public LiveData<StatFilter> getSelectedStatAsLiveData() {
+        return mSelectedStat;
+    }
+
     public StatFilter getSelectedStat() {
-        return mSelectedStat.getValue() == null ? WEIGHT : mSelectedStat.getValue();
+        return mSelectedStat.getValue() == null ? StatFilter.WEIGHT : mSelectedStat.getValue();
     }
 
     public void toggleFiltersExpansion() {

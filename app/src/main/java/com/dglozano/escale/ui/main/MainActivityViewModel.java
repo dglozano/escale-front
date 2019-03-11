@@ -8,7 +8,9 @@ import android.arch.lifecycle.ViewModel;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.db.entity.Patient;
+import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
@@ -30,6 +32,7 @@ public class MainActivityViewModel extends ViewModel {
     private PatientRepository mPatientRepository;
     private ChatRepository mChatRepository;
     private DietRepository mDietRepository;
+    private BodyMeasurementRepository mMeasurementRepository;
     private LiveData<Event<Boolean>> mMustChangePassword;
     private LiveData<Integer> mNumberOfUnreadMessages;
     private final LiveData<Patient> mLoggedPatient;
@@ -42,15 +45,18 @@ public class MainActivityViewModel extends ViewModel {
     private MutableLiveData<Boolean> mIsRefreshingDiets;
     private MutableLiveData<Boolean> mIsRefreshingMessages;
     private MutableLiveData<Boolean> mIsRefreshingPatient;
+    private MutableLiveData<Boolean> mIsRefreshingMeasurements;
 
     @Inject
     public MainActivityViewModel(PatientRepository patientRepository,
+                                 BodyMeasurementRepository bodyMeasurementRepository,
                                  SharedPreferences sharedPreferences,
                                  ChatRepository chatRepository, DietRepository dietRepository) {
         disposables = new CompositeDisposable();
         mDietRepository = dietRepository;
         mPatientRepository = patientRepository;
         mChatRepository = chatRepository;
+        mMeasurementRepository = bodyMeasurementRepository;
         mSharedPreferences = sharedPreferences;
         mErrorEvent = new MutableLiveData<>();
         positionOfCurrentFragment = new MutableLiveData<>();
@@ -82,9 +88,30 @@ public class MainActivityViewModel extends ViewModel {
     private void refreshEverythingElse(Long loggedPatientId) {
         mIsRefreshingDiets.postValue(true);
         mIsRefreshingMessages.postValue(true);
+        mIsRefreshingMeasurements.postValue(true);
         mIsRefreshingPatient.postValue(false);
         refreshMessagesAndCount(loggedPatientId);
         refreshDiets(loggedPatientId);
+        refreshMeasurements(loggedPatientId);
+    }
+
+
+    private void refreshMessagesAndCount(Long patientId) {
+        disposables.add(mChatRepository.refreshMessagesAndCountOfPatientWithId(patientId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(newUnread -> {
+                    mIsRefreshingMessages.postValue(false);
+                    addUnreadMessages(newUnread);
+                    Timber.d("Finished refreshing messages");
+                }, error -> {
+                    if (error instanceof NoSuchElementException) {
+                        markMessagesAsRead();
+                    } else {
+                        Timber.e(error);
+                    }
+                    mIsRefreshingMessages.postValue(false);
+                }));
     }
 
     private void refreshDiets(Long patientId) {
@@ -96,6 +123,7 @@ public class MainActivityViewModel extends ViewModel {
                                 markNewDietAsSeen(false);
                             }
                             mIsRefreshingDiets.postValue(false);
+                            Timber.d("Finished refreshing diets");
                         },
                         error -> {
                             Timber.e(error, "Error refreshing diets");
@@ -104,21 +132,19 @@ public class MainActivityViewModel extends ViewModel {
         );
     }
 
-    private void refreshMessagesAndCount(Long patientId) {
-        disposables.add(mChatRepository.refreshMessagesAndCountOfPatientWithId(patientId)
+    private void refreshMeasurements(Long patientId) {
+        disposables.add(mMeasurementRepository.refreshMeasurements(patientId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(newUnread -> {
-                    mIsRefreshingMessages.postValue(false);
-                    addUnreadMessages(newUnread);
-                }, error -> {
-                    if (error instanceof NoSuchElementException) {
-                        markMessagesAsRead();
-                    } else {
-                        Timber.e(error);
-                    }
-                    mIsRefreshingMessages.postValue(false);
-                }));
+                .subscribe(() -> {
+                            mIsRefreshingMeasurements.postValue(false);
+                            Timber.d("Finished refreshing measurements");
+                        },
+                        error -> {
+                            Timber.e(error, "Error refreshing measurements");
+                            mIsRefreshingMeasurements.postValue(false);
+                        })
+        );
     }
 
     private void setupRefreshingObservable() {
@@ -127,21 +153,32 @@ public class MainActivityViewModel extends ViewModel {
         mIsRefreshingMessages = new MutableLiveData<>();
         mIsRefreshingPatient = new MutableLiveData<>();
         mIsRefreshingDiets = new MutableLiveData<>();
+        mIsRefreshingMeasurements = new MutableLiveData<>();
         mIsRefreshingMessages.setValue(false);
         mIsRefreshingPatient.setValue(false);
         mIsRefreshingDiets.setValue(false);
+        mIsRefreshingMeasurements.setValue(false);
 
         mIsRefreshing.addSource(mIsRefreshingDiets, isRefreshingDiets ->
                 mIsRefreshing.postValue(isRefreshingDiets ||
                         mIsRefreshingMessages.getValue() ||
+                        mIsRefreshingMeasurements.getValue() ||
                         mIsRefreshingPatient.getValue()));
         mIsRefreshing.addSource(mIsRefreshingMessages, isRefreshingMessages ->
                 mIsRefreshing.postValue(isRefreshingMessages ||
                         mIsRefreshingDiets.getValue() ||
+                        mIsRefreshingMeasurements.getValue() ||
                         mIsRefreshingPatient.getValue()));
         mIsRefreshing.addSource(mIsRefreshingPatient, isRefreshingPatient ->
                 mIsRefreshing.postValue(isRefreshingPatient ||
                         mIsRefreshingDiets.getValue() ||
+                        mIsRefreshingMeasurements.getValue() ||
+                        mIsRefreshingMessages.getValue())
+        );
+        mIsRefreshing.addSource(mIsRefreshingMeasurements, isRefreshingMeasurements ->
+                mIsRefreshing.postValue(isRefreshingMeasurements ||
+                        mIsRefreshingDiets.getValue() ||
+                        mIsRefreshingPatient.getValue() ||
                         mIsRefreshingMessages.getValue())
         );
     }

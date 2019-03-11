@@ -11,6 +11,7 @@ import com.dglozano.escale.web.dto.LoginResponse;
 import com.dglozano.escale.web.dto.PatientDTO;
 import com.dglozano.escale.web.dto.SendChatMessageDTO;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -40,8 +41,10 @@ public interface EscaleRestApi {
     @GET("patients/{id}/measurements")
     Call<List<BodyMeasurementDTO>> getAllBodyMeasurement(@Path("id") int patientId);
 
-    @GET("patients/{id}/last-measurement")
-    Call<BodyMeasurementDTO> getLastBodyMeasurement(@Path("id") int patientId);
+    @GET("patients/{id}/last_measurements")
+    Single<List<BodyMeasurementDTO>> getLastBodyMeasurements(@Path("id") Long patientId,
+                                                     @Query("from") String isoFromDate,
+                                                     @Query("limit") Integer limit);
 
     @GET("patients/{id}/diets")
     Single<List<DietDTO>> getDiets(@Path("id") Long patientId);

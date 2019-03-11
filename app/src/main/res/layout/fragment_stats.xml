@@ -53,6 +53,7 @@
             app:rrbg_animateDrawables_enter="overshoot"
             app:rrbg_animateTexts_enter="overshoot"
             app:rrbg_selectorColor="@color/colorPrimaryLight"
+            app:rrbg_checkedPosition="0"
             app:rrbg_dividerColor="#EEEEEE"
             app:rrbg_dividerSize="1dp"
             app:rrbg_dividerPadding="@dimen/padding_medium"

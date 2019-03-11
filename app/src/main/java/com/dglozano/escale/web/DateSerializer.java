@@ -10,29 +10,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import timber.log.Timber;
-
 public class DateSerializer implements JsonSerializer<Date> {
 
-    private static final String[] DATE_FORMATS = new String[]{
-            "yyyy-MM-dd'T'HH:mm:ss.SSS",
-            "yyyy-MM-dd"
-    };
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
     @Override
     public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
+        String formattedDate = formatDate(src);
+        return new JsonPrimitive(formattedDate);
+    }
 
-        for (String format : DATE_FORMATS) {
-            SimpleDateFormat sdf = new SimpleDateFormat(format);
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-            try {
-                return new JsonPrimitive(sdf.format(src));
-            } catch (Exception exp) {
-                Timber.e(exp);
-            }
-        }
-
-        return null;
+    public static String formatDate(Date src) {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return sdf.format(src);
     }
 }

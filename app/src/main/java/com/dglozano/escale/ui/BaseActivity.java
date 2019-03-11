@@ -21,8 +21,8 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected abstract View getRootLayout();
 
-    private NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
-    private Disposable mNetworkDisposable;
+//    private NetworkChangeReceiver networkChangeReceiver = new NetworkChangeReceiver();
+//    private Disposable mNetworkDisposable;
 
     protected void showSnackbarWithOkDismiss(String text) {
         Snackbar snackbar = Snackbar.make(getRootLayout(), text, Snackbar.LENGTH_INDEFINITE)
@@ -54,36 +54,36 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(networkChangeReceiver);
+//        unregisterReceiver(networkChangeReceiver);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if(mNetworkDisposable != null ) mNetworkDisposable.dispose();
+//        if(mNetworkDisposable != null ) mNetworkDisposable.dispose();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(networkChangeReceiver, intentFilter);
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+//        registerReceiver(networkChangeReceiver, intentFilter);
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mNetworkDisposable = NetworkUtil.checkInternetAccess(this).subscribe(hasInternet -> {
-            if(!hasInternet) {
-                showNoInternetActivity();
-            }
-        }, (Throwable throwable) -> showNoInternetActivity());
+//        mNetworkDisposable = NetworkUtil.checkInternetAccess(this).subscribe(hasInternet -> {
+//            if(!hasInternet) {
+//                showNoInternetActivity();
+//            }
+//        }, (Throwable throwable) -> showNoInternetActivity());
     }
 
-    private void showNoInternetActivity() {
-        Intent intent = new Intent(this, NoInternetActivity.class);
-        startActivity(intent);
-        finish();
-    }
+//    private void showNoInternetActivity() {
+//        Intent intent = new Intent(this, NoInternetActivity.class);
+//        startActivity(intent);
+//        finish();
+//    }
 }

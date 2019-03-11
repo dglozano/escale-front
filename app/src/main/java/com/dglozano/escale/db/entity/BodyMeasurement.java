@@ -5,6 +5,8 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
+import com.dglozano.escale.web.dto.BodyMeasurementDTO;
+
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,11 +20,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         onDelete = CASCADE))
 public class BodyMeasurement {
 
-    @Ignore
-    public static float NO_VALUE = -1.0f;
-
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    @PrimaryKey
+    private Long id;
     private Long userId;
     private Date date;
     private float weight;
@@ -37,7 +36,20 @@ public class BodyMeasurement {
     }
 
     @Ignore
-    private BodyMeasurement(int id, Long userId, Date date, float weight) {
+    public BodyMeasurement(BodyMeasurementDTO dto) {
+        this.id = dto.getId();
+        this.userId = dto.getPatientId();
+        this.date = dto.getDate();
+        this.weight = dto.getWeight();
+        this.bmi = dto.getBmi();
+        this.fat = dto.getFat();
+        this.water = dto.getWater();
+        this.bones = dto.getBones();
+        this.muscles = dto.getMuscles();
+    }
+
+    @Ignore
+    private BodyMeasurement(Long id, Long userId, Date date, float weight) {
         this.id = id;
         this.userId = userId;
         this.date = date;
@@ -61,7 +73,7 @@ public class BodyMeasurement {
         cal.set(Calendar.MONTH, month);
         cal.set(Calendar.DAY_OF_MONTH, day);
 
-        BodyMeasurement bodyMeasurementTest = new BodyMeasurement(0, userId, cal.getTime(), weight);
+        BodyMeasurement bodyMeasurementTest = new BodyMeasurement(0L, userId, cal.getTime(), weight);
 
         bodyMeasurementTest.setBmi(bmi);
         bodyMeasurementTest.setFat(fat);
@@ -72,11 +84,11 @@ public class BodyMeasurement {
         return bodyMeasurementTest;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

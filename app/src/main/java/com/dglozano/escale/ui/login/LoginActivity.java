@@ -1,14 +1,11 @@
 package com.dglozano.escale.ui.login;
 
-import android.app.ActivityOptions;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.transition.Slide;
-import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -20,7 +17,6 @@ import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.Event;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.web.EscaleRestApi;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import javax.inject.Inject;
 
@@ -67,7 +63,7 @@ public class LoginActivity extends BaseActivity {
         binding.setViewmodel(mViewModel);
 
         Bundle extras = getIntent().getExtras();
-        if(extras != null && extras.getBoolean(MainActivity.ASK_NEW_FIREBASE_TOKEN, false)) {
+        if (extras != null && extras.getBoolean(MainActivity.ASK_NEW_FIREBASE_TOKEN, false)) {
             mViewModel.askForNewFirebaseToken();
         }
 

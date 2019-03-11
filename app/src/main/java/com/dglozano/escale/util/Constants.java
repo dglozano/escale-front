@@ -39,6 +39,8 @@ public class Constants {
     public static final int FRESH_TIMEOUT = 30;
     public static final String TOKEN_HEADER_KEY = "token";
     public static final String REFRESH_TOKEN_HEADER_KEY = "refreshToken";
+    public static final Integer BODY_MEASUREMENTS_DEFAULT_LIMIT = 15;
+
 
     //Shared Prefrences keys
     public static final String LOGGED_USER_ID_SHARED_PREF = "loggedUserId";

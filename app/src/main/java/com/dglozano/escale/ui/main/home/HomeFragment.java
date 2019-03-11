@@ -37,6 +37,7 @@ import com.dglozano.escale.util.LocationPermission;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -74,6 +75,8 @@ public class HomeFragment extends Fragment {
     TextView mWeightTexView;
     @BindView(R.id.bmi_number_top)
     TextView mBmiTextView;
+    @BindView(R.id.fat_number_top)
+    TextView mFatTextView;
 
     @BindString(R.string.connected)
     String mConnectedString;
@@ -132,15 +135,11 @@ public class HomeFragment extends Fragment {
         mBluetoothCommService.getConnectionState().observe(this, this::switchConnected);
         mBluetoothCommService.getLoadingState().observe(this,
                 (text) -> mLoaderText.setText(String.format("%1$s...", text)));
-        mBluetoothCommService.getBodyMeasurement().observe(this, this::updateBodyMeasurement);
     }
 
-    private void updateBodyMeasurement(BodyMeasurement bodyMeasurement) {
-        if (bodyMeasurement != null) {
-            Toast.makeText(mMainActivity, "New Body Measurement " + dateFormat.format(bodyMeasurement.getDate()), Toast.LENGTH_LONG).show();
-            mWeightTexView.setText(decimalFormat.format(bodyMeasurement.getWeight()).replace(",", "."));
-            mBmiTextView.setText(decimalFormat.format(bodyMeasurement.getBmi()).replace(",", "."));
-        }
+    @NonNull
+    private String formatDecimal(float weight) {
+        return decimalFormat.format(weight).replace(",", ".");
     }
 
     @Override
@@ -184,9 +183,19 @@ public class HomeFragment extends Fragment {
         mRecyclerViewMeasurements.addItemDecoration(mDividerItemDecoration);
         mRecyclerViewMeasurements.setAdapter(mMeasurementListAdapter);
 
-        //TODO Borrar
-        BodyMeasurement mBodyMeasurement = BodyMeasurement.createMockBodyMeasurementForUser(7L);
-        mMeasurementListAdapter.addItems(MeasurementItem.getMeasurementList(mBodyMeasurement));
+        mHomeViewModel.getLastBodyMeasurement().observe(this, bodyMeasurement -> {
+            if(bodyMeasurement == null || !bodyMeasurement.isPresent()) {
+                mWeightTexView.setText("-");
+                mBmiTextView.setText("-");
+                mFatTextView.setText("-");
+            } else {
+                mWeightTexView.setText(formatDecimal(bodyMeasurement.get().getWeight()));
+                mBmiTextView.setText(formatDecimal(bodyMeasurement.get().getBmi()));
+                mFatTextView.setText(formatDecimal(bodyMeasurement.get().getFat()));
+            }
+            mMeasurementListAdapter.addItems(MeasurementItem.getMeasurementList(
+                    bodyMeasurement == null ? Optional.empty() : bodyMeasurement));
+        });
 
         mCustomGauge.setValue(1000);
     }

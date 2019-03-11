@@ -37,10 +37,6 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     Drawable bmiIcon;
     @BindDrawable(R.drawable.home_ic_muscle_colored)
     Drawable muscleIcon;
-    @BindString(R.string.measurement_item_holder_value)
-    String measurementItemHolderValueString;
-    @BindString(R.string.decimal_format)
-    String decimalFormat;
 
     private List<MeasurementItem> mMeasurementItems;
 
@@ -76,9 +72,7 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
         if (mMeasurementItems != null) {
             final MeasurementItem measurement = mMeasurementItems.get(position);
             holder.mMeasurementTypeTextView.setText(measurement.getName().toString());
-            holder.mMeasurementValueTextView.setText(String.format(measurementItemHolderValueString,
-                    getFormattedValue(measurement.getValue()),
-                    measurement.getUnit().toString()));
+            holder.mMeasurementValueTextView.setText(measurement.getFormattedValue());
             switch (measurement.getIconResource()) {
                 case MeasurementItem.ICON_RESOURCE_WEIGHT:
                     holder.mIconImageView.setImageDrawable(scaleIcon);
@@ -100,11 +94,6 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
                     break;
             }
         }
-    }
-
-    private String getFormattedValue(float v) {
-        DecimalFormat df = new DecimalFormat(decimalFormat);
-        return df.format(v);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
