@@ -66,11 +66,6 @@ public class LoginActivity extends BaseActivity {
         // Assign the component to a property in the binding class.
         binding.setViewmodel(mViewModel);
 
-        // Set an exit transition
-        Slide slide = new Slide();
-        slide.setSlideEdge(Gravity.START);
-        getWindow().setEnterTransition(slide);
-
         Bundle extras = getIntent().getExtras();
         if(extras != null && extras.getBoolean(MainActivity.ASK_NEW_FIREBASE_TOKEN, false)) {
             mViewModel.askForNewFirebaseToken();

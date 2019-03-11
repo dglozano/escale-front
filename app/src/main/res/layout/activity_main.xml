@@ -22,7 +22,7 @@
             android:background="@android:color/white"
             android:elevation="10dp"
             android:visibility="gone"
-            app:el_duration="700"
+            app:el_duration="150"
             app:el_expanded="true">
 
             <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
