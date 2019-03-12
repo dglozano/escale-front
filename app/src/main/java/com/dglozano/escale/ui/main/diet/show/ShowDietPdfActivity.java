@@ -1,5 +1,6 @@
 package com.dglozano.escale.ui.main.diet.show;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -59,12 +60,14 @@ public class ShowDietPdfActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
+        setResult(Activity.RESULT_OK);
         finish();
         return true;
     }
 
     @Override
     public void onBackPressed() {
+        setResult(Activity.RESULT_OK);
         finish();
     }
 }

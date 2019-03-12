@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.main.diet.old;
+package com.dglozano.escale.ui.main.diet.all;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
@@ -32,6 +32,8 @@ import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
 public class AllDietsFragment extends Fragment {
+
+    private static final int SHOW_PDF_CODE = 999;
 
     @BindView(R.id.recycler_view_diets)
     RecyclerView mRecyclerViewDiets;
@@ -95,7 +97,7 @@ public class AllDietsFragment extends Fragment {
             if (pdfEvent != null && !pdfEvent.hasBeenHandled()) {
                 Intent intent = new Intent(getActivity(), ShowDietPdfActivity.class);
                 intent.putExtra("diet_file_path", pdfEvent.handleContent().getAbsolutePath());
-                startActivity(intent);
+                startActivityForResult(intent, SHOW_PDF_CODE);
             }
         });
         mAllDietsViewModel.getErrorEvent().observe(this, errorEvent -> {
@@ -113,12 +115,7 @@ public class AllDietsFragment extends Fragment {
         mRecyclerViewDiets.setLayoutManager(mLayoutManager);
         mRecyclerViewDiets.setItemAnimator(mDefaultItemAnimator);
         mRecyclerViewDiets.addItemDecoration(mDividerItemDecoration);
-        mAllDietsListAdapter.setDietClickListener(new AllDietsListAdapter.DietClickListener() {
-            @Override
-            public void onClick(Diet diet) {
-                mAllDietsViewModel.openOldDietFile(diet);
-            }
-        });
+        mAllDietsListAdapter.setDietClickListener(diet -> mAllDietsViewModel.openOldDietFile(diet));
         mRecyclerViewDiets.setAdapter(mAllDietsListAdapter);
         mAllDietsViewModel.getDietsOfLoggedPatient().observe(this, diets -> {
             if (diets != null) {

@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.main.diet.old;
+package com.dglozano.escale.ui.main.diet.all;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;

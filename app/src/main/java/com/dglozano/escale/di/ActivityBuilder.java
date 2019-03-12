@@ -10,7 +10,7 @@ import com.dglozano.escale.ui.main.diet.DietFragmentProvider;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietProvider;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivity;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfModule;
-import com.dglozano.escale.ui.main.diet.old.AllDietsProvider;
+import com.dglozano.escale.ui.main.diet.all.AllDietsProvider;
 import com.dglozano.escale.ui.main.home.AddMeasurementActivity;
 import com.dglozano.escale.ui.main.home.AddMeasurementModule;
 import com.dglozano.escale.ui.main.home.HomeFragmentProvider;

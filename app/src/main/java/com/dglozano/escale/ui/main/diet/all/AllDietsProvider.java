@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.main.diet.old;
+package com.dglozano.escale.ui.main.diet.all;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
@@ -7,5 +7,5 @@ import dagger.android.ContributesAndroidInjector;
 public abstract class AllDietsProvider {
 
     @ContributesAndroidInjector(modules = AllDietsModule.class)
-    public abstract AllDietsFragment provideOldDietsFragment();
+    public abstract AllDietsFragment provideAllDietsFragment();
 }

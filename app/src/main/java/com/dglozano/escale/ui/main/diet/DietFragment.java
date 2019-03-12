@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -17,7 +16,7 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietFragment;
-import com.dglozano.escale.ui.main.diet.old.AllDietsFragment;
+import com.dglozano.escale.ui.main.diet.all.AllDietsFragment;
 
 import javax.inject.Inject;
 

@@ -9,7 +9,7 @@ import com.dglozano.escale.ui.login.LoginActivityViewModel;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietViewModel;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivityViewModel;
-import com.dglozano.escale.ui.main.diet.old.AllDietsViewModel;
+import com.dglozano.escale.ui.main.diet.all.AllDietsViewModel;
 import com.dglozano.escale.ui.main.home.AddMeasurementViewModel;
 import com.dglozano.escale.ui.main.home.HomeViewModel;
 import com.dglozano.escale.ui.main.messages.MessagesViewModel;
