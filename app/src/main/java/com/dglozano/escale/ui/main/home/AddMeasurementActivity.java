@@ -111,6 +111,7 @@ public class AddMeasurementActivity extends BaseActivity {
         }
     }
 
+
     @OnFocusChange(R.id.add_measurement_water_input)
     public void onFocusChangeWater(View v, boolean hasFocus) {
         if (!hasFocus) {
@@ -118,6 +119,7 @@ public class AddMeasurementActivity extends BaseActivity {
             mWaterInputLayout.setError(errorString == null ? null : getString(errorString));
         }
     }
+
 
     @OnFocusChange(R.id.add_measurement_fat_input)
     public void onFocusChangeFat(View v, boolean hasFocus) {
