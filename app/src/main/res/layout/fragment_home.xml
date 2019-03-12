@@ -203,7 +203,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:layout_centerVertical="true"
-                        android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+                        android:layout_margin="@dimen/activity_vertical_margin_very_small"
                         android:visibility="visible"
                         app:srcCompat="@drawable/ic_calendar" />
 
@@ -212,9 +212,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_marginStart="@dimen/activity_vertical_margin_very_small"
                         android:layout_toEndOf="@id/home_last_row_image_view"
-                        android:text="27/02/2019 a las 15:23hs"
+                        android:layout_marginTop="@dimen/activity_vertical_margin_very_small"
+                        android:layout_marginBottom="@dimen/activity_vertical_margin_very_small"
+                        android:text="@string/loading"
                         android:textAppearance="@android:style/TextAppearance.Material"
                         android:textColor="@color/almostWhite"
                         android:textSize="12sp"

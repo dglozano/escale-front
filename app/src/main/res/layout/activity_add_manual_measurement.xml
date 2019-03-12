@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewmodel"
+            type="com.dglozano.escale.ui.main.home.AddMeasurementViewModel" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/add_measurement_btn"
+            android:layout_centerVertical="true"
+            android:layout_margin="@dimen/activity_vertical_margin_big"
+            android:background="@color/almostWhite"
+            android:fadeScrollbars="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/add_measurement_weight_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:src="@drawable/home_ic_scale_colored" />
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/add_measurement_weight_input_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/add_measurement_weight_unit"
+                        android:layout_toEndOf="@id/add_measurement_weight_image"
+                        app:errorEnabled="true"
+                        app:hintEnabled="true">
+
+                        <EditText
+                            android:id="@+id/add_measurement_weight_input_edittext"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/weight"
+                            android:inputType="numberDecimal"
+                            android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                            android:textColor="@color/colorTextBlack"
+                            android:textColorHint="@color/colorTextDark" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/add_measurement_weight_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:text="kg." />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/add_measurement_water_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:src="@drawable/home_ic_drop_colored" />
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/add_measurement_water_input_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/add_measurement_water_unit"
+                        android:layout_toEndOf="@id/add_measurement_water_image"
+                        app:errorEnabled="true"
+                        app:hintEnabled="true">
+
+                        <EditText
+                            android:id="@+id/add_measurement_water_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/water"
+                            android:inputType="numberDecimal"
+                            android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                            android:textColor="@color/colorTextBlack"
+                            android:textColorHint="@color/colorTextDark" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/add_measurement_water_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:text="  %" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/add_measurement_fat_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:src="@drawable/home_ic_pizza_slice_colored" />
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/add_measurement_fat_input_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/add_measurement_fat_unit"
+                        android:layout_toEndOf="@id/add_measurement_fat_image"
+                        app:errorEnabled="true"
+                        app:hintEnabled="true">
+
+                        <EditText
+                            android:id="@+id/add_measurement_fat_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/fat"
+                            android:inputType="numberDecimal"
+                            android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                            android:textColor="@color/colorTextBlack"
+                            android:textColorHint="@color/colorTextDark" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/add_measurement_fat_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:text="  %" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/add_measurement_bones_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:src="@drawable/home_ic_bone_colored" />
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/add_measurement_bones_input_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/add_measurement_bones_unit"
+                        android:layout_toEndOf="@id/add_measurement_bones_image"
+                        app:errorEnabled="true"
+                        app:hintEnabled="true">
+
+                        <EditText
+                            android:id="@+id/add_measurement_bones_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/bones"
+                            android:inputType="numberDecimal"
+                            android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                            android:textColor="@color/colorTextBlack"
+                            android:textColorHint="@color/colorTextDark" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/add_measurement_bones_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:text="kg." />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/add_measurement_bmi_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:src="@drawable/home_ic_bmi_colored" />
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/add_measurement_imc_input_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/add_measurement_bmi_unit"
+                        android:layout_toEndOf="@id/add_measurement_bmi_image"
+                        app:errorEnabled="true"
+                        app:hintEnabled="true">
+
+                        <EditText
+                            android:id="@+id/add_measurement_imc_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/imc"
+                            android:inputType="numberDecimal"
+                            android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                            android:textColor="@color/colorTextBlack"
+                            android:textColorHint="@color/colorTextDark" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/add_measurement_bmi_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:text="   " />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/add_measurement_muscles_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:src="@drawable/home_ic_muscle_colored" />
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/add_measurement_muscles_input_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/add_measurement_muscle_unit"
+                        android:layout_toEndOf="@id/add_measurement_muscles_image"
+                        app:errorEnabled="true"
+                        app:hintEnabled="true">
+
+                        <EditText
+                            android:id="@+id/add_measurement_muscles_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/muscles"
+                            android:inputType="numberDecimal"
+                            android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                            android:textColor="@color/colorTextBlack"
+                            android:textColorHint="@color/colorTextDark" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/add_measurement_muscle_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_small"
+                        android:text="  %" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <Button
+            android:id="@+id/add_measurement_btn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="@dimen/activity_vertical_margin_big"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_big"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_big"
+            android:background="@drawable/login_button_rounded"
+            android:text="@string/add_measurement_btn"
+            android:textColor="@color/almostWhite"
+            android:textStyle="bold" />
+
+        <RelativeLayout
+            android:id="@+id/add_measurement_progress_bar_container"
+            android:layout_width="match_parent"
+            android:translationZ="10dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:layout_height="match_parent"
+            android:background="@color/colorBlackOverlay"
+            android:visibility="visible"
+            tools:ignore="ExtraText">
+
+            <ProgressBar
+                android:id="@+id/add_measurement_progress_bar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorAccent" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</layout>

@@ -9,7 +9,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -37,6 +36,7 @@ import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.common.ChangePasswordActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.diet.DietFragment;
+import com.dglozano.escale.ui.main.home.AddMeasurementActivity;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
@@ -50,6 +50,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
@@ -63,6 +64,8 @@ public class MainActivity extends BaseActivity
         HasSupportFragmentInjector {
 
     private static final int CHANGE_PASSWORD_CODE = 123;
+    public static final int ADD_MEASUREMENT_CODE = 456;
+
     public static final String ASK_NEW_FIREBASE_TOKEN = "ask_new_firebase_token";
 
     // Binding views with Butterknife
@@ -91,8 +94,6 @@ public class MainActivity extends BaseActivity
     DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
-    @Inject
-    SharedPreferences sharedPreferences;
 
     private MainActivityViewModel mViewModel;
     private Badge mMessagesBadge = null;
@@ -116,7 +117,7 @@ public class MainActivity extends BaseActivity
         int openFragmentInPosition = 0;
         if (getIntent().getExtras() != null) {
             openFragmentInPosition = handleFirebaseIntent();
-            if(openFragmentInPosition == 2 )
+            if (openFragmentInPosition == 2)
                 setElevationOfAppBar(0f);
         }
 
@@ -220,7 +221,6 @@ public class MainActivity extends BaseActivity
     private void onKeyboardVisibilityEvent() {
         KeyboardVisibilityEvent.setEventListener(this,
                 isOpen -> {
-                    // some code depending on keyboard visiblity status
                     if (isOpen)
                         mExpandableBottomBar.collapse(true);
                     else
@@ -357,7 +357,6 @@ public class MainActivity extends BaseActivity
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
 
 
     // Add notifications' number to bottomNav icon at position

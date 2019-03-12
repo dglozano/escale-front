@@ -55,6 +55,8 @@ import mehdi.sakout.fancybuttons.FancyButton;
 import pl.pawelkleczkowski.customgauge.CustomGauge;
 import timber.log.Timber;
 
+import static com.dglozano.escale.ui.main.MainActivity.ADD_MEASUREMENT_CODE;
+
 public class HomeFragment extends Fragment {
 
     private static final int SCAN_REQUEST_CODE = 42;
@@ -145,6 +147,12 @@ public class HomeFragment extends Fragment {
                 (text) -> mLoaderText.setText(String.format("%1$s...", text)));
     }
 
+    @OnClick(R.id.add_measurement_floating_button)
+    public void addMeasurementBtnOnClick(View view) {
+        Intent intent = new Intent(getActivity(), AddMeasurementActivity.class);
+        startActivityForResult(intent, ADD_MEASUREMENT_CODE);
+    }
+
     @NonNull
     private String formatDecimal(float weight) {
         return decimalFormat.format(weight).replace(",", ".");
@@ -197,7 +205,7 @@ public class HomeFragment extends Fragment {
                 mLastRowImageView.setVisibility(View.VISIBLE);
                 mLastRowText.setText(String.format("%shs", dateFormat.format(bodyMeasurement.get().getDate())));
             }
-            mMeasurementListAdapter.addItems(MeasurementItem.getMeasurementList(
+            mMeasurementListAdapter.setItems(MeasurementItem.getMeasurementList(
                     bodyMeasurement == null ? Optional.empty() : bodyMeasurement));
         });
 
