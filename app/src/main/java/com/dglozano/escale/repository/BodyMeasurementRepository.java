@@ -9,6 +9,8 @@ import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.web.DateSerializer;
 import com.dglozano.escale.web.EscaleRestApi;
+import com.dglozano.escale.web.dto.AddBodyMeasurementDTO;
+import com.dglozano.escale.web.dto.BodyMeasurementDTO;
 import com.dglozano.escale.web.dto.DietDTO;
 
 import java.util.Calendar;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
+import io.reactivex.Single;
 import timber.log.Timber;
 
 import static com.dglozano.escale.util.Constants.BODY_MEASUREMENTS_DEFAULT_LIMIT;
@@ -29,10 +32,13 @@ public class BodyMeasurementRepository {
 
     private BodyMeasurementDao mBodyMeasurementDao;
     private EscaleRestApi mEscaleRestApi;
+    private PatientRepository mPatientRepository;
 
     @Inject
     public BodyMeasurementRepository(BodyMeasurementDao bodyMeasurementDao,
+                                     PatientRepository patientRepository,
                                      EscaleRestApi escaleRestApi) {
+        mPatientRepository = patientRepository;
         mBodyMeasurementDao = bodyMeasurementDao;
         mEscaleRestApi = escaleRestApi;
     }
@@ -60,5 +66,14 @@ public class BodyMeasurementRepository {
                             .forEach(mBodyMeasurementDao::insertBodyMeasurement);
                     return Completable.complete();
                 });
+    }
+
+    public Single<Long> addMeasurement(float weight, float water, float fat, float bones, float bmi, float muscle) {
+        Long patientId = mPatientRepository.getLoggedPatiendId();
+        AddBodyMeasurementDTO addDto = new AddBodyMeasurementDTO(patientId, weight, water,
+                fat, bmi, bones, muscle, Calendar.getInstance().getTime());
+        return mEscaleRestApi.postNewMeasurement(addDto, patientId)
+                .map(BodyMeasurement::new)
+                .map(mBodyMeasurementDao::insertBodyMeasurement);
     }
 }

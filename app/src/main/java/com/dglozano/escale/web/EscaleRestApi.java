@@ -1,5 +1,6 @@
 package com.dglozano.escale.web;
 
+import com.dglozano.escale.web.dto.AddBodyMeasurementDTO;
 import com.dglozano.escale.web.dto.BodyMeasurementDTO;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.ChatDTO;
@@ -39,12 +40,16 @@ public interface EscaleRestApi {
     Single<PatientDTO> getPatientById(@Path("id") Long patientId);
 
     @GET("patients/{id}/measurements")
-    Call<List<BodyMeasurementDTO>> getAllBodyMeasurement(@Path("id") int patientId);
+    Call<List<BodyMeasurementDTO>> getAllBodyMeasurement(@Path("id") Long patientId);
 
     @GET("patients/{id}/last_measurements")
     Single<List<BodyMeasurementDTO>> getLastBodyMeasurements(@Path("id") Long patientId,
                                                      @Query("from") String isoFromDate,
                                                      @Query("limit") Integer limit);
+
+    @POST("patients/{id}/measurements/add")
+    Single<BodyMeasurementDTO> postNewMeasurement(@Body AddBodyMeasurementDTO addBodyMeasurementDTO,
+                                              @Path("id") Long patientId);
 
     @GET("patients/{id}/diets")
     Single<List<DietDTO>> getDiets(@Path("id") Long patientId);

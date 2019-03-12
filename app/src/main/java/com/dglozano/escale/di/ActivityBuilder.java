@@ -11,6 +11,8 @@ import com.dglozano.escale.ui.main.diet.current.CurrentDietProvider;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivity;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfModule;
 import com.dglozano.escale.ui.main.diet.old.AllDietsProvider;
+import com.dglozano.escale.ui.main.home.AddMeasurementActivity;
+import com.dglozano.escale.ui.main.home.AddMeasurementModule;
 import com.dglozano.escale.ui.main.home.HomeFragmentProvider;
 import com.dglozano.escale.ui.main.messages.MessagesProvider;
 import com.dglozano.escale.ui.main.stats.StatsProvider;
@@ -46,4 +48,9 @@ public abstract class ActivityBuilder {
             ShowDietPdfModule.class
     })
     public abstract ShowDietPdfActivity bindShowDietPdfActivity();
+
+    @ContributesAndroidInjector(modules = {
+            AddMeasurementModule.class
+    })
+    public abstract AddMeasurementActivity bindShowAddMeasurementActivity();
 }

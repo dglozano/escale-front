@@ -57,13 +57,10 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
         return new MeasurementViewHolder(itemView);
     }
 
-    public void addItems(List<MeasurementItem> measurementItemList) {
+    public void setItems(List<MeasurementItem> measurementItemList) {
+        mMeasurementItems.clear();
         mMeasurementItems.addAll(measurementItemList);
         notifyDataSetChanged();
-    }
-
-    public void clearItems() {
-        mMeasurementItems.clear();
     }
 
     // Replace the contents of a view (invoked by the layout manager)

@@ -6,11 +6,8 @@
     <string name="navigation_drawer_close">nav drawe close</string>
     <string name="measurement_item_holder_value">%1$s %2$s</string>
     <string name="decimal_format">###,###.##</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="loading">Loading...</string>
+    <string name="loading">Cargando…</string>
     <string name="user_profile_picture">Foto de perfil de usuario</string>
-
     <!-- Ble scan error messages -->
     <string name="error_bluetooth_not_available">Bluetooth is not available</string>
     <string name="error_bluetooth_disabled">Enable bluetooth and try again</string>
@@ -59,6 +56,7 @@
     <string name="try_again">Reintentar</string>
     <string name="snackbar_no_connection_detected">No se ha detectado conexión a Internet.\nIntente nuevamente.</string>
     <string name="change_password_error_snackbar">No pudimos cambiar la contraseña. Revisa los datos e intenta nuevamente.</string>
+    <string name="add_measurement_error_snackbar">No pudimos agregar la medición. Pruebe nuevamente más tarde.</string>
     <string name="logout_title">Cerrar sesion</string>
     <string name="confirm_logout_msg">¿Está seguro que desea salir?</string>
     <string name="yes">Si</string>
@@ -77,7 +75,7 @@
     <string name="send_message_hint">Escribe un mensaje</string>
     <string name="error_sending_message">No se pudo enviar el mensaje. Intente nuevamente.</string>
     <string name="copy">Copiar</string>
-    <string name="add_body_measurement">Nuevo peso</string>
+    <string name="add_body_measurement">Agregar medición</string>
     <string name="add_body_measurement_with_scale">Agregar peso con balanza</string>
     <string name="add_body_measurement_manually">Agregar peso manualmente</string>
     <string name="copied">Copiado al portapapeles</string>
@@ -86,4 +84,23 @@
     <string name="show_filter_stats">Ver Filtros</string>
     <string name="hide_filter_stats">OCULTAR FILTROS</string>
     <string name="no_body_measurement_yet">No tienes tienen pesaje cargado aún.</string>
+    <string name="add_measurement_btn">Agregar medición</string>
+    <string name="weight">Peso</string>
+    <string name="water">Agua corporal</string>
+    <string name="fat">Grasa corporal</string>
+    <string name="bones">Masa ósea</string>
+    <string name="imc">IMC</string>
+    <string name="muscles">Masa muscular</string>
+    <string name="add_measurement_input_error_snackbar">Revisa los datos ingresados e intenta nuevamente</string>
+    <string name="add_measurement_percentage_range_error">Ingresa un valor entre 0% y 100%</string>
+    <string name="add_measurement_negative_number_error">Ingresa un valor positivo</string>
+    <string name="add_measurement_empty_error">Este campo no puede estar vacío</string>
+
+    WEIGHT("Peso"),
+    BMI("IMC"),
+    MUSCLES("Masa Muscular"),
+    BONES("Masa Ósea"),
+    WATER("Agua Corporal"),
+    FAT("Grasa corporal");
+
 </resources>

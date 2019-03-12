@@ -10,6 +10,7 @@ import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietViewModel;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivityViewModel;
 import com.dglozano.escale.ui.main.diet.old.AllDietsViewModel;
+import com.dglozano.escale.ui.main.home.AddMeasurementViewModel;
 import com.dglozano.escale.ui.main.home.HomeViewModel;
 import com.dglozano.escale.ui.main.messages.MessagesViewModel;
 import com.dglozano.escale.ui.main.stats.StatsViewModel;
@@ -24,6 +25,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(MainActivityViewModel.class)
     abstract ViewModel bindMainActivityViewModel(MainActivityViewModel mainActivityViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AddMeasurementViewModel.class)
+    abstract ViewModel bindAddMeasurementViewModel(AddMeasurementViewModel addMeasurementViewModel);
 
     @Binds
     @IntoMap
