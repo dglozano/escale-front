@@ -1,6 +1,7 @@
 package com.dglozano.escale.ble;
 
 import android.app.Service;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Intent;
@@ -68,8 +69,8 @@ public class BleCommunicationService extends Service {
     private Disposable mScanDisposable;
     private Disposable mConnectionStateDisposable;
     private Disposable mConnectionDisposable;
-    private CompositeDisposable mCompositeDisposable;
     private MutableLiveData<Boolean> mIsScanning;
+    private MutableLiveData<Boolean> mIsMeasurementTriggered;
     private MutableLiveData<String> mConnectionState;
     private MutableLiveData<BodyMeasurement> mLastBodyMeasurement;
     private MediatorLiveData<Boolean> mIsScanningOrConnecting;
@@ -83,8 +84,9 @@ public class BleCommunicationService extends Service {
         Timber.d("onCreate.");
         RxBleClient.setLogLevel(RxBleLog.VERBOSE);
         mBinder = new LocalBinder();
-        mCompositeDisposable = new CompositeDisposable();
         mIsScanning = new MutableLiveData<>();
+        mIsMeasurementTriggered = new MutableLiveData<>();
+        mIsMeasurementTriggered.setValue(false);
         mConnectionState = new MutableLiveData<>();
         mLastBodyMeasurement = new MutableLiveData<>();
         mIsScanning.setValue(false);
@@ -440,6 +442,18 @@ public class BleCommunicationService extends Service {
 
     public Boolean isConnected() {
         return mConnectionState.getValue().equals(Constants.CONNECTED);
+    }
+
+    public LiveData<Boolean> getIsMeasurementTriggered() {
+        return mIsMeasurementTriggered;
+    }
+
+    public void triggerMeasurement() {
+        mIsMeasurementTriggered.postValue(true);
+    }
+
+    public void stopMeasurement() {
+        mIsMeasurementTriggered.postValue(false);
     }
 
     public class LocalBinder extends Binder {

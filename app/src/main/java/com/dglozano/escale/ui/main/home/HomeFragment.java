@@ -71,6 +71,8 @@ public class HomeFragment extends Fragment {
     CustomGauge mCustomGauge;
     @BindView(R.id.layout_loader)
     RelativeLayout mLoaderLayout;
+    @BindView(R.id.home_step_on_scale_container)
+    RelativeLayout mStepOnScaleLayout;
     @BindView(R.id.loader_text)
     TextView mLoaderText;
     @BindView(R.id.loader_webview)
@@ -145,12 +147,18 @@ public class HomeFragment extends Fragment {
         mBluetoothCommService.getConnectionState().observe(this, this::switchConnected);
         mBluetoothCommService.getLoadingState().observe(this,
                 (text) -> mLoaderText.setText(String.format("%1$s...", text)));
+        mBluetoothCommService.getIsMeasurementTriggered().observe(this, this::showStepOnScale);
     }
 
     @OnClick(R.id.add_measurement_floating_button)
     public void addMeasurementBtnOnClick(View view) {
-        Intent intent = new Intent(getActivity(), AddMeasurementActivity.class);
-        startActivityForResult(intent, ADD_MEASUREMENT_CODE);
+//        if(mBluetoothCommService.getConnectionState().getValue() != null &&
+//                mBluetoothCommService.getConnectionState().getValue().equals(Constants.CONNECTED)) {
+            mBluetoothCommService.triggerMeasurement();
+//        } else {
+//            Intent intent = new Intent(getActivity(), AddMeasurementActivity.class);
+//            startActivityForResult(intent, ADD_MEASUREMENT_CODE);
+//        }
     }
 
     @NonNull
@@ -305,6 +313,19 @@ public class HomeFragment extends Fragment {
             mLoaderLayout.setVisibility(View.GONE);
             mMeasurementLayout.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void showStepOnScale(Boolean isMeasurementTriggered) {
+        if(isMeasurementTriggered) {
+            mStepOnScaleLayout.setVisibility(View.VISIBLE);
+        } else {
+            mStepOnScaleLayout.setVisibility(View.GONE);
+        }
+    }
+
+    @OnClick(R.id.home_cancel_measurement)
+    public void cancelMeasurement(View v) {
+        mBluetoothCommService.stopMeasurement();
     }
 
     private class MyServiceConnection implements ServiceConnection {

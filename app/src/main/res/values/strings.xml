@@ -95,6 +95,7 @@
     <string name="add_measurement_percentage_range_error">Ingresa un valor entre 0% y 100%</string>
     <string name="add_measurement_negative_number_error">Ingresa un valor positivo</string>
     <string name="add_measurement_empty_error">Este campo no puede estar vacío</string>
+    <string name="home_step_on_scale">Sáquese zapatillas y medias, súbase a la balanza y espere a que termine la medición.</string>
 
     WEIGHT("Peso"),
     BMI("IMC"),

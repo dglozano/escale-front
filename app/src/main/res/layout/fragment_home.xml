@@ -14,31 +14,18 @@
         android:layout_centerInParent="true"
         android:visibility="gone" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_measurement_floating_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
-        android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/home_ic_menu_add_weight_manually"
-        app:backgroundTint="@color/colorPrimaryLight" />
-
     <RelativeLayout
         android:id="@+id/layout_measurement"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/layout_top_measurement"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_vertical_margin_big"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_vertical_margin_big"
             android:gravity="center"
             android:orientation="horizontal"
@@ -176,9 +163,9 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_measurements"
-                android:layout_above="@id/home_last_row"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_above="@id/home_last_row"
                 android:layout_below="@id/ble_connect_btn"
                 android:background="@drawable/home_round_listview"
                 android:paddingStart="@dimen/padding_small"
@@ -212,9 +199,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toEndOf="@id/home_last_row_image_view"
                         android:layout_marginTop="@dimen/activity_vertical_margin_very_small"
                         android:layout_marginBottom="@dimen/activity_vertical_margin_very_small"
+                        android:layout_toEndOf="@id/home_last_row_image_view"
                         android:text="@string/loading"
                         android:textAppearance="@android:style/TextAppearance.Material"
                         android:textColor="@color/almostWhite"
@@ -225,6 +212,19 @@
             </RelativeLayout>
 
         </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add_measurement_floating_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/home_ic_menu_add_weight_manually"
+            app:backgroundTint="@color/colorPrimaryLight" />
 
     </RelativeLayout>
 
@@ -255,6 +255,55 @@
             android:textColor="@color/colorTextDark"
             android:textSize="14sp"
             android:textStyle="italic" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/home_step_on_scale_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/almostWhiteOverlay"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="@dimen/activity_vertical_margin_medium"
+        android:translationZ="100dp"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <ImageView
+                android:id="@+id/step_on_scale_image"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/home_ic_step_on_scale" />
+
+            <TextView
+                android:id="@+id/step_on_scale_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/step_on_scale_image"
+                android:layout_marginTop="@dimen/activity_vertical_margin_very_big"
+                android:text="@string/home_step_on_scale"
+                android:textAlignment="center"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                android:textColor="@color/colorTextDark" />
+
+        </RelativeLayout>
+
+        <ImageButton
+            android:id="@+id/home_cancel_measurement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="@dimen/activity_vertical_margin_very_small"
+            android:background="@color/transparent"
+            android:src="@drawable/ic_home_close" />
+
     </RelativeLayout>
 
 </RelativeLayout>
