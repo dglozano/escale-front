@@ -97,8 +97,8 @@ public class AddMeasurementActivity extends BaseActivity {
                 Objects.requireNonNull(mWeightInputLayout.getEditText()).getText().toString(),
                 Objects.requireNonNull(mWaterInputLayout.getEditText()).getText().toString(),
                 Objects.requireNonNull(mFatInputLayout.getEditText()).getText().toString(),
-                Objects.requireNonNull(mBonesInputLayout.getEditText()).getText().toString(),
                 Objects.requireNonNull(mBmiInputLayout.getEditText()).getText().toString(),
+                Objects.requireNonNull(mBonesInputLayout.getEditText()).getText().toString(),
                 Objects.requireNonNull(mMusclesInputLayout.getEditText()).getText().toString()
         );
     }

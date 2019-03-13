@@ -183,7 +183,6 @@ public class StatsFragment extends Fragment {
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
-        mMainActivityViewModel = ViewModelProviders.of((MainActivity) context).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -197,6 +196,7 @@ public class StatsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
-        mStatsViewModel = ViewModelProviders.of(getActivity(), mViewModelFactory).get(StatsViewModel.class);
+        mStatsViewModel = ViewModelProviders.of(this, mViewModelFactory).get(StatsViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 }

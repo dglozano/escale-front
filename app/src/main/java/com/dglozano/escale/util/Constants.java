@@ -23,7 +23,7 @@ public class Constants {
     public static final String DECIMAL_FORMAT = "#0.0";
 
     // Bytes
-    public static final String BYTES_SET_KG = "FF00FFFF1E00FFFF";
+    public static final String BYTES_SET_KG = "FF00FFFFB80BFAFF";
     public static final String BYTES_SET_LB = "FF01FFFF1E00FFFF";
 
     // Commands bluetooth

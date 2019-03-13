@@ -156,7 +156,6 @@ public class MessagesFragment extends Fragment {
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
-        mMainActivityViewModel = ViewModelProviders.of((MainActivity) context).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -170,6 +169,7 @@ public class MessagesFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
-        mMessagesViewModel = ViewModelProviders.of(getActivity(), mViewModelFactory).get(MessagesViewModel.class);
+        mMessagesViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MessagesViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 }

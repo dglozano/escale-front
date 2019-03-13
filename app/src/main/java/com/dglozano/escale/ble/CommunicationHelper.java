@@ -116,6 +116,21 @@ class CommunicationHelper {
         return bodyMeasurement;
     }
 
+    static BodyMeasurement parseFullMeasurementFromHex(String hexWeight, String hexBody) {
+        //TODO Read flags
+        BodyMeasurement bodyMeasurement = parseWeightMeasurementFromHex(hexWeight);
+        float fatPercentage = hexToDec(flipBytes(hexBody.substring(4, 8))) * 0.1f;
+        float bonesKg = 99f;
+        float waterMass = hexToDec(flipBytes(hexBody.substring(20, 24))) * 0.005f;
+        float musclesPercentage = hexToDec(flipBytes(hexBody.substring(12, 16))) * 0.1f;
+
+        bodyMeasurement.setFat(fatPercentage);
+        bodyMeasurement.setBones(bonesKg);
+        bodyMeasurement.setWater(waterMass * 100f / bodyMeasurement.getWeight());
+        bodyMeasurement.setMuscles(musclesPercentage);
+        return bodyMeasurement;
+    }
+
     static boolean isSetToKilo(String fff1) {
         return fff1.equals(Constants.BYTES_SET_KG);
     }

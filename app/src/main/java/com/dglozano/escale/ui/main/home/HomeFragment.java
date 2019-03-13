@@ -152,13 +152,13 @@ public class HomeFragment extends Fragment {
 
     @OnClick(R.id.add_measurement_floating_button)
     public void addMeasurementBtnOnClick(View view) {
-//        if(mBluetoothCommService.getConnectionState().getValue() != null &&
-//                mBluetoothCommService.getConnectionState().getValue().equals(Constants.CONNECTED)) {
+        if(mBluetoothCommService.getConnectionState().getValue() != null &&
+                mBluetoothCommService.getConnectionState().getValue().equals(Constants.CONNECTED)) {
             mBluetoothCommService.triggerMeasurement();
-//        } else {
-//            Intent intent = new Intent(getActivity(), AddMeasurementActivity.class);
-//            startActivityForResult(intent, ADD_MEASUREMENT_CODE);
-//        }
+        } else {
+            Intent intent = new Intent(getActivity(), AddMeasurementActivity.class);
+            startActivityForResult(intent, ADD_MEASUREMENT_CODE);
+        }
     }
 
     @NonNull
@@ -170,7 +170,6 @@ public class HomeFragment extends Fragment {
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
-        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -186,6 +185,7 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
         mHomeViewModel = ViewModelProviders.of(this, mViewModelFactory).get(HomeViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 
     @Override

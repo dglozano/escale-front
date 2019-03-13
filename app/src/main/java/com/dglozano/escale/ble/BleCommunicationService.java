@@ -15,6 +15,8 @@ import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BluetoothInfo;
+import com.dglozano.escale.repository.BodyMeasurementRepository;
+import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.Constants;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleConnection;
@@ -38,7 +40,6 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -54,6 +55,7 @@ import static com.dglozano.escale.ble.CommunicationHelper.getPhysicalActivity;
 import static com.dglozano.escale.ble.CommunicationHelper.getSexHex;
 import static com.dglozano.escale.ble.CommunicationHelper.hexToBytes;
 import static com.dglozano.escale.ble.CommunicationHelper.lastNBytes;
+import static com.dglozano.escale.ble.CommunicationHelper.parseFullMeasurementFromHex;
 import static com.dglozano.escale.ble.CommunicationHelper.parseWeightMeasurementFromHex;
 
 @ApplicationScope
@@ -64,15 +66,19 @@ public class BleCommunicationService extends Service {
     @Inject
     @BluetoothInfo
     String mScaleBleNameString;
+    @Inject
+    PatientRepository patientRepository;
+    @Inject
+    BodyMeasurementRepository bodyMeasurementRepository;
 
     private IBinder mBinder;
     private Disposable mScanDisposable;
     private Disposable mConnectionStateDisposable;
     private Disposable mConnectionDisposable;
+    private Disposable mMeasurementTriggerDisposable;
     private MutableLiveData<Boolean> mIsScanning;
     private MutableLiveData<Boolean> mIsMeasurementTriggered;
     private MutableLiveData<String> mConnectionState;
-    private MutableLiveData<BodyMeasurement> mLastBodyMeasurement;
     private MediatorLiveData<Boolean> mIsScanningOrConnecting;
     private Observable<RxBleConnection> mConnectionObservable;
     private RxBleConnection mRxBleConnection;
@@ -88,10 +94,8 @@ public class BleCommunicationService extends Service {
         mIsMeasurementTriggered = new MutableLiveData<>();
         mIsMeasurementTriggered.setValue(false);
         mConnectionState = new MutableLiveData<>();
-        mLastBodyMeasurement = new MutableLiveData<>();
         mIsScanning.setValue(false);
         mConnectionState.setValue(Constants.DISCONNECTED);
-        mLastBodyMeasurement.setValue(null);
         mIsScanningOrConnecting = new MediatorLiveData<>();
         prepareScanningOrConnectionMediator();
     }
@@ -158,32 +162,35 @@ public class BleCommunicationService extends Service {
                 BondingHelper.bondWithDevice(this, scaleDevice, 10, TimeUnit.SECONDS)
                         .andThen(Completable.fromAction(() -> mConnectionState.postValue(Constants.CONNECTING)))
                         .andThen(mConnectionObservable)
+                        .flatMap(rxBleConnection -> {
+                            rxBleConnection.requestMtu(50);
+                            return Observable.just(rxBleConnection);
+                        })
                         .flatMapSingle(rxBleConnection -> communicationInitialization(rxBleConnection)
 //                                        rxBleConnection.discoverServices().delay(600, TimeUnit.MILLISECONDS)
 //                                        .flatMap(bytesIgnored -> hasScaleUsers(rxBleConnection))
-                                // TODO: ADD LOGIC TO PUT CREDENTEIALS
+                                        // TODO: ADD LOGIC TO PUT CREDENTEIALS
 //                                .flatMap(hasUsers -> createScaleUserIfNecessaryAndLogin(hasUsers, rxBleConnection))
 //                                 TODO: ADD LOGIC IF FAILS LOGIN, TO CREATE USER
 //                                .flatMap(isLoginSuccesful -> triggerWeightMeasurement(rxBleConnection))
 //                                rxBleConnection.discoverServices().delay(600, TimeUnit.MILLISECONDS)
-                                .flatMap(responseIgnored -> createUserInScale(rxBleConnection)
-                                        .flatMap(pinAndIndex -> loginUserInScale(pinAndIndex.index(),
-                                                pinAndIndex.pin(), rxBleConnection))
-                                        .flatMap(loginStatus -> writeUserData(Calendar.getInstance().getTime(),
-                                                Patient.Gender.MALE, 3, rxBleConnection)
-                                                .flatMap(bytesIgnored -> Single.just(loginStatus)))
-                                        .doOnSuccess(couldConnect -> {
-                                            if (couldConnect) {
-                                                mConnectionState.postValue(Constants.CONNECTED);
-                                            } else {
-                                                mConnectionState.postValue(Constants.DISCONNECTED);
-                                            }
-                                        })
-                                )
-                                .flatMap(isLoginSuccesful -> triggerWeightMeasurement(rxBleConnection))
+                                        .flatMap(responseIgnored -> createUserInScale(rxBleConnection)
+                                                .flatMap(pinAndIndex -> loginUserInScale(pinAndIndex.index(),
+                                                        pinAndIndex.pin(), rxBleConnection))
+                                                .flatMap(loginStatus -> writeUserData(Calendar.getInstance().getTime(),
+                                                        Patient.Gender.MALE, 3, rxBleConnection)
+                                                        .flatMap(bytesIgnored -> Single.just(loginStatus)))
+                                                .doOnSuccess(couldConnect -> {
+                                                    if (couldConnect) {
+                                                        mConnectionState.postValue(Constants.CONNECTED);
+                                                    } else {
+                                                        mConnectionState.postValue(Constants.DISCONNECTED);
+                                                    }
+                                                })
+                                        )
                         )
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io()) // TODO: Check this
+                        .subscribeOn(Schedulers.io())
                         .doFinally(this::disposeConnection)
                         .subscribe(hexResponse -> Timber.d("Final response %1$s", hexResponse), this::throwException);
     }
@@ -304,7 +311,9 @@ public class BleCommunicationService extends Service {
                 })
                 .singleOrError()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess(pair -> Timber.d("Index: %1$s , PIN: %2$s", pair.index(), pair.pin()))
+                .doOnSuccess(pair -> {
+                    Timber.d("Index: %1$s , PIN: %2$s", pair.index(), pair.pin());
+                })
                 .doOnError(this::throwException);
     }
 
@@ -321,7 +330,7 @@ public class BleCommunicationService extends Service {
                 CMD, true, rxBleConnection)
                 .take(1)
                 .flatMapSingle(hexResponse -> {
-                    if(!hexResponse.equals(Constants.USER_LOGIN_SUCCESS)) {
+                    if (!hexResponse.equals(Constants.USER_LOGIN_SUCCESS)) {
                         throw new CommunicationHelper.LoginScaleUserFailed();
                     }
                     return Single.just(hexResponse.equals(Constants.USER_LOGIN_SUCCESS));
@@ -360,17 +369,39 @@ public class BleCommunicationService extends Service {
     }
 
     private Single<BodyMeasurement> triggerWeightMeasurement(RxBleConnection rxBleConnection) {
-        return writeAndReadOnNotification(Constants.CUSTOM_FFF4_ACTIVATE_SCALE_CHARACTERISTIC, Constants.WEIGHT_MEASUREMENT,
-                "00", true, rxBleConnection)
-                .take(1)
-                .flatMapSingle(hexResponse -> Single.just(parseWeightMeasurementFromHex(hexResponse)))
-                .singleOrError()
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess(bodyMeasurement -> {
-                    Timber.d("Resource Weight: %1$s", bodyMeasurement.getWeight());
-                    mLastBodyMeasurement.postValue(bodyMeasurement);
+        Observable<Observable<byte[]>> weightIndication = rxBleConnection.setupIndication(Constants.WEIGHT_MEASUREMENT);
+        Observable<Observable<byte[]>> bodyMeasurementIndication = rxBleConnection.setupIndication(Constants.BODY_COMPOSITION_MEASUREMENT);
+        Observable<byte[]> writeObservable = rxBleConnection.writeCharacteristic(
+                Constants.CUSTOM_FFF4_ACTIVATE_SCALE_CHARACTERISTIC,
+                hexToBytes("00")).toObservable();
+
+        return Observable.zip(weightIndication, bodyMeasurementIndication,
+                (weightInd, bodyInd) -> {
+                    Timber.d("Weight ind %s - BodyInd %s", weightInd, bodyInd);
+                    return writeObservable.flatMap(response -> {
+                        Timber.d("RESPONSE %s", bytesToHex(response));
+                        return Observable.zip(weightInd.take(1), bodyInd.take(1),
+                                (weightResponse, bodyResponse) -> {
+                                    Timber.d("Weight response: %s - Body Response %s",
+                                            bytesToHex(weightResponse),
+                                            bytesToHex(bodyResponse));
+                                    return parseFullMeasurementFromHex(bytesToHex(weightResponse), bytesToHex(bodyResponse));
+                                });
+                    });
                 })
-                .doOnError(this::throwException);
+                .flatMap(r -> {
+                    Timber.d("Finished retreiving weight and body measurement");
+                    return r;})
+                .take(1)
+                .singleOrError();
+
+
+//
+//        return writeAndReadOnNotification(Constants.CUSTOM_FFF4_ACTIVATE_SCALE_CHARACTERISTIC, Constants.BODY_COMPOSITION_MEASUREMENT,
+//                "00", true, rxBleConnection)
+//                .take(1)
+//                .flatMapSingle(hexResponse -> Single.just(parseWeightMeasurementFromHex(hexResponse)))
+//                .singleOrError();
     }
 
     private Observable<String> writeAndReadOnNotification(UUID writeTo, UUID readOn,
@@ -410,10 +441,6 @@ public class BleCommunicationService extends Service {
         return mConnectionState;
     }
 
-    public MutableLiveData<BodyMeasurement> getBodyMeasurement() {
-        return mLastBodyMeasurement;
-    }
-
     @SuppressWarnings("unused")
     private void onConnectionReceived(RxBleConnection rxBleConnection) {
         Timber.d("Connection received.");
@@ -431,6 +458,7 @@ public class BleCommunicationService extends Service {
         Timber.d("onDestroy(). Disposing connection and scanning...");
         disposeConnection();
         disposeScanning();
+        stopMeasurement();
         super.onDestroy();
     }
 
@@ -449,11 +477,34 @@ public class BleCommunicationService extends Service {
     }
 
     public void triggerMeasurement() {
-        mIsMeasurementTriggered.postValue(true);
+        mMeasurementTriggerDisposable = triggerWeightMeasurement(mRxBleConnection)
+                .flatMap(bodyMeasurement -> {
+                    mIsMeasurementTriggered.postValue(false);
+                    bodyMeasurement.setUserId(patientRepository.getLoggedPatiendId());
+                    return bodyMeasurementRepository.addMeasurement(bodyMeasurement);
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .doOnSubscribe(d -> mIsMeasurementTriggered.postValue(true))
+                .doOnDispose(() -> mIsMeasurementTriggered.postValue(false))
+                .subscribe(bodyMeasurement -> {
+                            Timber.d("New body measurement saved to server and locally - id %s", bodyMeasurement);
+                            mIsMeasurementTriggered.postValue(false);
+                            stopMeasurement();
+                        }, error -> {
+                            Timber.e(error);
+                            mIsMeasurementTriggered.postValue(false);
+                            stopMeasurement();
+                        }
+                );
     }
 
+
     public void stopMeasurement() {
-        mIsMeasurementTriggered.postValue(false);
+        if (mMeasurementTriggerDisposable != null) {
+            mMeasurementTriggerDisposable.dispose();
+            mMeasurementTriggerDisposable = null;
+        }
     }
 
     public class LocalBinder extends Binder {

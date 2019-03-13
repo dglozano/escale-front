@@ -69,14 +69,13 @@ public class AddMeasurementViewModel extends ViewModel {
         return mSuccessEvent;
     }
 
-    public void hitAddMeasurement(String weight, String water, String fat, String bones,
-                                  String bmi, String muscle) {
+    public void hitAddMeasurement(String weight, String water, String fat, String bmi,  String bones, String muscle) {
         if (isInputValid(weight, water, fat, bones, bmi, muscle)) {
             disposables.add(mMeasurementRepository.addMeasurement(Float.parseFloat(weight),
                     Float.parseFloat(water),
                     Float.parseFloat(fat),
-                    Float.parseFloat(bones),
                     Float.parseFloat(bmi),
+                    Float.parseFloat(bones),
                     Float.parseFloat(muscle))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
