@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -40,12 +41,14 @@ public class MainActivityViewModel extends ViewModel {
     private final SharedPreferences mSharedPreferences;
     private final CompositeDisposable disposables;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
-
+    private MediatorLiveData<Boolean> mShowAppBarShadow;
+    private LiveData<Boolean> mAreDietsEmpty;
     private MediatorLiveData<Boolean> mIsRefreshing;
     private MutableLiveData<Boolean> mIsRefreshingDiets;
     private MutableLiveData<Boolean> mIsRefreshingMessages;
     private MutableLiveData<Boolean> mIsRefreshingPatient;
     private MutableLiveData<Boolean> mIsRefreshingMeasurements;
+
 
     @Inject
     public MainActivityViewModel(PatientRepository patientRepository,
@@ -65,6 +68,38 @@ public class MainActivityViewModel extends ViewModel {
         setupRefreshingObservable();
         setupMustChangePasswordObservable();
         setupUnreadMessagesObservable();
+        setupAppBarShadowStatus();
+    }
+
+    private void setupAppBarShadowStatus() {
+        mShowAppBarShadow = new MediatorLiveData<>();
+        mAreDietsEmpty = Transformations.map(mDietRepository.getCurrentDiet(
+                mPatientRepository.getLoggedPatiendId()),
+                Objects::isNull);
+        mShowAppBarShadow.addSource(mAreDietsEmpty, dietsEmpty -> {
+            Timber.d("Diets empty %s", dietsEmpty);
+            if(dietsEmpty != null && !dietsEmpty){
+                if(positionOfCurrentFragment.getValue() != null
+                        && positionOfCurrentFragment.getValue() == 2) {
+                    mShowAppBarShadow.postValue(false);
+                } else {
+                    mShowAppBarShadow.postValue(true);
+                }
+            } else {
+                mShowAppBarShadow.postValue(true);
+            }
+        });
+        mShowAppBarShadow.addSource(positionOfCurrentFragment, positionFragment -> {
+            if(mAreDietsEmpty.getValue() != null && !mAreDietsEmpty.getValue()){
+                if(positionFragment != null && positionFragment == 2) {
+                    mShowAppBarShadow.postValue(false);
+                } else {
+                    mShowAppBarShadow.postValue(true);
+                }
+            } else {
+                mShowAppBarShadow.postValue(true);
+            }
+        });
     }
 
     public void refreshData() {
@@ -94,7 +129,6 @@ public class MainActivityViewModel extends ViewModel {
         refreshDiets(loggedPatientId);
         refreshMeasurements(loggedPatientId);
     }
-
 
     private void refreshMessagesAndCount(Long patientId) {
         disposables.add(mChatRepository.refreshMessagesAndCountOfPatientWithId(patientId)
@@ -265,6 +299,10 @@ public class MainActivityViewModel extends ViewModel {
 
     public LiveData<Boolean> observeIfHasUnseenNewDiets() {
         return mDietRepository.getHasUnseenNewDiets();
+    }
+
+    public MediatorLiveData<Boolean> getAppBarShadowStatus() {
+        return mShowAppBarShadow;
     }
 }
 

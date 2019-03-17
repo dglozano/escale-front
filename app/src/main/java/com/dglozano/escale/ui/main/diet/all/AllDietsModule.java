@@ -13,11 +13,6 @@ import dagger.Provides;
 public class AllDietsModule {
 
     @Provides
-    LinearLayoutManager provideLinearLayoutManager(AllDietsFragment fragment) {
-        return new LinearLayoutManager(fragment.getActivity());
-    }
-
-    @Provides
     DividerItemDecoration provideDividerItemDecoration(MainActivity mainActivity) {
         return new DividerItemDecoration(mainActivity, LinearLayoutManager.VERTICAL);
     }

@@ -8,16 +8,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ui.main.MainActivity;
-import com.dglozano.escale.ui.main.MainActivityViewModel;
-import com.dglozano.escale.ui.main.diet.current.CurrentDietFragment;
 import com.dglozano.escale.ui.main.diet.all.AllDietsFragment;
+import com.dglozano.escale.ui.main.diet.current.CurrentDietFragment;
 
 import javax.inject.Inject;
 
@@ -33,6 +35,10 @@ public class DietFragment extends Fragment {
     ViewPager mTabsViewPager;
     @BindView(R.id.diets_current_or_all_tablayout)
     TabLayout mTabLayout;
+    @BindView(R.id.no_diets_layout)
+    RelativeLayout mNoDietsLayout;
+    @BindView(R.id.diets_main_container)
+    RelativeLayout mDietsMainContainer;
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -40,7 +46,7 @@ public class DietFragment extends Fragment {
     DietTabAdapter mTabsAdapter;
 
     private Unbinder mViewUnbinder;
-    private MainActivityViewModel mMainActivityViewModel;
+    private DietViewModel mDietViewModel;
 
     public DietFragment() {
         // Required empty public constructor
@@ -58,7 +64,20 @@ public class DietFragment extends Fragment {
         mViewUnbinder = ButterKnife.bind(this, view);
 
         setupViewPager(mTabsViewPager);
-        mTabLayout.setupWithViewPager(mTabsViewPager);
+
+        mDietViewModel.areDietsEmpty().observe(this, dietEmpty -> {
+            if (dietEmpty != null && !dietEmpty) {
+                mDietsMainContainer.setVisibility(View.VISIBLE);
+                mTabLayout.setVisibility(View.VISIBLE);
+                mNoDietsLayout.setVisibility(View.GONE);
+                mTabLayout.setupWithViewPager(mTabsViewPager);
+            } else {
+                mNoDietsLayout.setVisibility(View.VISIBLE);
+                mDietsMainContainer.setVisibility(View.GONE);
+                mTabLayout.setVisibility(View.GONE);
+            }
+        });
+
         return view;
     }
 
@@ -84,6 +103,6 @@ public class DietFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        mDietViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DietViewModel.class);
     }
 }

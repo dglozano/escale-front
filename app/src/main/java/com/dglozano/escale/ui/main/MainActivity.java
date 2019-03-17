@@ -117,8 +117,6 @@ public class MainActivity extends BaseActivity
         int openFragmentInPosition = 0;
         if (getIntent().getExtras() != null) {
             openFragmentInPosition = handleFirebaseIntent();
-            if (openFragmentInPosition == 2)
-                setElevationOfAppBar(0f);
         }
 
         setSupportActionBar(mToolbar);
@@ -139,6 +137,14 @@ public class MainActivity extends BaseActivity
         addFragmentsToBottomNav(openFragmentInPosition);
 
         mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
+
+        mViewModel.getAppBarShadowStatus().observe(this, showShadow -> {
+            if(showShadow != null && !showShadow) {
+                setElevationOfAppBar(0f);
+            } else {
+                setElevationOfAppBar(10f);
+            }
+        });
     }
 
     private void observeErrorEvent() {
@@ -187,17 +193,17 @@ public class MainActivity extends BaseActivity
             if (posFragment != null) {
                 switch (posFragment) {
                     case 0: // HOME
-                        setElevationOfAppBar(10f);
+                        mViewModel.setPositionOfCurrentFragment(0);
                         break;
                     case 1: // STATS
-                        setElevationOfAppBar(10f);
+                        mViewModel.setPositionOfCurrentFragment(1);
                         break;
                     case 2: // DIETS
-                        setElevationOfAppBar(0f);
+                        mViewModel.setPositionOfCurrentFragment(2);
                         mViewModel.markNewDietAsSeen(true);
                         break;
                     case 3: // MESSAGES
-                        setElevationOfAppBar(10f);
+                        mViewModel.setPositionOfCurrentFragment(3);
                         mViewModel.markMessagesAsRead();
                         break;
                 }
@@ -432,7 +438,7 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void setElevationOfAppBar(float elevation) {
+    public void setElevationOfAppBar(float elevation) {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setElevation(elevation);

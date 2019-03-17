@@ -38,8 +38,6 @@ public class AddMeasurementActivity extends BaseActivity {
     TextInputLayout mWaterInputLayout;
     @BindView(R.id.add_measurement_fat_input_layout)
     TextInputLayout mFatInputLayout;
-    @BindView(R.id.add_measurement_bones_input_layout)
-    TextInputLayout mBonesInputLayout;
     @BindView(R.id.add_measurement_imc_input_layout)
     TextInputLayout mBmiInputLayout;
     @BindView(R.id.add_measurement_muscles_input_layout)
@@ -98,7 +96,7 @@ public class AddMeasurementActivity extends BaseActivity {
                 Objects.requireNonNull(mWaterInputLayout.getEditText()).getText().toString(),
                 Objects.requireNonNull(mFatInputLayout.getEditText()).getText().toString(),
                 Objects.requireNonNull(mBmiInputLayout.getEditText()).getText().toString(),
-                Objects.requireNonNull(mBonesInputLayout.getEditText()).getText().toString(),
+                "0", // TODO: Think what to do with Bone Mass.
                 Objects.requireNonNull(mMusclesInputLayout.getEditText()).getText().toString()
         );
     }
@@ -126,14 +124,6 @@ public class AddMeasurementActivity extends BaseActivity {
         if (!hasFocus) {
             Integer errorString = validateEditText(((EditText) v).getText(), true);
             mFatInputLayout.setError(errorString == null ? null : getString(errorString));
-        }
-    }
-
-    @OnFocusChange(R.id.add_measurement_bones_input)
-    public void onFocusChangeBones(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            Integer errorString = validateEditText(((EditText) v).getText(), false);
-            mBonesInputLayout.setError(errorString == null ? null : getString(errorString));
         }
     }
 
@@ -179,6 +169,14 @@ public class AddMeasurementActivity extends BaseActivity {
     protected void afterEditTextChangedFat(Editable editable) {
         Integer errorString = validateEditText(editable, true);
         mFatInputLayout.setError(errorString == null ? null : getString(errorString));
+    }
+
+
+    @OnTextChanged(value = R.id.add_measurement_imc_input,
+            callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    protected void afterEditTextChangedImc(Editable editable) {
+        Integer errorString = validateEditText(editable, true);
+        mBmiInputLayout.setError(errorString == null ? null : getString(errorString));
     }
 
     private Integer validateEditText(Editable inputLayout, boolean isPercentage) {

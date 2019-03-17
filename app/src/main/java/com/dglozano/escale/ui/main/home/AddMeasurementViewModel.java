@@ -47,7 +47,7 @@ public class AddMeasurementViewModel extends ViewModel {
         List<Float> inputFloat = Arrays.stream(input)
                 .filter(s -> s != null && !s.isEmpty())
                 .map(Float::parseFloat)
-                .filter(f -> f > 0f)
+                .filter(f -> f >= 0f)
                 .collect(Collectors.toList());
         if(inputFloat.size() < input.length)
             return false;

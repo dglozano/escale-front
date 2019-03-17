@@ -10,6 +10,7 @@ import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.AddBodyMeasurementDTO;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,8 +39,8 @@ public class BodyMeasurementRepository {
         mEscaleRestApi = escaleRestApi;
     }
 
-    public LiveData<List<BodyMeasurement>> getLastBodyMeasurementsOfUserWithId(Long userId, Integer limit) {
-        return mBodyMeasurementDao.getLastBodyMeasurementsOfUserWithId(userId, limit);
+    public LiveData<List<BodyMeasurement>> getBodyMeasurementsOfUserWithIdSince(Long userId, Date date) {
+        return mBodyMeasurementDao.getBodyMeasurementsOfUserWithIdSince(userId, date);
     }
 
     public LiveData<Optional<BodyMeasurement>> getLastBodyMeasurementOfUserWithId(Long userId) {

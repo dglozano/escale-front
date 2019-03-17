@@ -33,8 +33,6 @@ import timber.log.Timber;
 public class CurrentDietFragment extends Fragment {
     @BindView(R.id.actual_diet_pdf_view)
     PDFView mPdfView;
-    @BindView(R.id.no_current_diet_layout)
-    RelativeLayout mNoCurrentDietLayout;
     @BindView(R.id.current_diet_swipe_refresh)
     SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.actual_diet_layout)
@@ -85,11 +83,9 @@ public class CurrentDietFragment extends Fragment {
         mViewModel.getCurrentDiet().observe(this, currentDiet -> {
             if (currentDiet == null) {
                 mPdfHolderLayout.setVisibility(View.GONE);
-                mNoCurrentDietLayout.setVisibility(View.VISIBLE);
                 mSwipeRefreshLayout.setEnabled(true);
             } else {
                 mSwipeRefreshLayout.setEnabled(false);
-                mNoCurrentDietLayout.setVisibility(View.GONE);
                 mPdfHolderLayout.setVisibility(View.VISIBLE);
                 switch (currentDiet.getFileStatus()) {
                     case DOWNLOADED:
@@ -119,18 +115,9 @@ public class CurrentDietFragment extends Fragment {
                 }
             }
         });
-        mViewModel.getRefreshingListStatus().
-
-                observe(this, isRefreshing ->
-
-                {
-                    mSwipeRefreshLayout.setRefreshing(isRefreshing != null && isRefreshing);
-                });
-        mSwipeRefreshLayout.setOnRefreshListener(() ->
-
-        {
-            mViewModel.refreshCurrentDiet();
-        });
+        mViewModel.getRefreshingListStatus().observe(this, isRefreshing ->
+                mSwipeRefreshLayout.setRefreshing(isRefreshing != null && isRefreshing));
+        mSwipeRefreshLayout.setOnRefreshListener(() -> mViewModel.refreshCurrentDiet());
     }
 
 

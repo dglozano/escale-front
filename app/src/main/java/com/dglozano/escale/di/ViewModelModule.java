@@ -7,6 +7,7 @@ import com.dglozano.escale.di.annotation.ViewModelKey;
 import com.dglozano.escale.ui.common.ChangePasswordActivityViewModel;
 import com.dglozano.escale.ui.login.LoginActivityViewModel;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
+import com.dglozano.escale.ui.main.diet.DietViewModel;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietViewModel;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivityViewModel;
 import com.dglozano.escale.ui.main.diet.all.AllDietsViewModel;
@@ -60,6 +61,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(CurrentDietViewModel.class)
     abstract ViewModel bindCurrentDietViewModel(CurrentDietViewModel currentDietViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(DietViewModel.class)
+    abstract ViewModel bindDietViewModel(DietViewModel dietViewModel);
 
     @Binds
     @IntoMap

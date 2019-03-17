@@ -11,13 +11,12 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.ToggleButton;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.repository.PatientRepository;
-import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
-import com.dglozano.escale.util.Constants;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
@@ -36,6 +35,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -57,6 +57,10 @@ public class StatsFragment extends Fragment {
     ToggleButton mShowFiltersToggle;
     @BindView(R.id.stats_filter_radio_group)
     RadioRealButtonGroup statsFilterRadioGroup;
+    @BindView(R.id.stats_main_container)
+    RelativeLayout mStatsContainer;
+    @BindView(R.id.no_stats_layout)
+    RelativeLayout mNoStatsLayout;
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -89,8 +93,13 @@ public class StatsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         mStatsViewModel.getChartEntries().observe(this, entriesList -> {
-            if(entriesList != null && !entriesList.isEmpty()) {
+            if (entriesList != null && !entriesList.isEmpty()) {
                 refreshChartEntries(entriesList);
+                mStatsContainer.setVisibility(View.VISIBLE);
+                mNoStatsLayout.setVisibility(View.GONE);
+            } else {
+                mNoStatsLayout.setVisibility(View.VISIBLE);
+                mStatsContainer.setVisibility(View.GONE);
             }
         });
 
@@ -106,41 +115,60 @@ public class StatsFragment extends Fragment {
     }
 
     private void refreshChartEntries(List<Entry> entriesList) {
-        LineDataSet dataSet = new LineDataSet(entriesList, mStatsViewModel.getSelectedStat().toString());
-        dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+
+        entriesList.sort(Comparator.comparingDouble(Entry::getX));
+
+        float dayInMilliseconds = 24 * 3600 * 1000;
+        float lastDate = entriesList.get(entriesList.size() - 1).getX();
+        float firstDate = lastDate - dayInMilliseconds * 10;
+
+        List<Entry> filteredList = entriesList.stream()
+                .filter(entry -> entry.getX() > firstDate)
+                .collect(Collectors.toList());
+
+        filteredList.add(0, new Entry(firstDate - dayInMilliseconds, filteredList.get(0).getY()));
+
+
+        LineDataSet dataSet = new LineDataSet(filteredList, mStatsViewModel.getSelectedStat().toString());
+        dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
         dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.colorTextDark));
-        dataSet.setCircleColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
-        dataSet.setCircleHoleRadius(1.5f);
-        dataSet.setValueTextSize(8f);
+        dataSet.setCircleColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+        dataSet.setFillColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+        dataSet.setFillAlpha(100);
+        dataSet.setDrawFilled(true);
+        dataSet.setCircleRadius(2.5f);
+        dataSet.setDrawCircleHole(false);
+        dataSet.setValueTextSize(10f);
         dataSet.setLineWidth(1.5f);
+        dataSet.setCubicIntensity(0.1f);
         dataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
         dataSet.setValueFormatter(new IValueFormatter() {
             @Override
             public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                return new DecimalFormat("###,###.##").format(value).replace(",", ".");
+                return new DecimalFormat("###,###.#").format(value).replace(",", ".");
             }
         });
 
         LineData lineData = new LineData(dataSet);
-
-        float dayInMilliseconds = 24 * 3600 * 1000;
-        float firstDate = entriesList.get(0).getX();
-        float lastDate = entriesList.get(entriesList.size() - 1).getX();
-        float daysAfterLast = Constants.BODY_MEASUREMENTS_DEFAULT_LIMIT + 1 - entriesList.size();
 
         float maxYValue = entriesList.stream().map(BaseEntry::getY).max(Comparator.comparing(Float::valueOf)).orElse(150f);
         float minYValue = entriesList.stream().map(BaseEntry::getY).min(Comparator.comparing(Float::valueOf)).orElse(0f);
         float axisMax = maxYValue + 1.5f * (maxYValue - (maxYValue + minYValue) / 2f);
         float axisMin = minYValue - 1.5f * (((maxYValue + minYValue) / 2f) - minYValue);
 
+        mLineChart.getXAxis().setAxisMinimum(lastDate - dayInMilliseconds * 10);
+        mLineChart.getXAxis().setAxisMaximum(lastDate + dayInMilliseconds * 3);
+
+        mLineChart.getAxisLeft().setAxisMaximum(axisMax == axisMin ? axisMax * 2 : axisMax);
+        mLineChart.getAxisLeft().setAxisMinimum(axisMin < 0 || axisMin == axisMax ? 0 : axisMin);
+        mLineChart.getAxisLeft().setSpaceBottom(0.0f);
+
         mLineChart.setData(lineData);
 
-        mLineChart.getXAxis().setAxisMinimum(firstDate - dayInMilliseconds);
-        mLineChart.getXAxis().setAxisMaximum(lastDate + dayInMilliseconds * daysAfterLast);
-        mLineChart.getAxisLeft().setAxisMaximum(axisMax == axisMin ? axisMax * 2 : axisMax );
-        mLineChart.getAxisLeft().setAxisMinimum(axisMin < 0 || axisMin == axisMax ? 0 : axisMin);
-
         mLineChart.notifyDataSetChanged();
+
+        mLineChart.getXAxis().setSpaceMax(50f);
+
         mLineChart.invalidate();
     }
 
@@ -157,6 +185,8 @@ public class StatsFragment extends Fragment {
         mLineChart.getXAxis().setAxisLineWidth(1.5f);
         mLineChart.getXAxis().setAxisLineColor(ContextCompat.getColor(getContext(), R.color.lightGray));
         mLineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        mLineChart.getXAxis().setDrawGridLines(true);
+        mLineChart.getXAxis().setCenterAxisLabels(true);
 
         mLineChart.getXAxis().setValueFormatter((value, axis) -> {
             Date d = new Date(Float.valueOf(value).longValue());
@@ -166,12 +196,17 @@ public class StatsFragment extends Fragment {
         mLineChart.getAxisLeft().setAxisLineWidth(1.5f);
         mLineChart.getAxisLeft().setAxisLineColor(ContextCompat.getColor(getContext(), R.color.lightGray));
         mLineChart.getAxisLeft().setDrawGridLines(false);
+        mLineChart.getAxisLeft().setEnabled(false);
 
         mLineChart.getAxisRight().setEnabled(false);
         mLineChart.getLegend().setEnabled(false);
-        mLineChart.setHighlightPerTapEnabled(false);
-        mLineChart.setHighlightPerDragEnabled(false);
-        mLineChart.invalidate();
+        mLineChart.setTouchEnabled(false);
+
+        mLineChart.setViewPortOffsets(0f, 0f, 0f, 75f);
+
+//        mLineChart.setHighlightPerTapEnabled(false);
+//        mLineChart.setHighlightPerDragEnabled(false);
+
     }
 
     @OnClick(R.id.toggle_show_filter_button)

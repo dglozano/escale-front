@@ -70,6 +70,9 @@ public class DietRepository {
         return mDietDao.getCurrenDietOfUserWithIdAsLiveData(loggedPatiendId);
     }
 
+    public LiveData<Integer> getDietsCountOfPatient(Long loggedPatiendId) {
+        return mDietDao.dietsCountOfPatient(loggedPatiendId);
+    }
 
     public Single<Integer> refreshDietsSingle(Long patientId) {
         return mEscaleRestApi.getDiets(patientId)

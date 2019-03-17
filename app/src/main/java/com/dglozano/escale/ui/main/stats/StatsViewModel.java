@@ -3,18 +3,21 @@ package com.dglozano.escale.ui.main.stats;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.ui.Event;
-import com.dglozano.escale.util.Constants;
 import com.github.mikephil.charting.data.Entry;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -50,9 +53,15 @@ public class StatsViewModel extends ViewModel {
         mSelectedStat = new MutableLiveData<>();
         mSelectedStat.postValue(WEIGHT);
 
-        mBodyMeasurementList = mMeasurementsRepository.getLastBodyMeasurementsOfUserWithId(
-                patientRepository.getLoggedPatiendId(),
-                Constants.BODY_MEASUREMENTS_DEFAULT_LIMIT);
+        mBodyMeasurementList = Transformations.switchMap(
+                mMeasurementsRepository.getLastBodyMeasurementOfUserWithId(mPatientRepository.getLoggedPatiendId()),
+                lastBodyMeasurement -> {
+                    Calendar cal = Calendar.getInstance();
+                    lastBodyMeasurement.ifPresent(bodyMeasurement -> cal.setTime(bodyMeasurement.getDate()));
+                    cal.add(Calendar.DATE, -10);
+                    return mMeasurementsRepository.getBodyMeasurementsOfUserWithIdSince(
+                            patientRepository.getLoggedPatiendId(), cal.getTime());
+                });
 
         mChartEntriesList = new MediatorLiveData<>();
         mChartEntriesList.addSource(mBodyMeasurementList, newList -> {
@@ -64,32 +73,45 @@ public class StatsViewModel extends ViewModel {
     }
 
     private List<Entry> getEntriesListFromMeasurement(List<BodyMeasurement> bodyMeasurements, StatFilter selectedFilter) {
-        List<Entry> list = bodyMeasurements == null ? Collections.emptyList() :
-                bodyMeasurements.stream()
-                        .map(bodyMeasurement -> {
-                            float yData = bodyMeasurement.getWeight();
-                            switch (selectedFilter) {
-                                case MUSCLE:
-                                    yData = bodyMeasurement.getMuscles();
-                                    break;
-                                case WATER:
-                                    yData = bodyMeasurement.getWater();
-                                    break;
-                                case BONES:
-                                    yData = bodyMeasurement.getBones();
-                                    break;
-                                case IMC:
-                                    yData = bodyMeasurement.getBmi();
-                                    break;
-                                case FAT:
-                                    yData = bodyMeasurement.getFat();
-                                    break;
-                            }
-                            return new Entry(bodyMeasurement.getDate().getTime(), yData);
-                        })
-                        .collect(Collectors.toList());
-        Collections.reverse(list);
-        return list;
+
+        if (bodyMeasurements == null) {
+            return Collections.emptyList();
+        } else {
+            SimpleDateFormat dayFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+            Map<String, List<BodyMeasurement>> groupedByDateMeasurements =
+                    bodyMeasurements.stream()
+                            .collect(Collectors.groupingBy(bodyMeasurement -> dayFormatter.format(bodyMeasurement.getDate())));
+
+            return groupedByDateMeasurements.keySet().stream()
+                    .map(groupedByDateMeasurements::get)
+                    .map(listOfMeasurementsInOneDay -> listOfMeasurementsInOneDay.get(0))
+                    .map(bodyMeasurement -> {
+                        float yData = bodyMeasurement.getWeight();
+                        switch (selectedFilter) {
+                            case MUSCLE:
+                                yData = bodyMeasurement.getMuscles();
+                                break;
+                            case WATER:
+                                yData = bodyMeasurement.getWater();
+                                break;
+                            case IMC:
+                                yData = bodyMeasurement.getBmi();
+                                break;
+                            case FAT:
+                                yData = bodyMeasurement.getFat();
+                                break;
+                        }
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(bodyMeasurement.getDate());
+                        cal.set(Calendar.HOUR_OF_DAY, 10);
+                        cal.set(Calendar.MINUTE, 0);
+                        cal.set(Calendar.SECOND, 0);
+                        cal.set(Calendar.MILLISECOND, 0);
+                        return new Entry(cal.getTime().getTime(), yData);
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
@@ -129,9 +151,8 @@ public class StatsViewModel extends ViewModel {
         WEIGHT(0),
         WATER(1),
         FAT(2),
-        BONES(3),
-        IMC(4),
-        MUSCLE(5);
+        IMC(3),
+        MUSCLE(4);
 
         private int value;
 

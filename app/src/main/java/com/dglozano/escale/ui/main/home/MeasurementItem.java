@@ -35,8 +35,6 @@ public class MeasurementItem {
                 df.format(bodyMeasurement.get().getWater()), Unit.PERCENTAGE) : "-";
         String fat = bodyMeasurement.isPresent() ? String.format("%s %s",
                 df.format(bodyMeasurement.get().getFat()), Unit.PERCENTAGE) : "-";
-        String bones = bodyMeasurement.isPresent() ? String.format("%s %s",
-                df.format(bodyMeasurement.get().getBones()), Unit.KG) : "-";
         String bmi = bodyMeasurement.isPresent() ? String.format("%s %s",
                 df.format(bodyMeasurement.get().getBmi()), Unit.NO_UNIT) : "-";
         String muscles = bodyMeasurement.isPresent() ? String.format("%s %s",
@@ -54,10 +52,6 @@ public class MeasurementItem {
                 ICON_RESOURCE_FAT,
                 fat,
                 MeasurementItem.MeasurementName.FAT));
-        measurementItemList.add(new MeasurementItem(
-                ICON_RESOURCE_BONES,
-                bones,
-                MeasurementItem.MeasurementName.BONES));
         measurementItemList.add(new MeasurementItem(
                 ICON_RESOURCE_BMI,
                 bmi,

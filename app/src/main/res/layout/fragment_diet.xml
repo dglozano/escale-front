@@ -8,22 +8,58 @@
     android:background="@color/almostWhite"
     tools:context="com.dglozano.escale.ui.main.diet.DietFragment">
 
-
-    <android.support.design.widget.TabLayout
-        android:id="@+id/diets_current_or_all_tablayout"
+    <RelativeLayout
+        android:id="@+id/no_diets_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:elevation="0dp"
-        app:tabIndicatorColor="@color/colorAccent"
-        app:tabMaxWidth="0dp"
-        app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/almostWhite"
-        app:tabTextColor="@color/disabledTabLightBlue" />
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:padding="@dimen/activity_vertical_margin_medium"
+        android:visibility="gone">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/diet_view_pager_tabs"
-        android:layout_below="@id/diets_current_or_all_tablayout"
+        <ImageView
+            android:id="@+id/no_diets_img"
+            android:layout_width="72dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_diet_empty_icon" />
+
+        <TextView
+            android:id="@+id/no_diets_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/no_diets_img"
+            android:layout_marginTop="@dimen/activity_vertical_margin_very_big"
+            android:text="@string/no_diets_text"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textColor="@color/colorTextDark" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/diets_main_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/diets_current_or_all_tablayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:elevation="10dp"
+            app:tabIndicatorColor="@color/colorAccent"
+            app:tabMaxWidth="0dp"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/almostWhite"
+            app:tabTextColor="@color/disabledTabLightBlue" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/diet_view_pager_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/diets_current_or_all_tablayout" />
+    </RelativeLayout>
+
 </RelativeLayout>

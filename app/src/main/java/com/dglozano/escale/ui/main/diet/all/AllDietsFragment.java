@@ -37,13 +37,9 @@ public class AllDietsFragment extends Fragment {
 
     @BindView(R.id.recycler_view_diets)
     RecyclerView mRecyclerViewDiets;
-    @BindView(R.id.diets_empty_layout)
-    RelativeLayout mDietsEmptyLayout;
     @BindView(R.id.diets_swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
 
-    @Inject
-    LinearLayoutManager mLayoutManager;
     @Inject
     AllDietsListAdapter mAllDietsListAdapter;
     @Inject
@@ -112,7 +108,7 @@ public class AllDietsFragment extends Fragment {
 
     private void setupRecyclerList() {
         mRecyclerViewDiets.setHasFixedSize(true);
-        mRecyclerViewDiets.setLayoutManager(mLayoutManager);
+        mRecyclerViewDiets.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerViewDiets.setItemAnimator(mDefaultItemAnimator);
         mRecyclerViewDiets.addItemDecoration(mDividerItemDecoration);
         mAllDietsListAdapter.setDietClickListener(diet -> mAllDietsViewModel.openOldDietFile(diet));
@@ -121,16 +117,6 @@ public class AllDietsFragment extends Fragment {
             if (diets != null) {
                 diets.forEach(diet -> Timber.d("Diet %s - Status %s", diet.getFileName(), diet.getFileStatus()));
                 mAllDietsListAdapter.setItems(diets);
-                if (diets.isEmpty()) {
-                    mRecyclerViewDiets.setVisibility(View.GONE);
-                    mDietsEmptyLayout.setVisibility(View.VISIBLE);
-                } else {
-                    mDietsEmptyLayout.setVisibility(View.GONE);
-                    mRecyclerViewDiets.setVisibility(View.VISIBLE);
-                }
-            } else {
-                mRecyclerViewDiets.setVisibility(View.GONE);
-                mDietsEmptyLayout.setVisibility(View.VISIBLE);
             }
         });
     }

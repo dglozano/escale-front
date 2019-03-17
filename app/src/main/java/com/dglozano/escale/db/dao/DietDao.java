@@ -26,7 +26,7 @@ public interface DietDao {
     LiveData<Diet> getCurrenDietOfUserWithIdAsLiveData(Long userId);
 
     @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC LIMIT 1")
-    Optional<Diet> getCurrenDietOfUserWithId(Long userId);
+    LiveData<Optional<Diet>> getCurrenDietOfUserWithIdLiveOptional(Long userId);
 
     @Query("SELECT * FROM Diet WHERE id == :id")
     Optional<Diet> getDietById(String id);
@@ -40,6 +40,10 @@ public interface DietDao {
 
     @Query("SELECT COUNT(*) FROM Diet WHERE id == :id")
     Integer dietExists(String id);
+
+
+    @Query("SELECT COUNT(*) FROM Diet WHERE userId == :userId")
+    LiveData<Integer> dietsCountOfPatient(Long userId);
 
     @Delete
     void deleteDiet(Diet diet);

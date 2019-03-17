@@ -27,6 +27,9 @@ public interface BodyMeasurementDao {
     @Query("SELECT * FROM BodyMeasurement WHERE userId == :userId ORDER BY date DESC LIMIT :limit")
     LiveData<List<BodyMeasurement>> getLastBodyMeasurementsOfUserWithId(Long userId, Integer limit);
 
+    @Query("SELECT * FROM BodyMeasurement WHERE userId == :userId AND date >= :since ORDER BY date DESC")
+    LiveData<List<BodyMeasurement>> getBodyMeasurementsOfUserWithIdSince(Long userId, Date since);
+
     @Query("SELECT * FROM BodyMeasurement WHERE userId == :userId ORDER BY date DESC LIMIT 1")
     LiveData<Optional<BodyMeasurement>> getLastBodyMeasurementOfUserWithIdOptional(Long userId);
 
@@ -44,4 +47,5 @@ public interface BodyMeasurementDao {
 
     @Delete
     void deleteBodyMeasurement(BodyMeasurement bodyMeasurement);
+
 }

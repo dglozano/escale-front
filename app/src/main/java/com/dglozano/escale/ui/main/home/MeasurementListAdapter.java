@@ -31,8 +31,6 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     Drawable waterIcon;
     @BindDrawable(R.drawable.home_ic_pizza_slice_colored)
     Drawable pizzaIcon;
-    @BindDrawable(R.drawable.home_ic_bone_colored)
-    Drawable boneIcon;
     @BindDrawable(R.drawable.home_ic_bmi_colored)
     Drawable bmiIcon;
     @BindDrawable(R.drawable.home_ic_muscle_colored)
@@ -79,9 +77,6 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
                     break;
                 case MeasurementItem.ICON_RESOURCE_FAT:
                     holder.mIconImageView.setImageDrawable(pizzaIcon);
-                    break;
-                case MeasurementItem.ICON_RESOURCE_BONES:
-                    holder.mIconImageView.setImageDrawable(boneIcon);
                     break;
                 case MeasurementItem.ICON_RESOURCE_BMI:
                     holder.mIconImageView.setImageDrawable(bmiIcon);

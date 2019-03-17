@@ -120,7 +120,7 @@ class CommunicationHelper {
         //TODO Read flags
         BodyMeasurement bodyMeasurement = parseWeightMeasurementFromHex(hexWeight);
         float fatPercentage = hexToDec(flipBytes(hexBody.substring(4, 8))) * 0.1f;
-        float bonesKg = 99f;
+        float bonesKg = 0f;
         float waterMass = hexToDec(flipBytes(hexBody.substring(20, 24))) * 0.005f;
         float musclesPercentage = hexToDec(flipBytes(hexBody.substring(12, 16))) * 0.1f;
 

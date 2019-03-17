@@ -168,51 +168,6 @@
                     android:layout_height="wrap_content">
 
                     <ImageView
-                        android:id="@+id/add_measurement_bones_image"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_margin="@dimen/activity_vertical_margin_small"
-                        android:src="@drawable/home_ic_bone_colored" />
-
-                    <android.support.design.widget.TextInputLayout
-                        android:id="@+id/add_measurement_bones_input_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/add_measurement_bones_unit"
-                        android:layout_toEndOf="@id/add_measurement_bones_image"
-                        app:errorEnabled="true"
-                        app:hintEnabled="true">
-
-                        <EditText
-                            android:id="@+id/add_measurement_bones_input"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/bones"
-                            android:inputType="numberDecimal"
-                            android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
-                            android:textColor="@color/colorTextBlack"
-                            android:textColorHint="@color/colorTextDark" />
-                    </android.support.design.widget.TextInputLayout>
-
-                    <TextView
-                        android:id="@+id/add_measurement_bones_unit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_margin="@dimen/activity_vertical_margin_small"
-                        android:text="kg." />
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
                         android:id="@+id/add_measurement_bmi_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
