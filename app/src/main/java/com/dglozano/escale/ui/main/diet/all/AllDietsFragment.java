@@ -17,10 +17,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivity;
 
 import javax.inject.Inject;
@@ -64,7 +62,7 @@ public class AllDietsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.sub_fragment_all_diets_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_diet_all, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
         return view;
     }

@@ -1,4 +1,4 @@
-package com.dglozano.escale.web;
+package com.dglozano.escale.web.services;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -6,10 +6,10 @@ import android.support.annotation.Nullable;
 
 import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.entity.Diet;
-import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.RootFileDirectory;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.FileUtil;
+import com.dglozano.escale.web.EscaleRestApi;
 
 import java.io.File;
 import java.util.Optional;

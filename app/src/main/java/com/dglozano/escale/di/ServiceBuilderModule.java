@@ -1,9 +1,9 @@
 package com.dglozano.escale.di;
 
 import com.dglozano.escale.ble.BleCommunicationService;
-import com.dglozano.escale.web.DownloadService;
-import com.dglozano.escale.web.FirebaseTokenSenderService;
-import com.dglozano.escale.web.MyFirebaseMessagingService;
+import com.dglozano.escale.web.services.DownloadService;
+import com.dglozano.escale.web.services.FirebaseTokenSenderService;
+import com.dglozano.escale.web.services.MyFirebaseMessagingService;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;

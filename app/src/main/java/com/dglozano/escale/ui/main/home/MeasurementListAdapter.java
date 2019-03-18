@@ -12,14 +12,12 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.ui.main.MainActivity;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindDrawable;
-import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -50,7 +48,7 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
     public MeasurementViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                     int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.measurement_row_item, parent, false);
+                .inflate(R.layout.row_item_measurement, parent, false);
 
         return new MeasurementViewHolder(itemView);
     }

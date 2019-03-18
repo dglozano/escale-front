@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.main.diet;
+package com.dglozano.escale.util.ui;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

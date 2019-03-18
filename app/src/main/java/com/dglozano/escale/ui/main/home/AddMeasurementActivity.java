@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityAddManualMeasurementBinding;
 import com.dglozano.escale.ui.BaseActivity;
-import com.dglozano.escale.ui.Event;
+import com.dglozano.escale.util.ui.Event;
 
 import java.util.Objects;
 

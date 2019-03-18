@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
 import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityLoginBinding;
 import com.dglozano.escale.ui.BaseActivity;
-import com.dglozano.escale.ui.Event;
+import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.web.EscaleRestApi;
 

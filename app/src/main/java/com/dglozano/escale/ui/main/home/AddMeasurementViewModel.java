@@ -7,7 +7,7 @@ import android.arch.lifecycle.ViewModel;
 import com.dglozano.escale.R;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.PatientRepository;
-import com.dglozano.escale.ui.Event;
+import com.dglozano.escale.util.ui.Event;
 
 import java.util.Arrays;
 import java.util.List;

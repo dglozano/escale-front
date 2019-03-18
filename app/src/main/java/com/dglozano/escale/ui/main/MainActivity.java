@@ -36,11 +36,13 @@ import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.common.ChangePasswordActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.diet.DietFragment;
-import com.dglozano.escale.ui.main.home.AddMeasurementActivity;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
-import com.dglozano.escale.web.FirebaseTokenSenderService;
+import com.dglozano.escale.ui.main.stats.chart.StatsChartFragment;
+import com.dglozano.escale.util.ui.BottomBarAdapter;
+import com.dglozano.escale.util.ui.NoSwipePager;
+import com.dglozano.escale.web.services.FirebaseTokenSenderService;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
@@ -50,7 +52,6 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;

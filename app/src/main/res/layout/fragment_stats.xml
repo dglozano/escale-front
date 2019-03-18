@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fragment_stats_id"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:background="@color/almostWhite">
 
     <RelativeLayout
@@ -41,132 +41,23 @@
         android:layout_height="match_parent"
         android:visibility="gone">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/expandable_filters_stats">
-
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/stats_line_chart"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@id/toggle_show_filter_button"
-                android:layout_marginBottom="@dimen/activity_vertical_margin_medium" />
-
-            <ToggleButton
-                android:id="@+id/toggle_show_filter_button"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/height_small"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
-                android:background="@drawable/login_button_rounded"
-                android:checked="true"
-                android:paddingStart="@dimen/padding_small"
-                android:paddingEnd="@dimen/padding_small"
-                android:textColor="@color/almostWhite"
-                android:textOff="@string/show_filter_stats"
-                android:textOn="@string/hide_filter_stats"
-                android:textStyle="bold" />
-
-        </RelativeLayout>
-
-        <net.cachapa.expandablelayout.ExpandableLayout
-            android:id="@+id/expandable_filters_stats"
+        <android.support.design.widget.TabLayout
+            android:id="@+id/stats_chart_or_list_tablayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/stats_shadow_radiogroup"
+            android:background="@color/colorPrimary"
             android:elevation="10dp"
-            app:el_duration="150"
-            app:el_expanded="true">
+            app:tabIndicatorColor="@color/colorAccent"
+            app:tabMaxWidth="0dp"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/almostWhite"
+            app:tabTextColor="@color/disabledTabLightBlue" />
 
-            <co.ceryle.radiorealbutton.RadioRealButtonGroup
-                android:id="@+id/stats_filter_radio_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:rrbg_animateDrawables_enter="overshoot"
-                app:rrbg_animateTexts_enter="overshoot"
-                app:rrbg_checkedPosition="0"
-                app:rrbg_dividerColor="#EEEEEE"
-                app:rrbg_dividerPadding="@dimen/padding_medium"
-                app:rrbg_dividerSize="1dp"
-                app:rrbg_selectorColor="@color/colorPrimaryLight"
-                app:rrbg_selectorSize="6dp">
-
-                <co.ceryle.radiorealbutton.RadioRealButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:rrb_drawable="@drawable/home_ic_scale_colored"
-                    app:rrb_drawableGravity="top"
-                    app:rrb_drawableHeight="18dp"
-                    app:rrb_drawablePadding="8dp"
-                    app:rrb_drawableWidth="18dp"
-                    app:rrb_ripple="true"
-                    app:rrb_rippleColor="@color/colorPrimaryLight"
-                    app:rrb_text="PESO"
-                    app:rrb_textColor="@color/colorTextDark"
-                    app:rrb_textSize="8sp" />
-
-                <co.ceryle.radiorealbutton.RadioRealButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:rrb_drawable="@drawable/home_ic_drop_colored"
-                    app:rrb_drawableGravity="top"
-                    app:rrb_drawableHeight="18dp"
-                    app:rrb_drawablePadding="8dp"
-                    app:rrb_drawableWidth="18dp"
-                    app:rrb_ripple="true"
-                    app:rrb_rippleColor="@color/colorPrimaryLight"
-                    app:rrb_text="AGUA"
-                    app:rrb_textColor="@color/colorTextDark"
-                    app:rrb_textSize="8sp" />
-
-                <co.ceryle.radiorealbutton.RadioRealButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:rrb_drawable="@drawable/home_ic_pizza_slice_colored"
-                    app:rrb_drawableGravity="top"
-                    app:rrb_drawableHeight="18dp"
-                    app:rrb_drawablePadding="8dp"
-                    app:rrb_drawableWidth="18dp"
-                    app:rrb_ripple="true"
-                    app:rrb_rippleColor="@color/colorPrimaryLight"
-                    app:rrb_text="GRASA"
-                    app:rrb_textColor="@color/colorTextDark"
-                    app:rrb_textSize="8sp" />
-
-                <co.ceryle.radiorealbutton.RadioRealButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:rrb_drawable="@drawable/home_ic_bmi_colored"
-                    app:rrb_drawableGravity="top"
-                    app:rrb_drawableHeight="18dp"
-                    app:rrb_drawablePadding="8dp"
-                    app:rrb_drawableWidth="18dp"
-                    app:rrb_ripple="true"
-                    app:rrb_rippleColor="@color/colorPrimaryLight"
-                    app:rrb_text="IMC"
-                    app:rrb_textColor="@color/colorTextDark"
-                    app:rrb_textSize="8sp" />
-
-                <co.ceryle.radiorealbutton.RadioRealButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:rrb_drawable="@drawable/home_ic_muscle_colored"
-                    app:rrb_drawableGravity="top"
-                    app:rrb_drawableHeight="18dp"
-                    app:rrb_drawablePadding="8dp"
-                    app:rrb_drawableWidth="18dp"
-                    app:rrb_ripple="true"
-                    app:rrb_rippleColor="@color/colorPrimaryLight"
-                    app:rrb_text="MÚSCULOS"
-                    app:rrb_textColor="@color/colorTextDark"
-                    app:rrb_textSize="8sp" />
-
-            </co.ceryle.radiorealbutton.RadioRealButtonGroup>
-        </net.cachapa.expandablelayout.ExpandableLayout>
-
+        <android.support.v4.view.ViewPager
+            android:id="@+id/stats_view_pager_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/stats_chart_or_list_tablayout" />
     </RelativeLayout>
 
 </RelativeLayout>

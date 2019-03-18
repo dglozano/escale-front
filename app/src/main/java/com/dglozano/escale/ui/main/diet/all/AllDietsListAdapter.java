@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.ui.main.MainActivity;
-import com.dglozano.escale.web.DownloadService;
+import com.dglozano.escale.web.services.DownloadService;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -62,7 +62,7 @@ public class AllDietsListAdapter extends RecyclerView.Adapter<AllDietsListAdapte
     public DietViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                              int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.diet_row_item, parent, false);
+                .inflate(R.layout.row_item_diet, parent, false);
         return new DietViewHolder(itemView, mClickListener);
     }
 

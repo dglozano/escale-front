@@ -12,7 +12,7 @@ import com.dglozano.escale.db.entity.ChatMessage;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.PatientRepository;
-import com.dglozano.escale.ui.Event;
+import com.dglozano.escale.util.ui.Event;
 
 import java.util.List;
 import java.util.stream.Collectors;

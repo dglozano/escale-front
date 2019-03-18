@@ -1,25 +1,17 @@
-package com.dglozano.escale.web;
+package com.dglozano.escale.web.services;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 
-import com.dglozano.escale.db.dao.DietDao;
-import com.dglozano.escale.db.entity.Diet;
-import com.dglozano.escale.di.annotation.RootFileDirectory;
-import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
-import com.dglozano.escale.util.FileUtil;
+import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.FirebaseTokenUpdateDTO;
-
-import java.io.File;
-import java.util.Optional;
 
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import timber.log.Timber;

@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.main.diet;
+package com.dglozano.escale.util.ui;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,12 +9,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class DietTabAdapter extends FragmentPagerAdapter {
+public class MyTabAdapter extends FragmentPagerAdapter {
     private final List<Fragment> mFragmentList = new ArrayList<>();
     private final List<String> mFragmentTitleList = new ArrayList<>();
 
     @Inject
-    public DietTabAdapter(FragmentManager manager) {
+    public MyTabAdapter(FragmentManager manager) {
         super(manager);
     }
 

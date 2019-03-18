@@ -15,7 +15,9 @@ import com.dglozano.escale.ui.main.home.AddMeasurementActivity;
 import com.dglozano.escale.ui.main.home.AddMeasurementModule;
 import com.dglozano.escale.ui.main.home.HomeFragmentProvider;
 import com.dglozano.escale.ui.main.messages.MessagesProvider;
-import com.dglozano.escale.ui.main.stats.StatsProvider;
+import com.dglozano.escale.ui.main.stats.StatsFragmentProvider;
+import com.dglozano.escale.ui.main.stats.chart.StatsChartProvider;
+import com.dglozano.escale.ui.main.stats.list.StatsListProvider;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
@@ -26,11 +28,13 @@ public abstract class ActivityBuilder {
     @ContributesAndroidInjector(modules = {
             MainActivityModule.class,
             HomeFragmentProvider.class,
+            StatsFragmentProvider.class,
+            StatsChartProvider.class,
+            StatsListProvider.class,
             DietFragmentProvider.class,
             AllDietsProvider.class,
             CurrentDietProvider.class,
-            MessagesProvider.class,
-            StatsProvider.class
+            MessagesProvider.class
     })
     public abstract MainActivity bindMainActivity();
 

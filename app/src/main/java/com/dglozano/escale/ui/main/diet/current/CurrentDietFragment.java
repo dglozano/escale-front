@@ -17,8 +17,8 @@ import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Diet;
-import com.dglozano.escale.ui.main.diet.CustomPdfScrollHandle;
-import com.dglozano.escale.web.DownloadService;
+import com.dglozano.escale.util.ui.CustomPdfScrollHandle;
+import com.dglozano.escale.web.services.DownloadService;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
 
@@ -60,7 +60,7 @@ public class CurrentDietFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.sub_fragment_actual_diet, container, false);
+        View view = inflater.inflate(R.layout.fragment_diet_current, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
         return view;
     }

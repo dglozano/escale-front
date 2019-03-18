@@ -9,7 +9,7 @@ import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.exception.DietDownloadStateException;
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
-import com.dglozano.escale.ui.Event;
+import com.dglozano.escale.util.ui.Event;
 
 import java.io.File;
 import java.util.List;

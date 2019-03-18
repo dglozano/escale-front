@@ -7,22 +7,19 @@ import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.content.SharedPreferences;
 
-import com.dglozano.escale.R;
-import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
-import com.dglozano.escale.ui.Event;
 import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.ui.Event;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import javax.inject.Inject;
 
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -43,6 +40,7 @@ public class MainActivityViewModel extends ViewModel {
     private final MutableLiveData<Event<Integer>> mErrorEvent;
     private MediatorLiveData<Boolean> mShowAppBarShadow;
     private LiveData<Boolean> mAreDietsEmpty;
+    private LiveData<Boolean> mAreMeasurementsEmpty;
     private MediatorLiveData<Boolean> mIsRefreshing;
     private MutableLiveData<Boolean> mIsRefreshingDiets;
     private MutableLiveData<Boolean> mIsRefreshingMessages;
@@ -76,30 +74,35 @@ public class MainActivityViewModel extends ViewModel {
         mAreDietsEmpty = Transformations.map(mDietRepository.getCurrentDiet(
                 mPatientRepository.getLoggedPatiendId()),
                 Objects::isNull);
+        mAreMeasurementsEmpty = Transformations.map(
+                mMeasurementRepository.getLastBodyMeasurementOfUserWithId(
+                        mPatientRepository.getLoggedPatiendId()), measurement -> !measurement.isPresent());
         mShowAppBarShadow.addSource(mAreDietsEmpty, dietsEmpty -> {
-            Timber.d("Diets empty %s", dietsEmpty);
-            if(dietsEmpty != null && !dietsEmpty){
-                if(positionOfCurrentFragment.getValue() != null
-                        && positionOfCurrentFragment.getValue() == 2) {
-                    mShowAppBarShadow.postValue(false);
-                } else {
-                    mShowAppBarShadow.postValue(true);
-                }
-            } else {
-                mShowAppBarShadow.postValue(true);
-            }
+            checkEmptyStateAndFragmentPosition();
+        });
+        mShowAppBarShadow.addSource(mAreMeasurementsEmpty, measurementEmpty -> {
+            checkEmptyStateAndFragmentPosition();
         });
         mShowAppBarShadow.addSource(positionOfCurrentFragment, positionFragment -> {
-            if(mAreDietsEmpty.getValue() != null && !mAreDietsEmpty.getValue()){
-                if(positionFragment != null && positionFragment == 2) {
-                    mShowAppBarShadow.postValue(false);
-                } else {
-                    mShowAppBarShadow.postValue(true);
-                }
-            } else {
-                mShowAppBarShadow.postValue(true);
-            }
+            checkEmptyStateAndFragmentPosition();
         });
+    }
+
+    private void checkEmptyStateAndFragmentPosition() {
+        boolean dietsNotEmpty = mAreDietsEmpty.getValue() != null && !mAreDietsEmpty.getValue();
+        boolean measurementsNotEmpty = mAreMeasurementsEmpty.getValue() != null
+                && !mAreMeasurementsEmpty.getValue();
+        boolean fragmentPositionDiets = positionOfCurrentFragment.getValue() != null
+                && positionOfCurrentFragment.getValue() == 2;
+        boolean fragmentPositionMeasurement = positionOfCurrentFragment.getValue() != null
+                && positionOfCurrentFragment.getValue() == 1;
+        if (dietsNotEmpty && fragmentPositionDiets) {
+            mShowAppBarShadow.postValue(false);
+        } else if (measurementsNotEmpty && fragmentPositionMeasurement) {
+            mShowAppBarShadow.postValue(false);
+        } else {
+            mShowAppBarShadow.postValue(true);
+        }
     }
 
     public void refreshData() {

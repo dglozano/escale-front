@@ -1,4 +1,4 @@
-package com.dglozano.escale.web;
+package com.dglozano.escale.util;
 
 import android.support.annotation.NonNull;
 

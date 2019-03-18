@@ -8,16 +8,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.ui.main.MainActivity;
+import com.dglozano.escale.util.ui.MyTabAdapter;
 import com.dglozano.escale.ui.main.diet.all.AllDietsFragment;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietFragment;
 
@@ -43,7 +41,7 @@ public class DietFragment extends Fragment {
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
     @Inject
-    DietTabAdapter mTabsAdapter;
+    MyTabAdapter mTabsAdapter;
 
     private Unbinder mViewUnbinder;
     private DietViewModel mDietViewModel;

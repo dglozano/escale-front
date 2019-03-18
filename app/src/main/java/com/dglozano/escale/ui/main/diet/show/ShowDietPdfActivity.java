@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.ui.main.diet.CustomPdfScrollHandle;
+import com.dglozano.escale.util.ui.CustomPdfScrollHandle;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
 

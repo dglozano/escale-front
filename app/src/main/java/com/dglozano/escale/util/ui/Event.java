@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui;
+package com.dglozano.escale.util.ui;
 
 public class Event<T> {
 

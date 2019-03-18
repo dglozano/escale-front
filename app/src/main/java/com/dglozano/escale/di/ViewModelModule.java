@@ -15,6 +15,8 @@ import com.dglozano.escale.ui.main.home.AddMeasurementViewModel;
 import com.dglozano.escale.ui.main.home.HomeViewModel;
 import com.dglozano.escale.ui.main.messages.MessagesViewModel;
 import com.dglozano.escale.ui.main.stats.StatsViewModel;
+import com.dglozano.escale.ui.main.stats.chart.StatsChartViewModel;
+import com.dglozano.escale.ui.main.stats.list.StatsListViewModel;
 
 import dagger.Binds;
 import dagger.Module;
@@ -54,8 +56,18 @@ public abstract class ViewModelModule {
 
     @Binds
     @IntoMap
+    @ViewModelKey(StatsChartViewModel.class)
+    abstract ViewModel bindStatsChartViewModel(StatsChartViewModel statsChartViewModel);
+
+    @Binds
+    @IntoMap
     @ViewModelKey(StatsViewModel.class)
     abstract ViewModel bindStatsViewModel(StatsViewModel statsViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(StatsListViewModel.class)
+    abstract ViewModel bindStatsListViewModel(StatsListViewModel statsListViewModel);
 
     @Binds
     @IntoMap

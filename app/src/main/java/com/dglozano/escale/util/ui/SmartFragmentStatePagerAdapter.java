@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.main;
+package com.dglozano.escale.util.ui;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;

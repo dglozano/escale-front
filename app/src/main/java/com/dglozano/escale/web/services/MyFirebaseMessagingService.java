@@ -1,4 +1,4 @@
-package com.dglozano.escale.web;
+package com.dglozano.escale.web.services;
 
 import android.content.SharedPreferences;
 

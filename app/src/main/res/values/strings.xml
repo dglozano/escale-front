@@ -97,6 +97,8 @@
     <string name="add_measurement_empty_error">Este campo no puede estar vacío</string>
     <string name="home_step_on_scale">Sáquese zapatillas y medias, súbase a la balanza y espere a que termine la medición.</string>
     <string name="no_stats_text">Aún no tienes pesajes. Ve a la pantalla inicial para agregar tu primer pesaje.</string>
+    <string name="list_stats_title">Lista</string>
+    <string name="chart_stats_title">Gráfico</string>
 
     WEIGHT("Peso"),
     BMI("IMC"),
