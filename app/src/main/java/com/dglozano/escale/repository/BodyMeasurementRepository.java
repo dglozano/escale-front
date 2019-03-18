@@ -64,7 +64,7 @@ public class BodyMeasurementRepository {
                 });
     }
 
-    public Single<Long> addMeasurement(float weight, float water, float fat, float bmi,  float bones, float muscle) {
+    public Single<Long> addMeasurement(float weight, float water, float fat, float bmi, float bones, float muscle) {
         Long patientId = mPatientRepository.getLoggedPatiendId();
         AddBodyMeasurementDTO addDto = new AddBodyMeasurementDTO(patientId, weight, water,
                 fat, bmi, bones, muscle, Calendar.getInstance().getTime());
@@ -81,5 +81,9 @@ public class BodyMeasurementRepository {
                 bodyMeasurement.getBmi(),
                 bodyMeasurement.getBones(),
                 bodyMeasurement.getMuscles());
+    }
+
+    public LiveData<List<BodyMeasurement>> getLastBodyMeasurementsOfUserWithId(Long loggedPatiendId) {
+        return mBodyMeasurementDao.getLastBodyMeasurementsOfUserWithId(loggedPatiendId, BODY_MEASUREMENTS_DEFAULT_LIMIT);
     }
 }

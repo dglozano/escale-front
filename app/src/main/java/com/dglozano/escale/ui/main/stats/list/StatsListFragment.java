@@ -7,6 +7,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +20,7 @@ import com.dglozano.escale.ui.main.MainActivityViewModel;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
@@ -23,8 +28,17 @@ import timber.log.Timber;
 
 public class StatsListFragment extends Fragment {
 
+    @BindView(R.id.stats_list_recycler_view)
+    RecyclerView mRecyclerView;
+
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
+    @Inject
+    StatsListAdapter mStatsAdapter;
+    @Inject
+    DefaultItemAnimator mDefaultItemAnimator;
+    @Inject
+    DividerItemDecoration mDividerItemDecoration;
 
     private Unbinder mViewUnbinder;
     private MainActivityViewModel mMainActivityViewModel;
@@ -50,22 +64,16 @@ public class StatsListFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-//        mStatsListViewModel.getChartEntries().observe(this, entriesList -> {
-//            if (entriesList != null && !entriesList.isEmpty()) {
-//                refreshChartEntries(entriesList);
-//            }
-//        });
-//
-//        mStatsChartViewModel.getFilterExpansionState().observe(this, expanded -> {
-//            mFiltersExpandable.setExpanded(expanded == null ? true : expanded);
-//        });
-//
-//        statsFilterRadioGroup.setOnClickedButtonListener((button, position) -> {
-//            mStatsChartViewModel.setSelectedStat(position);
-//        });
-//
-//        setupLineChart();
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(mDefaultItemAnimator);
+        mRecyclerView.addItemDecoration(mDividerItemDecoration);
+        mRecyclerView.setAdapter(mStatsAdapter);
+        mStatsListViewModel.getStatsOfLoggedUser().observe(this, stats -> {
+            if (stats != null) {
+                mStatsAdapter.setItems(stats);
+            }
+        });
     }
 
     @Override
@@ -86,6 +94,11 @@ public class StatsListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
         mStatsListViewModel = ViewModelProviders.of(this, mViewModelFactory).get(StatsListViewModel.class);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 }

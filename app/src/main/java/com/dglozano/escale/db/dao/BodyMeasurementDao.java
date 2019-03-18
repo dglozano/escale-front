@@ -47,5 +47,4 @@ public interface BodyMeasurementDao {
 
     @Delete
     void deleteBodyMeasurement(BodyMeasurement bodyMeasurement);
-
 }

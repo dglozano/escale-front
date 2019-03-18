@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ui.main.MainActivity;
+import com.dglozano.escale.util.ui.MeasurementItem;
 
 import java.util.ArrayList;
 import java.util.List;

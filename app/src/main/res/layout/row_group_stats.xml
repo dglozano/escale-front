@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/almostWhite">
+
+    <RelativeLayout
+        android:id="@+id/stats_group_container"
+        android:paddingTop="@dimen/activity_vertical_margin_medium"
+        android:paddingBottom="@dimen/activity_vertical_margin_medium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/measurement_group_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:text="Miércoles 20/12/19 a las 15:30hs"
+            android:textAppearance="@android:style/TextAppearance.Material.Small"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/measurement_group_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:src="@drawable/ic_stats_arrow_up"/>
+
+    </RelativeLayout>
+
+
+
+    <net.cachapa.expandablelayout.ExpandableLayout
+        android:id="@+id/measurement_group_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/stats_group_container"
+        app:el_duration="250"
+        app:el_expanded="false">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/measurement_item_weight_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/almostWhite"
+                android:paddingTop="@dimen/activity_vertical_margin_small"
+                android:paddingBottom="@dimen/activity_vertical_margin_small">
+
+                <ImageView
+                    android:id="@+id/measurement_item_weight_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_vertical_margin_double"
+                    app:srcCompat="@drawable/home_ic_scale_colored" />
+
+                <TextView
+                    android:id="@+id/measurement_item_weight_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/measurement_item_weight_icon"
+                    android:text="@string/weight"
+                    android:textAppearance="@android:style/TextAppearance.Material"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/measurement_item_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:text="28"
+                    android:textAppearance="@android:style/TextAppearance.Material"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/measurement_item_water_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/almostWhite"
+                android:paddingTop="@dimen/activity_vertical_margin_small"
+                android:paddingBottom="@dimen/activity_vertical_margin_small">
+
+                <ImageView
+                    android:id="@+id/measurement_item_water_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_vertical_margin_double"
+                    app:srcCompat="@drawable/home_ic_drop_colored" />
+
+                <TextView
+                    android:id="@+id/measurement_item_water_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/measurement_item_water_icon"
+                    android:text="@string/water"
+                    android:textAppearance="@android:style/TextAppearance.Material"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/measurement_item_water"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:text="28"
+                    android:textAppearance="@android:style/TextAppearance.Material"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/measurement_item_fat_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/almostWhite"
+                android:paddingTop="@dimen/activity_vertical_margin_small"
+                android:paddingBottom="@dimen/activity_vertical_margin_small">
+
+                <ImageView
+                    android:id="@+id/measurement_item_fat_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_vertical_margin_double"
+                    app:srcCompat="@drawable/home_ic_pizza_slice_colored" />
+
+                <TextView
+                    android:id="@+id/measurement_item_fat_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/measurement_item_fat_icon"
+                    android:text="@string/fat"
+                    android:textAppearance="@android:style/TextAppearance.Material"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/measurement_item_fat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:text="28"
+                    android:textAppearance="@android:style/TextAppearance.Material"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/measurement_item_bmi_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/almostWhite"
+                android:paddingTop="@dimen/activity_vertical_margin_small"
+                android:paddingBottom="@dimen/activity_vertical_margin_small">
+
+                <ImageView
+                    android:id="@+id/measurement_item_bmi_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_vertical_margin_double"
+                    app:srcCompat="@drawable/home_ic_bmi_colored" />
+
+                <TextView
+                    android:id="@+id/measurement_item_bmi_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/measurement_item_bmi_icon"
+                    android:text="@string/imc"
+                    android:textAppearance="@android:style/TextAppearance.Material"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/measurement_item_bmi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:text="28"
+                    android:textAppearance="@android:style/TextAppearance.Material"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/measurement_item_muscle_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/almostWhite"
+                android:paddingTop="@dimen/activity_vertical_margin_small"
+                android:paddingBottom="@dimen/activity_vertical_margin_small">
+
+                <ImageView
+                    android:id="@+id/measurement_item_muscle_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_vertical_margin_double"
+                    app:srcCompat="@drawable/home_ic_muscle_colored" />
+
+                <TextView
+                    android:id="@+id/measurement_item_muscle_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/measurement_item_muscle_icon"
+                    android:text="@string/muscles"
+                    android:textAppearance="@android:style/TextAppearance.Material"
+                    android:textColor="@color/colorTextDark"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/measurement_item_muscle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:text="28"
+                    android:textAppearance="@android:style/TextAppearance.Material"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+        </LinearLayout>
+
+    </net.cachapa.expandablelayout.ExpandableLayout>
+</RelativeLayout>

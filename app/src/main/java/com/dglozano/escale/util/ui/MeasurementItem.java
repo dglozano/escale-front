@@ -1,4 +1,7 @@
-package com.dglozano.escale.ui.main.home;
+package com.dglozano.escale.util.ui;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.dglozano.escale.db.entity.BodyMeasurement;
 
@@ -7,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class MeasurementItem {
+public class MeasurementItem implements Parcelable {
 
-    static final int ICON_RESOURCE_WEIGHT = 1;
-    static final int ICON_RESOURCE_WATER = 2;
-    static final int ICON_RESOURCE_FAT = 3;
+    public static final int ICON_RESOURCE_WEIGHT = 1;
+    public static final int ICON_RESOURCE_WATER = 2;
+    public static final int ICON_RESOURCE_FAT = 3;
     static final int ICON_RESOURCE_BONES = 4;
-    static final int ICON_RESOURCE_BMI = 5;
-    static final int ICON_RESOURCE_MUSCLES = 6;
+    public static final int ICON_RESOURCE_BMI = 5;
+    public static final int ICON_RESOURCE_MUSCLES = 6;
 
     private int iconResource;
     private String formattedValue;
@@ -26,7 +29,7 @@ public class MeasurementItem {
         this.name = name;
     }
 
-    static List<MeasurementItem> getMeasurementList(Optional<BodyMeasurement> bodyMeasurement) {
+    public static List<MeasurementItem> getMeasurementList(Optional<BodyMeasurement> bodyMeasurement) {
         DecimalFormat df = new DecimalFormat("###,###.##");
         List<MeasurementItem> measurementItemList = new ArrayList<>();
         String weight = bodyMeasurement.isPresent() ? String.format("%s %s",
@@ -63,7 +66,7 @@ public class MeasurementItem {
         return measurementItemList;
     }
 
-    int getIconResource() {
+    public int getIconResource() {
         return iconResource;
     }
 
@@ -81,6 +84,16 @@ public class MeasurementItem {
 
     public void setName(MeasurementName name) {
         this.name = name;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
     }
 
     public enum MeasurementName {

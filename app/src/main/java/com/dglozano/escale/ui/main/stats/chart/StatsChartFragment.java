@@ -214,6 +214,11 @@ public class StatsChartFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
         mStatsChartViewModel = ViewModelProviders.of(this, mViewModelFactory).get(StatsChartViewModel.class);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 }

@@ -18,8 +18,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -30,12 +28,12 @@ import android.widget.Toast;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BleCommunicationService;
-import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.LocationPermission;
+import com.dglozano.escale.util.ui.MeasurementItem;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -185,6 +183,11 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
         mHomeViewModel = ViewModelProviders.of(this, mViewModelFactory).get(HomeViewModel.class);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 
