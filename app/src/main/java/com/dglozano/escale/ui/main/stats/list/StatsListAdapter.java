@@ -1,5 +1,8 @@
 package com.dglozano.escale.ui.main.stats.list;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +26,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import butterknife.BindColor;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,6 +38,10 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
     Drawable arrowDown;
     @BindDrawable(R.drawable.ic_stats_arrow_up)
     Drawable arrowUp;
+    @BindColor(R.color.almostWhite)
+    int almostWhite;
+    @BindColor(android.R.color.white)
+    int white;
 
     private static final int UNSELECTED = -1;
 
@@ -92,6 +100,17 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
 
         holder.measurementArrow.setImageDrawable(isSelected ? arrowDown : arrowUp);
         holder.measurementListExpandable.setExpanded(isSelected, false);
+
+        animateBackgroundColorChange(holder, isSelected);
+    }
+
+    private void animateBackgroundColorChange(@NonNull BodyMeasurementViewHolder holder, boolean isSelected) {
+        ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(),
+                ((ColorDrawable)holder.itemView.getBackground()).getColor(), isSelected ? white : almostWhite);
+        colorAnimation.setDuration(200); // milliseconds
+        colorAnimation.addUpdateListener(animator ->
+                holder.itemView.setBackgroundColor((int) animator.getAnimatedValue()));
+        colorAnimation.start();
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -125,7 +144,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
             super(v);
             ButterKnife.bind(this, v);
 
-            measurementListExpandable.setInterpolator(new OvershootInterpolator());
+            measurementListExpandable.setInterpolator(new OvershootInterpolator(0.0f));
             measurementListExpandable.setOnExpansionUpdateListener(this);
 
             v.setOnClickListener(this);
@@ -137,15 +156,18 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
             if (holder != null) {
                 holder.measurementArrow.setImageDrawable(arrowUp);
                 holder.measurementListExpandable.collapse();
+                animateBackgroundColorChange(holder, false);
             }
 
             int position = getAdapterPosition();
             if (position == mExpandedPosition) {
                 mExpandedPosition = UNSELECTED;
+                animateBackgroundColorChange(this, false);
             } else {
                 measurementArrow.setImageDrawable(arrowDown);
                 measurementListExpandable.expand();
                 mExpandedPosition = position;
+                animateBackgroundColorChange(this, true);
             }
         }
 

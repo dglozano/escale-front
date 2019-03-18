@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -55,6 +56,18 @@ public class StatsChartFragment extends Fragment {
     ExpandableLayout mFiltersExpandable;
     @BindView(R.id.stats_filter_radio_group)
     RadioRealButtonGroup statsFilterRadioGroup;
+    @BindColor(R.color.colorAccent)
+    int colorAccent;
+    @BindColor(R.color.colorTextDark)
+    int textDark;
+    @BindColor(R.color.colorTextBlack)
+    int textBlack;
+    @BindColor(R.color.lightGray)
+    int lightGray;
+    @BindColor(R.color.lightGrayTransparent)
+    int lightGrayTransparent;
+    @BindColor(android.R.color.white)
+    int white;
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -115,15 +128,15 @@ public class StatsChartFragment extends Fragment {
                 .filter(entry -> entry.getX() > firstDate)
                 .collect(Collectors.toList());
 
-        filteredList.add(0, new Entry(firstDate - dayInMilliseconds, filteredList.get(0).getY()));
+        float xAxisMin = filteredList.get(0).getX() - dayInMilliseconds;
+        float xAxisMax = filteredList.get(filteredList.size() - 1).getX() + 2 * dayInMilliseconds;
+
+        filteredList.add(0, new Entry(firstDate - dayInMilliseconds * 2, filteredList.get(0).getY()));
 
         LineDataSet dataSet = new LineDataSet(filteredList, mStatsChartViewModel.getSelectedStat().toString());
-        dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
-        dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.colorTextDark));
-        dataSet.setCircleColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
-        dataSet.setFillColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
-        dataSet.setFillAlpha(60);
-        dataSet.setDrawFilled(true);
+        dataSet.setColor(colorAccent);
+        dataSet.setValueTextColor(textDark);
+        dataSet.setCircleColor(colorAccent);
         dataSet.setCircleRadius(2.5f);
         dataSet.setDrawCircleHole(false);
         dataSet.setValueTextSize(10f);
@@ -140,11 +153,11 @@ public class StatsChartFragment extends Fragment {
 
         float maxYValue = entriesList.stream().map(BaseEntry::getY).max(Comparator.comparing(Float::valueOf)).orElse(150f);
         float minYValue = entriesList.stream().map(BaseEntry::getY).min(Comparator.comparing(Float::valueOf)).orElse(0f);
-        float axisMax = maxYValue + 1.5f * (maxYValue - (maxYValue + minYValue) / 2f);
-        float axisMin = minYValue - 1.5f * (((maxYValue + minYValue) / 2f) - minYValue);
+        float axisMax = maxYValue + 2f * (maxYValue - (maxYValue + minYValue) / 2f);
+        float axisMin = minYValue - 2f * (((maxYValue + minYValue) / 2f) - minYValue);
 
-        mLineChart.getXAxis().setAxisMinimum(lastDate - dayInMilliseconds * 10);
-        mLineChart.getXAxis().setAxisMaximum(lastDate + dayInMilliseconds * 3);
+        mLineChart.getXAxis().setAxisMinimum(xAxisMin);
+        mLineChart.getXAxis().setAxisMaximum(xAxisMax);
         mLineChart.getXAxis().setCenterAxisLabels(true);
         mLineChart.getXAxis().setLabelCount(6, true);
 
@@ -161,7 +174,6 @@ public class StatsChartFragment extends Fragment {
 
     private void setupLineChart() {
         mLineChart.setNoDataText("");
-        mLineChart.setNoDataTextColor(ContextCompat.getColor(getContext(), R.color.lightGray));
 
         Description description = new Description();
         description.setText("");
@@ -170,8 +182,9 @@ public class StatsChartFragment extends Fragment {
         mLineChart.getXAxis().setDrawGridLines(false);
         mLineChart.getXAxis().setLabelRotationAngle(-30f);
         mLineChart.getXAxis().setAxisLineWidth(1.5f);
-        mLineChart.getXAxis().setAxisLineColor(ContextCompat.getColor(getContext(), R.color.lightGray));
+        mLineChart.getXAxis().setAxisLineColor(lightGray);
         mLineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        mLineChart.getXAxis().setGridColor(lightGrayTransparent);
         mLineChart.getXAxis().setDrawGridLines(true);
 
         mLineChart.getXAxis().setValueFormatter((value, axis) -> {
@@ -180,7 +193,7 @@ public class StatsChartFragment extends Fragment {
         });
 
         mLineChart.getAxisLeft().setAxisLineWidth(1.5f);
-        mLineChart.getAxisLeft().setAxisLineColor(ContextCompat.getColor(getContext(), R.color.lightGray));
+        mLineChart.getAxisLeft().setAxisLineColor(lightGray);
         mLineChart.getAxisLeft().setDrawGridLines(false);
         mLineChart.getAxisLeft().setEnabled(false);
 
@@ -188,7 +201,9 @@ public class StatsChartFragment extends Fragment {
         mLineChart.getLegend().setEnabled(false);
         mLineChart.setTouchEnabled(false);
 
-        mLineChart.setViewPortOffsets(0f, 0f, 0f, 75f);
+        mLineChart.setGridBackgroundColor(white);
+
+        mLineChart.setViewPortOffsets(0f, 0f, 0f, 80f);
     }
 
     @OnClick(R.id.toggle_show_filter_button)

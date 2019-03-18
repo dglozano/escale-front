@@ -15,5 +15,5 @@
     <dimen name="radius">6dp</dimen>
     <dimen name="radius_medium">10dp</dimen>
     <dimen name="radius_full">50dp</dimen>
-    <dimen name="activity_vertical_margin_double">32dp</dimen>
+    <dimen name="margin_horizontal_indent_stats_list">36dp</dimen>
 </resources>
