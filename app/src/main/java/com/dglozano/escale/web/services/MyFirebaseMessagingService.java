@@ -106,7 +106,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .subscribe(() -> {
                             Timber.d("Received diet from firebase and saved successfully");
                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putBoolean(Constants.HAS_NEW_UNREAD_DIET, true);
+                            editor.putBoolean(Constants.HAS_NEW_UNREAD_DIET_SHARED_PREF, true);
                             editor.apply();
                         },
                         Timber::e)

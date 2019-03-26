@@ -1,6 +1,5 @@
 package com.dglozano.escale.repository;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.content.SharedPreferences;
 
@@ -29,7 +28,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ApplicationScope
@@ -55,7 +53,7 @@ public class DietRepository {
         mAppExecutors = appExecutors;
         mHasNewUnseenDiets = new SharedPreferencesLiveData.SharedPreferenceBooleanLiveData(
                 mSharedPreferences,
-                Constants.HAS_NEW_UNREAD_DIET, false);
+                Constants.HAS_NEW_UNREAD_DIET_SHARED_PREF, false);
     }
 
     public LiveData<Boolean> getHasUnseenNewDiets() {

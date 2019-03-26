@@ -14,6 +14,7 @@ public class Constants {
     public static final String CREATING_USER = "Creando usuario";
     public static final String SETTING_USER_DATA = "Seteando datos del usuario";
     public static final String LOGGING_IN = "Logueando usuario";
+    public static final String RECONNECTING = "Refrescando conexión";
 
     // Scale name
     public static final String BF600 = "BF600";
@@ -35,7 +36,7 @@ public class Constants {
 
     // Web
     public static final String BASE_HEROKU_URL = "https://escale-api.herokuapp.com/api/";
-    public static final String BASE_LOCALHOST_URL = "http://192.168.0.65:8080/api/";
+    public static final String BASE_LOCALHOST_URL = "http://192.168.0.3:8080/api/";
     public static final int FRESH_TIMEOUT = 30;
     public static final String TOKEN_HEADER_KEY = "token";
     public static final String REFRESH_TOKEN_HEADER_KEY = "refreshToken";
@@ -49,7 +50,9 @@ public class Constants {
     public static final String TOKEN_SHARED_PREF = "token";
     public static final String REFRESH_TOKEN_SHARED_PREF = "refreshToken";
     public static final String UNREAD_MESSAGES_SHARED_PREF = "unreadMessages";
-    public static final String HAS_NEW_UNREAD_DIET = "unseenDiets";
+    public static final String HAS_NEW_UNREAD_DIET_SHARED_PREF = "unseenDiets";
+    public static final String SCALE_USER_INDEX_SHARED_PREF = "scaleUserIndex";
+    public static final String SCALE_USER_PIN_SHARED_PREF = "scaleUserPin";
 
     /**
      * 1: Patient index

@@ -34,7 +34,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".ble.BleCommunicationService" />
+        <service android:name=".ble.BF600BleService" />
         <service android:name=".web.services.DownloadService" />
         <service android:name=".web.services.MyFirebaseMessagingService">
             <intent-filter>

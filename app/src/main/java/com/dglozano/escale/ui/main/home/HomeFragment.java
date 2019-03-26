@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
@@ -12,6 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -27,12 +29,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.ble.BleCommunicationService;
+import com.dglozano.escale.ble.BF600BleService;
+import com.dglozano.escale.ble.CommunicationHelper;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.LocationPermission;
+import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.util.ui.MeasurementItem;
 
 import java.text.DecimalFormat;
@@ -49,13 +53,15 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
+import io.reactivex.subjects.MaybeSubject;
 import mehdi.sakout.fancybuttons.FancyButton;
 import pl.pawelkleczkowski.customgauge.CustomGauge;
 import timber.log.Timber;
 
 import static com.dglozano.escale.ui.main.MainActivity.ADD_MEASUREMENT_CODE;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment
+        implements AskScaleCredentialsDialog.ScaleCredentialsDialogListener {
 
     private static final int SCAN_REQUEST_CODE = 42;
 
@@ -127,9 +133,11 @@ public class HomeFragment extends Fragment {
     private MainActivityViewModel mMainActivityViewModel;
     private boolean mHasClickedScan;
 
-    private BleCommunicationService mBluetoothCommService;
+    private BF600BleService mBF600BleService;
     private boolean mBleServiceIsBound = false;
     private ServiceConnection mServiceConnection = new MyServiceConnection();
+    private MaybeSubject<CommunicationHelper.PinIndex> mScaleCredentialsDialogSubject = null;
+    private AskScaleCredentialsDialog mAskScaleCredentialsDialog = null;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -141,18 +149,29 @@ public class HomeFragment extends Fragment {
 
     private void observeServiceLiveData() {
         Timber.d("Start observing Bluetooth Service data.");
-        mBluetoothCommService.isScanningOrConnecting().observe(this, this::showLoader);
-        mBluetoothCommService.getConnectionState().observe(this, this::switchConnected);
-        mBluetoothCommService.getLoadingState().observe(this,
-                (text) -> mLoaderText.setText(String.format("%1$s...", text)));
-        mBluetoothCommService.getIsMeasurementTriggered().observe(this, this::showStepOnScale);
+        mBF600BleService.isScanningOrConnecting().observe(this, this::showLoader);
+        mBF600BleService.getConnectionState().observe(this, this::switchConnected);
+        mBF600BleService.getIsMeasurementTriggered().observe(this, this::showStepOnScale);
+        mBF600BleService.showScaleCredentialsDialogEvent().observe(this, this::showScaleCredentialsDialog);
+    }
+
+    private void showScaleCredentialsDialog(Event<MaybeSubject<CommunicationHelper.PinIndex>> scaleCredentialsDialogEvent) {
+        if (scaleCredentialsDialogEvent != null
+                && !scaleCredentialsDialogEvent.hasBeenHandled()
+                && mAskScaleCredentialsDialog == null) {
+            Timber.d("Showing dialog credentials ...");
+
+            mScaleCredentialsDialogSubject = scaleCredentialsDialogEvent.handleContent();
+            mAskScaleCredentialsDialog = new AskScaleCredentialsDialog();
+            mAskScaleCredentialsDialog.show(HomeFragment.this.getChildFragmentManager(), "ScaleCredentialsDialog");
+        }
     }
 
     @OnClick(R.id.add_measurement_floating_button)
     public void addMeasurementBtnOnClick(View view) {
-        if(mBluetoothCommService.getConnectionState().getValue() != null &&
-                mBluetoothCommService.getConnectionState().getValue().equals(Constants.CONNECTED)) {
-            mBluetoothCommService.triggerMeasurement();
+        if (mBF600BleService.getConnectionState().getValue() != null &&
+                mBF600BleService.getConnectionState().getValue().equals(Constants.CONNECTED)) {
+            mBF600BleService.triggerMeasurement();
         } else {
             Intent intent = new Intent(getActivity(), AddMeasurementActivity.class);
             startActivityForResult(intent, ADD_MEASUREMENT_CODE);
@@ -203,7 +222,7 @@ public class HomeFragment extends Fragment {
         mRecyclerViewMeasurements.setAdapter(mMeasurementListAdapter);
 
         mHomeViewModel.getLastBodyMeasurement().observe(this, bodyMeasurement -> {
-            if(bodyMeasurement == null || !bodyMeasurement.isPresent()) {
+            if (bodyMeasurement == null || !bodyMeasurement.isPresent()) {
                 mWeightTexView.setText("-");
                 mBmiTextView.setText("-");
                 mFatTextView.setText("-");
@@ -234,7 +253,7 @@ public class HomeFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
-        Intent intent = new Intent(mMainActivity, BleCommunicationService.class);
+        Intent intent = new Intent(mMainActivity, BF600BleService.class);
         mMainActivity.bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -255,7 +274,7 @@ public class HomeFragment extends Fragment {
             mHasClickedScan = false;
             if (mBleServiceIsBound) {
                 Timber.d("Permission granted. Starting Ble Scan...");
-                mBluetoothCommService.scanBleDevices();
+                mBF600BleService.scanForBF600Scale();
             } else {
                 Toast.makeText(mMainActivity, "Couldn't connect. Try again...", Toast.LENGTH_SHORT).show();
             }
@@ -264,11 +283,11 @@ public class HomeFragment extends Fragment {
 
     @OnClick(R.id.ble_connect_btn)
     public void onConnectButtonClicked() {
-        Boolean isConnected = mBluetoothCommService.isConnected();
+        Boolean isConnected = mBF600BleService.isConnected();
         if (isConnected != null && isConnected) {
             if (mBleServiceIsBound) {
                 Timber.d("Pressed disconnect button. Triggering disconnection...");
-                mBluetoothCommService.disposeConnection();
+                mBF600BleService.disposeConnection();
             } else {
                 Toast.makeText(mMainActivity, "Couldn't disconnect. Try again...", Toast.LENGTH_SHORT).show();
             }
@@ -277,7 +296,7 @@ public class HomeFragment extends Fragment {
                 Timber.d("Clicked on connect. Permission already granted...");
                 if (mBleServiceIsBound) {
                     Timber.d("BleService is Bound. Starting Ble Scan...");
-                    mBluetoothCommService.scanBleDevices();
+                    mBF600BleService.scanForBF600Scale();
                 } else {
                     Toast.makeText(mMainActivity, "Couldn't connect. Try again...", Toast.LENGTH_SHORT).show();
                 }
@@ -291,6 +310,7 @@ public class HomeFragment extends Fragment {
 
     private void switchConnected(String state) {
         boolean connected = state.equals(Constants.CONNECTED);
+        mLoaderText.setText(String.format("%1$s...", state));
         if (connected) {
             Timber.d("Bluetooth BLE Connected. Changing Button color and text...");
             mConnectButton.setBackgroundColor(mColorPrimary);
@@ -299,6 +319,11 @@ public class HomeFragment extends Fragment {
             mAddMeasurementButton.setImageResource(R.drawable.home_ic_menu_add_weight_scale);
         } else {
             Timber.d("Bluetooth BLE Disconnected. Changing Button color and text...");
+            if(mAskScaleCredentialsDialog != null) {
+                mAskScaleCredentialsDialog.dismiss();
+                mAskScaleCredentialsDialog = null;
+                mScaleCredentialsDialogSubject = null;
+            }
             mConnectButton.setBackgroundColor(mColorText);
             mConnectButton.setText(mDisconnectedString.toUpperCase());
             mConnectButton.setIconResource(mBleDisonnectedIconDrawable);
@@ -319,7 +344,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void showStepOnScale(Boolean isMeasurementTriggered) {
-        if(isMeasurementTriggered) {
+        if (isMeasurementTriggered) {
             mStepOnScaleLayout.setVisibility(View.VISIBLE);
         } else {
             mStepOnScaleLayout.setVisibility(View.GONE);
@@ -328,7 +353,23 @@ public class HomeFragment extends Fragment {
 
     @OnClick(R.id.home_cancel_measurement)
     public void cancelMeasurement(View v) {
-        mBluetoothCommService.stopMeasurement();
+        mBF600BleService.stopMeasurement();
+    }
+
+    @Override
+    public void onScaleCredentialsDialogLogin() {
+        mScaleCredentialsDialogSubject.onSuccess(mAskScaleCredentialsDialog.getEnteredPinIndex());
+    }
+
+    @Override
+    public void onScaleCredentialsDialogCreateNewUser() {
+        mScaleCredentialsDialogSubject.onComplete();
+    }
+
+    @Override
+    public void onScaleCredentialsDialogCancel() {
+        mAskScaleCredentialsDialog = null;
+        mBF600BleService.disposeConnection();
     }
 
     private class MyServiceConnection implements ServiceConnection {
@@ -336,8 +377,8 @@ public class HomeFragment extends Fragment {
         public void onServiceConnected(ComponentName name, IBinder binder) {
             Timber.d("onServiceConnected(). Bluetooth Service is Bound.");
             mBleServiceIsBound = true;
-            BleCommunicationService.LocalBinder localBinder = (BleCommunicationService.LocalBinder) binder;
-            mBluetoothCommService = localBinder.getService();
+            BF600BleService.LocalBinder localBinder = (BF600BleService.LocalBinder) binder;
+            mBF600BleService = localBinder.getService();
             observeServiceLiveData();
         }
 
@@ -345,7 +386,7 @@ public class HomeFragment extends Fragment {
         public void onServiceDisconnected(ComponentName name) {
             Timber.d("onServiceDisconnected(). Unbinding Bluetooth Service.");
             mBleServiceIsBound = false;
-            mBluetoothCommService = null;
+            mBF600BleService = null;
         }
     }
 }

@@ -12,7 +12,7 @@ import java.util.Random;
 
 import timber.log.Timber;
 
-class CommunicationHelper {
+public class CommunicationHelper {
 
     private static SimpleDateFormat sdf = new SimpleDateFormat(Constants.SIMPLE_DATE_FORMAT);
 
@@ -135,7 +135,7 @@ class CommunicationHelper {
         return fff1.equals(Constants.BYTES_SET_KG);
     }
 
-    static String flipBytes(String twoBytes) {
+    public static String flipBytes(String twoBytes) {
         if (twoBytes.length() != 4) {
             throw new IllegalArgumentException("flipBytes requires a 2 char long (1 byte) String parameter");
         }
@@ -162,7 +162,7 @@ class CommunicationHelper {
     }
 
     // Converts Dec to Hex and add 0 if there is an odd amount of digits
-    static String decToHex(int dec) {
+    public static String decToHex(int dec) {
 
         String hex = Integer.toHexString(dec);
 
@@ -192,11 +192,11 @@ class CommunicationHelper {
         return hexString.substring(from);
     }
 
-    static class PinIndex {
+    public static class PinIndex {
         private String pin;
         private String index;
 
-        PinIndex(String index, String pin) {
+        public PinIndex(String index, String pin) {
             this.index = index;
             this.pin = pin;
         }
@@ -218,11 +218,11 @@ class CommunicationHelper {
         }
     }
 
-    static class ScaleUserLimitExcedded extends Exception {
+    static class ScaleUserLimitExcedded extends Throwable {
 
     }
 
-    static class LoginScaleUserFailed extends Exception {
+    static class LoginScaleUserFailed extends Throwable {
 
     }
 }

@@ -297,7 +297,7 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     public void markNewDietAsSeen(Boolean hasBeenSeen) {
-        mSharedPreferences.edit().putBoolean(Constants.HAS_NEW_UNREAD_DIET, !hasBeenSeen).apply();
+        mSharedPreferences.edit().putBoolean(Constants.HAS_NEW_UNREAD_DIET_SHARED_PREF, !hasBeenSeen).apply();
     }
 
     public LiveData<Boolean> observeIfHasUnseenNewDiets() {

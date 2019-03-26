@@ -2,7 +2,6 @@ package com.dglozano.escale.repository;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
-import android.arch.persistence.room.RoomDatabase;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.EscaleDatabase;
@@ -37,9 +36,11 @@ import io.reactivex.Single;
 import timber.log.Timber;
 
 import static com.dglozano.escale.util.Constants.FRESH_TIMEOUT;
-import static com.dglozano.escale.util.Constants.HAS_NEW_UNREAD_DIET;
+import static com.dglozano.escale.util.Constants.HAS_NEW_UNREAD_DIET_SHARED_PREF;
 import static com.dglozano.escale.util.Constants.IS_FIREBASE_TOKEN_SENT_SHARED_PREF;
 import static com.dglozano.escale.util.Constants.REFRESH_TOKEN_SHARED_PREF;
+import static com.dglozano.escale.util.Constants.SCALE_USER_INDEX_SHARED_PREF;
+import static com.dglozano.escale.util.Constants.SCALE_USER_PIN_SHARED_PREF;
 import static com.dglozano.escale.util.Constants.TOKEN_SHARED_PREF;
 import static com.dglozano.escale.util.Constants.UNREAD_MESSAGES_SHARED_PREF;
 
@@ -89,6 +90,11 @@ public class PatientRepository {
     public LiveData<Patient> getLoggedPatient() {
         return mLoggedPatient;
     }
+
+    public Single<Patient> getLoggedPatientSingle() {
+        return mPatientDao.getPatientSingleById(getLoggedPatiendId());
+    }
+
 
     public LiveData<Long> getLoggedPatientIdAsLiveData() {
         return mLoggedUserId;
@@ -184,8 +190,10 @@ public class PatientRepository {
             editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
             editor.remove(TOKEN_SHARED_PREF);
             editor.remove(REFRESH_TOKEN_SHARED_PREF);
+            editor.remove(SCALE_USER_INDEX_SHARED_PREF);
+            editor.remove(SCALE_USER_PIN_SHARED_PREF);
             editor.putBoolean(IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
-            editor.putBoolean(HAS_NEW_UNREAD_DIET, false);
+            editor.putBoolean(HAS_NEW_UNREAD_DIET_SHARED_PREF, false);
             editor.putInt(UNREAD_MESSAGES_SHARED_PREF, 0);
             editor.apply();
             Timber.d("Clearing db");

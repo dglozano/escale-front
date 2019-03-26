@@ -21,6 +21,9 @@ public interface PatientDao {
     @Query("SELECT * FROM Patient WHERE id == :id")
     LiveData<Patient> getPatientById(Long id);
 
+    @Query("SELECT * FROM Patient WHERE id == :id")
+    Single<Patient> getPatientSingleById(Long id);
+
     @Delete
     void deleteUser(Patient patient);
 

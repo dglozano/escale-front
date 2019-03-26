@@ -30,4 +30,5 @@ public class HomeViewModel extends ViewModel {
     public LiveData<Optional<BodyMeasurement>> getLastBodyMeasurement() {
         return mBodyMeasurementRepository.getLastBodyMeasurementOfUserWithId(mPatientRepository.getLoggedPatiendId());
     }
+
 }

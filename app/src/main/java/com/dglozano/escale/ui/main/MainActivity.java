@@ -31,7 +31,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.ble.BleCommunicationService;
+import com.dglozano.escale.ble.BF600BleService;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.common.ChangePasswordActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
@@ -39,7 +39,6 @@ import com.dglozano.escale.ui.main.diet.DietFragment;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
-import com.dglozano.escale.ui.main.stats.chart.StatsChartFragment;
 import com.dglozano.escale.util.ui.BottomBarAdapter;
 import com.dglozano.escale.util.ui.NoSwipePager;
 import com.dglozano.escale.web.services.FirebaseTokenSenderService;
@@ -99,7 +98,7 @@ public class MainActivity extends BaseActivity
     private MainActivityViewModel mViewModel;
     private Badge mMessagesBadge = null;
     private Badge mNewDietsBadge = null;
-    private BleCommunicationService mBluetoothCommService;
+    private BF600BleService mBF600BleService;
     private boolean mBleServiceIsBound = false;
     private AlertDialog activeDialog = null;
 
@@ -140,7 +139,7 @@ public class MainActivity extends BaseActivity
         mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
 
         mViewModel.getAppBarShadowStatus().observe(this, showShadow -> {
-            if(showShadow != null && !showShadow) {
+            if (showShadow != null && !showShadow) {
                 setElevationOfAppBar(0f);
             } else {
                 setElevationOfAppBar(10f);
@@ -304,6 +303,7 @@ public class MainActivity extends BaseActivity
 
     private void addFragmentsToBottomNav(int currentFragmentPosition) {
         mNoSwipePager.setPagingEnabled(false);
+        mNoSwipePager.setOffscreenPageLimit(0);
         mNoSwipePager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -358,6 +358,7 @@ public class MainActivity extends BaseActivity
             Intent intent = new Intent(this, LoginActivity.class);
             intent.putExtra(ASK_NEW_FIREBASE_TOKEN, true);
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+            mBF600BleService.disposeConnection();
             finish();
         }
 
@@ -395,7 +396,7 @@ public class MainActivity extends BaseActivity
         mViewModel.refreshData();
         mNotificationManager.cancelAll();
         Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
-        Intent intent = new Intent(this, BleCommunicationService.class);
+        Intent intent = new Intent(this, BF600BleService.class);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -452,8 +453,8 @@ public class MainActivity extends BaseActivity
         public void onServiceConnected(ComponentName name, IBinder binder) {
             Timber.d("onServiceConnected(). Bluetooth Service is Bound.");
             mBleServiceIsBound = true;
-            BleCommunicationService.LocalBinder localBinder = (BleCommunicationService.LocalBinder) binder;
-            mBluetoothCommService = localBinder.getService();
+            BF600BleService.LocalBinder localBinder = (BF600BleService.LocalBinder) binder;
+            mBF600BleService = localBinder.getService();
         }
 
         @Override

@@ -3,28 +3,28 @@
     <string name="connected">Conectado</string>
     <string name="disconnected">Desconectado</string>
     <string name="navigation_drawer_open">Nav drawer open</string>
-    <string name="navigation_drawer_close">nav drawe close</string>
+    <string name="navigation_drawer_close">Nav drawer close</string>
     <string name="measurement_item_holder_value">%1$s %2$s</string>
     <string name="decimal_format">###,###.##</string>
     <string name="loading">Cargando…</string>
     <string name="user_profile_picture">Foto de perfil de usuario</string>
     <!-- Ble scan error messages -->
-    <string name="error_bluetooth_not_available">Bluetooth is not available</string>
-    <string name="error_bluetooth_disabled">Enable bluetooth and try again</string>
-    <string name="error_location_permission_missing">On Android 6.0 location permission is required. Please enable it in phone settings</string>
-    <string name="error_location_services_disabled">Location services need to be enabled on Android 6.0</string>
-    <string name="error_scan_failed_already_started">Scan with the same filters is already started</string>
-    <string name="error_scan_failed_application_registration_failed">Failed to register application for bluetooth scan</string>
-    <string name="error_scan_failed_feature_unsupported">Scan with specified parameters is not supported</string>
-    <string name="error_scan_failed_internal_error">Scan failed due to internal error</string>
-    <string name="error_scan_failed_out_of_hardware_resources">Scan cannot start due to limited hardware resources</string>
-    <string name="error_undocumented_scan_throttle">Android 7+ does not allow more scans.</string>
-    <string name="error_undocumented_scan_throttle_retry">Try in %d seconds</string>
-    <string name="error_bluetooth_cannot_start">Unable to start scanning</string>
+    <string name="error_bluetooth_not_available">Su dispositivo no tiene conectividad Bluetooth.</string>
+    <string name="error_bluetooth_disabled">Active el Bluetooth y prueba de nuevo.</string>
+    <string name="error_location_permission_missing">Desde Android 6.0 los permisos de ubicación son requeridos. Por favor, habilitelos desde las configuraciones del telefono.</string>
+    <string name="error_location_services_disabled">Activa tu Ubicación para poder utilizar el Bluetooth.</string>
+    <string name="error_scan_failed_already_started">Ya hay un escaneo en ejecución.</string>
+    <string name="error_scan_failed_application_registration_failed">No se pudo registrar la aplicación para el escaneo Bluetooth.</string>
+    <string name="error_scan_failed_feature_unsupported">El escaneo con los parámetros solocitados no está soportado.</string>
+    <string name="error_scan_failed_internal_error">El escaneo falló por un problema interno.</string>
+    <string name="error_scan_failed_out_of_hardware_resources">El escaneo no pudo comenza debido a recursos limitados de hardware.</string>
+    <string name="error_undocumented_scan_throttle">Android 7+ no permite más escaneos.</string>
+    <string name="error_undocumented_scan_throttle_retry">Intente de nuevo en %d segundos</string>
+    <string name="error_bluetooth_cannot_start">No se pudo comenzar a escanear.</string>
     <string name="error_unknown_error">Unknown error</string>
-    <string name="ble_error_try_again">Bluetooth error. Try again.</string>
-    <string name="ble_scan_timeout">Scale not found after 10 s. Try Again</string>
-    <string name="loader_scanning">Scanning</string>
+    <string name="ble_error_try_again">Error Bluetooth. Intente de nuevo.</string>
+    <string name="ble_scan_timeout">Balanza no encontrado despues de 10 s. Intente de nuevo.</string>
+    <string name="loader_scanning">Escaneando</string>
     <string name="password">Contraseña</string>
     <string name="email">Email</string>
     <string name="login_welcome_to_escale"><big>Bienvenido a <b><i>Escale</i></b>.</big></string>
@@ -91,20 +91,37 @@
     <string name="bones">Masa ósea</string>
     <string name="imc">IMC</string>
     <string name="muscles">Masa muscular</string>
-    <string name="add_measurement_input_error_snackbar">Revisa los datos ingresados e intenta nuevamente</string>
+    <string name="add_measurement_input_error_snackbar">
+        Revisa los datos ingresados e intenta nuevamente
+    </string>
     <string name="add_measurement_percentage_range_error">Ingresa un valor entre 0% y 100%</string>
     <string name="add_measurement_negative_number_error">Ingresa un valor positivo</string>
     <string name="add_measurement_empty_error">Este campo no puede estar vacío</string>
-    <string name="home_step_on_scale">Sáquese zapatillas y medias, súbase a la balanza y espere a que termine la medición.</string>
-    <string name="no_stats_text">Aún no tienes pesajes. Ve a la pantalla inicial para agregar tu primer pesaje.</string>
+    <string name="home_step_on_scale">
+        Sáquese zapatillas y medias, súbase a la balanza y espere a que termine la medición.
+    </string>
+    <string name="no_stats_text">
+        Aún no tienes pesajes. Ve a la pantalla inicial para agregar tu primer pesaje.
+    </string>
     <string name="list_stats_title">Lista</string>
     <string name="chart_stats_title">Gráfico</string>
-
-    WEIGHT("Peso"),
-    BMI("IMC"),
-    MUSCLES("Masa Muscular"),
-    BONES("Masa Ósea"),
-    WATER("Agua Corporal"),
-    FAT("Grasa corporal");
-
+    <string name="scale_login_error">Error al iniciar sesión en la balanza</string>
+    <string name="dialog_credentials_create_new_user_btn">Nuevo Usuario</string>
+    <string name="ask_for_scale_credentials_dialog_instructions">
+        Ingrese el <b>Índice</b> y <b>PIN</b> de su usuario en la balanza. Con el botón SET y las flechas
+        en la balanza puede moverse entre los usuarios. \n\n Si no tiene un usuario,
+        seleccione <i>\"Crear usuario\"</i>.</string>
+    <string name="scale_index">Índice</string>
+    <string name="scale_pin">PIN</string>
+    <string name="dialog_credentials_title">Ingrese Índice y PIN</string>
+    <string name="ble_scale_login_error">El PIN del usuario de la balanza ingresado no es correcto.</string>
+    <string-array name="scale_user_indexes_array">
+        <item>P-01</item>
+        <item>P-02</item>
+        <item>P-03</item>
+        <item>P-04</item>
+        <item>P-05</item>
+        <item>P-06</item>
+        <item>P-07</item>
+    </string-array>
 </resources>
