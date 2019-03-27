@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
@@ -13,7 +12,6 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -152,17 +150,27 @@ public class HomeFragment extends Fragment
         mBF600BleService.isScanningOrConnecting().observe(this, this::showLoader);
         mBF600BleService.getConnectionState().observe(this, this::switchConnected);
         mBF600BleService.getIsMeasurementTriggered().observe(this, this::showStepOnScale);
-        mBF600BleService.showScaleCredentialsDialogEvent().observe(this, this::showScaleCredentialsDialog);
+        mBF600BleService.showScaleCredentialsDialogEvent().observe(this, this::showScaleCredentialsDialogToLogin);
+        mBF600BleService.showScaleCredentialsDialogToDeleteUserEvent().observe(this, this::showScaleCredentialsDialogToDelete);
     }
 
-    private void showScaleCredentialsDialog(Event<MaybeSubject<CommunicationHelper.PinIndex>> scaleCredentialsDialogEvent) {
+    private void showScaleCredentialsDialogToLogin(Event<MaybeSubject<CommunicationHelper.PinIndex>> maybeSubjectEvent) {
+        showScaleCredentialsDialog(maybeSubjectEvent, false);
+    }
+
+    private void showScaleCredentialsDialogToDelete(Event<MaybeSubject<CommunicationHelper.PinIndex>> maybeSubjectEvent) {
+        showScaleCredentialsDialog(maybeSubjectEvent, true);
+    }
+
+    private void showScaleCredentialsDialog(Event<MaybeSubject<CommunicationHelper.PinIndex>>
+                                                    scaleCredentialsDialogEvent, boolean isDeleteDialog) {
         if (scaleCredentialsDialogEvent != null
                 && !scaleCredentialsDialogEvent.hasBeenHandled()
                 && mAskScaleCredentialsDialog == null) {
             Timber.d("Showing dialog credentials ...");
 
             mScaleCredentialsDialogSubject = scaleCredentialsDialogEvent.handleContent();
-            mAskScaleCredentialsDialog = new AskScaleCredentialsDialog();
+            mAskScaleCredentialsDialog = AskScaleCredentialsDialog.newInstance(isDeleteDialog);
             mAskScaleCredentialsDialog.show(HomeFragment.this.getChildFragmentManager(), "ScaleCredentialsDialog");
         }
     }
@@ -319,7 +327,7 @@ public class HomeFragment extends Fragment
             mAddMeasurementButton.setImageResource(R.drawable.home_ic_menu_add_weight_scale);
         } else {
             Timber.d("Bluetooth BLE Disconnected. Changing Button color and text...");
-            if(mAskScaleCredentialsDialog != null) {
+            if (mAskScaleCredentialsDialog != null) {
                 mAskScaleCredentialsDialog.dismiss();
                 mAskScaleCredentialsDialog = null;
                 mScaleCredentialsDialogSubject = null;
@@ -357,7 +365,7 @@ public class HomeFragment extends Fragment
     }
 
     @Override
-    public void onScaleCredentialsDialogLogin() {
+    public void onScaleCredentialsDialogSubmitCredentials() {
         mScaleCredentialsDialogSubject.onSuccess(mAskScaleCredentialsDialog.getEnteredPinIndex());
     }
 

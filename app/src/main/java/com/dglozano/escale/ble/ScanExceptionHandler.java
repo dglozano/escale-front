@@ -63,27 +63,30 @@ public class ScanExceptionHandler {
      * @param context   current Activity context
      * @param exception BleScanException to show error message for
      */
-    public static void handleException(final Context context, final BleScanException exception) {
+    public static Integer handleException(final Context context, final BleScanException exception) {
         final String text;
+        Integer resId;
         final int reason = exception.getReason();
 
         // Special case, as there might or might not be a retry date suggestion
         if (reason == BleScanException.UNDOCUMENTED_SCAN_THROTTLE) {
             text = getUndocumentedScanThrottleErrorMessage(context, exception.getRetryDateSuggestion());
+            resId = R.string.error_undocumented_scan_throttle_retry;
         } else {
             // Handle all other possible errors
-            final Integer resId = ERROR_MESSAGES.get(reason);
+            resId = ERROR_MESSAGES.get(reason);
             if (resId != null) {
                 text = context.getString(resId);
             } else {
                 // unknown error - return default message
                 Timber.w("No message found for reason=%d. Consider adding one.", reason);
                 text = context.getString(R.string.error_unknown_error);
+                resId = R.string.error_unknown_error;
             }
         }
 
         Timber.w(text);
-        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+        return resId;
     }
 
     private static String getUndocumentedScanThrottleErrorMessage(final Context context, final Date retryDate) {

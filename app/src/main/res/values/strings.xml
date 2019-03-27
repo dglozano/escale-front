@@ -115,6 +115,15 @@
     <string name="scale_pin">PIN</string>
     <string name="dialog_credentials_title">Ingrese Índice y PIN</string>
     <string name="ble_scale_login_error">El PIN del usuario de la balanza ingresado no es correcto.</string>
+    <string name="ble_scale_disconnected">Se perdió la conexión con la balanza.</string>
+    <string name="ble_scale_user_limit_error">\"La balanza no tiene espacio para crear nuevos usuarios\"</string>
+    <string name="dialog_scale_full_title">Límite de usuarios alcanzado</string>
+    <string name="dialog_scale_full_instructions">Se ha alcanzado el límite de usuarios en la balanza.
+        Para poder crear un nuevo usuario, <b>deberá eliminar otro primero</b>.
+        Ingrese el <b>Índice</b> y <b>PIN</b> del usuario a eliminar. Con el botón SET y las flechas
+        en la balanza puede moverse entre los usuarios.</string>
+    <string name="dialog_delete_user_btn">Eliminar usuario</string>
+    <string name="ble_scale_delete_error">No se pudo eliminar el usuario</string>
     <string-array name="scale_user_indexes_array">
         <item>P-01</item>
         <item>P-02</item>
@@ -123,5 +132,6 @@
         <item>P-05</item>
         <item>P-06</item>
         <item>P-07</item>
+        <item>P-08</item>
     </string-array>
 </resources>

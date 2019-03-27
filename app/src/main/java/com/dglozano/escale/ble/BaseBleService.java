@@ -6,14 +6,14 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.ui.Event;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleConnection;
 import com.polidea.rxandroidble2.RxBleDevice;
-import com.polidea.rxandroidble2.exceptions.BleException;
+import com.polidea.rxandroidble2.exceptions.BleDisconnectedException;
 import com.polidea.rxandroidble2.exceptions.BleScanException;
 import com.polidea.rxandroidble2.internal.RxBleLog;
 import com.polidea.rxandroidble2.scan.ScanFilter;
@@ -27,11 +27,8 @@ import java.util.concurrent.TimeoutException;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.exceptions.UndeliverableException;
 import io.reactivex.functions.Consumer;
-import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.SingleSubject;
 import timber.log.Timber;
@@ -46,6 +43,7 @@ public abstract class BaseBleService extends Service {
     protected Disposable mConnectionStateDisposable;
     protected Disposable mConnectionDisposable;
     protected MutableLiveData<Boolean> mIsScanning;
+    protected MutableLiveData<Event<Integer>> mErrorEvent;
     protected MutableLiveData<String> mConnectionState;
     protected MediatorLiveData<Boolean> mIsScanningOrConnecting;
     protected RxBleDevice mScaleDevice;
@@ -57,17 +55,14 @@ public abstract class BaseBleService extends Service {
         super.onCreate();
         Timber.d("onCreate.");
         RxBleClient.setLogLevel(RxBleLog.VERBOSE);
-//        RxJavaPlugins.setErrorHandler(error -> {
-//            if (error instanceof UndeliverableException && error.getCause() instanceof BleException) {
-//                return; // ignore BleExceptions as they were surely delivered at least once
-//            }
-//        });
 
         mIsScanning = new MutableLiveData<>();
         mIsScanning.setValue(false);
 
         mConnectionState = new MutableLiveData<>();
         mConnectionState.setValue(Constants.DISCONNECTED);
+
+        mErrorEvent = new MutableLiveData<>();
 
         mIsScanningOrConnecting = new MediatorLiveData<>();
         prepareScanningOrConnectionMediator();
@@ -94,7 +89,7 @@ public abstract class BaseBleService extends Service {
 
         mScanDisposable = observableScanResults
                 .timeout(10, TimeUnit.SECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .doFinally(this::disposeScanning)
                 .subscribe(onScanResult, this::throwException);
         mConnectionState.postValue(Constants.SCANNING);
@@ -145,7 +140,7 @@ public abstract class BaseBleService extends Service {
                     rxBleConnection.requestMtu(50);
                     return Observable.just(rxBleConnection);
                 })
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io());
     }
 
@@ -158,7 +153,7 @@ public abstract class BaseBleService extends Service {
                     return BondingHelper.bondWithDevice(this, mScaleDevice, 15, TimeUnit.SECONDS);
                 })
                 .andThen(createConnectionObservable(mScaleDevice, true))
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io());
     }
 
@@ -169,22 +164,31 @@ public abstract class BaseBleService extends Service {
     protected Observable<RxBleConnection> createConnectionObservable(RxBleDevice scaleDevice, boolean autoConnect) {
         return scaleDevice
                 .establishConnection(autoConnect)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .doOnError(this::throwException);
     }
 
     protected void throwException(Throwable throwable) {
         Timber.d("throwException(). Message: %1$s", throwable.getMessage());
+        Integer errorStrResource;
         if (throwable instanceof BleScanException) {
-            ScanExceptionHandler.handleException(this, (BleScanException) throwable);
+            errorStrResource = ScanExceptionHandler.handleException(this, (BleScanException) throwable);
         } else if (throwable instanceof TimeoutException) {
-            Toast.makeText(this, R.string.ble_scan_timeout, Toast.LENGTH_SHORT).show();
+            errorStrResource = R.string.ble_scan_timeout;
         } else if (throwable instanceof CommunicationHelper.LoginScaleUserFailed) {
-            Toast.makeText(this, R.string.ble_scale_login_error, Toast.LENGTH_SHORT).show();
+            errorStrResource = R.string.ble_scale_login_error;
+        } else if (throwable instanceof BleDisconnectedException) {
+            errorStrResource = R.string.ble_scale_disconnected;
+        } else if (throwable instanceof CommunicationHelper.ScaleUserLimitExcedded) {
+            errorStrResource = R.string.ble_scale_user_limit_error;
+        } else if (throwable instanceof CommunicationHelper.DeleteScaleUserFailed) {
+            errorStrResource = R.string.ble_scale_delete_error;
         } else {
             Timber.e(throwable);
-            Toast.makeText(this, R.string.ble_error_try_again, Toast.LENGTH_SHORT).show();
+            errorStrResource = R.string.ble_error_try_again;
         }
+
+        mErrorEvent.postValue(new Event<>(errorStrResource));
         mIsScanning.postValue(false);
         mConnectionState.postValue(Constants.DISCONNECTED);
     }
@@ -235,6 +239,32 @@ public abstract class BaseBleService extends Service {
         }
     }
 
+    protected Observable<String> writeAndReadOnNotificationUntilConditionMet(UUID writeTo, UUID readOn,
+                                                                             String hexString,
+                                                                             boolean isIndication,
+                                                                             RxBleConnection rxBleConnection,
+                                                                             String condition) {
+        Observable<Observable<byte[]>> notifObservable =
+                isIndication ?
+                        rxBleConnection.setupIndication(readOn) :
+                        rxBleConnection.setupNotification(readOn);
+        return notifObservable.flatMap(
+                (notificationObservable) -> Observable.combineLatest(
+                        rxBleConnection.writeCharacteristic(writeTo, hexToBytes(hexString)).toObservable(),
+                        notificationObservable.takeUntil(bytes -> {
+                            Timber.d("received %s", bytesToHex(bytes));
+                            return bytesToHex(bytes).startsWith(condition);
+                        })
+                                .lastElement().toObservable(),
+                        (writtenBytes, responseBytes) -> {
+                            Timber.d("Wrote %1$s to %2$s - Resource: %3$s",
+                                    bytesToHex(writtenBytes), writeTo.toString(), bytesToHex(responseBytes));
+                            return bytesToHex(responseBytes);
+                        }
+                )
+        ).observeOn(Schedulers.io()).doOnError(this::throwException);
+    }
+
     protected Observable<String> writeAndReadOnNotification(UUID writeTo, UUID readOn,
                                                             String hexString,
                                                             boolean isIndication,
@@ -244,7 +274,7 @@ public abstract class BaseBleService extends Service {
                         rxBleConnection.setupIndication(readOn) :
                         rxBleConnection.setupNotification(readOn);
         return notifObservable.flatMap(
-                (notificationObservable) -> Observable.combineLatest(
+                (notificationObservable) -> Observable.zip(
                         rxBleConnection.writeCharacteristic(writeTo, hexToBytes(hexString)).toObservable(),
                         notificationObservable.take(1),
                         (writtenBytes, responseBytes) -> {
@@ -253,7 +283,7 @@ public abstract class BaseBleService extends Service {
                             return bytesToHex(responseBytes);
                         }
                 )
-        ).observeOn(AndroidSchedulers.mainThread()).doOnError(this::throwException);
+        ).observeOn(Schedulers.io()).doOnError(this::throwException);
     }
 
     protected Single<byte[]> singleToWrite(
@@ -261,7 +291,7 @@ public abstract class BaseBleService extends Service {
             String hexString,
             RxBleConnection connection) {
         return connection.writeCharacteristic(characteristicUuid, hexToBytes(hexString))
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .doOnSuccess(bytes -> Timber.d("Bytes written %1$s", bytesToHex(bytes)))
                 .doOnError(this::throwException);
     }
@@ -270,7 +300,7 @@ public abstract class BaseBleService extends Service {
             UUID characteristicUuid,
             RxBleConnection connection) {
         return connection.readCharacteristic(characteristicUuid)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
                 .doOnSuccess(bytes -> Timber.d("Bytes read %1$s", bytesToHex(bytes)))
                 .doOnError(this::throwException);
     }
@@ -289,6 +319,10 @@ public abstract class BaseBleService extends Service {
 
     public Boolean isConnected() {
         return mConnectionState.getValue().equals(Constants.CONNECTED);
+    }
+
+    public MutableLiveData<Event<Integer>> getErrorEvent() {
+        return mErrorEvent;
     }
 
     @Override

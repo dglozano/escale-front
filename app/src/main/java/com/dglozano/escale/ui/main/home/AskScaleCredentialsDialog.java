@@ -1,10 +1,8 @@
 package com.dglozano.escale.ui.main.home;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,10 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.CommunicationHelper;
-import com.dglozano.escale.ui.main.MainActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,17 +28,35 @@ public class AskScaleCredentialsDialog extends DialogFragment {
     Spinner mUserIndexSpinner;
     @BindView(R.id.dialog_credentials_pin_edittext)
     EditText mUserPinEditText;
+    @BindView(R.id.dialog_credentials_title)
+    TextView mTitle;
+    @BindView(R.id.dialog_credentials_instructions)
+    TextView mInstructions;
 
     private Unbinder mViewUnbinder;
+    private boolean mIsDeleteDialog;
 
     public interface ScaleCredentialsDialogListener {
-        void onScaleCredentialsDialogLogin();
+        void onScaleCredentialsDialogSubmitCredentials();
+
         void onScaleCredentialsDialogCreateNewUser();
+
         void onScaleCredentialsDialogCancel();
     }
 
     private ScaleCredentialsDialogListener mListener;
     private Fragment parentFragment;
+
+    public static AskScaleCredentialsDialog newInstance(boolean isDeleteDialog) {
+        AskScaleCredentialsDialog f = new AskScaleCredentialsDialog();
+
+        // Supply num input as an argument.
+        Bundle args = new Bundle();
+        args.putBoolean("isDeleteDialog", isDeleteDialog);
+        f.setArguments(args);
+
+        return f;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +64,13 @@ public class AskScaleCredentialsDialog extends DialogFragment {
         try {
             parentFragment = getParentFragment();
             mListener = (ScaleCredentialsDialogListener) parentFragment;
+
+            if(getArguments() != null) {
+                mIsDeleteDialog = getArguments().getBoolean("isDeleteDialog", false);
+            } else {
+                mIsDeleteDialog = false;
+            }
+
         } catch (ClassCastException e) {
             throw new ClassCastException("Calling fragment must implement ScaleCredentialsDialogListener interface");
         }
@@ -63,11 +86,22 @@ public class AskScaleCredentialsDialog extends DialogFragment {
         View dialogView = inflater.inflate(R.layout.dialog_ask_scale_credentials, null);
         mViewUnbinder = ButterKnife.bind(this, dialogView);
 
-        builder.setView(dialogView)
-                .setPositiveButton(android.R.string.ok, (dialog, id) ->
-                        mListener.onScaleCredentialsDialogLogin())
-                .setNegativeButton(R.string.dialog_credentials_create_new_user_btn,
-                        (dialog, which) -> mListener.onScaleCredentialsDialogCreateNewUser());
+        if(mIsDeleteDialog) {
+            mTitle.setText(R.string.dialog_scale_full_title);
+            mInstructions.setText(R.string.dialog_scale_full_instructions);
+            builder.setView(dialogView)
+                    .setPositiveButton(R.string.dialog_delete_user_btn, (dialog, id) ->
+                            mListener.onScaleCredentialsDialogSubmitCredentials())
+                    .setNegativeButton(android.R.string.cancel,
+                            (dialog, which) -> mListener.onScaleCredentialsDialogCancel());
+        } else {
+            builder.setView(dialogView)
+                    .setPositiveButton(android.R.string.ok, (dialog, id) ->
+                            mListener.onScaleCredentialsDialogSubmitCredentials())
+                    .setNegativeButton(R.string.dialog_credentials_create_new_user_btn,
+                            (dialog, which) -> mListener.onScaleCredentialsDialogCreateNewUser());
+        }
+
         return builder.create();
     }
 
@@ -87,9 +121,15 @@ public class AskScaleCredentialsDialog extends DialogFragment {
     public CommunicationHelper.PinIndex getEnteredPinIndex() {
         String index = mUserIndexSpinner.getSelectedItemPosition() + 1 + "";
         String PIN = mUserPinEditText.getText().toString();
+        Timber.d("Dialog PIN input text %s", PIN);
+        PIN = CommunicationHelper.decToHex(Integer.parseInt(PIN));
+        PIN = PIN.length() == 2 ? "00" + PIN : PIN;
+        Timber.d("Dialog PIN after processing %s", PIN);
 
         index = "0" + index;
-        PIN = CommunicationHelper.flipBytes(CommunicationHelper.decToHex(Integer.parseInt(PIN)));
+        PIN = CommunicationHelper.flipBytes(PIN);
+
+        Timber.d("Dialog PIN final %s", PIN);
 
         return new CommunicationHelper.PinIndex(index, PIN);
     }

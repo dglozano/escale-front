@@ -15,6 +15,7 @@ public class Constants {
     public static final String SETTING_USER_DATA = "Seteando datos del usuario";
     public static final String LOGGING_IN = "Logueando usuario";
     public static final String RECONNECTING = "Refrescando conexión";
+    public static final String DELETING_USER = "Eliminando usuario";
 
     // Scale name
     public static final String BF600 = "BF600";
@@ -33,6 +34,9 @@ public class Constants {
     public static final String USER_LOGIN_CMD = "02%1$s%2$s"; //INDEX, PIN
     public static final String USER_LOGIN_ERROR = "200205";
     public static final String USER_LOGIN_SUCCESS = "200201";
+    public static final String USER_DELETE_SUCCESS = "200301";
+    public static final String USER_DELETE_CMD = "03%1$s"; //INDEX
+
 
     // Web
     public static final String BASE_HEROKU_URL = "https://escale-api.herokuapp.com/api/";

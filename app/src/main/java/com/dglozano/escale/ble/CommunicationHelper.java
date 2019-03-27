@@ -225,4 +225,7 @@ public class CommunicationHelper {
     static class LoginScaleUserFailed extends Throwable {
 
     }
+
+    public static class DeleteScaleUserFailed extends Throwable{
+    }
 }

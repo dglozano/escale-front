@@ -40,6 +40,7 @@ import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
 import com.dglozano.escale.util.ui.BottomBarAdapter;
+import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.util.ui.NoSwipePager;
 import com.dglozano.escale.web.services.FirebaseTokenSenderService;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
@@ -132,7 +133,7 @@ public class MainActivity extends BaseActivity
         observerFirebaseTokenUpdate();
         observeCurrentFragmentPosition();
         observeNewDietNotification();
-        observeErrorEvent();
+        mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
 
         addFragmentsToBottomNav(openFragmentInPosition);
 
@@ -147,12 +148,10 @@ public class MainActivity extends BaseActivity
         });
     }
 
-    private void observeErrorEvent() {
-        mViewModel.getErrorEvent().observe(this, errorEvent -> {
-            if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-                showSnackbarWithDuration(errorEvent.handleContent(), Snackbar.LENGTH_SHORT);
-            }
-        });
+    private void showSnackbarError(Event<Integer> errorEvent) {
+        if (errorEvent != null && errorEvent.peekContent() != null && !errorEvent.hasBeenHandled()) {
+            showSnackbarWithDuration(errorEvent.handleContent(), Snackbar.LENGTH_SHORT);
+        }
     }
 
 
@@ -448,6 +447,10 @@ public class MainActivity extends BaseActivity
         ViewCompat.setElevation(mAppBarLayout, elevation);
     }
 
+    private void observeServiceLiveData() {
+        mBF600BleService.getErrorEvent().observe(this, this::showSnackbarError);
+    }
+
     private class MyServiceConnection implements ServiceConnection {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
@@ -455,6 +458,7 @@ public class MainActivity extends BaseActivity
             mBleServiceIsBound = true;
             BF600BleService.LocalBinder localBinder = (BF600BleService.LocalBinder) binder;
             mBF600BleService = localBinder.getService();
+            observeServiceLiveData();
         }
 
         @Override
@@ -463,4 +467,6 @@ public class MainActivity extends BaseActivity
             mBleServiceIsBound = false;
         }
     }
+
+
 }
