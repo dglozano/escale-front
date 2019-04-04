@@ -11,13 +11,13 @@ public class PatientDTO {
     private String lastName;
     private String email;
     private Patient.Gender gender;
-    private int scaleUserPin;
-    private int scaleUserIndex;
     private int heightInCm;
     private int physicalActivity;
     private Date birthday;
     private boolean changedDefaultPassword;
     private DoctorDTO doctor;
+    private WeightGoalDTO currentWeightGoal;
+    private boolean enabled;
 
     public PatientDTO() {
     }
@@ -62,22 +62,6 @@ public class PatientDTO {
         this.gender = gender;
     }
 
-    public int getScaleUserPin() {
-        return scaleUserPin;
-    }
-
-    public void setScaleUserPin(int scaleUserPin) {
-        this.scaleUserPin = scaleUserPin;
-    }
-
-    public int getScaleUserIndex() {
-        return scaleUserIndex;
-    }
-
-    public void setScaleUserIndex(int scaleUserIndex) {
-        this.scaleUserIndex = scaleUserIndex;
-    }
-
     public int getHeightInCm() {
         return heightInCm;
     }
@@ -118,6 +102,22 @@ public class PatientDTO {
         this.doctor = doctor;
     }
 
+    public WeightGoalDTO getCurrentWeightGoal() {
+        return currentWeightGoal;
+    }
+
+    public void setCurrentWeightGoal(WeightGoalDTO currentWeightGoal) {
+        this.currentWeightGoal = currentWeightGoal;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public String toString() {
         return String.format("{\n " +
@@ -125,11 +125,10 @@ public class PatientDTO {
                 "   firstName: %s \n" +
                 "   lastName: %s \n" +
                 "   email: %s \n" +
-                "   userindex: %s \n" +
                 "   gender: %s \n" +
                 "   changedpass: %s \n" +
                 "   height: %s \n" +
                 "   physicalactivity: %s \n" +
-                "}", id, firstName, lastName, email,scaleUserIndex,gender,changedDefaultPassword, heightInCm, physicalActivity);
+                "}", id, firstName, lastName, email,gender,changedDefaultPassword, heightInCm, physicalActivity);
     }
 }

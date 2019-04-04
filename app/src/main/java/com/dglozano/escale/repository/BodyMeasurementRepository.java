@@ -64,10 +64,11 @@ public class BodyMeasurementRepository {
                 });
     }
 
-    public Single<Long> addMeasurement(float weight, float water, float fat, float bmi, float bones, float muscle) {
+    public Single<Long> addMeasurement(float weight, float water, float fat, float bmi, float bones,
+                                       float muscle, boolean isManual) {
         Long patientId = mPatientRepository.getLoggedPatiendId();
         AddBodyMeasurementDTO addDto = new AddBodyMeasurementDTO(patientId, weight, water,
-                fat, bmi, bones, muscle, Calendar.getInstance().getTime());
+                fat, bmi, bones, muscle, Calendar.getInstance().getTime(), isManual);
         return mEscaleRestApi.postNewMeasurement(addDto, patientId)
                 .map(BodyMeasurement::new)
                 .map(mBodyMeasurementDao::insertBodyMeasurement)
@@ -80,7 +81,8 @@ public class BodyMeasurementRepository {
                 bodyMeasurement.getFat(),
                 bodyMeasurement.getBmi(),
                 bodyMeasurement.getBones(),
-                bodyMeasurement.getMuscles());
+                bodyMeasurement.getMuscles(),
+                bodyMeasurement.isManual());
     }
 
     public LiveData<List<BodyMeasurement>> getLastBodyMeasurementsOfUserWithId(Long loggedPatiendId) {

@@ -3,6 +3,7 @@ package com.dglozano.escale.ui.main.home;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.animation.AlphaAnimation;
 
 import com.dglozano.escale.ui.main.MainActivity;
 

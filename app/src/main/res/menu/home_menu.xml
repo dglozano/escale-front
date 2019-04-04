@@ -2,14 +2,32 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu_home_add_measurement_manually"
-        android:icon="@drawable/home_ic_menu_add_weight_manually"
-        android:title="@string/add_body_measurement_manually"
-        app:showAsAction="ifRoom"/>
+        android:id="@+id/home_menu_battery_almost_empty"
+        android:icon="@drawable/ic_baseline_battery_alert_24px"
+        android:title="Bateria baja"
+        app:showAsAction="always" />
 
-    <!--<item-->
-        <!--android:id="@+id/menu_home_add_measurement"-->
-        <!--android:icon="@drawable/home_ic_menu_add_weight_scale"-->
-        <!--android:title="@string/add_body_measurement_with_scale"-->
-        <!--app:showAsAction="ifRoom"/>-->
+    <item
+        android:id="@+id/home_menu_battery_percent20"
+        android:icon="@drawable/ic_baseline_battery_20_24px"
+        android:title="Bateria al 20%"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/home_menu_battery_percent50"
+        android:icon="@drawable/ic_baseline_battery_50_24px"
+        android:title="Bateria al 50%"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/home_menu_battery_percent80"
+        android:icon="@drawable/ic_baseline_battery_80_24px"
+        android:title="Bateria al 80%"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/home_menu_battery_almost_full"
+        android:icon="@drawable/ic_baseline_battery_full_24px"
+        android:title="Bateria llena"
+        app:showAsAction="always" />
 </menu>

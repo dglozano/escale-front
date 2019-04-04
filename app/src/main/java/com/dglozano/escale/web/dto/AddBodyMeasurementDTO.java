@@ -12,12 +12,13 @@ public class AddBodyMeasurementDTO {
     private float bones;
     private float muscles;
     private Date date;
+    private boolean manual;
 
     public AddBodyMeasurementDTO() {
     }
 
     public AddBodyMeasurementDTO(Long patientId, float weight, float water, float fat,
-                                 float bmi, float bones, float muscles, Date date) {
+                                 float bmi, float bones, float muscles, Date date, boolean manual) {
         this.patientId = patientId;
         this.weight = weight;
         this.water = water;
@@ -26,6 +27,7 @@ public class AddBodyMeasurementDTO {
         this.bones = bones;
         this.muscles = muscles;
         this.date = date;
+        this.manual = manual;
     }
 
     public Long getPatientId() {
@@ -90,5 +92,13 @@ public class AddBodyMeasurementDTO {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public boolean isManual() {
+        return manual;
+    }
+
+    public void setManual(boolean manual) {
+        this.manual = manual;
     }
 }

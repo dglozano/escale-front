@@ -121,7 +121,7 @@
             android:focusable="true"
             android:text="@string/login_reset_password_text"
             android:textAlignment="center"
-            android:textColor="@color/almostWhite"
+            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="@id/login_root" />
 
         <RelativeLayout

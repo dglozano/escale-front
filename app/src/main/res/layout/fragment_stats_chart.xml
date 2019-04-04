@@ -62,7 +62,7 @@
             <co.ceryle.radiorealbutton.RadioRealButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:rrb_drawable="@drawable/home_ic_scale_colored"
+                app:rrb_drawable="@drawable/home_ic_weight_kg"
                 app:rrb_drawableGravity="top"
                 app:rrb_drawableHeight="18dp"
                 app:rrb_drawablePadding="8dp"

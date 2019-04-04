@@ -18,4 +18,7 @@
     <color name="colorBlackOverlay">#e0313131</color>
     <color name="almostWhiteOverlay">#e0fafafa</color>
     <color name="colorPrimaryDarkTransparent">#a9023246</color>
+    <color name="colorCenterProfileGradientOverlay">#c881d4fa</color>
+    <color name="colorEdgeProfileGradientOverlay">#960288d1</color>
+    <color name="colorPrimaryVeryDark">#01579b</color>
 </resources>

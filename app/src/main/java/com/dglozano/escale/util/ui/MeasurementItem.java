@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class MeasurementItem implements Parcelable {
+public class MeasurementItem {
 
     public static final int ICON_RESOURCE_WEIGHT = 1;
     public static final int ICON_RESOURCE_WATER = 2;
@@ -84,16 +84,6 @@ public class MeasurementItem implements Parcelable {
 
     public void setName(MeasurementName name) {
         this.name = name;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
     }
 
     public enum MeasurementName {

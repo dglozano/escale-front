@@ -2,20 +2,20 @@ package com.dglozano.escale.db;
 
 import android.arch.persistence.room.TypeConverter;
 
-import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.db.entity.Patient;
+import com.dglozano.escale.util.FileUtils;
 
 import java.util.Date;
 
 public class DatabaseConverters {
     @TypeConverter
     public Long dateToLong(Date date) {
-        return date.getTime();
+        return date != null ? date.getTime() : null;
     }
 
     @TypeConverter
     public Date longToDate(Long time) {
-        return new Date(time);
+        return time != null ? new Date(time) : null;
     }
 
     @TypeConverter
@@ -29,7 +29,7 @@ public class DatabaseConverters {
     }
 
     @TypeConverter
-    public Integer fileStatusToInt(Diet.FileStatus fileStatus) {
+    public Integer fileStatusToInt(FileUtils.FileStatus fileStatus) {
         switch (fileStatus) {
             case DOWNLOADING:
                 return 1;
@@ -42,15 +42,15 @@ public class DatabaseConverters {
     }
 
     @TypeConverter
-    public Diet.FileStatus intToFileStatus(Integer integer) {
+    public FileUtils.FileStatus intToFileStatus(Integer integer) {
         switch (integer) {
             case 1:
-                return Diet.FileStatus.DOWNLOADING;
+                return FileUtils.FileStatus.DOWNLOADING;
             case 2:
-                return Diet.FileStatus.DOWNLOADED;
+                return FileUtils.FileStatus.DOWNLOADED;
             case 3:
-                return Diet.FileStatus.NOT_DOWNLOADED;
+                return FileUtils.FileStatus.NOT_DOWNLOADED;
         }
-        return Diet.FileStatus.NOT_DOWNLOADED;
+        return FileUtils.FileStatus.NOT_DOWNLOADED;
     }
 }

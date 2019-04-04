@@ -10,6 +10,7 @@ import com.dglozano.escale.di.annotation.RootFileDirectory;
 import com.dglozano.escale.exception.DietDownloadStateException;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.FileUtils;
 import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.DietDTO;
@@ -93,7 +94,6 @@ public class DietRepository {
 
                     List<Diet> dietsInDatabase = mDietDao.getAllDietsOfUserWithId(patientId);
 
-
                     if (dietsInDatabase != null) {
                         dietsInDatabase
                                 .stream()
@@ -110,13 +110,13 @@ public class DietRepository {
         mAppExecutors.getDiskIO().execute(() -> {
             boolean deleted = file.delete();
             Timber.e("Was file %s deleted? %s", file, deleted);
-            diet.setFileStatus(Diet.FileStatus.NOT_DOWNLOADED);
+            diet.setFileStatus(FileUtils.FileStatus.NOT_DOWNLOADED);
             mDietDao.updateDiet(diet);
         });
     }
 
     public File getDietPdfFile(Diet diet) throws DietDownloadStateException {
-        if (diet.getFileStatus().equals(Diet.FileStatus.DOWNLOADED)) {
+        if (diet.getFileStatus().equals(FileUtils.FileStatus.DOWNLOADED)) {
             return new File(mFileDirectory.getPath(), diet.getLocalFileName());
         } else {
             throw new DietDownloadStateException("La dieta no se encuentra descargada.");
@@ -143,7 +143,7 @@ public class DietRepository {
         return Completable.fromCallable(() -> {
             Optional<Diet> diet = mDietDao.getDietById(uuid);
             if(diet.isPresent()) {
-                if (diet.get().getFileStatus().equals(Diet.FileStatus.DOWNLOADED)) {
+                if (diet.get().getFileStatus().equals(FileUtils.FileStatus.DOWNLOADED)) {
                     boolean deleted = new File(mFileDirectory.getPath(), diet.get().getLocalFileName()).delete();
                     Timber.e("Was diet file deleted? %s", deleted);
                 }

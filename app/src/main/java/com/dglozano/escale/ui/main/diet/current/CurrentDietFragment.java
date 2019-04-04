@@ -16,9 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.db.entity.Diet;
+import com.dglozano.escale.util.FileUtils;
 import com.dglozano.escale.util.ui.CustomPdfScrollHandle;
-import com.dglozano.escale.web.services.DownloadService;
+import com.dglozano.escale.web.services.DietDownloadService;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
 
@@ -106,9 +106,9 @@ public class CurrentDietFragment extends Fragment {
                     case NOT_DOWNLOADED:
                         mDietPdfProgressBar.setVisibility(View.VISIBLE);
                         mPdfView.setVisibility(View.GONE);
-                        Intent startIntent = new Intent(getActivity(), DownloadService.class);
+                        Intent startIntent = new Intent(getActivity(), DietDownloadService.class);
                         startIntent.putExtra("diet-uuid", currentDiet.getId());
-                        currentDiet.setFileStatus(Diet.FileStatus.DOWNLOADING);
+                        currentDiet.setFileStatus(FileUtils.FileStatus.DOWNLOADING);
                         mViewModel.updateDiet(currentDiet);
                         getActivity().startService(startIntent);
                         break;
@@ -119,7 +119,6 @@ public class CurrentDietFragment extends Fragment {
                 mSwipeRefreshLayout.setRefreshing(isRefreshing != null && isRefreshing));
         mSwipeRefreshLayout.setOnRefreshListener(() -> mViewModel.refreshCurrentDiet());
     }
-
 
     @Override
     public void onDestroyView() {

@@ -76,7 +76,8 @@ public class AddMeasurementViewModel extends ViewModel {
                     Float.parseFloat(fat),
                     Float.parseFloat(bmi),
                     Float.parseFloat(bones),
-                    Float.parseFloat(muscle))
+                    Float.parseFloat(muscle),
+                    true)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe((d) -> mLoading.postValue(true))

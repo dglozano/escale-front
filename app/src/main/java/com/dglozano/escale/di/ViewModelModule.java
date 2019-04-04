@@ -4,13 +4,15 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 
 import com.dglozano.escale.di.annotation.ViewModelKey;
-import com.dglozano.escale.ui.common.ChangePasswordActivityViewModel;
+import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivityViewModel;
+import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivityViewModel;
+import com.dglozano.escale.ui.drawer.profile.PatientProfileActivityViewModel;
 import com.dglozano.escale.ui.login.LoginActivityViewModel;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.diet.DietViewModel;
+import com.dglozano.escale.ui.main.diet.all.AllDietsViewModel;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietViewModel;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivityViewModel;
-import com.dglozano.escale.ui.main.diet.all.AllDietsViewModel;
 import com.dglozano.escale.ui.main.home.AddMeasurementViewModel;
 import com.dglozano.escale.ui.main.home.HomeViewModel;
 import com.dglozano.escale.ui.main.messages.MessagesViewModel;
@@ -86,9 +88,20 @@ public abstract class ViewModelModule {
 
     @Binds
     @IntoMap
+    @ViewModelKey(PatientProfileActivityViewModel.class)
+    abstract ViewModel bindProfileActivityViewModel(PatientProfileActivityViewModel profileActivityViewModel);
+
+    @Binds
+    @IntoMap
     @ViewModelKey(ChangePasswordActivityViewModel.class)
     abstract ViewModel bindChangePasswordActivityViewModel(
             ChangePasswordActivityViewModel changePasswordActivityViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(RecoverPasswordActivityViewModel.class)
+    abstract ViewModel bindRecoverPasswordActivityViewModel(
+            RecoverPasswordActivityViewModel recoverPasswordActivityViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory factory);

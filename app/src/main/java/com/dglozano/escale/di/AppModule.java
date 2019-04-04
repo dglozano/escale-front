@@ -19,6 +19,7 @@ import com.dglozano.escale.di.annotation.ApplicationContext;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BaseUrl;
 import com.dglozano.escale.di.annotation.BluetoothInfo;
+import com.dglozano.escale.di.annotation.CacheDirectory;
 import com.dglozano.escale.di.annotation.DatabaseInfo;
 import com.dglozano.escale.di.annotation.RootFileDirectory;
 import com.dglozano.escale.util.Constants;
@@ -32,6 +33,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.polidea.rxandroidble2.RxBleClient;
+import com.squareup.picasso.OkHttp3Downloader;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -137,6 +140,13 @@ public class AppModule {
 
     @Provides
     @ApplicationScope
+    @CacheDirectory
+    File getCacheDirectory(@ApplicationContext Context context) {
+        return context.getCacheDir();
+    }
+
+    @Provides
+    @ApplicationScope
     RxBleClient providesRxBleClient(@ApplicationContext Context context) {
         return RxBleClient.create(context);
     }
@@ -226,4 +236,21 @@ public class AppModule {
     ApiServiceHolder provideApiServiceHolder() {
         return new ApiServiceHolder();
     }
+
+    @Provides
+    @ApplicationScope
+    public Picasso picasso(@ApplicationContext Context context, OkHttp3Downloader okHttp3Downloader){
+        return new Picasso.Builder(context)
+                .loggingEnabled(true)
+                .indicatorsEnabled(true)
+                .downloader(okHttp3Downloader)
+                .build();
+    }
+
+    @Provides
+    @ApplicationScope
+    public OkHttp3Downloader okHttp3Downloader(OkHttpClient okHttpClient){
+        return new OkHttp3Downloader(okHttpClient);
+    }
+
 }

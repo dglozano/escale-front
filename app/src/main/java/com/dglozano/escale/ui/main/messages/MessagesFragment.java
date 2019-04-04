@@ -17,7 +17,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
@@ -130,7 +129,7 @@ public class MessagesFragment extends Fragment {
     }
 
     private void setupMessagesList() {
-        String senderId = mMainActivityViewModel.getLoggedPatient().getValue().getId().toString();
+        String senderId = mMainActivityViewModel.getLoggedPatientId().toString();
         mMessagesListAdapter = new MessagesListAdapter<>(senderId, null);
         mMessagesListAdapter.enableSelectionMode(count -> {
             mMessagesViewModel.setCopyMenuVisible(count > 0);

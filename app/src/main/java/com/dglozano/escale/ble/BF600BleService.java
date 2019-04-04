@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
+import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -37,7 +38,20 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.MaybeSubject;
 import timber.log.Timber;
 
-import static com.dglozano.escale.ble.CommunicationHelper.*;
+import static com.dglozano.escale.ble.CommunicationHelper.PinIndex;
+import static com.dglozano.escale.ble.CommunicationHelper.ScaleUserLimitExcedded;
+import static com.dglozano.escale.ble.CommunicationHelper.bytesToHex;
+import static com.dglozano.escale.ble.CommunicationHelper.decToHex;
+import static com.dglozano.escale.ble.CommunicationHelper.generatePIN;
+import static com.dglozano.escale.ble.CommunicationHelper.getCurrentTimeHex;
+import static com.dglozano.escale.ble.CommunicationHelper.getHexBirthDate;
+import static com.dglozano.escale.ble.CommunicationHelper.getNextDbIncrement;
+import static com.dglozano.escale.ble.CommunicationHelper.getPhysicalActivity;
+import static com.dglozano.escale.ble.CommunicationHelper.getSexHex;
+import static com.dglozano.escale.ble.CommunicationHelper.hexToBytes;
+import static com.dglozano.escale.ble.CommunicationHelper.hexToDec;
+import static com.dglozano.escale.ble.CommunicationHelper.lastNBytes;
+import static com.dglozano.escale.ble.CommunicationHelper.parseFullMeasurementFromHex;
 
 @ApplicationScope
 public class BF600BleService extends BaseBleService {
@@ -55,7 +69,9 @@ public class BF600BleService extends BaseBleService {
     SharedPreferences sharedPreferences;
 
     private Disposable mMeasurementTriggerDisposable;
+    private Disposable mBatteryDisposable;
     private MutableLiveData<Boolean> mIsMeasurementTriggered;
+    private MutableLiveData<Integer> mBatteryLevel;
     private MutableLiveData<Event<MaybeSubject<PinIndex>>> mTriggerScaleCredentialsDialog;
     private MutableLiveData<Event<MaybeSubject<PinIndex>>> mTriggerScaleDeleteUserDialog;
     private boolean hasMeasuredDuringThisConnection = false;
@@ -73,6 +89,9 @@ public class BF600BleService extends BaseBleService {
 
         mTriggerScaleCredentialsDialog = new MutableLiveData<>();
         mTriggerScaleDeleteUserDialog = new MutableLiveData<>();
+
+        mBatteryLevel = new MutableLiveData<>();
+        mBatteryDisposable = null;
     }
 
     public void scanForBF600Scale() {
@@ -82,7 +101,8 @@ public class BF600BleService extends BaseBleService {
     private void connectToScaleAndInitialize(ScanResult scanResult) {
         mConnectionDisposable = super.connectToBleDevice(scanResult)
                 .flatMapSingle(rxBleConnection -> communicationInitialization(rxBleConnection)
-                        .flatMap(bytesIgnored -> hasScaleUsers(rxBleConnection))
+                        .flatMapCompletable(bytesIgnored -> readBatteryAndSetNotify(rxBleConnection))
+                        .andThen(hasScaleUsers(rxBleConnection))
                         .flatMap(hasScaleUsers -> {
                             if (hasScaleUsers) {
                                 return tryToLoginWithCredentials(rxBleConnection);
@@ -96,12 +116,42 @@ public class BF600BleService extends BaseBleService {
                         this::throwException);
     }
 
+    private Completable readBatteryAndSetNotify(RxBleConnection rxBleConnection) {
+        mBatteryDisposable = singleToRead(Constants.BATTERY_LEVEL, rxBleConnection)
+                .flatMapObservable(bytesRead -> {
+                    int batteryLevel = hexToDec(bytesToHex(bytesRead));
+                    mBatteryLevel.postValue(batteryLevel);
+                    Timber.d("Battery level read %s", batteryLevel);
+                    return rxBleConnection.setupNotification(Constants.BATTERY_LEVEL);
+                })
+                .doOnNext(notificationObservable -> {
+                    Timber.d("Battery service notification has been set up");
+                })
+                .flatMap(notificationObservable -> notificationObservable)
+                .subscribe(
+                        bytesReadNotified -> {
+                            int batteryLevel = hexToDec(bytesToHex(bytesReadNotified));
+                            mBatteryLevel.postValue(batteryLevel);
+                            Timber.d("Battery level notified %s", batteryLevel);
+                        },
+                        throwable -> {
+                            Timber.e(throwable, "Error while reading Battery level");
+                        }
+                );
+        return Completable.complete();
+    }
+
     private Single<Boolean> tryToLoginWithCredentials(RxBleConnection rxBleConnection) {
         Timber.d("Try to login with credentials");
         return getSavedCredentials()
                 .switchIfEmpty(Maybe.defer(this::askUserToEnterCredentials))
                 .toSingle()
                 .flatMap(pinIndex -> loginUserInScale(pinIndex.index(), pinIndex.pin(), rxBleConnection))
+                .zipWith(patientRepository.getLoggedPatientSingle(), (couldConnect, patient) ->
+                        updateUserDataIfNecessary(patient, rxBleConnection)
+                                .toSingleDefault(couldConnect)
+                )
+                .flatMap(couldConnect -> couldConnect)
                 .onErrorResumeNext(error -> {
                     if (error instanceof NoSuchElementException) {
                         return createUserAndLogin(rxBleConnection);
@@ -165,11 +215,8 @@ public class BF600BleService extends BaseBleService {
                     Timber.d("Setting scale user data");
                     Patient patient = patientAndStatus.first;
                     Boolean loginStatus = patientAndStatus.second;
-                    return writeUserData(patient.getBirthday(),
-                            patient.getGender(),
-                            patient.getPhysicalActivity(),
-                            rxBleConnection)
-                            .map(bytes -> loginStatus);
+                    return updateUserDataIfNecessary(patient, rxBleConnection)
+                            .toSingleDefault(loginStatus);
                 })
                 .doOnSuccess(couldConnect -> {
                     if (couldConnect) {
@@ -179,6 +226,19 @@ public class BF600BleService extends BaseBleService {
                         Timber.d("Couldn't login to scale");
                     }
                 });
+    }
+
+    private Completable updateUserDataIfNecessary(Patient patient, RxBleConnection rxBleConnection) {
+        if (patient.isHasToUpdateDataInScale()) {
+            return writeUserData(patient.getBirthday(),
+                    patient.getGender(),
+                    patient.getPhysicalActivity(),
+                    patient.getHeightInCm(),
+                    rxBleConnection)
+                    .flatMapCompletable(ignore -> Completable.complete());
+        } else {
+            return Completable.complete();
+        }
     }
 
     public Single<byte[]> communicationInitialization(RxBleConnection rxBleConnection) {
@@ -303,7 +363,7 @@ public class BF600BleService extends BaseBleService {
                 .doOnSuccess(couldConnect -> Timber.d("Could connect ? %1$s", couldConnect));
     }
 
-    public Single<byte[]> writeUserData(Date dateOfBirth, Patient.Gender gender, int activity,
+    public Single<byte[]> writeUserData(Date dateOfBirth, Patient.Gender gender, int activity, int heightInCm,
                                         RxBleConnection rxBleConnection) {
         Timber.d("Writing user data");
         mConnectionState.postValue(Constants.SETTING_USER_DATA);
@@ -311,9 +371,12 @@ public class BF600BleService extends BaseBleService {
                 .flatMap(bytesWritten -> singleToWrite(Constants.GENDER, getSexHex(gender), rxBleConnection))
                 .flatMap(bytesWritten -> singleToWrite(Constants.CUSTOM_FFF3_PH_ACTIVITY_CHARACTERISTIC,
                         getPhysicalActivity(activity), rxBleConnection))
+                .flatMap(bytesWritten -> singleToWrite(Constants.HEIGHT, decToHex(heightInCm), rxBleConnection))
                 .flatMap(bytesWritten -> singleToRead(Constants.DB_CHANGE_INCREMENT, rxBleConnection))
                 .flatMap(bytesRead -> singleToWrite(Constants.DB_CHANGE_INCREMENT,
                         getNextDbIncrement(bytesToHex(bytesRead)), rxBleConnection))
+                .flatMap(bytesWritten -> patientRepository.setHasToUpdateDataInScale(false, patientRepository.getLoggedPatiendId())
+                        .map(response -> bytesWritten))
                 .observeOn(Schedulers.io())
                 .doOnError(this::throwException);
     }
@@ -361,9 +424,11 @@ public class BF600BleService extends BaseBleService {
                             }
                     );
         } else {
+            disposeBatteryNotification();
             mConnectionDisposable = super.reconnectToBleDevice()
                     .flatMapSingle(rxBleConnection -> rxBleConnection.discoverServices().delay(600, TimeUnit.MILLISECONDS)
-                            .flatMap(responseIgnored -> tryToLoginWithCredentials(rxBleConnection))
+                            .flatMapCompletable(responseIgnored -> readBatteryAndSetNotify(rxBleConnection))
+                            .andThen(tryToLoginWithCredentials(rxBleConnection))
                             .flatMap(couldConnect -> {
                                 if (couldConnect) {
                                     mConnectionState.postValue(Constants.CONNECTED);
@@ -384,6 +449,7 @@ public class BF600BleService extends BaseBleService {
     private Single<Long> saveMeasurementToDb(BodyMeasurement bodyMeasurement) {
         mIsMeasurementTriggered.postValue(false);
         bodyMeasurement.setUserId(patientRepository.getLoggedPatiendId());
+        bodyMeasurement.setManual(false);
         return bodyMeasurementRepository.addMeasurement(bodyMeasurement);
     }
 
@@ -411,7 +477,7 @@ public class BF600BleService extends BaseBleService {
     }
 
     public void stopMeasurement() {
-        if (mMeasurementTriggerDisposable != null) {
+        if (mMeasurementTriggerDisposable != null && !mMeasurementTriggerDisposable.isDisposed()) {
             mMeasurementTriggerDisposable.dispose();
             mMeasurementTriggerDisposable = null;
         }
@@ -433,6 +499,19 @@ public class BF600BleService extends BaseBleService {
     public void disposeConnection() {
         super.disposeConnection();
         hasMeasuredDuringThisConnection = false;
+        disposeBatteryNotification();
+    }
+
+    private void disposeBatteryNotification() {
+        if (mBatteryDisposable != null && !mBatteryDisposable.isDisposed()) {
+            mBatteryDisposable.dispose();
+            mBatteryDisposable = null;
+            mBatteryLevel.postValue(-1);
+        }
+    }
+
+    public LiveData<Integer> getBatteryLevel() {
+        return mBatteryLevel;
     }
 
     @Nullable

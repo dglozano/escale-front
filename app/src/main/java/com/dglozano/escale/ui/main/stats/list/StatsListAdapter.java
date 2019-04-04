@@ -38,6 +38,10 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
     Drawable arrowDown;
     @BindDrawable(R.drawable.ic_stats_arrow_up)
     Drawable arrowUp;
+    @BindDrawable(R.drawable.ic_manual_mesaurement_icon)
+    Drawable manualMeasurementIcon;
+    @BindDrawable(R.drawable.home_ic_scale_colored)
+    Drawable scaleMeasurementIcon;
     @BindColor(R.color.almostWhite)
     int almostWhite;
     @BindColor(android.R.color.white)
@@ -48,7 +52,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
     private int mExpandedPosition = UNSELECTED;
     private RecyclerView mRecyclerView;
     private List<BodyMeasurement> mBodyMeasurementList;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("EEEE dd/MM/yyyy 'a las' H:mm 'hs.'", Locale.getDefault());
+    private final SimpleDateFormat sdf = new SimpleDateFormat("EEE dd/MM/yyyy 'a las' H:mm 'hs.'", Locale.getDefault());
     private final DecimalFormat df = new DecimalFormat("###.##");
 
     @Override
@@ -94,6 +98,12 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
             holder.measurementItemFat.setText(String.format("%s %%", df.format(bm.getFat())));
             holder.measurementItemMuscle.setText(String.format("%s %%", df.format(bm.getMuscles())));
             holder.measurementItemWater.setText(String.format("%s %%", df.format(bm.getWater())));
+            holder.measurementItemManualOrScaleImage.setImageDrawable(bm.isManual() ?
+                    manualMeasurementIcon : scaleMeasurementIcon);
+            holder.measurementItemManualOrScaleText.setText(bm.isManual() ?
+                    R.string.manual_measurement : R.string.scale_measurement );
+            holder.measurementHeaderManualOrScaleImage.setImageDrawable(bm.isManual() ?
+                    manualMeasurementIcon : scaleMeasurementIcon);
         }
 
         boolean isSelected = position == mExpandedPosition;
@@ -127,6 +137,8 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
         TextView measurementDate;
         @BindView(R.id.measurement_group_arrow)
         ImageView measurementArrow;
+        @BindView(R.id.measurement_group_is_manual_img)
+        ImageView measurementHeaderManualOrScaleImage;
         @BindView(R.id.measurement_group_list)
         ExpandableLayout measurementListExpandable;
         @BindView(R.id.measurement_item_weight)
@@ -139,6 +151,10 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
         TextView measurementItemBmi;
         @BindView(R.id.measurement_item_muscle)
         TextView measurementItemMuscle;
+        @BindView(R.id.measurement_item_manual_or_scale_icon)
+        ImageView measurementItemManualOrScaleImage;
+        @BindView(R.id.measurement_item_manual_or_scale_text)
+        TextView measurementItemManualOrScaleText;
 
         BodyMeasurementViewHolder(View v) {
             super(v);

@@ -8,6 +8,8 @@ import android.arch.lifecycle.ViewModel;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.entity.Patient;
+import com.dglozano.escale.di.annotation.BaseUrl;
+import com.dglozano.escale.exception.AccountDisabledException;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
@@ -15,6 +17,8 @@ import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.Event;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -38,6 +42,7 @@ public class MainActivityViewModel extends ViewModel {
     private final SharedPreferences mSharedPreferences;
     private final CompositeDisposable disposables;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
+    private final MutableLiveData<Event<Integer>> mLogoutEvent;
     private MediatorLiveData<Boolean> mShowAppBarShadow;
     private LiveData<Boolean> mAreDietsEmpty;
     private LiveData<Boolean> mAreMeasurementsEmpty;
@@ -46,7 +51,6 @@ public class MainActivityViewModel extends ViewModel {
     private MutableLiveData<Boolean> mIsRefreshingMessages;
     private MutableLiveData<Boolean> mIsRefreshingPatient;
     private MutableLiveData<Boolean> mIsRefreshingMeasurements;
-
 
     @Inject
     public MainActivityViewModel(PatientRepository patientRepository,
@@ -60,6 +64,7 @@ public class MainActivityViewModel extends ViewModel {
         mMeasurementRepository = bodyMeasurementRepository;
         mSharedPreferences = sharedPreferences;
         mErrorEvent = new MutableLiveData<>();
+        mLogoutEvent = new MutableLiveData<>();
         positionOfCurrentFragment = new MutableLiveData<>();
         positionOfCurrentFragment.postValue(0);
         mLoggedPatient = mPatientRepository.getLoggedPatient();
@@ -112,10 +117,15 @@ public class MainActivityViewModel extends ViewModel {
                 .doOnSubscribe(d -> mIsRefreshingPatient.postValue(true))
                 .subscribe(this::refreshEverythingElse,
                         error -> {
-                            if (error instanceof NoSuchElementException) {
+                            if (error instanceof AccountDisabledException) {
+                                Timber.d("The user's account was disabled");
+                                mIsRefreshingPatient.postValue(false);
+                                logout();
+                            } else if (error instanceof NoSuchElementException) {
                                 // Means that the user was fresh enough, so didn't have to call api
                                 refreshEverythingElse(mPatientRepository.getLoggedPatiendId());
                             } else {
+                                mIsRefreshingPatient.postValue(false);
                                 Timber.e(error);
                             }
                         })
@@ -221,6 +231,11 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     public void logout() {
+        logout(-1);
+    }
+
+    public void logout(Integer logoutMessageResourceId) {
+        mLogoutEvent.postValue(new Event<>(logoutMessageResourceId));
         mPatientRepository.logout();
     }
 
@@ -270,6 +285,10 @@ public class MainActivityViewModel extends ViewModel {
         return mErrorEvent;
     }
 
+    public LiveData<Event<Integer>> getLogoutEvent() {
+        return mLogoutEvent;
+    }
+
     public LiveData<Integer> getNumberOfUnreadMessages() {
         return mNumberOfUnreadMessages;
     }
@@ -306,6 +325,10 @@ public class MainActivityViewModel extends ViewModel {
 
     public MediatorLiveData<Boolean> getAppBarShadowStatus() {
         return mShowAppBarShadow;
+    }
+
+    public URL getProfileImageUrlOfLoggedPatient() throws MalformedURLException {
+        return mPatientRepository.getProfileImageUrlOfLoggedPatient();
     }
 }
 

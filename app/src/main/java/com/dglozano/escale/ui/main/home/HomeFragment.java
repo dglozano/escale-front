@@ -1,5 +1,6 @@
 package com.dglozano.escale.ui.main.home;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
@@ -18,6 +19,9 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -33,12 +37,13 @@ import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.util.Constants;
-import com.dglozano.escale.util.LocationPermission;
+import com.dglozano.escale.util.PermissionHelper;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.util.ui.MeasurementItem;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -61,8 +66,6 @@ import static com.dglozano.escale.ui.main.MainActivity.ADD_MEASUREMENT_CODE;
 public class HomeFragment extends Fragment
         implements AskScaleCredentialsDialog.ScaleCredentialsDialogListener {
 
-    private static final int SCAN_REQUEST_CODE = 42;
-
     @BindView(R.id.layout_measurement)
     RelativeLayout mMeasurementLayout;
     @BindView(R.id.ble_connect_btn)
@@ -81,6 +84,8 @@ public class HomeFragment extends Fragment
     WebView mLoaderWebView;
     @BindView(R.id.weight_gauge_text)
     TextView mWeightTexView;
+    @BindView(R.id.weight_gauge_goal_text)
+    TextView mGoalTextView;
     @BindView(R.id.bmi_number_top)
     TextView mBmiTextView;
     @BindView(R.id.fat_number_top)
@@ -145,6 +150,7 @@ public class HomeFragment extends Fragment
         return new HomeFragment();
     }
 
+
     private void observeServiceLiveData() {
         Timber.d("Start observing Bluetooth Service data.");
         mBF600BleService.isScanningOrConnecting().observe(this, this::showLoader);
@@ -152,6 +158,107 @@ public class HomeFragment extends Fragment
         mBF600BleService.getIsMeasurementTriggered().observe(this, this::showStepOnScale);
         mBF600BleService.showScaleCredentialsDialogEvent().observe(this, this::showScaleCredentialsDialogToLogin);
         mBF600BleService.showScaleCredentialsDialogToDeleteUserEvent().observe(this, this::showScaleCredentialsDialogToDelete);
+        mBF600BleService.getBatteryLevel().observe(this, this::showBatteryLevel);
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        mLoaderWebView.loadUrl("file:///android_asset/loader.html");
+
+        mRecyclerViewMeasurements.setHasFixedSize(true);
+        mRecyclerViewMeasurements.setLayoutManager(mLayoutManager);
+        mRecyclerViewMeasurements.setItemAnimator(mDefaultItemAnimator);
+        mRecyclerViewMeasurements.addItemDecoration(mDividerItemDecoration);
+        mRecyclerViewMeasurements.setAdapter(mMeasurementListAdapter);
+
+        mHomeViewModel.getLastBodyMeasurement().observe(this, bodyMeasurement -> {
+            if (bodyMeasurement == null || !bodyMeasurement.isPresent()) {
+                mWeightTexView.setText("-");
+                mBmiTextView.setText("-");
+                mFatTextView.setText("-");
+                mLastRowImageView.setVisibility(View.GONE);
+                mLastRowText.setText(R.string.no_body_measurement_yet);
+            } else {
+                mWeightTexView.setText(formatDecimal(bodyMeasurement.get().getWeight()));
+                mBmiTextView.setText(formatDecimal(bodyMeasurement.get().getBmi()));
+                mFatTextView.setText(formatDecimal(bodyMeasurement.get().getFat()));
+                mLastRowImageView.setVisibility(View.VISIBLE);
+                mLastRowText.setText(String.format("%shs", dateFormat.format(bodyMeasurement.get().getDate())));
+            }
+            mMeasurementListAdapter.setItems(MeasurementItem.getMeasurementList(
+                    bodyMeasurement == null ? Optional.empty() : bodyMeasurement));
+        });
+
+        mHomeViewModel.getLoggedPatient().observe(this, patient -> {
+            if (patient != null && patient.getGoalInKg() != null && patient.getGoalInKg() > 0f
+                    && patient.getGoalDueDate() != null
+                    && Calendar.getInstance().getTime().before(patient.getGoalDueDate())) {
+                DecimalFormat df = new DecimalFormat("'META' ###.# 'kg'");
+                mGoalTextView.setText(df.format(patient.getGoalInKg()));
+            } else {
+                mGoalTextView.setText(R.string.no_goal_set);
+            }
+        });
+
+        mCustomGauge.setValue(1000);
+    }
+
+    private void showBatteryLevel(Integer batteryLevel) {
+        if (batteryLevel == null) {
+            mHomeViewModel.setBatteryLevel(-1);
+        } else {
+            mHomeViewModel.setBatteryLevel(batteryLevel);
+        }
+        getActivity().invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.home_menu, menu);
+        MenuItem almostEmpty = menu.findItem(R.id.home_menu_battery_almost_empty);
+        MenuItem percent20 = menu.findItem(R.id.home_menu_battery_percent20);
+        MenuItem percent50 = menu.findItem(R.id.home_menu_battery_percent50);
+        MenuItem percent80 = menu.findItem(R.id.home_menu_battery_percent80);
+        MenuItem almostFull = menu.findItem(R.id.home_menu_battery_almost_full);
+        almostEmpty.setVisible(false);
+        percent20.setVisible(false);
+        percent50.setVisible(false);
+        percent80.setVisible(false);
+        almostFull.setVisible(false);
+        Integer batteryLevel = mHomeViewModel.getBatteryLevel();
+
+        if (mHomeViewModel.isScaleConnected() && batteryLevel != -1) {
+            if (batteryLevel > 0 && batteryLevel < 15) {
+                almostEmpty.setVisible(true);
+            } else if (batteryLevel >= 15 && batteryLevel < 35) {
+                percent20.setVisible(true);
+            } else if (batteryLevel >= 35 && batteryLevel < 65) {
+                percent50.setVisible(true);
+            } else if (batteryLevel >= 65 && batteryLevel < 85) {
+                percent80.setVisible(true);
+            } else if (batteryLevel >= 85 && batteryLevel <= 100) {
+                almostFull.setVisible(true);
+            }
+        }
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.home_menu_battery_almost_empty ||
+                id == R.id.home_menu_battery_percent20 ||
+                id == R.id.home_menu_battery_percent50 ||
+                id == R.id.home_menu_battery_percent80 ||
+                id == R.id.home_menu_battery_almost_full) {
+            Toast.makeText(getActivity(), String.format("%s %% Bateria de Balanza", mHomeViewModel.getBatteryLevel()), Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
     }
 
     private void showScaleCredentialsDialogToLogin(Event<MaybeSubject<CommunicationHelper.PinIndex>> maybeSubjectEvent) {
@@ -202,6 +309,9 @@ public class HomeFragment extends Fragment
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
+
+        setHasOptionsMenu(true);
+
         return view;
     }
 
@@ -216,38 +326,6 @@ public class HomeFragment extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        mLoaderWebView.loadUrl("file:///android_asset/loader.html");
-
-        mRecyclerViewMeasurements.setHasFixedSize(true);
-        mRecyclerViewMeasurements.setLayoutManager(mLayoutManager);
-        mRecyclerViewMeasurements.setItemAnimator(mDefaultItemAnimator);
-        mRecyclerViewMeasurements.addItemDecoration(mDividerItemDecoration);
-        mRecyclerViewMeasurements.setAdapter(mMeasurementListAdapter);
-
-        mHomeViewModel.getLastBodyMeasurement().observe(this, bodyMeasurement -> {
-            if (bodyMeasurement == null || !bodyMeasurement.isPresent()) {
-                mWeightTexView.setText("-");
-                mBmiTextView.setText("-");
-                mFatTextView.setText("-");
-                mLastRowImageView.setVisibility(View.GONE);
-                mLastRowText.setText(R.string.no_body_measurement_yet);
-            } else {
-                mWeightTexView.setText(formatDecimal(bodyMeasurement.get().getWeight()));
-                mBmiTextView.setText(formatDecimal(bodyMeasurement.get().getBmi()));
-                mFatTextView.setText(formatDecimal(bodyMeasurement.get().getFat()));
-                mLastRowImageView.setVisibility(View.VISIBLE);
-                mLastRowText.setText(String.format("%shs", dateFormat.format(bodyMeasurement.get().getDate())));
-            }
-            mMeasurementListAdapter.setItems(MeasurementItem.getMeasurementList(
-                    bodyMeasurement == null ? Optional.empty() : bodyMeasurement));
-        });
-
-        mCustomGauge.setValue(1000);
     }
 
     @Override
@@ -277,7 +355,7 @@ public class HomeFragment extends Fragment
     @Override
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions,
                                            @NonNull final int[] grantResults) {
-        if (LocationPermission.isRequestLocationPermissionGranted(requestCode, permissions, grantResults)
+        if (PermissionHelper.isRequestLocationPermissionGranted(requestCode, permissions, grantResults)
                 && mHasClickedScan) {
             mHasClickedScan = false;
             if (mBleServiceIsBound) {
@@ -300,7 +378,7 @@ public class HomeFragment extends Fragment
                 Toast.makeText(mMainActivity, "Couldn't disconnect. Try again...", Toast.LENGTH_SHORT).show();
             }
         } else {
-            if (LocationPermission.checkLocationPermissionGranted(mMainActivity)) {
+            if (PermissionHelper.checkLocationPermissionGranted(mMainActivity)) {
                 Timber.d("Clicked on connect. Permission already granted...");
                 if (mBleServiceIsBound) {
                     Timber.d("BleService is Bound. Starting Ble Scan...");
@@ -311,22 +389,22 @@ public class HomeFragment extends Fragment
             } else {
                 Timber.d("Doesn't have Permission. Asking for it...");
                 mHasClickedScan = true;
-                LocationPermission.requestLocationPermissionInFragment(this);
+                PermissionHelper.requestLocationPermissionInFragment(this);
             }
         }
     }
 
     private void switchConnected(String state) {
         boolean connected = state.equals(Constants.CONNECTED);
+        Timber.d("Bluetooth BLE State %s", state);
         mLoaderText.setText(String.format("%1$s...", state));
+        mHomeViewModel.setIsScaleConnected(connected);
         if (connected) {
-            Timber.d("Bluetooth BLE Connected. Changing Button color and text...");
             mConnectButton.setBackgroundColor(mColorPrimary);
             mConnectButton.setText(mConnectedString.toUpperCase());
             mConnectButton.setIconResource(mBleConnectedIconDrawable);
             mAddMeasurementButton.setImageResource(R.drawable.home_ic_menu_add_weight_scale);
         } else {
-            Timber.d("Bluetooth BLE Disconnected. Changing Button color and text...");
             if (mAskScaleCredentialsDialog != null) {
                 mAskScaleCredentialsDialog.dismiss();
                 mAskScaleCredentialsDialog = null;
@@ -337,6 +415,7 @@ public class HomeFragment extends Fragment
             mConnectButton.setIconResource(mBleDisonnectedIconDrawable);
             mAddMeasurementButton.setImageResource(R.drawable.home_ic_menu_add_weight_manually);
         }
+        getActivity().invalidateOptionsMenu();
     }
 
     private void showLoader(boolean isScanningOrConnecting) {

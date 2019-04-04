@@ -9,7 +9,6 @@ import android.util.LongSparseArray;
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Chat;
 import com.dglozano.escale.db.entity.ChatMessage;
-import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.ui.Event;
@@ -60,10 +59,14 @@ public class MessagesViewModel extends ViewModel {
     }
 
     private void setChatParticipants() {
-        Patient patient = mPatientRepository.getLoggedPatient().getValue();
-        Long doctorId = patient.getDoctorId();
-        mChatParticipants.put(patient.getId(), new AuthorImpl(patient.getId(), patient.getFirstName()));
-        mChatParticipants.put(doctorId, new AuthorImpl(doctorId, "Doctor"));
+        disposables.add(mPatientRepository.getLoggedPatientSingle()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(patient -> {
+                    Timber.d("Setting up chat participants for users %s and %s", patient.getId(), patient.getDoctorId());
+                    mChatParticipants.put(patient.getId(), new AuthorImpl(patient.getId(), patient.getFirstName()));
+                    mChatParticipants.put(patient.getDoctorId(), new AuthorImpl(patient.getDoctorId(), "Doctor"));
+                }, Timber::e));
     }
 
     public LiveData<List<MessageImpl>> getMessagesOfPatientChat() {
@@ -71,7 +74,8 @@ public class MessagesViewModel extends ViewModel {
     }
 
     public void sendMessage(String message) {
-        disposables.add(mChatRepository.sendMessage(message, mPatientRepository.getLoggedPatient().getValue())
+        disposables.add(mPatientRepository.getLoggedPatientSingle()
+                .flatMapCompletable(patient -> mChatRepository.sendMessage(message, patient))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(d -> mIsSending.postValue(true))

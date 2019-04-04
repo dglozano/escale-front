@@ -48,6 +48,6 @@ public interface DietDao {
     @Delete
     void deleteDiet(Diet diet);
 
-    @Query("DELETE FROM Patient WHERE id == :uuid")
+    @Query("DELETE FROM Diet WHERE id == :uuid")
     void deleteDietById(String uuid);
 }

@@ -1,7 +1,7 @@
 package com.dglozano.escale.di;
 
 import com.dglozano.escale.ble.BF600BleService;
-import com.dglozano.escale.web.services.DownloadService;
+import com.dglozano.escale.web.services.DietDownloadService;
 import com.dglozano.escale.web.services.FirebaseTokenSenderService;
 import com.dglozano.escale.web.services.MyFirebaseMessagingService;
 
@@ -15,7 +15,7 @@ public abstract class ServiceBuilderModule {
     public abstract BF600BleService contributeBleService();
 
     @ContributesAndroidInjector
-    public abstract DownloadService contributeDownloadService();
+    public abstract DietDownloadService contributeDietDownloadService();
 
     @ContributesAndroidInjector
     public abstract FirebaseTokenSenderService contributeFirebaseTokenSenderService();

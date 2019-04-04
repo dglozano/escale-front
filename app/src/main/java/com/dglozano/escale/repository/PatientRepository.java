@@ -12,27 +12,40 @@ import com.dglozano.escale.db.entity.AppUser;
 import com.dglozano.escale.db.entity.Doctor;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
+import com.dglozano.escale.di.annotation.BaseUrl;
+import com.dglozano.escale.di.annotation.CacheDirectory;
 import com.dglozano.escale.di.annotation.RootFileDirectory;
+import com.dglozano.escale.exception.AccountDisabledException;
 import com.dglozano.escale.exception.BadCredentialsException;
 import com.dglozano.escale.exception.ChangePasswordException;
 import com.dglozano.escale.exception.NotAPatientException;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
-import com.dglozano.escale.util.FileUtil;
+import com.dglozano.escale.util.FileUtils;
 import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.Credentials;
 import com.dglozano.escale.web.dto.LoginResponse;
+import com.dglozano.escale.web.dto.UpdatePatientDTO;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import timber.log.Timber;
 
 import static com.dglozano.escale.util.Constants.FRESH_TIMEOUT;
@@ -58,12 +71,17 @@ public class PatientRepository {
     private LiveData<Patient> mLoggedPatient;
     private EscaleDatabase mRoomDatabase;
     private File mRootFileDirectory;
+    private File mCacheDirectory;
+    private String baseUrl;
 
     @Inject
     public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi, DoctorDao doctorDao,
                              UserDao userDao, AppExecutors executors, SharedPreferences sharedPreferences,
-                             EscaleDatabase roomDatabase, @RootFileDirectory File rootFileDirectory) {
+                             EscaleDatabase roomDatabase, @RootFileDirectory File rootFileDirectory,
+                             @BaseUrl String baseUrl, @CacheDirectory File cacheDirectory) {
+        this.baseUrl = baseUrl;
         mRootFileDirectory = rootFileDirectory;
+        mCacheDirectory = cacheDirectory;
         mUserDao = userDao;
         mDoctorDao = doctorDao;
         mPatientDao = patientDao;
@@ -86,15 +104,13 @@ public class PatientRepository {
         return mSharedPreferences.getLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
     }
 
-
     public LiveData<Patient> getLoggedPatient() {
-        return mLoggedPatient;
+        return mPatientDao.getPatientById(getLoggedPatiendId());
     }
 
     public Single<Patient> getLoggedPatientSingle() {
         return mPatientDao.getPatientSingleById(getLoggedPatiendId());
     }
-
 
     public LiveData<Long> getLoggedPatientIdAsLiveData() {
         return mLoggedUserId;
@@ -108,6 +124,9 @@ public class PatientRepository {
                     // If the user had proper Credentials, but it is not a Patient,
                     // he can't use the mobile app.
                     throw new NotAPatientException();
+                }
+                if (!loginResponseBody.isEnabled()) {
+                    throw new AccountDisabledException();
                 }
                 Long loggedUserId = loginResponseBody.getId();
                 String newToken = response.headers().get(Constants.TOKEN_HEADER_KEY);
@@ -150,14 +169,19 @@ public class PatientRepository {
         return mPatientDao.hasUser(userId, FRESH_TIMEOUT)
                 .map(freshInt -> freshInt == 1)
                 .flatMapMaybe(hasFreshUser -> {
-                    if (!hasFreshUser) {
-                        return Maybe.fromSingle(mEscaleRestApi.getPatientById(userId));
-                    } else {
-                        return Maybe.empty();
-                    }
+                    // TODO: For now, I will query for the patient information always, even if it is fresh.
+//                    if (!hasFreshUser) {
+//                        return Maybe.fromSingle(mEscaleRestApi.getPatientById(userId));
+//                    } else {
+//                        return Maybe.empty();
+//                    }
+                    return Maybe.fromSingle(mEscaleRestApi.getPatientById(userId));
                 })
                 .flatMapSingle(patientDTO -> {
-                    Timber.d("Retrieved user with id %s from Api. Saving to db...", userId);
+                    Timber.d("Retrieved user with id %s from Api.", userId);
+                    if (!patientDTO.isEnabled()) {
+                        throw new AccountDisabledException();
+                    }
                     return Single.fromCallable(() -> {
                         Doctor doctor = new Doctor(patientDTO.getDoctorDTO(), Calendar.getInstance().getTime());
                         AppUser user = new AppUser(doctor);
@@ -172,6 +196,20 @@ public class PatientRepository {
                     AppUser user = new AppUser(patient);
                     mUserDao.save(user);
                     return mPatientDao.save(patient);
+                }));
+    }
+
+    public Completable saveNewGoalOnNotified(Long loggedPatiendId, Float weightInKg, String dueDate) {
+        return mPatientDao.getPatientSingleById(loggedPatiendId)
+                .flatMapCompletable(patient -> Completable.fromCallable(() -> {
+                    String format = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+                    SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
+                    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    Date date = sdf.parse(dueDate);
+                    patient.setGoalInKg(weightInKg);
+                    patient.setGoalDueDate(date);
+                    mPatientDao.update(patient);
+                    return Completable.complete();
                 }));
     }
 
@@ -198,8 +236,55 @@ public class PatientRepository {
             editor.apply();
             Timber.d("Clearing db");
             mRoomDatabase.clearAllTables();
-            Timber.d("Clearing files");
-            FileUtil.deleteContentOfRootDirectory(mRootFileDirectory);
+            Timber.d("Clearing internal storage");
+            FileUtils.deleteContentOfDirectory(mRootFileDirectory);
+            Timber.d("Clearing cache directory");
+            FileUtils.deleteContentOfDirectory(mCacheDirectory);
         });
+    }
+
+    public Completable uploadPicture(File picture, String mediaType) {
+        // create RequestBody instance from file
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse(mediaType),
+                        picture
+                );
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("file", picture.getName(), requestFile);
+
+        // finally, execute the request
+        return mEscaleRestApi.uploadProfilePicture(body, getLoggedPatiendId())
+                .doOnComplete(() -> {
+                    Timber.d("Was temp picture deleted? %s", picture.delete());
+                });
+    }
+
+    public URL getProfileImageUrlOfLoggedPatient() throws MalformedURLException {
+        return new URL(String.format("%s/api/patients/%s/profile_image", baseUrl, getLoggedPatiendId()));
+
+    }
+
+    public Completable updateLoggedPatientHeightAndActivity(int newHeight, int newActivity, Long loggedPatient) {
+        UpdatePatientDTO updatePatientDTO = new UpdatePatientDTO(newHeight, newActivity);
+        return mEscaleRestApi.updatePatientWithId(updatePatientDTO, getLoggedPatiendId())
+                .andThen(mPatientDao.getPatientSingleById(loggedPatient))
+                .flatMapCompletable(patient -> {
+                    patient.setHeightInCm(newHeight);
+                    patient.setPhysicalActivity(newActivity);
+                    patient.setHasToUpdateDataInScale(true);
+                    mPatientDao.update(patient);
+                    return Completable.complete();
+                });
+    }
+
+    public Single<Long> setHasToUpdateDataInScale(boolean flag, Long patientId) {
+        return mPatientDao.getPatientSingleById(patientId)
+                .flatMap(patient -> Single.fromCallable(() -> {
+                    patient.setHasToUpdateDataInScale(flag);
+                    mPatientDao.update(patient);
+                    return patient.getId();
+                }));
     }
 }

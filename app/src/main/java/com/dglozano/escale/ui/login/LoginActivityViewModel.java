@@ -6,6 +6,7 @@ import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.exception.AccountDisabledException;
 import com.dglozano.escale.exception.BadCredentialsException;
 import com.dglozano.escale.exception.NotAPatientException;
 import com.dglozano.escale.repository.PatientRepository;
@@ -75,6 +76,8 @@ public class LoginActivityViewModel extends ViewModel {
                                     mErrorEvent.postValue(new Event<>(R.string.login_error_bad_credentials));
                                 } else if (throwable instanceof NotAPatientException) {
                                     mErrorEvent.postValue(new Event<>(R.string.login_error_not_patient));
+                                } else if (throwable instanceof AccountDisabledException) {
+                                    mErrorEvent.postValue(new Event<>(R.string.account_disabled_error_msg));
                                 } else {
                                     mErrorEvent.postValue(new Event<>(R.string.login_error_could_not_reach_server));
                                 }

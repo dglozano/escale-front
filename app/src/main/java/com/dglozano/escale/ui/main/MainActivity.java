@@ -1,7 +1,6 @@
 package com.dglozano.escale.ui.main;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.NotificationManager;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
@@ -9,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -33,7 +33,8 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BF600BleService;
 import com.dglozano.escale.ui.BaseActivity;
-import com.dglozano.escale.ui.common.ChangePasswordActivity;
+import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivity;
+import com.dglozano.escale.ui.drawer.profile.PatientProfileActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.diet.DietFragment;
 import com.dglozano.escale.ui.main.home.HomeFragment;
@@ -44,12 +45,17 @@ import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.util.ui.NoSwipePager;
 import com.dglozano.escale.web.services.FirebaseTokenSenderService;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.makeramen.roundedimageview.RoundedImageView;
+import com.squareup.picasso.Picasso;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
+import java.net.MalformedURLException;
+
 import javax.inject.Inject;
 
+import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dagger.android.AndroidInjection;
@@ -62,7 +68,7 @@ import timber.log.Timber;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        HasSupportFragmentInjector {
+        HasSupportFragmentInjector, LogoutDialog.LogoutDialogListener {
 
     private static final int CHANGE_PASSWORD_CODE = 123;
     public static final int ADD_MEASUREMENT_CODE = 456;
@@ -86,7 +92,11 @@ public class MainActivity extends BaseActivity
     ExpandableLayout mExpandableBottomBar;
     @BindView(R.id.main_activity_progress_bar)
     ProgressBar mMainProgressBar;
+    @BindDrawable(R.drawable.ic_user_profile_image_default)
+    Drawable defaultProfileImage;
 
+    @Inject
+    Picasso mPicasso;
     @Inject
     NotificationManager mNotificationManager;
     @Inject
@@ -102,6 +112,10 @@ public class MainActivity extends BaseActivity
     private BF600BleService mBF600BleService;
     private boolean mBleServiceIsBound = false;
     private AlertDialog activeDialog = null;
+    private TextView mNavUsername;
+    private TextView mNavEmail;
+    private RoundedImageView mNavImageView;
+
 
     private ServiceConnection mServiceConnection = new MyServiceConnection();
 
@@ -121,6 +135,7 @@ public class MainActivity extends BaseActivity
         }
 
         setSupportActionBar(mToolbar);
+        setActionBarTitleAccordingToFragment(openFragmentInPosition);
         setupDrawerLayout();
         setupBottomNav();
 
@@ -134,6 +149,7 @@ public class MainActivity extends BaseActivity
         observeCurrentFragmentPosition();
         observeNewDietNotification();
         mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
+        mViewModel.getLogoutEvent().observe(this, this::onLogoutEvent);
 
         addFragmentsToBottomNav(openFragmentInPosition);
 
@@ -148,9 +164,19 @@ public class MainActivity extends BaseActivity
         });
     }
 
+    private void onLogoutEvent(Event<Integer> logoutEvent) {
+        if (logoutEvent != null && !logoutEvent.hasBeenHandled()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra(ASK_NEW_FIREBASE_TOKEN, true);
+            startActivity(intent);
+            mBF600BleService.disposeConnection();
+            finish();
+        }
+    }
+
     private void showSnackbarError(Event<Integer> errorEvent) {
         if (errorEvent != null && errorEvent.peekContent() != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithDuration(errorEvent.handleContent(), Snackbar.LENGTH_SHORT);
+            showSnackbarWithOkDismiss(errorEvent.handleContent());
         }
     }
 
@@ -190,22 +216,9 @@ public class MainActivity extends BaseActivity
     private void observeCurrentFragmentPosition() {
         mViewModel.getPositionOfCurrentFragment().observe(this, posFragment -> {
             if (posFragment != null) {
-                switch (posFragment) {
-                    case 0: // HOME
-                        mViewModel.setPositionOfCurrentFragment(0);
-                        break;
-                    case 1: // STATS
-                        mViewModel.setPositionOfCurrentFragment(1);
-                        break;
-                    case 2: // DIETS
-                        mViewModel.setPositionOfCurrentFragment(2);
-                        mViewModel.markNewDietAsSeen(true);
-                        break;
-                    case 3: // MESSAGES
-                        mViewModel.setPositionOfCurrentFragment(3);
-                        mViewModel.markMessagesAsRead();
-                        break;
-                }
+                if (posFragment == 2) mViewModel.markNewDietAsSeen(true);
+                if (posFragment == 3) mViewModel.markMessagesAsRead();
+                setActionBarTitleAccordingToFragment(posFragment);
             }
         });
     }
@@ -279,15 +292,33 @@ public class MainActivity extends BaseActivity
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
         mNavigationView.setNavigationItemSelectedListener(this);
+        mNavUsername = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_name);
+        mNavEmail = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_mail);
+        mNavImageView = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_picture);
+        mNavImageView.setOnClickListener(view -> startProfileActivity());
+    }
+
+    private void startProfileActivity() {
+        Intent intent = new Intent(this, PatientProfileActivity.class);
+        startActivityForResult(intent, 1);
     }
 
     private void observeUserData() {
-        TextView navUsername = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_name);
-        TextView navEmail = mNavigationView.getHeaderView(0).findViewById(R.id.nav_header_user_mail);
+
+
         mViewModel.getLoggedPatient().observe(this, user -> {
             if (user != null) {
-                navUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
-                navEmail.setText(user.getEmail());
+                mNavUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
+                mNavEmail.setText(user.getEmail());
+
+                try {
+                    mPicasso.load(mViewModel.getProfileImageUrlOfLoggedPatient().toString())
+                            .placeholder(R.drawable.ic_user_profile_image_default)
+                            .error(R.drawable.ic_user_profile_image_default)
+                            .into(mNavImageView);
+                } catch (MalformedURLException e) {
+                    Timber.e(e);
+                }
             }
         });
     }
@@ -344,25 +375,22 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_profile) {
-            // Handle the camera action
-        } else if (id == R.id.nav_doctor_info) {
-
+            startProfileActivity();
         } else if (id == R.id.nav_settings) {
-            Intent intent = new Intent(this, ChangePasswordActivity.class);
-            startActivityForResult(intent, CHANGE_PASSWORD_CODE);
+            startSettingsActivity();
         } else if (id == R.id.nav_help) {
 
         } else if (id == R.id.nav_logout) {
-            mViewModel.logout();
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra(ASK_NEW_FIREBASE_TOKEN, true);
-            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-            mBF600BleService.disposeConnection();
-            finish();
+            LogoutDialog.newInstance().show(getSupportFragmentManager(), "showLogoutConfirmDialog");
         }
 
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void startSettingsActivity() {
+        Intent intent = new Intent(this, ChangePasswordActivity.class);
+        startActivityForResult(intent, CHANGE_PASSWORD_CODE);
     }
 
 
@@ -447,8 +475,36 @@ public class MainActivity extends BaseActivity
         ViewCompat.setElevation(mAppBarLayout, elevation);
     }
 
+    private void setActionBarTitleAccordingToFragment(int fragmentPosition) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            switch (fragmentPosition) {
+                case 0:
+                    actionBar.setTitle(R.string.home_title);
+                    break;
+                case 1:
+                    actionBar.setTitle(R.string.stats_title);
+                    break;
+                case 2:
+                    actionBar.setTitle(R.string.diets_title);
+                    break;
+                case 3:
+                    actionBar.setTitle(R.string.chats_title);
+                    break;
+                default:
+                    actionBar.setDisplayShowTitleEnabled(false);
+            }
+        }
+    }
+
     private void observeServiceLiveData() {
         mBF600BleService.getErrorEvent().observe(this, this::showSnackbarError);
+    }
+
+    @Override
+    public void onLogoutConfirmed() {
+        Timber.d("Logout confirmed");
+        mViewModel.logout();
     }
 
     private class MyServiceConnection implements ServiceConnection {

@@ -1,16 +1,20 @@
 package com.dglozano.escale.di;
 
-import com.dglozano.escale.ui.common.ChangePasswordActivity;
-import com.dglozano.escale.ui.common.ChangePasswordActivityModule;
+import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivity;
+import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivityModule;
+import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivity;
+import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivityModule;
+import com.dglozano.escale.ui.drawer.profile.PatientProfileActivity;
+import com.dglozano.escale.ui.drawer.profile.PatientProfileActivityModule;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.login.LoginActivityModule;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityModule;
 import com.dglozano.escale.ui.main.diet.DietFragmentProvider;
+import com.dglozano.escale.ui.main.diet.all.AllDietsProvider;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietProvider;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivity;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfModule;
-import com.dglozano.escale.ui.main.diet.all.AllDietsProvider;
 import com.dglozano.escale.ui.main.home.AddMeasurementActivity;
 import com.dglozano.escale.ui.main.home.AddMeasurementModule;
 import com.dglozano.escale.ui.main.home.HomeFragmentProvider;
@@ -49,6 +53,11 @@ public abstract class ActivityBuilder {
     public abstract ChangePasswordActivity bindChangePasswordActivity();
 
     @ContributesAndroidInjector(modules = {
+            RecoverPasswordActivityModule.class
+    })
+    public abstract RecoverPasswordActivity bindRecoverPasswordActivity();
+
+    @ContributesAndroidInjector(modules = {
             ShowDietPdfModule.class
     })
     public abstract ShowDietPdfActivity bindShowDietPdfActivity();
@@ -57,4 +66,9 @@ public abstract class ActivityBuilder {
             AddMeasurementModule.class
     })
     public abstract AddMeasurementActivity bindShowAddMeasurementActivity();
+
+    @ContributesAndroidInjector(modules = {
+            PatientProfileActivityModule.class
+    })
+    public abstract PatientProfileActivity bindPatientProfileActivity();
 }

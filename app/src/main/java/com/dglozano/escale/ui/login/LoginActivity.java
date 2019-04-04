@@ -14,8 +14,9 @@ import android.widget.RelativeLayout;
 import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityLoginBinding;
 import com.dglozano.escale.ui.BaseActivity;
-import com.dglozano.escale.util.ui.Event;
+import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivity;
 import com.dglozano.escale.ui.main.MainActivity;
+import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.web.EscaleRestApi;
 
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import timber.log.Timber;
 
 public class LoginActivity extends BaseActivity {
 
+    private static final int RECOVER_PASSWORD_CODE = 444;
     @BindView(R.id.login_root)
     View mRootView;
     @BindView(R.id.login_progress_bar_container)
@@ -82,6 +84,21 @@ public class LoginActivity extends BaseActivity {
     @OnClick(R.id.login_sign_in_button)
     public void signIn() {
         mViewModel.hitLogin(mEmailEditText.getText().toString(), mPasswordEditText.getText().toString());
+    }
+
+    @OnClick(R.id.login_reset_password)
+    public void recoverPassword() {
+        Intent intent = new Intent(this, RecoverPasswordActivity.class);
+        startActivityForResult(intent, RECOVER_PASSWORD_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RECOVER_PASSWORD_CODE && resultCode == RESULT_OK) {
+            String email = data.getStringExtra("email");
+            if(email == null || email.isEmpty()) email = "tu cuenta";
+            showSnackbarWithOkDismiss(String.format(getString(R.string.email_sent_to_recover_snak_msg), email));
+        }
     }
 
     @Override

@@ -24,8 +24,8 @@ import butterknife.ButterKnife;
 
 public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementListAdapter.MeasurementViewHolder> {
 
-    @BindDrawable(R.drawable.home_ic_scale_colored)
-    Drawable scaleIcon;
+    @BindDrawable(R.drawable.home_ic_weight_kg)
+    Drawable weightIcon;
     @BindDrawable(R.drawable.home_ic_drop_colored)
     Drawable waterIcon;
     @BindDrawable(R.drawable.home_ic_pizza_slice_colored)
@@ -69,7 +69,7 @@ public class MeasurementListAdapter extends RecyclerView.Adapter<MeasurementList
             holder.mMeasurementValueTextView.setText(measurement.getFormattedValue());
             switch (measurement.getIconResource()) {
                 case MeasurementItem.ICON_RESOURCE_WEIGHT:
-                    holder.mIconImageView.setImageDrawable(scaleIcon);
+                    holder.mIconImageView.setImageDrawable(weightIcon);
                     break;
                 case MeasurementItem.ICON_RESOURCE_WATER:
                     holder.mIconImageView.setImageDrawable(waterIcon);

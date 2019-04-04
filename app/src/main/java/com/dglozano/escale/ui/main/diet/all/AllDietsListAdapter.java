@@ -16,7 +16,8 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.ui.main.MainActivity;
-import com.dglozano.escale.web.services.DownloadService;
+import com.dglozano.escale.util.FileUtils;
+import com.dglozano.escale.web.services.DietDownloadService;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -135,7 +136,7 @@ public class AllDietsListAdapter extends RecyclerView.Adapter<AllDietsListAdapte
                 }
             } else {
                 holder.mProgressBar.setVisibility(
-                        diet.getFileStatus().equals(Diet.FileStatus.DOWNLOADING) ? View.VISIBLE : View.GONE);
+                        diet.getFileStatus().equals(FileUtils.FileStatus.DOWNLOADING) ? View.VISIBLE : View.GONE);
                 holder.mDietBtnImageView.setVisibility(View.GONE);
             }
 
@@ -162,9 +163,9 @@ public class AllDietsListAdapter extends RecyclerView.Adapter<AllDietsListAdapte
 
     private void startDownload(Diet diet) {
         Intent startIntent = new Intent(mContext,
-                DownloadService.class);
+                DietDownloadService.class);
         startIntent.putExtra("diet-uuid", diet.getId());
-        diet.setFileStatus(Diet.FileStatus.DOWNLOADING);
+        diet.setFileStatus(FileUtils.FileStatus.DOWNLOADING);
         mAllDietsViewModel.updateDiet(diet);
         mContext.startService(startIntent);
     }

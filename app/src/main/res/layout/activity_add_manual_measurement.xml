@@ -39,7 +39,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_margin="@dimen/activity_vertical_margin_small"
-                        android:src="@drawable/home_ic_scale_colored" />
+                        android:src="@drawable/home_ic_weight_kg" />
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/add_measurement_weight_input_layout"

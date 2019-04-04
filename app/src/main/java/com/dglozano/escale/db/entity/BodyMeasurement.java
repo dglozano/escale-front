@@ -30,6 +30,7 @@ public class BodyMeasurement {
     private float water;
     private float bones;
     private float muscles;
+    private boolean isManual;
 
     public BodyMeasurement() {
 
@@ -46,6 +47,7 @@ public class BodyMeasurement {
         this.water = dto.getWater();
         this.bones = dto.getBones();
         this.muscles = dto.getMuscles();
+        this.isManual = dto.isManual();
     }
 
     @Ignore
@@ -172,6 +174,14 @@ public class BodyMeasurement {
                 && otherMeasurement.water == this.water
                 && otherMeasurement.fat == this.fat
                 && otherMeasurement.bmi == this.bmi;
+    }
+
+    public boolean isManual() {
+        return isManual;
+    }
+
+    public void setManual(boolean manual) {
+        isManual = manual;
     }
 
     @Override

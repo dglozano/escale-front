@@ -8,7 +8,6 @@
     <string name="decimal_format">###,###.##</string>
     <string name="loading">Cargando…</string>
     <string name="user_profile_picture">Foto de perfil de usuario</string>
-    <!-- Ble scan error messages -->
     <string name="error_bluetooth_not_available">Su dispositivo no tiene conectividad Bluetooth.</string>
     <string name="error_bluetooth_disabled">Active el Bluetooth y prueba de nuevo.</string>
     <string name="error_location_permission_missing">Desde Android 6.0 los permisos de ubicación son requeridos. Por favor, habilitelos desde las configuraciones del telefono.</string>
@@ -28,7 +27,7 @@
     <string name="password">Contraseña</string>
     <string name="email">Email</string>
     <string name="login_welcome_to_escale"><big>Bienvenido a <b><i>Escale</i></b>.</big></string>
-    <string name="login_button_text">Log In</string>
+    <string name="login_button_text">Iniciar Sesión</string>
     <string name="login_reset_password_text"><u>¿Olvidaste tu contraseña?</u></string>
     <string name="login_first_time_message">Si es tu primera vez, busca en tu bandeja de entrada el mail de bienvenida con la contraseña inicial.</string>
     <string name="ok">OK</string>
@@ -38,7 +37,6 @@
     <string name="drawer_option_profile">Perfil</string>
     <string name="drawer_option_doctor">Doctor</string>
     <string name="drawer_option_settings">Configuración</string>
-    <string name="drawer_option_help">Ayuda</string>
     <string name="drawer_option_logout">Salir</string>
     <string name="change_pass_instructions">Ingrese su contraseña actual seguido de su nueva contraseña.\n\nLa nueva contraseña debe tener <b>como mínimo 8 caracteres</b>, incluir <b>al menos una letra minúscula</b> y por lo menos <b>un dígito</b>.
     </string>
@@ -124,6 +122,39 @@
         en la balanza puede moverse entre los usuarios.</string>
     <string name="dialog_delete_user_btn">Eliminar usuario</string>
     <string name="ble_scale_delete_error">No se pudo eliminar el usuario</string>
+    <string name="recover_password_error_snackbar">Ups! Hubo un error al intentar recuperar tu clave. Intente nuevamente.</string>
+    <string name="recover_password_button">Recuperar Contraseña</string>
+    <string name="recover_pass_instructions">¡No te preocupes! Si perdiste u olvidaste tu contraseña podemos ayudarte a recuperarla.\n\nIngresa a continuación la cuenta de email con la que estás registrado en la app y <b>recibirás en tu casilla las instrucciones</b> para recuperar tu clave.</string>
+    <string name="email_sent_to_recover_snak_msg">Se ha enviado un email a %s con las instrucciones para recuperar tu contraseña.</string>
+    <string name="recover_password_activity_label">Recuperar Contraseña</string>
+    <string name="account_disabled_error_msg">Tu cuenta de Escale ha sido deshabilitada.</string>
+    <string name="no_goal_set">SIN META</string>
+    <string name="manual_measurement">Pesaje manual</string>
+    <string name="scale_measurement">Pesaje con balanza</string>
+    <string name="ucrop_activity_title">Ajustar Foto</string>
+    <string name="upload_picture_success_msg">Foto actualizada correctamente</string>
+    <string name="upload_picture_error_msg">Ups! No pudimos actualizar tu foto. Intenta de nuevo más tarde.</string>
+    <string name="profile_title">Perfil</string>
+    <string name="drawer_option_help_contact">Ayuda y Contacto</string>
+    <string name="edit">Editar</string>
+    <string name="edit_user_dialog_instructions">Ingrese los datos a modificar.</string>
+    <string name="height_in_cm">Altura (cm.)</string>
+    <string name="physical_actvitiy_label">Actividad Física</string>
+    <string name="dialog_edit_user_ph_activity_description_1"><b>NINGUNA</b>\n\nNo realizas ningún tipo de actividad física.</string>
+    <string name="dialog_edit_user_ph_activity_description_2"><b>BAJA</b>\n\nPoco ejercicio físico, pequeños paseos, trabajos de jardineria, gimnasia ligera.</string>
+    <string name="dialog_edit_user_ph_activity_description_3"><b>MEDIA</b>\n\nEjercicio físico en sesiones de 30 minutos , de 2 a 4 veces por semana como mínimo</string>
+    <string name="dialog_edit_user_ph_activity_description_4"><b>ALTA</b>\n\nEjercicio físico en sesiones de 30 minutos, de 4 a 6 veces por semana como mínimo</string>
+    <string name="dialog_edit_user_ph_activity_description_5"><b>MUY ALTA</b>\n\nEjercicios físicos intensivos, entrenamiento intensivo o trabajo corporal duro, diariamente, al menos 30 minutos cada día</string>
+    <string name="dialog_edit_user_submit">Aceptar</string>
+    <string name="height_range_error">Ingresa una altura entre 100 cm. y 250 cm.</string>
+    <string name="update_user_data_success">Datos actualizados correctamente.</string>
+    <string name="update_user_data_error_msg">Ups! No pudimos actualizar tus datos. Intenta de nuevo más tarde.</string>
+    <string name="home_title">Inicio</string>
+    <string name="stats_title">Estadísticas</string>
+    <string name="diets_title">Dietas</string>
+    <string name="chats_title">Chat</string>
+    <string name="dialog_logout_title">Cerrar sesión</string>
+    <string name="dialog_logout_instructions"><b>¿Está seguro que desea sailr?</b> De hacerlo, se borrarán todos sus datos almacenados localmente en su teléfono, como los chats con su médico y las dietas que haya descargado.</string>
     <string-array name="scale_user_indexes_array">
         <item>P-01</item>
         <item>P-02</item>

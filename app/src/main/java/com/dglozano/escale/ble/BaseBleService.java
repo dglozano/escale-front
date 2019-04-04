@@ -195,7 +195,7 @@ public abstract class BaseBleService extends Service {
 
     protected void disposeScanning() {
         Timber.d("Disposing Scanning.");
-        if (mScanDisposable != null) {
+        if (mScanDisposable != null && !mScanDisposable.isDisposed()) {
             mScanDisposable.dispose();
         }
         mScanDisposable = null;
@@ -215,7 +215,7 @@ public abstract class BaseBleService extends Service {
 
     protected void disposeConnection(String newState) {
         Timber.d("Disposing Connection.");
-        if (mConnectionDisposable != null) {
+        if (mConnectionDisposable != null && !mConnectionDisposable.isDisposed()) {
             mConnectionDisposable.dispose();
         }
         mConnectionDisposable = null;
@@ -330,7 +330,6 @@ public abstract class BaseBleService extends Service {
         Timber.d("onDestroy(). Disposing connection and scanning...");
         disposeConnection();
         disposeScanning();
-//        stopMeasurement();
         super.onDestroy();
     }
 

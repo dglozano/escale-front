@@ -7,8 +7,8 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.FileUtils;
 import com.dglozano.escale.web.dto.DietDTO;
-import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
@@ -27,7 +27,7 @@ public class Diet {
     private String fileName;
     private Date startDate;
     private long size;
-    private FileStatus fileStatus;
+    private FileUtils.FileStatus fileStatus;
     private int downloadId;
 
     public Diet() {
@@ -41,7 +41,7 @@ public class Diet {
         this.startDate = date;
         this.size = size;
         this.userId = patientId;
-        this.fileStatus = FileStatus.NOT_DOWNLOADED;
+        this.fileStatus = FileUtils.FileStatus.NOT_DOWNLOADED;
         this.downloadId = -1;
     }
 
@@ -90,13 +90,13 @@ public class Diet {
         this.startDate = startDate;
     }
 
-    public FileStatus getFileStatus() {
+    public FileUtils.FileStatus getFileStatus() {
         return fileStatus;
     }
 
-    public void setFileStatus(FileStatus fileStatus) {
+    public void setFileStatus(FileUtils.FileStatus fileStatus) {
         this.fileStatus = fileStatus;
-        if(fileStatus.equals(FileStatus.NOT_DOWNLOADED))
+        if (fileStatus.equals(FileUtils.FileStatus.NOT_DOWNLOADED))
             this.downloadId = -1;
     }
 
@@ -114,14 +114,5 @@ public class Diet {
 
     public String getLocalFileName() {
         return this.id + this.fileName;
-    }
-
-    public enum FileStatus {
-        @SerializedName("1")
-        DOWNLOADING,
-        @SerializedName("2")
-        DOWNLOADED,
-        @SerializedName("3")
-        NOT_DOWNLOADED
     }
 }

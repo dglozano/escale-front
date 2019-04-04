@@ -3,12 +3,15 @@ package com.dglozano.escale.db.entity;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
 
 import com.dglozano.escale.web.dto.PatientDTO;
 import com.google.gson.annotations.SerializedName;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -19,13 +22,14 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 public class Patient extends AppUser {
 
     private Gender gender;
-    private int scaleUserPin;
-    private int scaleUserIndex;
     private int heightInCm;
     private int physicalActivity;
     private Date birthday;
     private boolean changedDefaultPassword;
     private Long doctorId;
+    private Float goalInKg;
+    private Date goalDueDate;
+    private boolean hasToUpdateDataInScale = true;
 
     public Patient() {
     }
@@ -38,13 +42,18 @@ public class Patient extends AppUser {
                 patientDTO.getEmail(),
                 timestamp);
         this.gender = patientDTO.getGender();
-        this.scaleUserIndex = patientDTO.getScaleUserIndex();
-        this.scaleUserPin = patientDTO.getScaleUserPin();
         this.heightInCm = patientDTO.getHeightInCm();
         this.physicalActivity = patientDTO.getPhysicalActivity();
         this.birthday = patientDTO.getBirthday();
         this.doctorId = patientDTO.getDoctorDTO().getId();
         this.changedDefaultPassword = patientDTO.hasChangedDefaultPassword();
+        if (patientDTO.getCurrentWeightGoal() != null) {
+            this.goalDueDate = patientDTO.getCurrentWeightGoal().getDueDate();
+            this.goalInKg = patientDTO.getCurrentWeightGoal().getGoalInKg();
+        } else {
+            this.goalDueDate = null;
+            this.goalInKg = null;
+        }
     }
 
     public Gender getGender() {
@@ -53,22 +62,6 @@ public class Patient extends AppUser {
 
     public void setGender(Gender gender) {
         this.gender = gender;
-    }
-
-    public int getScaleUserPin() {
-        return scaleUserPin;
-    }
-
-    public void setScaleUserPin(int scaleUserPin) {
-        this.scaleUserPin = scaleUserPin;
-    }
-
-    public int getScaleUserIndex() {
-        return scaleUserIndex;
-    }
-
-    public void setScaleUserIndex(int scaleUserIndex) {
-        this.scaleUserIndex = scaleUserIndex;
     }
 
     public int getHeightInCm() {
@@ -85,6 +78,14 @@ public class Patient extends AppUser {
 
     public void setPhysicalActivity(int physicalActivity) {
         this.physicalActivity = physicalActivity;
+    }
+
+    public boolean isHasToUpdateDataInScale() {
+        return hasToUpdateDataInScale;
+    }
+
+    public void setHasToUpdateDataInScale(boolean hasToUpdateDataInScale) {
+        this.hasToUpdateDataInScale = hasToUpdateDataInScale;
     }
 
     public Date getBirthday() {
@@ -124,6 +125,22 @@ public class Patient extends AppUser {
         this.changedDefaultPassword = changedDefaultPassword;
     }
 
+    public Float getGoalInKg() {
+        return goalInKg;
+    }
+
+    public void setGoalInKg(Float goalInKg) {
+        this.goalInKg = goalInKg;
+    }
+
+    public Date getGoalDueDate() {
+        return goalDueDate;
+    }
+
+    public void setGoalDueDate(Date goalDueDate) {
+        this.goalDueDate = goalDueDate;
+    }
+
     @Override
     public String toString() {
         return String.format("{\n " +
@@ -135,7 +152,32 @@ public class Patient extends AppUser {
                 "   gender: %s \n" +
                 "   height: %s \n" +
                 "   physicalactivity: %s \n" +
-                "}", id, firstName, lastName, email,scaleUserIndex,gender, heightInCm, physicalActivity);
+                "}", id, firstName, lastName, email, gender, heightInCm, physicalActivity);
+    }
+
+    public int getAge() {
+        Date currentDate = Calendar.getInstance().getTime();
+        DateFormat formatter = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+        int d1 = Integer.parseInt(formatter.format(birthday));
+        int d2 = Integer.parseInt(formatter.format(currentDate));
+        return (d2 - d1) / 10000;
+    }
+
+    public String getActivityString() {
+        switch (physicalActivity) {
+            case 1:
+                return "Ninguna";
+            case 2:
+                return "Baja";
+            case 3:
+                return "Media";
+            case 4:
+                return "Alta";
+            case 5:
+                return "Muy Alta";
+            default:
+                return "Media";
+        }
     }
 
     public enum Gender {

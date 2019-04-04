@@ -9,6 +9,8 @@ import com.dglozano.escale.util.Constants;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Date;
+
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
@@ -28,7 +30,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     PatientRepository patientRepository;
 
     private CompositeDisposable disposables;
-
 
     @Override
     public void onCreate() {
@@ -73,6 +74,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 handleNewDietNotification(remoteMessage);
             } else if(type.equals("delete_diet")) {
                 handleDeleteDietNotification(remoteMessage);
+            } else if(type.equals("new_goal")) {
+                handleNewGoalNotification(remoteMessage);
             }
         }
 
@@ -131,6 +134,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             editor.putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, current + 1);
                             editor.apply();
                         },
+                        Timber::e)
+        );
+    }
+
+    private void handleNewGoalNotification(RemoteMessage remoteMessage) {
+        Long id = Long.parseLong(remoteMessage.getData().get("id"));
+        Float weightInKg = Float.parseFloat(remoteMessage.getData().get("goal_weight_kg"));
+        String startDate = remoteMessage.getData().get("start_date");
+        String dueDate = remoteMessage.getData().get("due_date");
+        Boolean isAccomplished = Boolean.parseBoolean(remoteMessage.getData().get("accomplished"));
+        disposables.add(patientRepository
+                .saveNewGoalOnNotified(patientRepository.getLoggedPatiendId(), weightInKg, dueDate)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(() -> Timber.d("Received new goal from firebase and saved successfully"),
                         Timber::e)
         );
     }
