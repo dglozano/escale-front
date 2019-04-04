@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_home_id"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@color/almostWhite">
+
+    <ProgressBar
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/layout_measurement"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/layout_top_measurement"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_vertical_margin_big"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_big"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="0dp">
+
+            <TextView
+                android:id="@+id/bmi_text_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="IMC"
+                android:textAppearance="@android:style/TextAppearance.Material"
+                android:textColor="@color/lightGray"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/weight_gauge_goal_text"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/gauge"
+                app:layout_constraintTop_toTopOf="@id/weight_gauge_goal_text" />
+
+            <TextView
+                android:id="@+id/bmi_number_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="-"
+                android:textAppearance="@android:style/TextAppearance.Material"
+                android:textColor="@color/colorPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/bmi_text_top"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/gauge" />
+
+            <pl.pawelkleczkowski.customgauge.CustomGauge
+                android:id="@+id/gauge"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:paddingLeft="20dp"
+                android:paddingTop="20dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="20dp"
+                app:gaugePointEndColor="@color/colorPrimaryLight"
+                app:gaugePointStartColor="@color/colorAccent"
+                app:gaugeStartAngle="135"
+                app:gaugeStrokeCap="ROUND"
+                app:gaugeStrokeColor="@color/lightGray"
+                app:gaugeStrokeWidth="10dp"
+                app:gaugeSweepAngle="270"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/weight_gauge_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="50dp"
+                android:text="115"
+                android:textAppearance="@android:style/TextAppearance.Material"
+                android:textColor="@color/colorPrimary"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="@id/gauge"
+                app:layout_constraintRight_toRightOf="@id/gauge"
+                app:layout_constraintTop_toTopOf="@id/gauge" />
+
+            <TextView
+                android:id="@+id/weight_gauge_goal_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/weight_gauge_text"
+                android:layout_centerHorizontal="true"
+                android:text="@string/no_goal_set"
+                android:textAppearance="@android:style/TextAppearance.Material"
+                android:textColor="@color/colorPrimary"
+                android:textSize="12sp"
+                app:layout_constraintLeft_toLeftOf="@id/gauge"
+                app:layout_constraintRight_toRightOf="@id/gauge"
+                app:layout_constraintTop_toBottomOf="@id/weight_gauge_text" />
+
+            <TextView
+                android:id="@+id/fat_number_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="-"
+                android:textAppearance="@android:style/TextAppearance.Material"
+                android:textColor="@color/colorPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/fat_text_top"
+                app:layout_constraintLeft_toRightOf="@id/gauge"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <TextView
+                android:id="@+id/fat_text_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="GRASA"
+                android:textAppearance="@android:style/TextAppearance.Material"
+                android:textColor="@color/lightGray"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/weight_gauge_goal_text"
+                app:layout_constraintLeft_toRightOf="@id/gauge"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/weight_gauge_goal_text" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <RelativeLayout
+            android:id="@+id/measurements_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/layout_top_measurement"
+            android:layout_marginStart="@dimen/activity_vertical_margin_big"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_big"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+            android:background="@drawable/home_shadow_listview">
+
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/ble_connect_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_small"
+                fancy:fb_defaultColor="@color/lightGray"
+                fancy:fb_iconPosition="left"
+                fancy:fb_iconResource="@drawable/home_bluetooth_disconnected"
+                fancy:fb_radiusTopLeft="@dimen/radius"
+                fancy:fb_radiusTopRight="@dimen/radius"
+                fancy:fb_text="DESCONECTADO"
+                fancy:fb_textColor="@color/almostWhite" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_measurements"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/home_last_row"
+                android:layout_below="@id/ble_connect_btn"
+                android:background="@drawable/home_round_listview"
+                android:paddingStart="@dimen/padding_small"
+                android:paddingEnd="@dimen/padding_small"
+                android:scrollbars="vertical" />
+
+            <RelativeLayout
+                android:id="@+id/home_last_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/last_row_background">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true">
+
+                    <ImageView
+                        android:id="@+id/home_last_row_image_view"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="@dimen/activity_vertical_margin_very_small"
+                        android:visibility="visible"
+                        app:srcCompat="@drawable/ic_calendar" />
+
+                    <TextView
+                        android:id="@+id/home_last_row_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginTop="@dimen/activity_vertical_margin_very_small"
+                        android:layout_marginBottom="@dimen/activity_vertical_margin_very_small"
+                        android:layout_toEndOf="@id/home_last_row_image_view"
+                        android:text="@string/loading"
+                        android:textAppearance="@android:style/TextAppearance.Material"
+                        android:textColor="@color/almostWhite"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add_measurement_floating_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/home_ic_menu_add_weight_manually"
+            app:backgroundTint="@color/colorPrimaryLight" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_loader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <WebView
+            android:id="@+id/loader_webview"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@color/almostWhite"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/loader_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/loader_webview"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:text="@string/loader_scanning"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/colorTextDark"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/home_step_on_scale_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/almostWhiteOverlay"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="@dimen/activity_vertical_margin_medium"
+        android:translationZ="100dp"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <ImageView
+                android:id="@+id/step_on_scale_image"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/home_ic_step_on_scale" />
+
+            <TextView
+                android:id="@+id/step_on_scale_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/step_on_scale_image"
+                android:layout_marginTop="@dimen/activity_vertical_margin_very_big"
+                android:text="@string/home_step_on_scale"
+                android:textAlignment="center"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                android:textColor="@color/colorTextDark" />
+
+        </RelativeLayout>
+
+        <ImageButton
+            android:id="@+id/home_cancel_measurement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="@dimen/activity_vertical_margin_very_small"
+            android:background="@color/transparent"
+            android:src="@drawable/ic_home_close" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

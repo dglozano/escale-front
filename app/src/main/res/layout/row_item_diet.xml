@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingTop="@dimen/activity_vertical_margin_medium"
+    android:paddingBottom="@dimen/activity_vertical_margin_medium">
+
+    <ImageView
+        android:id="@+id/diet_item_icon"
+        android:layout_width="36dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin_medium"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_diet_pdf" />
+
+    <FrameLayout
+        android:id="@+id/frame_btn_diet"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/diet_item_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:adjustViewBounds="true"
+            android:clickable="true"
+            android:focusable="true"
+
+            app:srcCompat="@drawable/ic_diet_download" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar_diet_item"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:indeterminate="true"
+            android:visibility="visible" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/diet_item_file_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin_very_small"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:text="Un nombre de archivo muy muy largo.pdf"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/frame_btn_diet"
+        app:layout_constraintStart_toEndOf="@id/diet_item_icon"
+        app:layout_constraintTop_toTopOf="@id/diet_item_icon" />
+
+    <TextView
+        android:id="@+id/diet_item_start_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin_very_small"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:text="Empezada el 15/02/2018"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/diet_item_icon"
+        app:layout_constraintEnd_toStartOf="@id/frame_btn_diet"
+        app:layout_constraintStart_toEndOf="@id/diet_item_icon" />
+</android.support.constraint.ConstraintLayout>

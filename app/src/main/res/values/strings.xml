@@ -1,9 +1,168 @@
 <resources>
     <string name="app_name">Escale</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="connected">Conectado</string>
+    <string name="disconnected">Desconectado</string>
+    <string name="navigation_drawer_open">Nav drawer open</string>
+    <string name="navigation_drawer_close">Nav drawer close</string>
+    <string name="measurement_item_holder_value">%1$s %2$s</string>
+    <string name="decimal_format">###,###.##</string>
+    <string name="loading">Cargando…</string>
+    <string name="user_profile_picture">Foto de perfil de usuario</string>
+    <string name="error_bluetooth_not_available">Su dispositivo no tiene conectividad Bluetooth.</string>
+    <string name="error_bluetooth_disabled">Active el Bluetooth y prueba de nuevo.</string>
+    <string name="error_location_permission_missing">Desde Android 6.0 los permisos de ubicación son requeridos. Por favor, habilitelos desde las configuraciones del telefono.</string>
+    <string name="error_location_services_disabled">Activa tu Ubicación para poder utilizar el Bluetooth.</string>
+    <string name="error_scan_failed_already_started">Ya hay un escaneo en ejecución.</string>
+    <string name="error_scan_failed_application_registration_failed">No se pudo registrar la aplicación para el escaneo Bluetooth.</string>
+    <string name="error_scan_failed_feature_unsupported">El escaneo con los parámetros solocitados no está soportado.</string>
+    <string name="error_scan_failed_internal_error">El escaneo falló por un problema interno.</string>
+    <string name="error_scan_failed_out_of_hardware_resources">El escaneo no pudo comenza debido a recursos limitados de hardware.</string>
+    <string name="error_undocumented_scan_throttle">Android 7+ no permite más escaneos.</string>
+    <string name="error_undocumented_scan_throttle_retry">Intente de nuevo en %d segundos</string>
+    <string name="error_bluetooth_cannot_start">No se pudo comenzar a escanear.</string>
+    <string name="error_unknown_error">Unknown error</string>
+    <string name="ble_error_try_again">Error Bluetooth. Intente de nuevo.</string>
+    <string name="ble_scan_timeout">Balanza no encontrado despues de 10 s. Intente de nuevo.</string>
+    <string name="loader_scanning">Escaneando</string>
+    <string name="password">Contraseña</string>
+    <string name="email">Email</string>
+    <string name="login_welcome_to_escale"><big>Bienvenido a <b><i>Escale</i></b>.</big></string>
+    <string name="login_button_text">Iniciar Sesión</string>
+    <string name="login_reset_password_text"><u>¿Olvidaste tu contraseña?</u></string>
+    <string name="login_first_time_message">Si es tu primera vez, busca en tu bandeja de entrada el mail de bienvenida con la contraseña inicial.</string>
+    <string name="ok">OK</string>
+    <string name="login_error_not_patient">La app es solo para pacientes. Si eres un doctor, ingresa a www.escale.com.ar</string>
+    <string name="login_error_bad_credentials">Ups! Las credenciales ingresadas no son válidas. Pruebe nuevamente.</string>
+    <string name="login_error_could_not_reach_server">No pudimos conectarnos con el servidor. Revisa tu conexión a internet.</string>
+    <string name="drawer_option_profile">Perfil</string>
+    <string name="drawer_option_doctor">Doctor</string>
+    <string name="drawer_option_settings">Configuración</string>
+    <string name="drawer_option_logout">Salir</string>
+    <string name="change_pass_instructions">Ingrese su contraseña actual seguido de su nueva contraseña.\n\nLa nueva contraseña debe tener <b>como mínimo 8 caracteres</b>, incluir <b>al menos una letra minúscula</b> y por lo menos <b>un dígito</b>.
+    </string>
+    <string name="current_password">Contraseña actual</string>
+    <string name="new_password">Nueva contraseña</string>
+    <string name="new_password_repeat">Repita su nueva contraseña</string>
+    <string name="change_password_button">Cambiar contraseña</string>
+    <string name="change_password_canceled_msg">No has cambiado tu contraseña. Recuerda que puedes cambiarla ingresando a tu perfil.</string>
+    <string name="snackbar_password_change_success_msg">La password se ha cambiado correctamente.</string>
+    <string name="change_password_title">Cambiar contraseña</string>
+    <string name="dialog_change_password">¡Bienvenido! Parece que es la primera vez que utilizas tu cuenta de Escale, por lo que debes cambiar tu contraseña inicial.</string>
+    <string name="dialog_title_error">Ups!</string>
+    <string name="must_change_password_error_msg_dialog">Por cuestiones de seguridad, usted debe modificar su contraseña inicial.</string>
+    <string name="no_internet_text">Ups! Parece que has perdido la conexión a Internet. Asegurate de estar conectado y vuelve a intentarlo.</string>
+    <string name="try_again">Reintentar</string>
+    <string name="snackbar_no_connection_detected">No se ha detectado conexión a Internet.\nIntente nuevamente.</string>
+    <string name="change_password_error_snackbar">No pudimos cambiar la contraseña. Revisa los datos e intenta nuevamente.</string>
+    <string name="add_measurement_error_snackbar">No pudimos agregar la medición. Pruebe nuevamente más tarde.</string>
+    <string name="logout_title">Cerrar sesion</string>
+    <string name="confirm_logout_msg">¿Está seguro que desea salir?</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="drawer_option_home">Principal</string>
+    <string name="no_diets_text">Parece que aún no se te ha asignado ninguna dieta. Comunicate con tu doctor para solicitar una.</string>
+    <string name="current_diet_title">Actual</string>
+    <string name="all_diets_title">Todas</string>
+    <string name="error_diet_not_downloaded_yet">Debes descargar la dieta antes de poder visualizarla</string>
+    <string name="error_diet_download_generic">Ups! Hubo un error al intentar descargar la dieta.</string>
+    <string name="error_diet_cancel_download_generic">Ups! Hubo un error al intentar cancelar la descarga.</string>
+    <string name="error_diet_delete_generic">Ups! Hubo un error al intentar borrar la dieta</string>
+    <string name="open_diet_pdf">Abrir dieta</string>
+    <string name="error_open_pdf_install_viewer">Ups! Parece que no tienes un lector de PDF. Instala uno y prueba de nuevo.</string>
+    <string name="old_diets_title">Anteriores</string>
+    <string name="send_message_hint">Escribe un mensaje</string>
+    <string name="error_sending_message">No se pudo enviar el mensaje. Intente nuevamente.</string>
+    <string name="copy">Copiar</string>
+    <string name="add_body_measurement">Agregar medición</string>
+    <string name="add_body_measurement_with_scale">Agregar peso con balanza</string>
+    <string name="add_body_measurement_manually">Agregar peso manualmente</string>
+    <string name="copied">Copiado al portapapeles</string>
+    <string name="logout_error">Ups! No pudimos desloguearte. Intente nuevamente más tarde.</string>
+    <string name="no_stats_yet_text_in_chart">Aún no tienes ningun pesaje cargado</string>
+    <string name="show_filter_stats">Ver Filtros</string>
+    <string name="hide_filter_stats">OCULTAR FILTROS</string>
+    <string name="no_body_measurement_yet">No tienes tienen pesaje cargado aún.</string>
+    <string name="add_measurement_btn">Agregar medición</string>
+    <string name="weight">Peso</string>
+    <string name="water">Agua corporal</string>
+    <string name="fat">Grasa corporal</string>
+    <string name="bones">Masa ósea</string>
+    <string name="imc">IMC</string>
+    <string name="muscles">Masa muscular</string>
+    <string name="add_measurement_input_error_snackbar">
+        Revisa los datos ingresados e intenta nuevamente
+    </string>
+    <string name="add_measurement_percentage_range_error">Ingresa un valor entre 0% y 100%</string>
+    <string name="add_measurement_negative_number_error">Ingresa un valor positivo</string>
+    <string name="add_measurement_empty_error">Este campo no puede estar vacío</string>
+    <string name="home_step_on_scale">
+        Sáquese zapatillas y medias, súbase a la balanza y espere a que termine la medición.
+    </string>
+    <string name="no_stats_text">
+        Aún no tienes pesajes. Ve a la pantalla inicial para agregar tu primer pesaje.
+    </string>
+    <string name="list_stats_title">Lista</string>
+    <string name="chart_stats_title">Gráfico</string>
+    <string name="scale_login_error">Error al iniciar sesión en la balanza</string>
+    <string name="dialog_credentials_create_new_user_btn">Nuevo Usuario</string>
+    <string name="ask_for_scale_credentials_dialog_instructions">
+        Ingrese el <b>Índice</b> y <b>PIN</b> de su usuario en la balanza. Con el botón SET y las flechas
+        en la balanza puede moverse entre los usuarios. \n\n Si no tiene un usuario,
+        seleccione <i>\"Crear usuario\"</i>.</string>
+    <string name="scale_index">Índice</string>
+    <string name="scale_pin">PIN</string>
+    <string name="dialog_credentials_title">Ingrese Índice y PIN</string>
+    <string name="ble_scale_login_error">El PIN del usuario de la balanza ingresado no es correcto.</string>
+    <string name="ble_scale_disconnected">Se perdió la conexión con la balanza.</string>
+    <string name="ble_scale_user_limit_error">\"La balanza no tiene espacio para crear nuevos usuarios\"</string>
+    <string name="dialog_scale_full_title">Límite de usuarios alcanzado</string>
+    <string name="dialog_scale_full_instructions">Se ha alcanzado el límite de usuarios en la balanza.
+        Para poder crear un nuevo usuario, <b>deberá eliminar otro primero</b>.
+        Ingrese el <b>Índice</b> y <b>PIN</b> del usuario a eliminar. Con el botón SET y las flechas
+        en la balanza puede moverse entre los usuarios.</string>
+    <string name="dialog_delete_user_btn">Eliminar usuario</string>
+    <string name="ble_scale_delete_error">No se pudo eliminar el usuario</string>
+    <string name="recover_password_error_snackbar">Ups! Hubo un error al intentar recuperar tu clave. Intente nuevamente.</string>
+    <string name="recover_password_button">Recuperar Contraseña</string>
+    <string name="recover_pass_instructions">¡No te preocupes! Si perdiste u olvidaste tu contraseña podemos ayudarte a recuperarla.\n\nIngresa a continuación la cuenta de email con la que estás registrado en la app y <b>recibirás en tu casilla las instrucciones</b> para recuperar tu clave.</string>
+    <string name="email_sent_to_recover_snak_msg">Se ha enviado un email a %s con las instrucciones para recuperar tu contraseña.</string>
+    <string name="recover_password_activity_label">Recuperar Contraseña</string>
+    <string name="account_disabled_error_msg">Tu cuenta de Escale ha sido deshabilitada.</string>
+    <string name="no_goal_set">SIN META</string>
+    <string name="manual_measurement">Pesaje manual</string>
+    <string name="scale_measurement">Pesaje con balanza</string>
+    <string name="ucrop_activity_title">Ajustar Foto</string>
+    <string name="upload_picture_success_msg">Foto actualizada correctamente</string>
+    <string name="upload_picture_error_msg">Ups! No pudimos actualizar tu foto. Intenta de nuevo más tarde.</string>
+    <string name="profile_title">Perfil</string>
+    <string name="drawer_option_help_contact">Ayuda y Contacto</string>
+    <string name="edit">Editar</string>
+    <string name="edit_user_dialog_instructions">Ingrese los datos a modificar.</string>
+    <string name="height_in_cm">Altura (cm.)</string>
+    <string name="physical_actvitiy_label">Actividad Física</string>
+    <string name="dialog_edit_user_ph_activity_description_1"><b>NINGUNA</b>\n\nNo realizas ningún tipo de actividad física.</string>
+    <string name="dialog_edit_user_ph_activity_description_2"><b>BAJA</b>\n\nPoco ejercicio físico, pequeños paseos, trabajos de jardineria, gimnasia ligera.</string>
+    <string name="dialog_edit_user_ph_activity_description_3"><b>MEDIA</b>\n\nEjercicio físico en sesiones de 30 minutos , de 2 a 4 veces por semana como mínimo</string>
+    <string name="dialog_edit_user_ph_activity_description_4"><b>ALTA</b>\n\nEjercicio físico en sesiones de 30 minutos, de 4 a 6 veces por semana como mínimo</string>
+    <string name="dialog_edit_user_ph_activity_description_5"><b>MUY ALTA</b>\n\nEjercicios físicos intensivos, entrenamiento intensivo o trabajo corporal duro, diariamente, al menos 30 minutos cada día</string>
+    <string name="dialog_edit_user_submit">Aceptar</string>
+    <string name="height_range_error">Ingresa una altura entre 100 cm. y 250 cm.</string>
+    <string name="update_user_data_success">Datos actualizados correctamente.</string>
+    <string name="update_user_data_error_msg">Ups! No pudimos actualizar tus datos. Intenta de nuevo más tarde.</string>
+    <string name="home_title">Inicio</string>
+    <string name="stats_title">Estadísticas</string>
+    <string name="diets_title">Dietas</string>
+    <string name="chats_title">Chat</string>
+    <string name="dialog_logout_title">Cerrar sesión</string>
+    <string name="dialog_logout_instructions"><b>¿Está seguro que desea sailr?</b> De hacerlo, se borrarán todos sus datos almacenados localmente en su teléfono, como los chats con su médico y las dietas que haya descargado.</string>
+    <string-array name="scale_user_indexes_array">
+        <item>P-01</item>
+        <item>P-02</item>
+        <item>P-03</item>
+        <item>P-04</item>
+        <item>P-05</item>
+        <item>P-06</item>
+        <item>P-07</item>
+        <item>P-08</item>
+    </string-array>
 </resources>
