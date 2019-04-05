@@ -202,9 +202,12 @@ public class HomeFragment extends Fragment
                     boolean hasToSetGaugeStart = sharedPreferences.getBoolean(Constants.GAUGE_HAS_TO_SET_START, false);
 
                     if (goal.isPresent()) {
+                        Timber.d("New bm - goal is present");
                         if (hasToSetGaugeStart) {
+                            Timber.d("New bm - hasToSetGaugeStart");
                             calculateAndSetGaugeParameters(goal.get(), bodyMeasurement.get());
                         } else {
+                            Timber.d("New bm - not hasToSetGaugeStart");
                             int gaugeValue = getGaugeValue(bodyMeasurement.get(), goal.get(), startValue, endValue);
                             mCustomGauge.setStartValue(startValue);
                             mCustomGauge.setEndValue(endValue);
@@ -212,6 +215,7 @@ public class HomeFragment extends Fragment
                             mCustomGauge.invalidate();
                         }
                     } else {
+                        Timber.d("New bm - goal is not present");
                         mCustomGauge.setStartValue(0);
                         mCustomGauge.setEndValue(100);
                         mCustomGauge.setValue(100);
@@ -227,6 +231,7 @@ public class HomeFragment extends Fragment
             if (patient != null && patient.getGoalInKg() != null && patient.getGoalInKg() > 0f
                     && patient.getGoalDueDate() != null
                     && Calendar.getInstance().getTime().before(patient.getGoalDueDate())) {
+                Timber.d("patient observer triggered");
                 DecimalFormat df = new DecimalFormat("'META' ###.# 'kg'");
                 mGoalTextView.setText(df.format(patient.getGoalInKg()));
                 setupGaugeLimits(patient);
@@ -238,21 +243,15 @@ public class HomeFragment extends Fragment
     }
 
     private int getGaugeValue(@NonNull BodyMeasurement bodyMeasurement, @NonNull Float goal, int startValue, int endValue) {
-
+        Timber.d("getGaugeValue");
         float difference = Math.abs(goal - bodyMeasurement.getWeight());
         int gaugeValue = Math.round(goal * 100 - difference * 100);
-        Timber.d("New body measurement. Goal is %s, the difference is %s and the gaugeValue %s",
-                goal,
-                difference,
-                gaugeValue);
-
         gaugeValue = gaugeValue < startValue ? startValue : gaugeValue > endValue ? endValue : gaugeValue;
-        Timber.d("set value %s", gaugeValue);
-
         return gaugeValue;
     }
 
     private void setupGaugeLimits(Patient patient) {
+        Timber.d("setupGaugeLimits");
         appExecutors.getDiskIO().execute(() -> {
             Optional<BodyMeasurement> lastBeforeGoalStarted =
                     mHomeViewModel.getLastBodyMeasurementBeforeGoalStarted(patient.getGoalStartDate(), patient.getId());
@@ -260,13 +259,14 @@ public class HomeFragment extends Fragment
                     mHomeViewModel.getFirstBodyMeasurementAfterGoalStarted(patient.getGoalStartDate(), patient.getId());
             Optional<BodyMeasurement> initialBodyMeasurement;
             if (lastBeforeGoalStarted.isPresent()) {
-                Timber.d("lastbeforegoalstarted is present");
                 initialBodyMeasurement = lastBeforeGoalStarted;
             } else initialBodyMeasurement = firstAfterGoalStarted;
 
             if (initialBodyMeasurement.isPresent()) {
+                Timber.d("initialBodyMeasurement.isPresent()");
                 calculateAndSetGaugeParameters(patient.getGoalInKg(), initialBodyMeasurement.get());
             } else {
+                Timber.d("initialBodyMeasurement is not present");
                 mCustomGauge.setStartValue(0);
                 mCustomGauge.setEndValue(Math.round(patient.getGoalInKg()) * 100);
                 mCustomGauge.setValue(0);
@@ -279,6 +279,7 @@ public class HomeFragment extends Fragment
     }
 
     private void calculateAndSetGaugeParameters(Float goal, BodyMeasurement initialBodyMeasurement) {
+        Timber.d("calculateAndSetGaugeParameters");
         float difference = Math.abs(goal - initialBodyMeasurement.getWeight());
         int startValue = Math.round(goal * 100 - difference * 1.20f * 100);
         int endValue = Math.round(goal * 100);

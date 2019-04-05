@@ -138,11 +138,11 @@ public class MainActivity extends BaseActivity
         setSupportActionBar(mToolbar);
         setActionBarTitleAccordingToFragment(openFragmentInPosition);
         setupDrawerLayout();
-        setupBottomNav();
 
         onKeyboardVisibilityEvent();
 
-        observeIsRefreshing();
+        setupBottomNav();
+        observeIsRefreshing(openFragmentInPosition);
         observeUserData();
         observeChangeDialogEvent();
         observeNumberOfUnreadMessages();
@@ -152,9 +152,6 @@ public class MainActivity extends BaseActivity
         mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
         mViewModel.getLogoutEvent().observe(this, this::onLogoutEvent);
 
-        addFragmentsToBottomNav(openFragmentInPosition);
-
-        mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
 
         mViewModel.getAppBarShadowStatus().observe(this, showShadow -> {
             if (showShadow != null && !showShadow) {
@@ -182,13 +179,17 @@ public class MainActivity extends BaseActivity
     }
 
 
-    private void observeIsRefreshing() {
+    private void observeIsRefreshing(int openFragmentInPosition) {
         mViewModel.isRefreshing().observe(this, isRefreshing -> {
             Timber.d("Refreshing status %s", isRefreshing);
             if (isRefreshing != null) {
                 mMainProgressBar.setVisibility(isRefreshing ? View.VISIBLE : View.GONE);
                 mNoSwipePager.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
                 mExpandableBottomBar.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
+                if (!isRefreshing) {
+                    addFragmentsToBottomNav(openFragmentInPosition);
+                    mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
+                }
             }
         });
     }
@@ -326,8 +327,6 @@ public class MainActivity extends BaseActivity
 
     private void setupBottomNav() {
         mBnv.enableAnimation(true);
-//        mBnv.enableShiftingMode(false);
-//        mBnv.enableItemShiftingMode(false);
         mBnv.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED); // for enableShiftingMode(false)
         mBnv.setItemHorizontalTranslationEnabled(false); // for enableItemShiftingMode(false)
         mBnv.setTextVisibility(false);
