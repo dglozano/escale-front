@@ -1,18 +1,12 @@
 package com.dglozano.escale.db.dao;
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.Query;
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.Query;
 
-import com.dglozano.escale.db.entity.AppUser;
 import com.dglozano.escale.db.entity.Chat;
-import com.dglozano.escale.db.entity.Diet;
-import com.dglozano.escale.db.entity.UserChatJoin;
 
-import java.util.List;
 import java.util.Optional;
-
-import io.reactivex.Completable;
 
 @Dao
 public interface ChatDao {

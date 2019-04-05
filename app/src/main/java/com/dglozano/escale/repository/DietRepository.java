@@ -1,6 +1,6 @@
 package com.dglozano.escale.repository;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.dao.DietDao;

@@ -1,11 +1,11 @@
 package com.dglozano.escale.ble;
 
 import android.app.Service;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.util.Constants;

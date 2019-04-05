@@ -1,11 +1,11 @@
 package com.dglozano.escale.ui.main.diet.show;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.util.ui.CustomPdfScrollHandle;

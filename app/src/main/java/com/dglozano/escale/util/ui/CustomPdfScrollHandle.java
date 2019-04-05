@@ -3,7 +3,7 @@ package com.dglozano.escale.util.ui;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 

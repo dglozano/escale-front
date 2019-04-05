@@ -1,10 +1,7 @@
 package com.dglozano.escale.ui.login;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -21,6 +18,9 @@ import com.dglozano.escale.web.EscaleRestApi;
 
 import javax.inject.Inject;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -94,9 +94,10 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RECOVER_PASSWORD_CODE && resultCode == RESULT_OK) {
             String email = data.getStringExtra("email");
-            if(email == null || email.isEmpty()) email = "tu cuenta";
+            if (email == null || email.isEmpty()) email = "tu cuenta";
             showSnackbarWithOkDismiss(String.format(getString(R.string.email_sent_to_recover_snak_msg), email));
         }
     }

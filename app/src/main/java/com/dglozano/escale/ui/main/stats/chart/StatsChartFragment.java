@@ -1,18 +1,10 @@
 package com.dglozano.escale.ui.main.stats.chart;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.ToggleButton;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.repository.PatientRepository;
@@ -39,6 +31,11 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -98,7 +95,6 @@ public class StatsChartFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         mStatsChartViewModel.getChartEntries().observe(this, entriesList -> {
             if (entriesList != null && !entriesList.isEmpty()) {
                 refreshChartEntries(entriesList);
@@ -114,6 +110,12 @@ public class StatsChartFragment extends Fragment {
         });
 
         setupLineChart();
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        statsFilterRadioGroup.setPosition(0);
     }
 
     private void refreshChartEntries(List<Entry> entriesList) {

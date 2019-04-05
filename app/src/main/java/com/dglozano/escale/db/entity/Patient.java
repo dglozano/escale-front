@@ -1,9 +1,5 @@
 package com.dglozano.escale.db.entity;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
-
 import com.dglozano.escale.web.dto.PatientDTO;
 import com.google.gson.annotations.SerializedName;
 
@@ -13,7 +9,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+
+import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(foreignKeys = @ForeignKey(entity = Doctor.class,
         parentColumns = "id",
@@ -29,6 +29,7 @@ public class Patient extends AppUser {
     private Long doctorId;
     private Float goalInKg;
     private Date goalDueDate;
+    private Date goalStartDate;
     private boolean hasToUpdateDataInScale = true;
 
     public Patient() {
@@ -50,9 +51,11 @@ public class Patient extends AppUser {
         if (patientDTO.getCurrentWeightGoal() != null) {
             this.goalDueDate = patientDTO.getCurrentWeightGoal().getDueDate();
             this.goalInKg = patientDTO.getCurrentWeightGoal().getGoalInKg();
+            this.goalStartDate = patientDTO.getCurrentWeightGoal().getStartDate();
         } else {
             this.goalDueDate = null;
             this.goalInKg = null;
+            this.goalStartDate = null;
         }
     }
 
@@ -125,6 +128,10 @@ public class Patient extends AppUser {
         this.changedDefaultPassword = changedDefaultPassword;
     }
 
+    public void setGoalStartDate(Date goalStartDate) {
+        this.goalStartDate = goalStartDate;
+    }
+
     public Float getGoalInKg() {
         return goalInKg;
     }
@@ -178,6 +185,11 @@ public class Patient extends AppUser {
             default:
                 return "Media";
         }
+    }
+
+
+    public Date getGoalStartDate() {
+        return goalStartDate;
     }
 
     public enum Gender {

@@ -1,6 +1,6 @@
 package com.dglozano.escale.db;
 
-import android.arch.persistence.room.TypeConverter;
+import androidx.room.TypeConverter;
 
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.util.FileUtils;

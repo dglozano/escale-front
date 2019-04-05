@@ -1,7 +1,7 @@
 package com.dglozano.escale.di;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.dglozano.escale.di.annotation.ViewModelKey;
 import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivityViewModel;

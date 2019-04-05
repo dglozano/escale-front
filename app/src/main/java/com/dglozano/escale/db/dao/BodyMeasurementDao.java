@@ -1,19 +1,17 @@
 package com.dglozano.escale.db.dao;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-
 import com.dglozano.escale.db.entity.BodyMeasurement;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import io.reactivex.Maybe;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
 import io.reactivex.Single;
 
 @Dao
@@ -47,4 +45,13 @@ public interface BodyMeasurementDao {
 
     @Delete
     void deleteBodyMeasurement(BodyMeasurement bodyMeasurement);
+
+    @Query("SELECT * FROM BodyMeasurement WHERE userId == :patientId AND date <= :goalStartDate ORDER BY date DESC LIMIT 1")
+    Optional<BodyMeasurement> getLastBodyMeasurementBeforeGoalStarted(Date goalStartDate, Long patientId);
+
+    @Query("SELECT * FROM BodyMeasurement WHERE userId == :patientId AND date >= :goalStartDate ORDER BY date ASC LIMIT 1")
+    Optional<BodyMeasurement> getFirstBodyMeasurementAfterGoalStarted(Date goalStartDate, Long patientId);
+
+    @Query("SELECT * FROM BodyMeasurement WHERE userId == :loggedPatiendId ORDER BY date DESC LIMIT 1")
+    Optional<BodyMeasurement> getLastBodyMeasurementBlockingOfPatient(Long loggedPatiendId);
 }

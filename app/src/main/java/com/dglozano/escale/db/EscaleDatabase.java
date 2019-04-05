@@ -1,8 +1,8 @@
 package com.dglozano.escale.db;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.TypeConverters;
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
 import com.dglozano.escale.db.dao.BodyMeasurementDao;
 import com.dglozano.escale.db.dao.ChatDao;
@@ -29,7 +29,7 @@ import com.dglozano.escale.db.entity.UserChatJoin;
         UserChatJoin.class,
         AppUser.class,
         Doctor.class,},
-        version = 16,
+        version = 17,
         exportSchema = false)
 @TypeConverters(DatabaseConverters.class)
 public abstract class EscaleDatabase extends RoomDatabase {

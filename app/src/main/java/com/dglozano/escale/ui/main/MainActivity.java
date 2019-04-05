@@ -2,8 +2,6 @@ package com.dglozano.escale.ui.main;
 
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,19 +9,6 @@ import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -44,6 +29,10 @@ import com.dglozano.escale.util.ui.BottomBarAdapter;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.util.ui.NoSwipePager;
 import com.dglozano.escale.web.services.FirebaseTokenSenderService;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.bottomnavigation.LabelVisibilityMode;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
@@ -55,6 +44,18 @@ import java.net.MalformedURLException;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -325,8 +326,10 @@ public class MainActivity extends BaseActivity
 
     private void setupBottomNav() {
         mBnv.enableAnimation(true);
-        mBnv.enableShiftingMode(false);
-        mBnv.enableItemShiftingMode(false);
+//        mBnv.enableShiftingMode(false);
+//        mBnv.enableItemShiftingMode(false);
+        mBnv.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED); // for enableShiftingMode(false)
+        mBnv.setItemHorizontalTranslationEnabled(false); // for enableItemShiftingMode(false)
         mBnv.setTextVisibility(false);
         mBnv.setIconSizeAt(0, 28, 28);
     }
@@ -457,7 +460,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CHANGE_PASSWORD_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 showSnackbarWithDuration(R.string.snackbar_password_change_success_msg, Snackbar.LENGTH_SHORT);

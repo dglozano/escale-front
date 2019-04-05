@@ -1,7 +1,5 @@
 package com.dglozano.escale.repository;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.EscaleDatabase;
@@ -36,10 +34,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.TimeZone;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -96,6 +98,7 @@ public class PatientRepository {
         mLoggedPatient = Transformations.switchMap(mLoggedUserId, this::getPatientById);
     }
 
+    @Nullable
     public LiveData<Patient> getPatientById(Long userId) {
         return mPatientDao.getPatientById(userId);
     }
@@ -286,5 +289,9 @@ public class PatientRepository {
                     mPatientDao.update(patient);
                     return patient.getId();
                 }));
+    }
+
+    public Optional<Float> getGoalOfPatientWithId(Long loggedPatiendId) {
+        return mPatientDao.getGoalOfPatient(loggedPatiendId);
     }
 }

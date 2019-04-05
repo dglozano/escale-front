@@ -17,7 +17,7 @@
         android:textColor="@color/white"
         android:textStyle="bold" />
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/dialog_edit_user_height_inputlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
             android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
             android:textColor="@color/colorTextBlack"
             android:textColorHint="@color/colorTextDark" />
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:id="@+id/dialog_edit_user_ph_activity_label"

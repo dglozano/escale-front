@@ -1,7 +1,7 @@
 package com.dglozano.escale.web;
 
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.dglozano.escale.util.Constants;
 

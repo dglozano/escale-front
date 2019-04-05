@@ -1,7 +1,7 @@
 package com.dglozano.escale.repository;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.dao.ChatDao;

@@ -1,7 +1,7 @@
 package com.dglozano.escale.util;
 
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.content.SharedPreferences;
 
 import java.util.Set;

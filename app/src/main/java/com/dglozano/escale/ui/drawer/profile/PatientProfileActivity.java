@@ -1,15 +1,10 @@
 package com.dglozano.escale.ui.drawer.profile;
 
 import android.Manifest;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +21,7 @@ import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.util.FileUtils;
 import com.dglozano.escale.util.PermissionHelper;
 import com.dglozano.escale.util.ui.Event;
+import com.google.android.material.snackbar.Snackbar;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -38,6 +34,10 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dagger.android.AndroidInjection;
@@ -174,7 +174,7 @@ public class PatientProfileActivity extends BaseActivity implements EditPatientD
         if (successEvent != null && !successEvent.hasBeenHandled()) {
             Integer successMessageResId = successEvent.handleContent();
             boolean isPictureChangedEvent = successMessageResId == R.string.upload_picture_success_msg;
-            if(isPictureChangedEvent) {
+            if (isPictureChangedEvent) {
                 try {
                     mPicasso.invalidate(Uri.parse(mViewModel.getProfileImageUrlOfLoggedPatient().toString()));
                     loadPicture();
@@ -202,6 +202,7 @@ public class PatientProfileActivity extends BaseActivity implements EditPatientD
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SELECT_PICTURE_CODE && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             Uri imageUri = data.getData();

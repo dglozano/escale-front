@@ -2,8 +2,7 @@ package com.dglozano.escale.ble;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.widget.Toast;
+import androidx.annotation.NonNull;
 
 import com.dglozano.escale.R;
 import com.polidea.rxandroidble2.exceptions.BleScanException;

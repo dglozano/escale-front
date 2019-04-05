@@ -3,7 +3,7 @@ package com.dglozano.escale.web.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.web.EscaleRestApi;

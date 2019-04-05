@@ -1,7 +1,7 @@
 package com.dglozano.escale.web.services;
 
 import android.content.Intent;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.entity.Diet;

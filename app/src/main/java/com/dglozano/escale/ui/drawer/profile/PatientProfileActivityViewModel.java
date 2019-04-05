@@ -1,23 +1,24 @@
 package com.dglozano.escale.ui.drawer.profile;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Transformations;
-import android.arch.lifecycle.ViewModel;
-
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Doctor;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.repository.DoctorRepository;
 import com.dglozano.escale.repository.PatientRepository;
+import com.dglozano.escale.util.AbsentLiveData;
 import com.dglozano.escale.util.ui.Event;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -43,7 +44,13 @@ public class PatientProfileActivityViewModel extends ViewModel {
         mSuccessEvent = new MutableLiveData<>();
         disposables = new CompositeDisposable();
         mLoggedPatient = mPatientRepository.getLoggedPatient();
-        mLoggedDoctor = Transformations.switchMap(mLoggedPatient, patient -> mDoctorRepository.getDoctorById(patient.getDoctorId()));
+        mLoggedDoctor = Transformations.switchMap(mLoggedPatient, patient -> {
+            if (patient != null) {
+                return mDoctorRepository.getDoctorById(patient.getDoctorId());
+            } else {
+                return AbsentLiveData.create();
+            }
+        });
         mLoading.postValue(false);
     }
 

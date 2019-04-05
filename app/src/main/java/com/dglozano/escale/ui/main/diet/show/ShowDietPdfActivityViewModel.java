@@ -1,6 +1,6 @@
 package com.dglozano.escale.ui.main.diet.show;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 
 import javax.inject.Inject;
 

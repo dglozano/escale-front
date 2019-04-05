@@ -2,7 +2,7 @@ package com.dglozano.escale.di;
 
 import android.app.Application;
 import android.app.NotificationManager;
-import android.arch.persistence.room.Room;
+import androidx.room.Room;
 import android.content.Context;
 import android.content.SharedPreferences;
 

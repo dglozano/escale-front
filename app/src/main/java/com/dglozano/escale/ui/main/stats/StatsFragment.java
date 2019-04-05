@@ -1,14 +1,14 @@
 package com.dglozano.escale.ui.main.stats;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.tabs.TabLayout;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,9 +63,7 @@ public class StatsFragment extends Fragment {
 
         setupViewPager(mTabsViewPager);
 
-        Timber.d("hola");
         mStatsViewModel.areMeasurementsEmpty().observe(this, measurementsEmpty -> {
-            Timber.d("hola %s", measurementsEmpty);
             if (measurementsEmpty != null && !measurementsEmpty) {
                 mStatsMainContainer.setVisibility(View.VISIBLE);
                 mTabLayout.setVisibility(View.VISIBLE);
@@ -88,7 +86,7 @@ public class StatsFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
     }

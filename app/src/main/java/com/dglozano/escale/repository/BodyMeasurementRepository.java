@@ -1,7 +1,5 @@
 package com.dglozano.escale.repository;
 
-import android.arch.lifecycle.LiveData;
-
 import com.dglozano.escale.db.dao.BodyMeasurementDao;
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.di.annotation.ApplicationScope;
@@ -16,6 +14,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
@@ -87,5 +86,17 @@ public class BodyMeasurementRepository {
 
     public LiveData<List<BodyMeasurement>> getLastBodyMeasurementsOfUserWithId(Long loggedPatiendId) {
         return mBodyMeasurementDao.getLastBodyMeasurementsOfUserWithId(loggedPatiendId, BODY_MEASUREMENTS_DEFAULT_LIMIT);
+    }
+
+    public Optional<BodyMeasurement> getLastBodyMeasurementBeforeGoalStarted(Date goalStartDate, Long patientId) {
+        return mBodyMeasurementDao.getLastBodyMeasurementBeforeGoalStarted(goalStartDate, patientId);
+    }
+
+    public Optional<BodyMeasurement> getFirstBodyMeasurementAfterGoalStarted(Date goalStartDate, Long patientId) {
+        return mBodyMeasurementDao.getFirstBodyMeasurementAfterGoalStarted(goalStartDate, patientId);
+    }
+
+    public Optional<BodyMeasurement> getLastBodyMeasurementBlockingOfPatient(Long loggedPatiendId) {
+        return mBodyMeasurementDao.getLastBodyMeasurementBlockingOfPatient(loggedPatiendId);
     }
 }
