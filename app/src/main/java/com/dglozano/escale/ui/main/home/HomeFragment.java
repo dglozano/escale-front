@@ -237,7 +237,9 @@ public class HomeFragment extends Fragment
                 setupGaugeLimits(patient);
             } else {
                 mGoalTextView.setText(R.string.no_goal_set);
-                mCustomGauge.setValue(1000);
+                mCustomGauge.setStartValue(0);
+                mCustomGauge.setEndValue(100);
+                mCustomGauge.setValue(100);
             }
         });
     }
