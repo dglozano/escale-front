@@ -31,7 +31,7 @@ import timber.log.Timber;
 
 public class AllDietsFragment extends Fragment {
 
-    private static final int SHOW_PDF_CODE = 999;
+    public static final int SHOW_PDF_CODE = 999;
 
     @BindView(R.id.recycler_view_diets)
     RecyclerView mRecyclerViewDiets;

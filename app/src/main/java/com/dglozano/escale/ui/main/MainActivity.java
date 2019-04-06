@@ -67,6 +67,8 @@ import q.rorbin.badgeview.Badge;
 import q.rorbin.badgeview.QBadgeView;
 import timber.log.Timber;
 
+import static com.dglozano.escale.ui.main.diet.all.AllDietsFragment.SHOW_PDF_CODE;
+
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         HasSupportFragmentInjector, LogoutDialog.LogoutDialogListener {
@@ -132,8 +134,9 @@ public class MainActivity extends BaseActivity
 
         int openFragmentInPosition = 0;
         if (getIntent().getExtras() != null) {
-            openFragmentInPosition = handleFirebaseIntent();
+            openFragmentInPosition = handleIntent();
         }
+        mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
 
         setSupportActionBar(mToolbar);
         setActionBarTitleAccordingToFragment(openFragmentInPosition);
@@ -142,7 +145,7 @@ public class MainActivity extends BaseActivity
         onKeyboardVisibilityEvent();
 
         setupBottomNav();
-        observeIsRefreshing(openFragmentInPosition);
+        observeIsRefreshing();
         observeUserData();
         observeChangeDialogEvent();
         observeNumberOfUnreadMessages();
@@ -179,7 +182,7 @@ public class MainActivity extends BaseActivity
     }
 
 
-    private void observeIsRefreshing(int openFragmentInPosition) {
+    private void observeIsRefreshing() {
         mViewModel.isRefreshing().observe(this, isRefreshing -> {
             Timber.d("Refreshing status %s", isRefreshing);
             if (isRefreshing != null) {
@@ -187,14 +190,13 @@ public class MainActivity extends BaseActivity
                 mNoSwipePager.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
                 mExpandableBottomBar.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
                 if (!isRefreshing) {
-                    addFragmentsToBottomNav(openFragmentInPosition);
-                    mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
+                    addFragmentsToBottomNav(mViewModel.getPositionOfCurrentFragment().getValue());
                 }
             }
         });
     }
 
-    private int handleFirebaseIntent() {
+    private int handleIntent() {
         int openFragment = 0;
         String msgType = getIntent().getExtras().getString("type");
         if (msgType != null) {
@@ -210,6 +212,7 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
+        mViewModel.refreshData();
         for (int i = 0; i < mNavigationView.getMenu().size(); i++) {
             mNavigationView.getMenu().getItem(i).setChecked(false);
         }
@@ -422,7 +425,6 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
-        mViewModel.refreshData();
         mNotificationManager.cancelAll();
         Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
         Intent intent = new Intent(this, BF600BleService.class);
@@ -466,6 +468,8 @@ public class MainActivity extends BaseActivity
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 showSnackbarWithOkDismiss(R.string.change_password_canceled_msg);
             }
+        } else if (requestCode == SHOW_PDF_CODE) {
+            mViewModel.setPositionOfCurrentFragment(2);
         }
     }
 

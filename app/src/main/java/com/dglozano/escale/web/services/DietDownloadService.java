@@ -1,7 +1,6 @@
 package com.dglozano.escale.web.services;
 
 import android.content.Intent;
-import androidx.annotation.Nullable;
 
 import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.entity.Diet;
@@ -11,6 +10,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -40,13 +40,13 @@ public class DietDownloadService extends AbstractDownloadService {
                     Timber.d("File download was a success? %s", writtenToDisk);
                     if (writtenToDisk) {
                         diet.setFileStatus(FileUtils.FileStatus.DOWNLOADED);
-                        dietDao.updateDiet(diet);
+                        dietDao.upsert(diet);
                     } else {
                         throw new Exception("Couldn't write Diet to disk");
                     }
                 } catch (Exception e) {
                     diet.setFileStatus(FileUtils.FileStatus.NOT_DOWNLOADED);
-                    dietDao.updateDiet(diet);
+                    dietDao.upsert(diet);
                     Timber.e(e, "Error while downloading diet %s", diet.getFileName());
                 }
             }

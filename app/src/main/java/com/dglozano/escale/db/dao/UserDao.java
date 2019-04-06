@@ -13,23 +13,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Dao
-public interface UserDao {
+public abstract class UserDao extends BaseDao<AppUser>{
     @Query("SELECT * FROM AppUser")
-    LiveData<List<AppUser>> getAllUsersAsLiveData();
+    public abstract LiveData<List<AppUser>> getAllUsersAsLiveData();
 
     @Query("SELECT * FROM AppUser WHERE id == :id")
-    LiveData<AppUser> getUserByIdAsLiveData(Long id);
+    public abstract LiveData<AppUser> getUserByIdAsLiveData(Long id);
 
     @Query("SELECT * FROM AppUser WHERE id == :id")
-    Optional<AppUser> getUserById(Long id);
-
-    @Delete
-    void deleteUser(AppUser user);
-
-    //FIXME: Borrar REPLACE cuando entre en produccion
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Long save(AppUser appUser);
+    public abstract Optional<AppUser> getUserById(Long id);
 
     @Query("DELETE FROM AppUser")
-    void deleteAll();
+    public abstract void deleteAll();
 }

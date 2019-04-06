@@ -1,6 +1,5 @@
 package com.dglozano.escale.repository;
 
-import androidx.lifecycle.LiveData;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.dao.DoctorDao;
@@ -11,6 +10,8 @@ import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.web.EscaleRestApi;
 
 import javax.inject.Inject;
+
+import androidx.lifecycle.LiveData;
 
 @ApplicationScope
 public class DoctorRepository {
@@ -33,5 +34,9 @@ public class DoctorRepository {
 
     public LiveData<Doctor> getDoctorById(Long doctorId) {
         return mDoctorDao.getDoctorByIdAsLiveData(doctorId);
+    }
+
+    public void upsert(Doctor doctor) {
+        mDoctorDao.upsert(doctor);
     }
 }

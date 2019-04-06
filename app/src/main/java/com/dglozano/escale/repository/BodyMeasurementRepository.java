@@ -58,7 +58,7 @@ public class BodyMeasurementRepository {
                             .filter(measurementDTO
                                     -> mBodyMeasurementDao.measurementExists(measurementDTO.getId()) != 1)
                             .map(BodyMeasurement::new)
-                            .forEach(mBodyMeasurementDao::insertBodyMeasurement);
+                            .forEach(mBodyMeasurementDao::upsert);
                     return Completable.complete();
                 });
     }
@@ -70,7 +70,10 @@ public class BodyMeasurementRepository {
                 fat, bmi, bones, muscle, Calendar.getInstance().getTime(), isManual);
         return mEscaleRestApi.postNewMeasurement(addDto, patientId)
                 .map(BodyMeasurement::new)
-                .map(mBodyMeasurementDao::insertBodyMeasurement)
+                .map(bm -> {
+                    mBodyMeasurementDao.upsert(bm);
+                    return bm.getId();
+                })
                 .subscribeOn(Schedulers.io());
     }
 

@@ -9,13 +9,11 @@ import com.dglozano.escale.db.entity.Chat;
 import java.util.Optional;
 
 @Dao
-public interface ChatDao {
-    @Insert
-    Long insert(Chat chat);
+public abstract class ChatDao extends BaseDao<Chat> {
 
     @Query("SELECT * FROM Chat WHERE id == :id")
-    Optional<Chat> getChatById(Long id);
+    public abstract Optional<Chat> getChatById(Long id);
 
     @Query("SELECT COUNT(*) FROM Chat WHERE id == :id")
-    Integer chatExists(Long id);
+    public abstract Integer chatExists(Long id);
 }

@@ -2,7 +2,6 @@ package com.dglozano.escale.di;
 
 import android.app.Application;
 import android.app.NotificationManager;
-import androidx.room.Room;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -42,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import androidx.room.Room;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
@@ -59,7 +59,7 @@ public class AppModule {
     @ApplicationContext
     @ApplicationScope
     Context provideContext(Application application) {
-        return application;
+        return application.getApplicationContext();
     }
 
     @Provides
@@ -239,7 +239,7 @@ public class AppModule {
 
     @Provides
     @ApplicationScope
-    public Picasso picasso(@ApplicationContext Context context, OkHttp3Downloader okHttp3Downloader){
+    public Picasso picasso(@ApplicationContext Context context, OkHttp3Downloader okHttp3Downloader) {
         return new Picasso.Builder(context)
                 .loggingEnabled(true)
                 .indicatorsEnabled(true)
@@ -249,7 +249,7 @@ public class AppModule {
 
     @Provides
     @ApplicationScope
-    public OkHttp3Downloader okHttp3Downloader(OkHttpClient okHttpClient){
+    public OkHttp3Downloader okHttp3Downloader(OkHttpClient okHttpClient) {
         return new OkHttp3Downloader(okHttpClient);
     }
 

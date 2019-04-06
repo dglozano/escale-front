@@ -124,7 +124,7 @@ public class ChatRepository {
                     return Single.fromCallable(() -> {
                         Chat chat = new Chat(chatDTO.getId());
                         Timber.d("Inserting chat from API %s", chatDTO.getId());
-                        mChatDao.insert(chat);
+                        mChatDao.upsert(chat);
                         return chatDTO;
                     });
                 })
@@ -132,7 +132,7 @@ public class ChatRepository {
                     return Completable.fromCallable(() -> {
                         for (Long id : chatDTO.getParticipantsIds()) {
                             Timber.d("Inserting chatjoin %s - %s", id, chatDTO.getId());
-                            mUserChatJoinDao.insert(new UserChatJoin(id, chatDTO.getId()));
+                            mUserChatJoinDao.upsert(new UserChatJoin(id, chatDTO.getId()));
                         }
                         return Completable.complete();
                     });
@@ -155,13 +155,13 @@ public class ChatRepository {
                 .map(chatDTO -> {
                     Chat chat = new Chat(chatDTO.getId());
                     Timber.d("Inserting chat from API %s", chatDTO.getId());
-                    mChatDao.insert(chat);
+                    mChatDao.upsert(chat);
                     return chatDTO;
                 })
                 .map(chatDTO -> {
                     for (Long id : chatDTO.getParticipantsIds()) {
                         Timber.d("Inserting chatjoin %s - %s", id, chatDTO.getId());
-                        mUserChatJoinDao.insert(new UserChatJoin(id, chatDTO.getId()));
+                        mUserChatJoinDao.upsert(new UserChatJoin(id, chatDTO.getId()));
                     }
                     return chatDTO.getId();
                 });
@@ -186,7 +186,7 @@ public class ChatRepository {
                             .collect(Collectors.toList());
                     newMessagesToAdd.forEach(chatMessage -> {
                         Timber.d("Inserting chatMessage from API %s", chatMessage.getId());
-                        mChatMessageDao.insertChatMessage(chatMessage);
+                        mChatMessageDao.upsert(chatMessage);
                     });
                     return newMessagesToAdd.size();
                 });
@@ -197,9 +197,9 @@ public class ChatRepository {
                 .flatMap(chatDTO -> {
                     Timber.d("Created chat for logged user with other user %s. Chat id %s", otherUserId, chatDTO.getId());
                     Chat chat = new Chat(chatDTO.getId());
-                    mChatDao.insert(chat);
+                    mChatDao.upsert(chat);
                     chatDTO.getParticipantsIds().forEach(participantId -> {
-                        mUserChatJoinDao.insert(new UserChatJoin(participantId, chat.getId()));
+                        mUserChatJoinDao.upsert(new UserChatJoin(participantId, chat.getId()));
                     });
                     return Single.just(chat.getId());
                 });
@@ -216,7 +216,7 @@ public class ChatRepository {
                 }).flatMap(chatId -> mEscaleRestApi.sendChatMessage(chatId,
                         new SendChatMessageDTO(message, Calendar.getInstance().getTime())))
                 .flatMapCompletable(msgDTO -> {
-                    mChatMessageDao.insertChatMessage(new ChatMessage(msgDTO, msgDTO.getChatId()));
+                    mChatMessageDao.upsert(new ChatMessage(msgDTO, msgDTO.getChatId()));
                     return Completable.complete();
                 });
     }
@@ -231,9 +231,9 @@ public class ChatRepository {
                     } else {
                         return Single.fromCallable(() -> {
                             Chat chat = new Chat(chatIdInMessage);
-                            mChatDao.insert(chat);
-                            mUserChatJoinDao.insert(new UserChatJoin(patientId, chatIdInMessage));
-                            mUserChatJoinDao.insert(new UserChatJoin(sender_id, chatIdInMessage));
+                            mChatDao.upsert(chat);
+                            mUserChatJoinDao.upsert(new UserChatJoin(patientId, chatIdInMessage));
+                            mUserChatJoinDao.upsert(new UserChatJoin(sender_id, chatIdInMessage));
                             return chatIdInMessage;
                         });
                     }
@@ -247,7 +247,7 @@ public class ChatRepository {
                     SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
                     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
                     Date date = sdf.parse(dateString);
-                    mChatMessageDao.insertChatMessage(new ChatMessage(id, chatId, sender_id, msg, date));
+                    mChatMessageDao.upsert(new ChatMessage(id, chatId, sender_id, msg, date));
                     return Completable.complete();
                 });
     }

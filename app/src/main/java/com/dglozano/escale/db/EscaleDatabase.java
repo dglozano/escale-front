@@ -29,7 +29,7 @@ import com.dglozano.escale.db.entity.UserChatJoin;
         UserChatJoin.class,
         AppUser.class,
         Doctor.class,},
-        version = 17,
+        version = 21,
         exportSchema = false)
 @TypeConverters(DatabaseConverters.class)
 public abstract class EscaleDatabase extends RoomDatabase {

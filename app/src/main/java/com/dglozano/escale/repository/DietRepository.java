@@ -1,6 +1,5 @@
 package com.dglozano.escale.repository;
 
-import androidx.lifecycle.LiveData;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.dao.DietDao;
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import timber.log.Timber;
@@ -77,15 +77,16 @@ public class DietRepository {
         return mEscaleRestApi.getDiets(patientId)
                 .flatMap(dietsApi -> {
                     Timber.d("Retrieved diets for user with id %s from Api", patientId);
+
                     List<Diet> newDietsToAdd = dietsApi.stream()
-                            .filter(dietDTO -> mDietDao.dietExists(dietDTO.getUuid()) != 1)
+                            .filter(dietDTO -> mDietDao.dietExists(dietDTO.getUuid()) == 0)
                             .map(dietDTO -> new Diet(dietDTO, patientId))
                             .collect(Collectors.toList());
 
                     newDietsToAdd.forEach(diet -> {
-                                Timber.d("Inserting diet from API %s", diet.getId());
-                                mDietDao.insertDiet(diet);
-                            });
+                        Timber.d("Inserting diet from API %s", diet.getId());
+                        mDietDao.upsert(diet);
+                    });
 
                     Set<String> dietUuids =
                             dietsApi.stream()
@@ -97,8 +98,9 @@ public class DietRepository {
                     if (dietsInDatabase != null) {
                         dietsInDatabase
                                 .stream()
-                                .filter(diet -> !dietUuids.contains(diet.getId()))
-                                .forEach(diet -> mDietDao.deleteDiet(diet));
+                                .map(Diet::getId)
+                                .filter(uuid -> !dietUuids.contains(uuid))
+                                .forEach(uuid -> mDietDao.deleteDietById(uuid));
                     }
 
                     return Single.just(newDietsToAdd.size());
@@ -111,7 +113,7 @@ public class DietRepository {
             boolean deleted = file.delete();
             Timber.e("Was file %s deleted? %s", file, deleted);
             diet.setFileStatus(FileUtils.FileStatus.NOT_DOWNLOADED);
-            mDietDao.updateDiet(diet);
+            mDietDao.upsert(diet);
         });
     }
 
@@ -124,7 +126,7 @@ public class DietRepository {
     }
 
     public void updateDiet(Diet diet) {
-        mAppExecutors.getDiskIO().execute(() -> mDietDao.updateDiet(diet));
+        mAppExecutors.getDiskIO().execute(() -> mDietDao.upsert(diet));
     }
 
     public Completable saveDietOnNotified(Long patientId, String uuid, String fileName,
@@ -134,20 +136,21 @@ public class DietRepository {
             SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
             sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
             Date date = sdf.parse(dateString);
-            mDietDao.insertDiet(new Diet(patientId, uuid, fileName, date, size));
+            mDietDao.upsert(new Diet(patientId, uuid, fileName, date, size));
             return Completable.complete();
         });
     }
 
     public Completable deleteDietByUuid(String uuid) {
+        Timber.d("delete diet %s", uuid);
         return Completable.fromCallable(() -> {
             Optional<Diet> diet = mDietDao.getDietById(uuid);
-            if(diet.isPresent()) {
+            if (diet.isPresent()) {
                 if (diet.get().getFileStatus().equals(FileUtils.FileStatus.DOWNLOADED)) {
                     boolean deleted = new File(mFileDirectory.getPath(), diet.get().getLocalFileName()).delete();
                     Timber.e("Was diet file deleted? %s", deleted);
                 }
-                mDietDao.deleteDiet(diet.get());
+                mDietDao.delete(diet.get());
             }
             return Completable.complete();
         });

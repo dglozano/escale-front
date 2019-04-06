@@ -3,7 +3,6 @@ package com.dglozano.escale.repository;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.EscaleDatabase;
-import com.dglozano.escale.db.dao.DoctorDao;
 import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.db.dao.UserDao;
 import com.dglozano.escale.db.entity.AppUser;
@@ -63,7 +62,7 @@ import static com.dglozano.escale.util.Constants.UNREAD_MESSAGES_SHARED_PREF;
 public class PatientRepository {
 
     private PatientDao mPatientDao;
-    private DoctorDao mDoctorDao;
+    private DoctorRepository mDoctorRepository;
     private UserDao mUserDao;
     private EscaleRestApi mEscaleRestApi;
     private AppExecutors mAppExecutors;
@@ -77,7 +76,7 @@ public class PatientRepository {
     private String baseUrl;
 
     @Inject
-    public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi, DoctorDao doctorDao,
+    public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi, DoctorRepository doctorRepository,
                              UserDao userDao, AppExecutors executors, SharedPreferences sharedPreferences,
                              EscaleDatabase roomDatabase, @RootFileDirectory File rootFileDirectory,
                              @BaseUrl String baseUrl, @CacheDirectory File cacheDirectory) {
@@ -85,7 +84,7 @@ public class PatientRepository {
         mRootFileDirectory = rootFileDirectory;
         mCacheDirectory = cacheDirectory;
         mUserDao = userDao;
-        mDoctorDao = doctorDao;
+        mDoctorRepository = doctorRepository;
         mPatientDao = patientDao;
         mRoomDatabase = roomDatabase;
         mEscaleRestApi = escaleRestApi;
@@ -164,7 +163,8 @@ public class PatientRepository {
                 })
                 .flatMap(patientDTO -> {
                     Patient patient = new Patient(patientDTO, Calendar.getInstance().getTime());
-                    return Single.fromCallable(() -> mPatientDao.save(patient));
+                    mPatientDao.upsert(patient);
+                    return Single.just(patient.getId());
                 });
     }
 
@@ -188,8 +188,8 @@ public class PatientRepository {
                     return Single.fromCallable(() -> {
                         Doctor doctor = new Doctor(patientDTO.getDoctorDTO(), Calendar.getInstance().getTime());
                         AppUser user = new AppUser(doctor);
-                        mUserDao.save(user);
-                        mDoctorDao.save(doctor);
+                        mUserDao.upsert(user);
+                        mDoctorRepository.upsert(doctor);
                         Timber.d("Saving doctor with id %s ", doctor.getId());
                         return patientDTO;
                     });
@@ -197,8 +197,9 @@ public class PatientRepository {
                 .flatMap(patientDTO -> Single.fromCallable(() -> {
                     Patient patient = new Patient(patientDTO, Calendar.getInstance().getTime());
                     AppUser user = new AppUser(patient);
-                    mUserDao.save(user);
-                    return mPatientDao.save(patient);
+                    mUserDao.upsert(user);
+                    mPatientDao.upsert(patient);
+                    return patient.getId();
                 }));
     }
 
@@ -211,7 +212,7 @@ public class PatientRepository {
                     Date date = sdf.parse(dueDate);
                     patient.setGoalInKg(weightInKg);
                     patient.setGoalDueDate(date);
-                    mPatientDao.update(patient);
+                    mPatientDao.upsert(patient);
                     return Completable.complete();
                 }));
     }
@@ -277,7 +278,7 @@ public class PatientRepository {
                     patient.setHeightInCm(newHeight);
                     patient.setPhysicalActivity(newActivity);
                     patient.setHasToUpdateDataInScale(true);
-                    mPatientDao.update(patient);
+                    mPatientDao.upsert(patient);
                     return Completable.complete();
                 });
     }
@@ -286,7 +287,7 @@ public class PatientRepository {
         return mPatientDao.getPatientSingleById(patientId)
                 .flatMap(patient -> Single.fromCallable(() -> {
                     patient.setHasToUpdateDataInScale(flag);
-                    mPatientDao.update(patient);
+                    mPatientDao.upsert(patient);
                     return patient.getId();
                 }));
     }

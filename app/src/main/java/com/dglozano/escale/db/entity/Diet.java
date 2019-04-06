@@ -1,16 +1,16 @@
 package com.dglozano.escale.db.entity;
 
-import androidx.room.Entity;
-import androidx.room.ForeignKey;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
-import androidx.annotation.NonNull;
-
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.FileUtils;
 import com.dglozano.escale.web.dto.DietDTO;
 
 import java.util.Date;
+
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import static androidx.room.ForeignKey.CASCADE;
 
@@ -28,7 +28,6 @@ public class Diet {
     private Date startDate;
     private long size;
     private FileUtils.FileStatus fileStatus;
-    private int downloadId;
 
     public Diet() {
 
@@ -42,20 +41,11 @@ public class Diet {
         this.size = size;
         this.userId = patientId;
         this.fileStatus = FileUtils.FileStatus.NOT_DOWNLOADED;
-        this.downloadId = -1;
     }
 
     @Ignore
     public Diet(DietDTO dietDTO, Long userId) {
         this(userId, dietDTO.getUuid(), dietDTO.getFileName(), dietDTO.getStartDate(), dietDTO.getSize());
-    }
-
-    public int getDownloadId() {
-        return downloadId;
-    }
-
-    public void setDownloadId(int downloadId) {
-        this.downloadId = downloadId;
     }
 
     public String getFileName() {
@@ -96,8 +86,6 @@ public class Diet {
 
     public void setFileStatus(FileUtils.FileStatus fileStatus) {
         this.fileStatus = fileStatus;
-        if (fileStatus.equals(FileUtils.FileStatus.NOT_DOWNLOADED))
-            this.downloadId = -1;
     }
 
     public long getSize() {
