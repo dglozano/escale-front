@@ -57,8 +57,10 @@ public class Constants {
     public static final String SCALE_USER_PIN_SHARED_PREF = "scaleUserPin";
     public static final String GAUGE_START = "startGauge";
     public static final String GAUGE_END = "endGauge";
-    public static final String GAUGE_HAS_TO_SET_START = "hasToSetStartGauge" ;
+    public static final String GAUGE_HAS_TO_SET_START = "hasToSetStartGauge";
 
+    //Chart
+    public static final String GOAL_DATASET_LABEL = "GOAL";
 
     /**
      * 1: Patient index

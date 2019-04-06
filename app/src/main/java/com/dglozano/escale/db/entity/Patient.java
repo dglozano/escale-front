@@ -192,6 +192,10 @@ public class Patient extends AppUser {
         return goalStartDate;
     }
 
+    public boolean hasActiveGoal(Date today) {
+        return goalInKg != null && goalDueDate != null && today.before(goalDueDate);
+    }
+
     public enum Gender {
         @SerializedName("1")
         MALE,

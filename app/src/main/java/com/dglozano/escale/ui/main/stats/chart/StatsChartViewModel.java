@@ -1,11 +1,5 @@
 package com.dglozano.escale.ui.main.stats.chart;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
-
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.PatientRepository;
@@ -23,6 +17,11 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static com.dglozano.escale.ui.main.stats.chart.StatsChartViewModel.StatFilter.WEIGHT;
@@ -35,9 +34,11 @@ public class StatsChartViewModel extends ViewModel {
     private CompositeDisposable disposables;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
     private final LiveData<List<BodyMeasurement>> mBodyMeasurementList;
+    private final LiveData<Entry> mGoalEntry;
     private final MutableLiveData<StatFilter> mSelectedStat;
     private final MutableLiveData<Boolean> mFilterExpandedState;
     private final MediatorLiveData<List<Entry>> mChartEntriesList;
+
 
     @Inject
     public StatsChartViewModel(BodyMeasurementRepository bodyMeasurementRepository,
@@ -62,6 +63,14 @@ public class StatsChartViewModel extends ViewModel {
                     return mMeasurementsRepository.getBodyMeasurementsOfUserWithIdSince(
                             patientRepository.getLoggedPatiendId(), cal.getTime());
                 });
+
+        mGoalEntry = Transformations.map(mPatientRepository.getLoggedPatient(), patient -> {
+            if (patient != null && patient.hasActiveGoal(Calendar.getInstance().getTime())) {
+                return new Entry(patient.getGoalDueDate().getTime(), patient.getGoalInKg());
+            } else {
+                return null;
+            }
+        });
 
         mChartEntriesList = new MediatorLiveData<>();
         mChartEntriesList.addSource(mBodyMeasurementList, newList -> {
@@ -145,6 +154,10 @@ public class StatsChartViewModel extends ViewModel {
 
     public void toggleFiltersExpansion() {
         mFilterExpandedState.postValue(mFilterExpandedState.getValue() != null && !mFilterExpandedState.getValue());
+    }
+
+    public LiveData<Entry> getGoalEntry() {
+        return mGoalEntry;
     }
 
     protected enum StatFilter {
