@@ -520,6 +520,7 @@ public class MainActivity extends BaseActivity
             mBleServiceIsBound = true;
             BF600BleService.LocalBinder localBinder = (BF600BleService.LocalBinder) binder;
             mBF600BleService = localBinder.getService();
+            mBF600BleService.disposeConnection();
             observeServiceLiveData();
         }
 

@@ -1,6 +1,7 @@
 package com.dglozano.escale.db.dao;
 
 import com.dglozano.escale.db.entity.Patient;
+import com.dglozano.escale.db.entity.MeasurementForecast;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,4 +39,5 @@ public abstract class PatientDao extends BaseDao<Patient> {
 
     @Query("DELETE FROM Patient")
     public abstract void deleteAll();
+
 }

@@ -2,23 +2,22 @@ package com.dglozano.escale.repository;
 
 import android.content.SharedPreferences;
 
-import com.dglozano.escale.db.EscaleDatabase;
+import com.dglozano.escale.db.dao.ForecastDao;
 import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.db.dao.UserDao;
 import com.dglozano.escale.db.entity.AppUser;
 import com.dglozano.escale.db.entity.Doctor;
+import com.dglozano.escale.db.entity.MeasurementForecast;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BaseUrl;
-import com.dglozano.escale.di.annotation.CacheDirectory;
-import com.dglozano.escale.di.annotation.RootFileDirectory;
 import com.dglozano.escale.exception.AccountDisabledException;
 import com.dglozano.escale.exception.BadCredentialsException;
 import com.dglozano.escale.exception.ChangePasswordException;
 import com.dglozano.escale.exception.NotAPatientException;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
-import com.dglozano.escale.util.FileUtils;
+import com.dglozano.escale.util.LogoutHelper;
 import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
@@ -40,53 +39,47 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Transformations;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import timber.log.Timber;
 
 import static com.dglozano.escale.util.Constants.FRESH_TIMEOUT;
-import static com.dglozano.escale.util.Constants.HAS_NEW_UNREAD_DIET_SHARED_PREF;
-import static com.dglozano.escale.util.Constants.IS_FIREBASE_TOKEN_SENT_SHARED_PREF;
-import static com.dglozano.escale.util.Constants.REFRESH_TOKEN_SHARED_PREF;
-import static com.dglozano.escale.util.Constants.SCALE_USER_INDEX_SHARED_PREF;
-import static com.dglozano.escale.util.Constants.SCALE_USER_PIN_SHARED_PREF;
-import static com.dglozano.escale.util.Constants.TOKEN_SHARED_PREF;
-import static com.dglozano.escale.util.Constants.UNREAD_MESSAGES_SHARED_PREF;
 
 @ApplicationScope
 public class PatientRepository {
 
     private PatientDao mPatientDao;
+    private ForecastDao mForecastDao;
     private DoctorRepository mDoctorRepository;
     private UserDao mUserDao;
     private EscaleRestApi mEscaleRestApi;
     private AppExecutors mAppExecutors;
+    private LogoutHelper mLogoutHelper;
     private SharedPreferences mSharedPreferences;
     private LiveData<Long> mLoggedUserId;
     private LiveData<String> mFirebaseDeviceToken;
-    private LiveData<Patient> mLoggedPatient;
-    private EscaleDatabase mRoomDatabase;
-    private File mRootFileDirectory;
-    private File mCacheDirectory;
+    private MediatorLiveData<Optional<MeasurementForecast>> mLastForecastWithPredictions;
     private String baseUrl;
 
     @Inject
-    public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi, DoctorRepository doctorRepository,
-                             UserDao userDao, AppExecutors executors, SharedPreferences sharedPreferences,
-                             EscaleDatabase roomDatabase, @RootFileDirectory File rootFileDirectory,
-                             @BaseUrl String baseUrl, @CacheDirectory File cacheDirectory) {
+    public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi,
+                             DoctorRepository doctorRepository,
+                             UserDao userDao, ForecastDao forecastDao, AppExecutors executors,
+                             SharedPreferences sharedPreferences, LogoutHelper logoutHelper,
+                             @BaseUrl String baseUrl) {
         this.baseUrl = baseUrl;
-        mRootFileDirectory = rootFileDirectory;
-        mCacheDirectory = cacheDirectory;
+        this.mForecastDao = forecastDao;
+        this.mLogoutHelper = logoutHelper;
         mUserDao = userDao;
         mDoctorRepository = doctorRepository;
         mPatientDao = patientDao;
-        mRoomDatabase = roomDatabase;
         mEscaleRestApi = escaleRestApi;
         mAppExecutors = executors;
         mSharedPreferences = sharedPreferences;
@@ -94,7 +87,16 @@ public class PatientRepository {
                 Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
         mFirebaseDeviceToken = new SharedPreferencesLiveData.SharedPreferenceStringLiveData(mSharedPreferences,
                 Constants.FIREBASE_TOKEN_SHARED_PREF, "");
-        mLoggedPatient = Transformations.switchMap(mLoggedUserId, this::getPatientById);
+
+        mLastForecastWithPredictions = new MediatorLiveData<>();
+        mLastForecastWithPredictions.addSource(
+                Transformations.switchMap(mLoggedUserId, id -> mForecastDao.getLastForecastOfUserWithIdAsLiveData(id)),
+                mfOpt -> {
+                    mfOpt.ifPresent(mf -> mAppExecutors.getDiskIO().execute(() -> {
+                        Timber.d("mf livedata present %s", mf);
+                        mLastForecastWithPredictions.postValue(mForecastDao.getForecastWithPredictions(mf.getId()));
+                    }));
+                });
     }
 
     @Nullable
@@ -199,8 +201,12 @@ public class PatientRepository {
                     AppUser user = new AppUser(patient);
                     mUserDao.upsert(user);
                     mPatientDao.upsert(patient);
-                    return patient.getId();
-                }));
+                    return patient;
+                }))
+                .flatMap(patient -> {
+                    return getUpdatedForecastFromApi(patient)
+                            .andThen(Single.just(patient.getId()));
+                });
     }
 
     public Completable saveNewGoalOnNotified(Long loggedPatiendId, Float weightInKg, String dueDate) {
@@ -225,26 +231,30 @@ public class PatientRepository {
         return mSharedPreferences.getBoolean(Constants.IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
     }
 
+//    public void logout() {
+//        mAppExecutors.getDiskIO().execute(() -> {
+//            Timber.d("Clearing preferences");
+//            SharedPreferences.Editor editor = mSharedPreferences.edit();
+//            editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
+//            editor.remove(TOKEN_SHARED_PREF);
+//            editor.remove(REFRESH_TOKEN_SHARED_PREF);
+//            editor.remove(SCALE_USER_INDEX_SHARED_PREF);
+//            editor.remove(SCALE_USER_PIN_SHARED_PREF);
+//            editor.putBoolean(IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
+//            editor.putBoolean(HAS_NEW_UNREAD_DIET_SHARED_PREF, false);
+//            editor.putInt(UNREAD_MESSAGES_SHARED_PREF, 0);
+//            editor.apply();
+//            Timber.d("Clearing db");
+//            mRoomDatabase.clearAllTables();
+//            Timber.d("Clearing internal storage");
+//            FileUtils.deleteContentOfDirectory(mRootFileDirectory);
+//            Timber.d("Clearing cache directory");
+//            FileUtils.deleteContentOfDirectory(mCacheDirectory);
+//        });
+//    }
+
     public void logout() {
-        mAppExecutors.getDiskIO().execute(() -> {
-            Timber.d("Clearing preferences");
-            SharedPreferences.Editor editor = mSharedPreferences.edit();
-            editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
-            editor.remove(TOKEN_SHARED_PREF);
-            editor.remove(REFRESH_TOKEN_SHARED_PREF);
-            editor.remove(SCALE_USER_INDEX_SHARED_PREF);
-            editor.remove(SCALE_USER_PIN_SHARED_PREF);
-            editor.putBoolean(IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
-            editor.putBoolean(HAS_NEW_UNREAD_DIET_SHARED_PREF, false);
-            editor.putInt(UNREAD_MESSAGES_SHARED_PREF, 0);
-            editor.apply();
-            Timber.d("Clearing db");
-            mRoomDatabase.clearAllTables();
-            Timber.d("Clearing internal storage");
-            FileUtils.deleteContentOfDirectory(mRootFileDirectory);
-            Timber.d("Clearing cache directory");
-            FileUtils.deleteContentOfDirectory(mCacheDirectory);
-        });
+        mLogoutHelper.logout();
     }
 
     public Completable uploadPicture(File picture, String mediaType) {
@@ -294,5 +304,33 @@ public class PatientRepository {
 
     public Optional<Float> getGoalOfPatientWithId(Long loggedPatiendId) {
         return mPatientDao.getGoalOfPatient(loggedPatiendId);
+    }
+
+    public Completable getUpdatedForecastFromApi(Patient patient) {
+        return mEscaleRestApi.getMeasurementForecastOfUser(patient.getId(), Constants.FORECAST_AMOUNT, true)
+                .flatMap(measurementForecastResponse -> {
+                    if (measurementForecastResponse.code() == 200) {
+                        mForecastDao.deleteAllByUserId(patient.getId());
+                        mForecastDao.upsertForecastWithPredictions(measurementForecastResponse.body());
+                    }
+                    return Single.just(patient);
+                }).flatMapCompletable(p -> Completable.complete())
+                .subscribeOn(Schedulers.io());
+    }
+
+    public Completable getUpdatedForecastFromApi(Long loggedPatientId) {
+        return mEscaleRestApi.getMeasurementForecastOfUser(loggedPatientId, Constants.FORECAST_AMOUNT, true)
+                .zipWith(mPatientDao.getPatientSingleById(loggedPatientId), (measurementForecastResponse, patient) -> {
+                    if (measurementForecastResponse.code() == 200) {
+                        mForecastDao.deleteAllByUserId(loggedPatientId);
+                        mForecastDao.upsertForecastWithPredictions(measurementForecastResponse.body());
+                    }
+                    return patient;
+                }).flatMapCompletable(p -> Completable.complete())
+                .subscribeOn(Schedulers.io());
+    }
+
+    public MediatorLiveData<Optional<MeasurementForecast>> getMeasurementForecastOfLoggedPatient() {
+        return mLastForecastWithPredictions;
     }
 }

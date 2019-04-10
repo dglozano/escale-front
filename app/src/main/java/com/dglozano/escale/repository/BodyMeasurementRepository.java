@@ -102,4 +102,8 @@ public class BodyMeasurementRepository {
     public Optional<BodyMeasurement> getLastBodyMeasurementBlockingOfPatient(Long loggedPatiendId) {
         return mBodyMeasurementDao.getLastBodyMeasurementBlockingOfPatient(loggedPatiendId);
     }
+
+    public LiveData<List<BodyMeasurement>> getAllBodyMeasurementByUserId(Long patientId) {
+        return mBodyMeasurementDao.getAllBodyMeasurementByUserId(patientId);
+    }
 }

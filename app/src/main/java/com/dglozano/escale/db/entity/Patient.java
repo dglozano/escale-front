@@ -31,6 +31,8 @@ public class Patient extends AppUser {
     private Date goalDueDate;
     private Date goalStartDate;
     private boolean hasToUpdateDataInScale = true;
+    @Ignore
+    private MeasurementForecast measurementForecast;
 
     public Patient() {
     }
@@ -146,6 +148,14 @@ public class Patient extends AppUser {
 
     public void setGoalDueDate(Date goalDueDate) {
         this.goalDueDate = goalDueDate;
+    }
+
+    public MeasurementForecast getMeasurementForecast() {
+        return measurementForecast;
+    }
+
+    public void setMeasurementForecast(MeasurementForecast measurementForecast) {
+        this.measurementForecast = measurementForecast;
     }
 
     @Override

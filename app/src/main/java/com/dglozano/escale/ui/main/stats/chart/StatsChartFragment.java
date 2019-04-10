@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.db.entity.MeasurementForecast;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
@@ -29,9 +30,9 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -120,16 +121,6 @@ public class StatsChartFragment extends Fragment {
             mFiltersExpandable.setExpanded(expanded == null ? true : expanded);
         });
 
-        mStatsChartViewModel.getGoalEntry().observe(this, goalEntry -> {
-            if (mStatsChartViewModel.getChartEntries() != null
-                    && mStatsChartViewModel.getChartEntries().getValue() != null
-                    && !mStatsChartViewModel.getChartEntries().getValue().isEmpty()) {
-                refreshChartEntries(mStatsChartViewModel.getChartEntries().getValue());
-            } else if (goalEntry != null) {
-                drawGoalLine(goalEntry);
-            }
-        });
-
         statsFilterRadioGroup.setOnClickedButtonListener((button, position) -> {
             mStatsChartViewModel.setSelectedStat(position);
         });
@@ -139,7 +130,10 @@ public class StatsChartFragment extends Fragment {
 
     private void refreshChartEntries(List<Entry> entriesList) {
 
+        if (mLineChart.getLineData() != null) mLineChart.clear();
+
         entriesList.sort(Comparator.comparingDouble(Entry::getX));
+        Entry lastEntry = entriesList.get(entriesList.size() - 1);
 
         setChartDescription();
 
@@ -152,7 +146,8 @@ public class StatsChartFragment extends Fragment {
                 .collect(Collectors.toList());
 
         float xAxisMin = filteredList.get(0).getX() - dayInMilliseconds;
-        float xAxisMax = filteredList.get(filteredList.size() - 1).getX() + 2 * dayInMilliseconds;
+        float xAxisMaxVisible = filteredList.get(filteredList.size() - 1).getX() + 2 * dayInMilliseconds;
+        float xAxisMax = filteredList.get(filteredList.size() - 1).getX() + Constants.FORECAST_AMOUNT * dayInMilliseconds;
 
         filteredList.add(0, new Entry(firstDate - dayInMilliseconds * 2, filteredList.get(0).getY()));
 
@@ -169,83 +164,157 @@ public class StatsChartFragment extends Fragment {
         mLineChart.getXAxis().setLabelCount(6, true);
         mLineChart.getAxisLeft().setSpaceBottom(0.0f);
 
-        LineData lineData = new LineData(dataSet);
+        LineData lineData = mLineChart.getLineData();
+        if (lineData == null) {
+            lineData = new LineData(dataSet);
+        } else {
+            ILineDataSet previousDataSet = lineData.getDataSetByLabel(dataSet.getLabel(), true);
+            if (previousDataSet != null) lineData.removeDataSet(previousDataSet);
+            lineData.addDataSet(dataSet);
+        }
+
         mLineChart.setData(lineData);
 
         if (mStatsChartViewModel.getSelectedStat().equals(StatsChartViewModel.StatFilter.WEIGHT) &&
                 mStatsChartViewModel.getGoalEntry().getValue() != null) {
-            drawGoalLine(mStatsChartViewModel.getGoalEntry().getValue());
+            Timber.d("goal in chart %s", mStatsChartViewModel.getGoalEntry().getValue());
+
+            drawGoalLine(mStatsChartViewModel.getGoalEntry().getValue(), lineData, xAxisMin, xAxisMax, xAxisMaxVisible);
         }
+
+        if (mStatsChartViewModel.getMeasurementForecast().getValue() != null
+                && mStatsChartViewModel.getMeasurementForecast().getValue().isPresent()) {
+            Timber.d("mf %s", mStatsChartViewModel.getMeasurementForecast().getValue().get());
+
+            drawForecastLine(lastEntry,
+                    mStatsChartViewModel.getMeasurementForecast().getValue().get(),
+                    mStatsChartViewModel.getSelectedStat(), lineData);
+        }
+
+        mLineChart.moveViewToX(xAxisMin);
+        mLineChart.setVisibleXRangeMaximum(xAxisMaxVisible - xAxisMin);
 
         mLineChart.notifyDataSetChanged();
         mLineChart.invalidate();
     }
 
-    private void drawGoalLine(Entry goalEntry) {
-        float minX = mLineChart.getXAxis().getAxisMinimum();
-        float maxX = mLineChart.getXAxis().getAxisMaximum();
-        float minY = mLineChart.getAxisLeft().getAxisMinimum();
-        float maxY = mLineChart.getAxisRight().getAxisMaximum();
+    private void drawForecastLine(Entry lastEntry, MeasurementForecast mf,
+                                  StatsChartViewModel.StatFilter selectedStat,
+                                  LineData lineData) {
+        if (lineData == null || lineData.getDataSetByLabel(Constants.FORECAST_DATASET, true) == null) {
+            Timber.d("drawing forecast");
+            List<Entry> forecastEntryList = new ArrayList<>();
+            forecastEntryList.add(lastEntry);
+            forecastEntryList.addAll(getExpSmoothForecastEntriesFor(lastEntry, mf, selectedStat));
+            LineDataSet forecastDataSet = new LineDataSet(forecastEntryList, Constants.FORECAST_DATASET);
 
-        float dayInMilliseconds = 24 * 3600 * 1000;
-        float halfDayInMilliseconds = 12 * 3600 * 1000;
+            setDefaultDataSetConfig(forecastDataSet);
+            forecastDataSet.setDrawCircleHole(false);
+            forecastDataSet.setDrawCircles(false);
+            forecastDataSet.enableDashedLine(10f, 10f, 0);
+            forecastDataSet.setDrawValues(false);
+            forecastDataSet.setColor(lightGray);
 
-        List<Entry> goalEntryList = new ArrayList<>();
-        LineDataSet goalDataSet;
-
-        if (goalEntry.getX() > minX && goalEntry.getX() < maxX) {
-            goalEntryList.add(new Entry(minX - dayInMilliseconds * 2, goalEntry.getY()));
-            goalEntryList.add(goalEntry);
-            goalEntryList.add(new Entry(maxX + dayInMilliseconds * 2, goalEntry.getY()));
-            goalDataSet = new LineDataSet(goalEntryList, Constants.GOAL_DATASET_LABEL);
-            setDefaultDataSetConfig(goalDataSet);
-        } else {
-            if (goalEntry.getX() > maxX) {
-                Entry goalHintEntry = new Entry(maxX - halfDayInMilliseconds, goalEntry.getY());
-                goalEntryList.add(new Entry(minX - dayInMilliseconds * 2, goalEntry.getY()));
-                goalEntryList.add(goalHintEntry);
-                goalEntryList.add(goalEntry);
-            } else if (goalEntry.getX() < minX) {
-                Entry goalHintEntry = new Entry(minX + halfDayInMilliseconds, goalEntry.getY());
-                goalEntryList.add(goalEntry);
-                goalEntryList.add(goalHintEntry);
-                goalEntryList.add(new Entry(maxX + dayInMilliseconds * 2, goalEntry.getY()));
+            if (lineData == null) {
+                lineData = new LineData(forecastDataSet);
+            } else {
+                ILineDataSet previousForecastDataSet = lineData.getDataSetByLabel(forecastDataSet.getLabel(), true);
+                if (previousForecastDataSet != null)
+                    lineData.removeDataSet(previousForecastDataSet);
+                lineData.addDataSet(forecastDataSet);
             }
-            goalDataSet = new LineDataSet(goalEntryList, Constants.GOAL_DATASET_LABEL);
+
+            mLineChart.setData(lineData);
+            mLineChart.notifyDataSetChanged();
+            mLineChart.invalidate();
+        }
+
+    }
+
+    private List<Entry> getExpSmoothForecastEntriesFor(Entry lastEntry, MeasurementForecast measurementForecast, StatsChartViewModel.StatFilter selectedStat) {
+        long dayInMillis = 24 * 3600 * 1000;
+        switch (selectedStat) {
+            case FAT:
+                return measurementForecast.getNextDaysPredictions().stream()
+                        .map(prediction ->
+                                new Entry(lastEntry.getX() + prediction.getDaysOffset() * dayInMillis, (float) prediction.getFat()))
+                        .collect(Collectors.toList());
+            case WATER:
+                return measurementForecast.getNextDaysPredictions().stream()
+                        .map(prediction ->
+                                new Entry(lastEntry.getX() + prediction.getDaysOffset() * dayInMillis, (float) prediction.getWater()))
+                        .collect(Collectors.toList());
+            case MUSCLE:
+                return measurementForecast.getNextDaysPredictions().stream()
+                        .map(prediction ->
+                                new Entry(lastEntry.getX() + prediction.getDaysOffset() * dayInMillis, (float) prediction.getMuscles()))
+                        .collect(Collectors.toList());
+            case IMC:
+                return measurementForecast.getNextDaysPredictions().stream()
+                        .map(prediction ->
+                                new Entry(lastEntry.getX() + prediction.getDaysOffset() * dayInMillis, (float) prediction.getBmi()))
+                        .collect(Collectors.toList());
+            case WEIGHT:
+            default:
+                return measurementForecast.getNextDaysPredictions().stream()
+                        .map(prediction ->
+                                new Entry(lastEntry.getX() + prediction.getDaysOffset() * dayInMillis, (float) prediction.getWeight()))
+                        .collect(Collectors.toList());
+        }
+    }
+
+    private void drawGoalLine(Entry goalEntry, LineData lineData, float xAxisMin, float xAxisMax, float xAxisMaxVisible) {
+        if (lineData != null && lineData.getDataSetByLabel(Constants.GOAL_DATASET, true) == null) {
+            Timber.d("drawing goal line");
+            float minY = mLineChart.getAxisLeft().getAxisMinimum();
+            float maxY = mLineChart.getAxisRight().getAxisMaximum();
+
+            float dayInMilliseconds = 24 * 3600 * 1000;
+
+            List<Entry> goalEntryList = new ArrayList<>();
+            LineDataSet goalDataSet;
+
+            float goalLabelPosition = (xAxisMaxVisible - xAxisMin) * 0.15f + xAxisMin;
+
+            LineDataSet goalLabelDataSet = new LineDataSet(
+                    Collections.singletonList(new Entry(goalLabelPosition, goalEntry.getY())), Constants.GOAL_LABEL_DATASET);
+            setDefaultDataSetConfig(goalLabelDataSet);
+            goalLabelDataSet.setValueFormatter((value, entry, dataSetIndex, viewPortHandler) -> String.format("META %s kg.", value));
+            goalLabelDataSet.setDrawCircles(false);
+
+            goalEntryList.add(new Entry(xAxisMin - dayInMilliseconds * 2, goalEntry.getY()));
+            goalEntryList.add(goalEntry);
+            goalEntryList.add(new Entry(xAxisMax + dayInMilliseconds * 2, goalEntry.getY()));
+            goalDataSet = new LineDataSet(goalEntryList, Constants.GOAL_DATASET);
             setDefaultDataSetConfig(goalDataSet);
-            goalDataSet.setDrawCircleHole(false);
-            goalDataSet.setDrawCircles(false);
-        }
+            goalDataSet.setMode(LineDataSet.Mode.LINEAR);
+            goalDataSet.setCircleRadius(4f);
+            goalDataSet.setColor(colorPrimaryLight);
+            goalDataSet.setCircleColor(colorPrimaryLight);
+            goalDataSet.enableDashedLine(10f, 10f, 0);
 
-        goalDataSet.setColor(colorPrimaryLight);
-        goalDataSet.setCircleColor(colorPrimaryLight);
-        goalDataSet.enableDashedLine(10f, 10f, 0);
+            boolean goalLineBelowLimits = goalEntry.getY() < minY;
+            boolean goalLineAboveLimits = goalEntry.getY() > maxY;
 
-        goalDataSet.setValueFormatter((value, entry, dataSetIndex, viewPortHandler) ->
-                String.format("META %s kg. \n",
-                        new DecimalFormat("###,###.#").format(value).replace(",", ".")));
+            if (goalLineBelowLimits) {
+                calculateLeftAxisMaxAndMin(goalEntry.getY(), maxY);
+            } else if (goalLineAboveLimits) {
+                calculateLeftAxisMaxAndMin(minY, goalEntry.getY());
+            }
 
-        boolean goalLineBelowLimits = goalEntry.getY() < minY;
-        boolean goalLineAboveLimits = goalEntry.getY() > maxY;
-
-        if (goalLineBelowLimits) {
-            calculateLeftAxisMaxAndMin(goalEntry.getY(), maxY);
-        } else if (goalLineAboveLimits) {
-            calculateLeftAxisMaxAndMin(minY, goalEntry.getY());
-        }
-
-        LineData lineData = mLineChart.getLineData();
-        if (lineData == null) {
-            lineData = new LineData(goalDataSet);
-        } else {
-            ILineDataSet previousGoalDataSet = lineData.getDataSetByLabel(Constants.GOAL_DATASET_LABEL, true);
-            if (previousGoalDataSet != null) lineData.removeDataSet(previousGoalDataSet);
+            ILineDataSet previousGoalDataSet = lineData.getDataSetByLabel(goalDataSet.getLabel(), true);
+            ILineDataSet previousGoalLabelDataSet = lineData.getDataSetByLabel(goalLabelDataSet.getLabel(), true);
+            if (previousGoalDataSet != null)
+                lineData.removeDataSet(previousGoalDataSet);
+            if (previousGoalLabelDataSet != null)
+                lineData.removeDataSet(previousGoalLabelDataSet);
+            lineData.addDataSet(goalLabelDataSet);
             lineData.addDataSet(goalDataSet);
-        }
 
-        mLineChart.setData(lineData);
-        mLineChart.notifyDataSetChanged();
-        mLineChart.invalidate();
+            mLineChart.setData(lineData);
+            mLineChart.notifyDataSetChanged();
+            mLineChart.invalidate();
+        }
     }
 
     private void setupLineChart() {
@@ -275,7 +344,8 @@ public class StatsChartFragment extends Fragment {
 
         mLineChart.getAxisRight().setEnabled(false);
         mLineChart.getLegend().setEnabled(false);
-        mLineChart.setTouchEnabled(false);
+        mLineChart.setTouchEnabled(true);
+        mLineChart.setHorizontalScrollBarEnabled(true);
 
         mLineChart.setGridBackgroundColor(white);
 
@@ -330,24 +400,20 @@ public class StatsChartFragment extends Fragment {
     }
 
     private void calculateLeftAxisMaxAndMin(float newMinY, float newMaxY) {
+        float range = newMaxY - newMinY;
+        float axisMin = newMinY - range * 1.10f;
+        float axisMax = newMaxY + range * 1.10f;
         switch (mStatsChartViewModel.getSelectedStat()) {
             case IMC:
-                mLineChart.getAxisLeft().setAxisMinimum(0f);
-                mLineChart.getAxisLeft().setAxisMaximum(50f);
-                break;
             case FAT:
             case WATER:
             case MUSCLE:
-                mLineChart.getAxisLeft().setAxisMinimum(0f);
-                mLineChart.getAxisLeft().setAxisMaximum(100f);
+                mLineChart.getAxisLeft().setAxisMinimum(axisMin < 0 ? 0 : range == 0 ? axisMin * 0.95f : axisMin);
+                mLineChart.getAxisLeft().setAxisMaximum(axisMax > 100 ? 100 : range == 0 ? axisMax * 1.05f : axisMax);
                 break;
             case WEIGHT:
             default:
-                float range = newMaxY - newMinY;
-                float axisMin = newMinY - range * 1.10f;
-                float axisMax = newMaxY + range * 1.10f;
-                Timber.d("axisMin %s - axisMax %s", axisMin, axisMax);
-                mLineChart.getAxisLeft().setAxisMinimum(axisMin < 0 || range == 0 ? axisMin * 0.95f : axisMin);
+                mLineChart.getAxisLeft().setAxisMinimum(axisMin < 0 ? 0 : range == 0 ? axisMin * 0.95f : axisMin);
                 mLineChart.getAxisLeft().setAxisMaximum(range == 0 ? axisMax * 1.05f : axisMax);
                 break;
         }

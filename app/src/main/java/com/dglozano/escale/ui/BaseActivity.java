@@ -50,6 +50,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         snackbar.setActionTextColor(ContextCompat.getColor(this, R.color.colorAccent));
     }
 
+
+
     @Override
     protected void onPause() {
         super.onPause();

@@ -19,17 +19,19 @@ public class HomeViewModel extends ViewModel {
     private BodyMeasurementRepository mBodyMeasurementRepository;
     private boolean isScaleConnected = false;
     private int batteryLevel = -1;
+    private LiveData<Optional<BodyMeasurement>> lastMeasurementOfLoggedUser;
+
 
     @Inject
     public HomeViewModel(PatientRepository patientRepository,
                          BodyMeasurementRepository bodyMeasurementRepository) {
         mPatientRepository = patientRepository;
         mBodyMeasurementRepository = bodyMeasurementRepository;
-
+        lastMeasurementOfLoggedUser = mBodyMeasurementRepository.getLastBodyMeasurementOfUserWithId(mPatientRepository.getLoggedPatiendId());
     }
 
     public LiveData<Optional<BodyMeasurement>> getLastBodyMeasurement() {
-        return mBodyMeasurementRepository.getLastBodyMeasurementOfUserWithId(mPatientRepository.getLoggedPatiendId());
+        return lastMeasurementOfLoggedUser;
     }
 
     public LiveData<Patient> getLoggedPatient() {

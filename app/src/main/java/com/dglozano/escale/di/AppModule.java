@@ -11,6 +11,7 @@ import com.dglozano.escale.db.dao.ChatDao;
 import com.dglozano.escale.db.dao.ChatMessageDao;
 import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.dao.DoctorDao;
+import com.dglozano.escale.db.dao.ForecastDao;
 import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.db.dao.UserChatJoinDao;
 import com.dglozano.escale.db.dao.UserDao;
@@ -21,6 +22,7 @@ import com.dglozano.escale.di.annotation.BluetoothInfo;
 import com.dglozano.escale.di.annotation.CacheDirectory;
 import com.dglozano.escale.di.annotation.DatabaseInfo;
 import com.dglozano.escale.di.annotation.RootFileDirectory;
+import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.web.ApiServiceHolder;
 import com.dglozano.escale.web.CustomOkHttpAuthenticator;
@@ -74,6 +76,12 @@ public class AppModule {
     @ApplicationScope
     PatientDao providePatientDao(EscaleDatabase db) {
         return db.patientDao();
+    }
+
+    @Provides
+    @ApplicationScope
+    ForecastDao provideForecastDao(EscaleDatabase db) {
+        return db.forecastDao();
     }
 
     @Provides

@@ -1,5 +1,6 @@
 package com.dglozano.escale.web;
 
+import com.dglozano.escale.db.entity.MeasurementForecast;
 import com.dglozano.escale.web.dto.AddBodyMeasurementDTO;
 import com.dglozano.escale.web.dto.BodyMeasurementDTO;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
@@ -47,13 +48,27 @@ public interface EscaleRestApi {
     @PUT("/api/patients/{id}/update")
     Completable updatePatientWithId(@Body UpdatePatientDTO updatePatientDTO, @Path("id") Long patientId);
 
-    @GET("/api/patients/{id}/measurements")
-    Call<List<BodyMeasurementDTO>> getAllBodyMeasurement(@Path("id") Long patientId);
-
     @GET("/api/patients/{id}/last_measurements")
     Single<List<BodyMeasurementDTO>> getLastBodyMeasurements(@Path("id") Long patientId,
                                                              @Query("from") String isoFromDate,
                                                              @Query("limit") Integer limit);
+
+    @GET("/api/patients/{id}/measurements/forecast")
+    Single<Response<MeasurementForecast>> getMeasurementForecastOfUser(@Path("id") Long patientId,
+                                                                       @Query("force") boolean force);
+
+    @GET("/api/patients/{id}/measurements/forecast")
+    Single<Response<MeasurementForecast>> getMeasurementForecastOfUser(@Path("id") Long patientId,
+                                                                       @Query("predictionsNumber") int predictionsNumber,
+                                                                       @Query("force") boolean force);
+
+
+    @GET("/api/patients/{id}/measurements/forecast")
+    Single<Response<MeasurementForecast>> getMeasurementForecastOfUser(@Path("id") Long patientId,
+                                                                       @Query("alpha") double alpha,
+                                                                       @Query("gamma") double gamma,
+                                                                       @Query("predictionsNumber") int predictionsNumber,
+                                                                       @Query("force") boolean force);
 
     @POST("/api/patients/{id}/measurements/add")
     Single<BodyMeasurementDTO> postNewMeasurement(@Body AddBodyMeasurementDTO addBodyMeasurementDTO,

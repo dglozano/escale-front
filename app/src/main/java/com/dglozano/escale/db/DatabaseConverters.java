@@ -1,11 +1,11 @@
 package com.dglozano.escale.db;
 
-import androidx.room.TypeConverter;
-
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.util.FileUtils;
 
 import java.util.Date;
+
+import androidx.room.TypeConverter;
 
 public class DatabaseConverters {
     @TypeConverter

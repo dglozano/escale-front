@@ -9,6 +9,7 @@ import com.dglozano.escale.db.dao.ChatDao;
 import com.dglozano.escale.db.dao.ChatMessageDao;
 import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.dao.DoctorDao;
+import com.dglozano.escale.db.dao.ForecastDao;
 import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.db.dao.UserChatJoinDao;
 import com.dglozano.escale.db.dao.UserDao;
@@ -18,6 +19,8 @@ import com.dglozano.escale.db.entity.Chat;
 import com.dglozano.escale.db.entity.ChatMessage;
 import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.db.entity.Doctor;
+import com.dglozano.escale.db.entity.MeasurementForecast;
+import com.dglozano.escale.db.entity.MeasurementPrediction;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.db.entity.UserChatJoin;
 
@@ -28,8 +31,10 @@ import com.dglozano.escale.db.entity.UserChatJoin;
         Chat.class,
         UserChatJoin.class,
         AppUser.class,
+        MeasurementForecast.class,
+        MeasurementPrediction.class,
         Doctor.class,},
-        version = 21,
+        version = 25,
         exportSchema = false)
 @TypeConverters(DatabaseConverters.class)
 public abstract class EscaleDatabase extends RoomDatabase {
@@ -49,4 +54,7 @@ public abstract class EscaleDatabase extends RoomDatabase {
     public abstract UserDao userDao();
 
     public abstract ChatDao chatDao();
+
+    public abstract ForecastDao forecastDao();
+
 }

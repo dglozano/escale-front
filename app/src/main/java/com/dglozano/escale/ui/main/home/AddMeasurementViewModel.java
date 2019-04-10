@@ -1,9 +1,5 @@
 package com.dglozano.escale.ui.main.home;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-
 import com.dglozano.escale.R;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.PatientRepository;
@@ -15,6 +11,9 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -49,9 +48,9 @@ public class AddMeasurementViewModel extends ViewModel {
                 .map(Float::parseFloat)
                 .filter(f -> f >= 0f)
                 .collect(Collectors.toList());
-        if(inputFloat.size() < input.length)
+        if (inputFloat.size() < input.length)
             return false;
-        if(inputFloat.get(1) > 100f || inputFloat.get(2) > 100f || inputFloat.get(5) > 100f) {
+        if (inputFloat.get(1) > 100f || inputFloat.get(2) > 100f || inputFloat.get(5) > 100f) {
             return false;
         }
         return true;
@@ -69,7 +68,7 @@ public class AddMeasurementViewModel extends ViewModel {
         return mSuccessEvent;
     }
 
-    public void hitAddMeasurement(String weight, String water, String fat, String bmi,  String bones, String muscle) {
+    public void hitAddMeasurement(String weight, String water, String fat, String bmi, String bones, String muscle) {
         if (isInputValid(weight, water, fat, bones, bmi, muscle)) {
             disposables.add(mMeasurementRepository.addMeasurement(Float.parseFloat(weight),
                     Float.parseFloat(water),
@@ -78,16 +77,17 @@ public class AddMeasurementViewModel extends ViewModel {
                     Float.parseFloat(bones),
                     Float.parseFloat(muscle),
                     true)
+                    .flatMapCompletable(id -> mPatientRepository.getUpdatedForecastFromApi(mPatientRepository.getLoggedPatiendId()))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe((d) -> mLoading.postValue(true))
                     .subscribe(
-                            insertedId -> {
-                                Timber.d("Inserted body measurement in server with id %s", insertedId);
+                            () -> {
+                                Timber.d("Inserted body measurement in server and updated forecast");
                                 mSuccessEvent.postValue(new Event<>(true));
                                 mLoading.postValue(false);
                             },
-                            onError -> {
+                            error -> {
                                 mLoading.postValue(false);
                                 mErrorEvent.postValue(new Event<>(R.string.add_measurement_error_snackbar));
                             }

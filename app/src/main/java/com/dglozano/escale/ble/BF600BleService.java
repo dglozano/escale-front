@@ -406,14 +406,22 @@ public class BF600BleService extends BaseBleService {
     public void triggerMeasurement() {
         if (!hasMeasuredDuringThisConnection) {
             mMeasurementTriggerDisposable = weightMeasurementSingle(mRxBleConnection, true)
+                    .map(bodyMeasurement -> {
+                        hasMeasuredDuringThisConnection = true;
+                        return bodyMeasurement;
+                    })
                     .flatMap(this::saveMeasurementToDb)
+                    .flatMapCompletable(id -> {
+                        mIsMeasurementTriggered.postValue(false);
+                        return patientRepository.getUpdatedForecastFromApi(patientRepository.getLoggedPatiendId());
+                    })
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
                     .doOnDispose(() -> mIsMeasurementTriggered.postValue(false))
                     .doOnSubscribe(d -> mIsMeasurementTriggered.postValue(true))
                     .doOnError(this::throwException)
-                    .subscribe(bodyMeasurement -> {
-                                Timber.d("New body measurement saved to server and locally - id %s", bodyMeasurement);
+                    .subscribe(() -> {
+                                Timber.d("New body measurement saved to server and locally and updated forecast");
                                 mIsMeasurementTriggered.postValue(false);
                                 hasMeasuredDuringThisConnection = true;
                                 stopMeasurement();

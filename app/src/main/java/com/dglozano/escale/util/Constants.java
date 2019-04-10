@@ -60,7 +60,11 @@ public class Constants {
     public static final String GAUGE_HAS_TO_SET_START = "hasToSetStartGauge";
 
     //Chart
-    public static final String GOAL_DATASET_LABEL = "GOAL";
+    public static final String GOAL_DATASET = "GOAL";
+    public static final String FORECAST_DATASET = "FORECAST";
+    public static final String GOAL_LABEL_DATASET = "GOALLABEL";
+    public static final int FORECAST_AMOUNT = 14;
+
 
     /**
      * 1: Patient index

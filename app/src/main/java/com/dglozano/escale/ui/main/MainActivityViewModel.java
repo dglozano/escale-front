@@ -10,6 +10,7 @@ import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.Event;
+import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -116,8 +117,9 @@ public class MainActivityViewModel extends ViewModel {
                 .doOnSubscribe(d -> mIsRefreshingPatient.postValue(true))
                 .subscribe(this::refreshEverythingElse,
                         error -> {
-                            if (error instanceof AccountDisabledException) {
-                                Timber.d("The user's account was disabled");
+                            if (error instanceof AccountDisabledException
+                                    || (error instanceof HttpException && error.getMessage().contains("401"))) {
+                                Timber.d("The user's account was disabled or token is not valid");
                                 mIsRefreshingPatient.postValue(false);
                                 logout();
                             } else if (error instanceof NoSuchElementException) {
