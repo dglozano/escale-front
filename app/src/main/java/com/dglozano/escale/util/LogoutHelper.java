@@ -50,6 +50,9 @@ public class LogoutHelper {
             editor.remove(REFRESH_TOKEN_SHARED_PREF);
             editor.remove(SCALE_USER_INDEX_SHARED_PREF);
             editor.remove(SCALE_USER_PIN_SHARED_PREF);
+            editor.remove(Constants.GAUGE_HAS_TO_SET_START);
+            editor.remove(Constants.GAUGE_START);
+            editor.remove(Constants.GAUGE_END);
             editor.putBoolean(IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
             editor.putBoolean(HAS_NEW_UNREAD_DIET_SHARED_PREF, false);
             editor.putInt(UNREAD_MESSAGES_SHARED_PREF, 0);
