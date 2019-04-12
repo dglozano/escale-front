@@ -1,11 +1,10 @@
 package com.dglozano.escale.di;
 
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
-
 import com.dglozano.escale.di.annotation.ViewModelKey;
 import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivityViewModel;
 import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivityViewModel;
+import com.dglozano.escale.ui.doctor.main.AddPatientViewModel;
+import com.dglozano.escale.ui.doctor.main.DoctorMainActivityViewModel;
 import com.dglozano.escale.ui.drawer.profile.PatientProfileActivityViewModel;
 import com.dglozano.escale.ui.login.LoginActivityViewModel;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
@@ -20,6 +19,8 @@ import com.dglozano.escale.ui.main.stats.StatsViewModel;
 import com.dglozano.escale.ui.main.stats.chart.StatsChartViewModel;
 import com.dglozano.escale.ui.main.stats.list.StatsListViewModel;
 
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoMap;
@@ -90,6 +91,16 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(PatientProfileActivityViewModel.class)
     abstract ViewModel bindProfileActivityViewModel(PatientProfileActivityViewModel profileActivityViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(DoctorMainActivityViewModel.class)
+    abstract ViewModel bindDoctorMainActivityViewModel(DoctorMainActivityViewModel doctorMainActivityViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AddPatientViewModel.class)
+    abstract ViewModel bindAddPatientViewModel(AddPatientViewModel addPatientViewModel);
 
     @Binds
     @IntoMap

@@ -12,17 +12,12 @@ import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BaseUrl;
 import com.dglozano.escale.exception.AccountDisabledException;
-import com.dglozano.escale.exception.BadCredentialsException;
 import com.dglozano.escale.exception.ChangePasswordException;
-import com.dglozano.escale.exception.NotAPatientException;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
-import com.dglozano.escale.util.LogoutHelper;
 import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
-import com.dglozano.escale.web.dto.Credentials;
-import com.dglozano.escale.web.dto.LoginResponse;
 import com.dglozano.escale.web.dto.UpdatePatientDTO;
 
 import java.io.File;
@@ -61,22 +56,22 @@ public class PatientRepository {
     private UserDao mUserDao;
     private EscaleRestApi mEscaleRestApi;
     private AppExecutors mAppExecutors;
-    private LogoutHelper mLogoutHelper;
     private SharedPreferences mSharedPreferences;
     private LiveData<Long> mLoggedUserId;
-    private LiveData<String> mFirebaseDeviceToken;
     private MediatorLiveData<Optional<MeasurementForecast>> mLastForecastWithPredictions;
     private String baseUrl;
 
     @Inject
-    public PatientRepository(PatientDao patientDao, EscaleRestApi escaleRestApi,
+    public PatientRepository(PatientDao patientDao,
+                             EscaleRestApi escaleRestApi,
                              DoctorRepository doctorRepository,
-                             UserDao userDao, ForecastDao forecastDao, AppExecutors executors,
-                             SharedPreferences sharedPreferences, LogoutHelper logoutHelper,
+                             UserDao userDao,
+                             ForecastDao forecastDao,
+                             AppExecutors executors,
+                             SharedPreferences sharedPreferences,
                              @BaseUrl String baseUrl) {
         this.baseUrl = baseUrl;
         this.mForecastDao = forecastDao;
-        this.mLogoutHelper = logoutHelper;
         mUserDao = userDao;
         mDoctorRepository = doctorRepository;
         mPatientDao = patientDao;
@@ -85,8 +80,6 @@ public class PatientRepository {
         mSharedPreferences = sharedPreferences;
         mLoggedUserId = new SharedPreferencesLiveData.SharedPreferenceLongLiveData(mSharedPreferences,
                 Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
-        mFirebaseDeviceToken = new SharedPreferencesLiveData.SharedPreferenceStringLiveData(mSharedPreferences,
-                Constants.FIREBASE_TOKEN_SHARED_PREF, "");
 
         mLastForecastWithPredictions = new MediatorLiveData<>();
         mLastForecastWithPredictions.addSource(
@@ -118,34 +111,6 @@ public class PatientRepository {
 
     public LiveData<Long> getLoggedPatientIdAsLiveData() {
         return mLoggedUserId;
-    }
-
-    public Completable loginPatient(String email, String password) {
-        return mEscaleRestApi.login(new Credentials(email, password)).flatMapCompletable(response -> {
-            LoginResponse loginResponseBody = response.body();
-            if (response.code() == 200 && loginResponseBody != null) {
-                if (loginResponseBody.getUserType() != 2) {
-                    // If the user had proper Credentials, but it is not a Patient,
-                    // he can't use the mobile app.
-                    throw new NotAPatientException();
-                }
-                if (!loginResponseBody.isEnabled()) {
-                    throw new AccountDisabledException();
-                }
-                Long loggedUserId = loginResponseBody.getId();
-                String newToken = response.headers().get(Constants.TOKEN_HEADER_KEY);
-                String newRefreshToken = response.headers().get(Constants.REFRESH_TOKEN_HEADER_KEY);
-                SharedPreferences.Editor editor = mSharedPreferences.edit();
-                editor.putString(Constants.TOKEN_SHARED_PREF, newToken);
-                editor.putString(Constants.REFRESH_TOKEN_SHARED_PREF, newRefreshToken);
-                editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, loggedUserId);
-                editor.apply();
-                return Completable.complete();
-            } else {
-                Timber.d("Login error - Resource code is not 200 (Bad Credentials)");
-                throw new BadCredentialsException();
-            }
-        });
     }
 
     public Single<Long> changePassword(String currentPassword,
@@ -221,40 +186,6 @@ public class PatientRepository {
                     mPatientDao.upsert(patient);
                     return Completable.complete();
                 }));
-    }
-
-    public LiveData<String> getFirebaseDeviceToken() {
-        return mFirebaseDeviceToken;
-    }
-
-    public Boolean isFirebaseTokenSent() {
-        return mSharedPreferences.getBoolean(Constants.IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
-    }
-
-//    public void logout() {
-//        mAppExecutors.getDiskIO().execute(() -> {
-//            Timber.d("Clearing preferences");
-//            SharedPreferences.Editor editor = mSharedPreferences.edit();
-//            editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
-//            editor.remove(TOKEN_SHARED_PREF);
-//            editor.remove(REFRESH_TOKEN_SHARED_PREF);
-//            editor.remove(SCALE_USER_INDEX_SHARED_PREF);
-//            editor.remove(SCALE_USER_PIN_SHARED_PREF);
-//            editor.putBoolean(IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
-//            editor.putBoolean(HAS_NEW_UNREAD_DIET_SHARED_PREF, false);
-//            editor.putInt(UNREAD_MESSAGES_SHARED_PREF, 0);
-//            editor.apply();
-//            Timber.d("Clearing db");
-//            mRoomDatabase.clearAllTables();
-//            Timber.d("Clearing internal storage");
-//            FileUtils.deleteContentOfDirectory(mRootFileDirectory);
-//            Timber.d("Clearing cache directory");
-//            FileUtils.deleteContentOfDirectory(mCacheDirectory);
-//        });
-//    }
-
-    public void logout() {
-        mLogoutHelper.logout();
     }
 
     public Completable uploadPicture(File picture, String mediaType) {

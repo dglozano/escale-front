@@ -29,7 +29,7 @@
     <string name="login_reset_password_text"><u>¿Olvidaste tu contraseña?</u></string>
     <string name="login_first_time_message">Si es tu primera vez, busca en tu bandeja de entrada el mail de bienvenida con la contraseña inicial.</string>
     <string name="ok">OK</string>
-    <string name="login_error_not_patient">La app es solo para pacientes. Si eres un doctor, ingresa a www.escale.com.ar</string>
+    <string name="login_error_not_mobile_user">No puedes usar la versión móvil de la app.</string>
     <string name="login_error_bad_credentials">Ups! Las credenciales ingresadas no son válidas. Pruebe nuevamente.</string>
     <string name="login_error_could_not_reach_server">No pudimos conectarnos con el servidor. Revisa tu conexión a internet.</string>
     <string name="drawer_option_profile">Perfil</string>
@@ -72,11 +72,11 @@
     <string name="fat">Grasa corporal</string>
     <string name="imc">IMC</string>
     <string name="muscles">Masa muscular</string>
-    <string name="add_measurement_input_error_snackbar">
+    <string name="input_validation_error_snackbar">
         Revisa los datos ingresados e intenta nuevamente
     </string>
     <string name="add_measurement_percentage_range_error">Ingresa un valor entre 0% y 100%</string>
-    <string name="add_measurement_empty_error">Este campo no puede estar vacío</string>
+    <string name="input_validation_empty_error">Este campo no puede estar vacío</string>
     <string name="home_step_on_scale">
         Sáquese zapatillas y medias, súbase a la balanza y espere a que termine la medición.
     </string>
@@ -125,7 +125,7 @@
     <string name="dialog_edit_user_ph_activity_description_4"><b>ALTA</b>\n\nEjercicio físico en sesiones de 30 minutos, de 4 a 6 veces por semana como mínimo</string>
     <string name="dialog_edit_user_ph_activity_description_5"><b>MUY ALTA</b>\n\nEjercicios físicos intensivos, entrenamiento intensivo o trabajo corporal duro, diariamente, al menos 30 minutos cada día</string>
     <string name="dialog_edit_user_submit">Aceptar</string>
-    <string name="height_range_error">Ingresa una altura entre 100 cm. y 250 cm.</string>
+    <string name="input_validation_height_range_error">Ingresa una altura entre 100 cm. y 250 cm.</string>
     <string name="update_user_data_success">Datos actualizados correctamente.</string>
     <string name="update_user_data_error_msg">Ups! No pudimos actualizar tus datos. Intenta de nuevo más tarde.</string>
     <string name="home_title">Inicio</string>
@@ -133,7 +133,32 @@
     <string name="diets_title">Dietas</string>
     <string name="chats_title">Chat</string>
     <string name="dialog_logout_title">Cerrar sesión</string>
-    <string name="dialog_logout_instructions"><b>¿Está seguro que desea sailr?</b> De hacerlo, se borrarán todos sus datos almacenados localmente en su teléfono, como los chats con su médico y las dietas que haya descargado.</string>
+    <string name="dialog_logout_instructions"><b>¿Está seguro que desea sailr?</b> De hacerlo, se borrarán todos sus datos almacenados localmente en su teléfono.</string>
+    <string name="no_patients_text">Parece que aún no tienes pacientes cargados. Haga click en el botón de abajo a la derecha para dar de alta el primero.</string>
+    <string name="kg">kg.</string>
+    <string name="no_new_patient_messages">Sin mensajes</string>
+    <string name="no_new_patient_alerts">Sin alertas</string>
+    <string name="first_name">Nombre</string>
+    <string name="last_name">Apellido</string>
+    <string name="add_patient_btn_text">Agregar paciente</string>
+    <string name="birthday">Fecha de nacimiento</string>
+    <string name="genre_label">Sexo</string>
+    <string name="add_patient_label">Alta Paciente</string>
+    <string name="input_default_validation_error">El dato ingresado no es válido</string>
+    <string name="input_validation_birthday_error">Ingrese una fecha de nacimiento válida</string>
+    <string name="add_patient_error_snackbar">Ups! No pudimos dar de alta el paciente. Revisa los datos ingresados e intenta de nuevo.</string>
+    <string name="input_validation_email_error">Ingrese un email válido</string>
+    <string name="patient_added_successfully">Paciente agregado exitosamente</string>
+    <plurals name="number_of_new_patient_messages">
+        <item quantity="zero">Sin mensajes</item>
+        <item quantity="one">%d Mensaje</item>
+        <item quantity="other">%d Mensajes</item>
+    </plurals>
+    <plurals name="number_of_new_patient_alerts">
+        <item quantity="zero">Sin alertas</item>
+        <item quantity="one">%d Alerta</item>
+        <item quantity="other">%d Alertas</item>
+    </plurals>
     <string-array name="scale_user_indexes_array">
         <item>P-01</item>
         <item>P-02</item>

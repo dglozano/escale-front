@@ -4,6 +4,10 @@ import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivity;
 import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivityModule;
 import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivity;
 import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivityModule;
+import com.dglozano.escale.ui.doctor.main.AddPatientActivity;
+import com.dglozano.escale.ui.doctor.main.AddPatientModule;
+import com.dglozano.escale.ui.doctor.main.DoctorMainActivity;
+import com.dglozano.escale.ui.doctor.main.DoctorMainActivityModule;
 import com.dglozano.escale.ui.drawer.profile.PatientProfileActivity;
 import com.dglozano.escale.ui.drawer.profile.PatientProfileActivityModule;
 import com.dglozano.escale.ui.login.LoginActivity;
@@ -71,4 +75,14 @@ public abstract class ActivityBuilder {
             PatientProfileActivityModule.class
     })
     public abstract PatientProfileActivity bindPatientProfileActivity();
+
+    @ContributesAndroidInjector(modules = {
+            DoctorMainActivityModule.class
+    })
+    public abstract DoctorMainActivity bindDoctorMainActivity();
+
+    @ContributesAndroidInjector(modules = {
+            AddPatientModule.class
+    })
+    public abstract AddPatientActivity bindAddPatientActivity();
 }

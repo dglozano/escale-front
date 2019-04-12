@@ -4,10 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.fragment.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -18,7 +14,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.util.ValidationHelper;
+import com.google.android.material.textfield.TextInputLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -178,10 +179,9 @@ public class EditPatientDialog extends DialogFragment {
     private Integer getHeightInputErrorStringResource(Editable editable) {
         Integer errorString;
         if (!TextUtils.isEmpty(editable)) {
-            float value = Integer.parseInt(editable.toString());
-            errorString = value >= 100 && value <= 250 ? null : R.string.height_range_error;
+            errorString = ValidationHelper.isValidHeight(editable) ? null : R.string.input_validation_height_range_error;
         } else {
-            errorString = R.string.add_measurement_empty_error;
+            errorString = R.string.input_validation_empty_error;
         }
         return errorString;
     }

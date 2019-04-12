@@ -6,8 +6,10 @@ import com.dglozano.escale.web.dto.BodyMeasurementDTO;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.ChatDTO;
 import com.dglozano.escale.web.dto.ChatMessageDTO;
+import com.dglozano.escale.web.dto.CreatePatientDTO;
 import com.dglozano.escale.web.dto.Credentials;
 import com.dglozano.escale.web.dto.DietDTO;
+import com.dglozano.escale.web.dto.DoctorDTO;
 import com.dglozano.escale.web.dto.FirebaseTokenUpdateDTO;
 import com.dglozano.escale.web.dto.LoginResponse;
 import com.dglozano.escale.web.dto.PasswordDTO;
@@ -18,6 +20,7 @@ import com.dglozano.escale.web.dto.UpdatePatientDTO;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
@@ -112,4 +115,10 @@ public interface EscaleRestApi {
     @POST("/api/patients/{id}/profile_image/upload")
     Completable uploadProfilePicture(@Part MultipartBody.Part file, @Path("id") Long userId);
 
+    @POST("/api/doctors/{id}/patients/sign-up")
+    Single<PatientDTO> createPatientForDoctor(@Body CreatePatientDTO createPatientDTO,
+                                                  @Path("id") Long doctorId);
+
+    @GET("/api/doctors/{id}")
+    Single<DoctorDTO> getDoctorById(@Path("id") Long doctorId);
 }

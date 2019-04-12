@@ -25,6 +25,7 @@ import com.dglozano.escale.ui.main.diet.DietFragment;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
+import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.BottomBarAdapter;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.util.ui.NoSwipePager;
@@ -75,8 +76,6 @@ public class MainActivity extends BaseActivity
 
     private static final int CHANGE_PASSWORD_CODE = 123;
     public static final int ADD_MEASUREMENT_CODE = 456;
-
-    public static final String ASK_NEW_FIREBASE_TOKEN = "ask_new_firebase_token";
 
     // Binding views with Butterknife
     @BindView(R.id.bnve)
@@ -168,7 +167,7 @@ public class MainActivity extends BaseActivity
     private void onLogoutEvent(Event<Integer> logoutEvent) {
         if (logoutEvent != null && !logoutEvent.hasBeenHandled()) {
             Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra(ASK_NEW_FIREBASE_TOKEN, true);
+            intent.putExtra(Constants.ASK_NEW_FIREBASE_TOKEN, true);
             startActivity(intent);
             mBF600BleService.disposeConnection();
             finish();
@@ -235,7 +234,7 @@ public class MainActivity extends BaseActivity
                 Timber.d("Sending token %s to server for user %s", token, patientId);
                 Intent startIntent = new Intent(this, FirebaseTokenSenderService.class);
                 startIntent.putExtra("token", token);
-                startIntent.putExtra("patientId", patientId);
+                startIntent.putExtra("userId", patientId);
                 startService(startIntent);
             }
         });

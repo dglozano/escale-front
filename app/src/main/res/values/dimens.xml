@@ -17,4 +17,5 @@
     <dimen name="radius_medium">10dp</dimen>
     <dimen name="radius_full">50dp</dimen>
     <dimen name="margin_horizontal_indent_stats_list">36dp</dimen>
+    <dimen name="padding_very_small">4dp</dimen>
 </resources>

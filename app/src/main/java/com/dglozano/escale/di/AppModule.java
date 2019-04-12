@@ -13,8 +13,10 @@ import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.dao.DoctorDao;
 import com.dglozano.escale.db.dao.ForecastDao;
 import com.dglozano.escale.db.dao.PatientDao;
+import com.dglozano.escale.db.dao.PatientInfoDao;
 import com.dglozano.escale.db.dao.UserChatJoinDao;
 import com.dglozano.escale.db.dao.UserDao;
+import com.dglozano.escale.db.entity.PatientInfo;
 import com.dglozano.escale.di.annotation.ApplicationContext;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BaseUrl;
@@ -94,6 +96,12 @@ public class AppModule {
     @ApplicationScope
     UserDao provideUserDao(EscaleDatabase db) {
         return db.userDao();
+    }
+
+    @Provides
+    @ApplicationScope
+    PatientInfoDao providePatientInfoDao(EscaleDatabase db) {
+        return db.patientInfoDao();
     }
 
     @Provides

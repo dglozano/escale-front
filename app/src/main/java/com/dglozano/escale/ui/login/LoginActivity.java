@@ -12,7 +12,9 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityLoginBinding;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivity;
+import com.dglozano.escale.ui.doctor.main.DoctorMainActivity;
 import com.dglozano.escale.ui.main.MainActivity;
+import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.web.EscaleRestApi;
 
@@ -65,20 +67,16 @@ public class LoginActivity extends BaseActivity {
         binding.setViewmodel(mViewModel);
 
         Bundle extras = getIntent().getExtras();
-        if (extras != null && extras.getBoolean(MainActivity.ASK_NEW_FIREBASE_TOKEN, false)) {
+        if (extras != null && extras.getBoolean(Constants.ASK_NEW_FIREBASE_TOKEN, false)) {
             mViewModel.askForNewFirebaseToken();
         }
 
         ButterKnife.bind(this);
-        mViewModel.getUserIdChangeEvent().observe(this, this::onLoggedUserChange);
+        mViewModel.getPatientIdChangedEvent().observe(this, this::onLoggedPatientChanged);
+        mViewModel.getDoctorIdChangedEvent().observe(this, this::onLoggedDoctorChanged);
+
         mViewModel.getLoading().observe(this, this::onLoadingStateChange);
         mViewModel.getErrorEvent().observe(this, this::onErrorEventFired);
-    }
-
-    private void startMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
     }
 
     @OnClick(R.id.login_sign_in_button)
@@ -107,11 +105,30 @@ public class LoginActivity extends BaseActivity {
         return findViewById(android.R.id.content);
     }
 
-    private void onLoggedUserChange(Event<Long> idEvent) {
-        Timber.d("Id onLoggedUserChange %s", idEvent.peekContent());
+    private void onLoggedPatientChanged(Event<Long> idEvent) {
+        Timber.d("Id onLoggedPatientChanged %s", idEvent.peekContent());
         if (!idEvent.hasBeenHandled() && idEvent.handleContent() != -1L) {
             startMainActivity();
         }
+    }
+
+    private void onLoggedDoctorChanged(Event<Long> idEvent) {
+        Timber.d("Id onLoggedDoctorChanged %s", idEvent.peekContent());
+        if (!idEvent.hasBeenHandled() && idEvent.handleContent() != -1L) {
+            startDoctorMainActivity();
+        }
+    }
+
+    private void startMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void startDoctorMainActivity() {
+        Intent intent = new Intent(this, DoctorMainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void onLoadingStateChange(Boolean isLoading) {

@@ -1,10 +1,7 @@
 package com.dglozano.escale.web;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 
-import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.LogoutHelper;
 import com.dglozano.escale.web.dto.LoginResponse;
@@ -19,8 +16,6 @@ import okhttp3.Request;
 import okhttp3.Route;
 import retrofit2.Call;
 import timber.log.Timber;
-
-import static com.dglozano.escale.ui.main.MainActivity.ASK_NEW_FIREBASE_TOKEN;
 
 public class CustomOkHttpAuthenticator implements Authenticator {
 

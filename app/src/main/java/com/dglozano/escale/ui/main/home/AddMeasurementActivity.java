@@ -188,7 +188,7 @@ public class AddMeasurementActivity extends BaseActivity {
                 return value >= 0f ? null : R.string.add_measurement_percentage_range_error;
             }
         } else {
-            return R.string.add_measurement_empty_error;
+            return R.string.input_validation_empty_error;
         }
     }
 

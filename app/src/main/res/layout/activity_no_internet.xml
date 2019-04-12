@@ -39,7 +39,7 @@
             android:layout_height="@dimen/height"
             android:layout_below="@id/no_internet_text"
             android:layout_marginTop="@dimen/activity_vertical_margin_very_big"
-            android:background="@drawable/login_button_rounded"
+            android:background="@drawable/button_rounded"
             android:text="@string/try_again"
             android:textColor="@color/almostWhite"
             android:textStyle="bold" />

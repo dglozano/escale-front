@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="viewmodel"
+            type="com.dglozano.escale.ui.doctor.main.AddPatientViewModel" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/add_patient_btn"
+            android:layout_centerVertical="true"
+            android:layout_margin="@dimen/activity_vertical_margin_big"
+            android:background="@color/almostWhite"
+            android:fadeScrollbars="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/padding_medium">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/add_patient_first_name_inputlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+                    app:errorEnabled="true"
+                    app:hintEnabled="true">
+
+                    <EditText
+                        android:id="@+id/add_patient_first_name_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/first_name"
+                        android:inputType="textCapSentences"
+                        android:lines="1"
+                        android:maxLength="250"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                        android:textColor="@color/colorTextBlack"
+                        android:textColorHint="@color/colorTextDark" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/add_patient_last_name_inputlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+                    app:errorEnabled="true"
+                    app:hintEnabled="true">
+
+                    <EditText
+                        android:id="@+id/add_patient_last_name_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/last_name"
+                        android:inputType="textCapSentences"
+                        android:lines="1"
+                        android:maxLength="250"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                        android:textColor="@color/colorTextBlack"
+                        android:textColorHint="@color/colorTextDark" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/add_patient_email_inputlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+                    app:errorEnabled="true"
+                    app:hintEnabled="true">
+
+                    <EditText
+                        android:id="@+id/add_patient_email_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/email"
+                        android:inputType="textEmailAddress"
+                        android:lines="1"
+                        android:maxLength="250"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                        android:textColor="@color/colorTextBlack"
+                        android:textColorHint="@color/colorTextDark" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/add_patient_birthday_inputlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+                    app:errorEnabled="true"
+                    app:hintEnabled="true">
+
+                    <EditText
+                        android:id="@+id/add_patient_birthday_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:cursorVisible="false"
+                        android:focusable="true"
+                        android:hint="@string/birthday"
+                        android:inputType="date"
+                        android:longClickable="false"
+                        android:nextFocusForward="@id/add_patient_height_inputlayout"
+                        android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                        android:textColor="@color/colorTextBlack"
+                        android:textColorHint="@color/colorTextDark" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/add_patient_height_inputlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+                    app:errorEnabled="true"
+                    app:hintEnabled="true">
+
+                    <EditText
+                        android:id="@+id/add_patient_height_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:digits="0123456789"
+                        android:hint="@string/height_in_cm"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:lines="1"
+                        android:maxLength="3"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+                        android:textColor="@color/colorTextBlack"
+                        android:textColorHint="@color/colorTextDark" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/add_patient_genre_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+                    android:text="@string/genre_label" />
+
+                <co.ceryle.radiorealbutton.RadioRealButtonGroup
+                    android:id="@+id/add_patient_genre_radiogroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="1dp"
+                    app:rrbg_borderColor="#E6E6E6"
+                    app:rrbg_borderSize="1dp"
+                    app:rrbg_bottomLineSize="0dp"
+                    app:rrbg_buttonsPaddingBottom="@dimen/padding_very_small"
+                    app:rrbg_buttonsPaddingLeft="@dimen/padding_small"
+                    app:rrbg_buttonsPaddingRight="@dimen/padding_small"
+                    app:rrbg_buttonsPaddingTop="@dimen/padding_small"
+                    app:rrbg_checkedPosition="0"
+                    app:rrbg_dividerColor="#EEEEEE"
+                    app:rrbg_dividerPadding="0dp"
+                    app:rrbg_dividerSize="1dp"
+                    app:rrbg_radius="28dp"
+                    app:rrbg_selectorColor="@color/colorPrimaryLight"
+                    app:rrbg_selectorSize="10dp">
+
+                    <co.ceryle.radiorealbutton.RadioRealButton
+                        android:id="@+id/male_radio_button"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        app:rrb_drawable="@drawable/ic_male"
+                        app:rrb_drawableGravity="top"
+                        app:rrb_drawableHeight="18dp"
+                        app:rrb_drawablePadding="4dp"
+                        app:rrb_drawableTint="@color/dark_gray"
+                        app:rrb_drawableWidth="18dp"
+                        app:rrb_ripple="true"
+                        app:rrb_rippleColor="@color/colorPrimaryLight"
+                        app:rrb_text="MASCULINO"
+                        app:rrb_textColor="@color/colorTextDark"
+                        app:rrb_textSize="10sp" />
+
+                    <co.ceryle.radiorealbutton.RadioRealButton
+                        android:id="@+id/female_radio_button"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        app:rrb_drawable="@drawable/ic_female"
+                        app:rrb_drawableGravity="top"
+                        app:rrb_drawableHeight="18dp"
+                        app:rrb_drawablePadding="4dp"
+                        app:rrb_drawableTint="@color/dark_gray"
+                        app:rrb_drawableWidth="18dp"
+                        app:rrb_ripple="true"
+                        app:rrb_rippleColor="@color/colorPrimaryLight"
+                        app:rrb_text="FEMENINO"
+                        app:rrb_textColor="@color/colorTextDark"
+                        app:rrb_textSize="10sp" />
+                </co.ceryle.radiorealbutton.RadioRealButtonGroup>
+
+                <TextView
+                    android:id="@+id/add_patient_ph_activity_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+                    android:text="@string/physical_actvitiy_label" />
+
+                <SeekBar
+                    android:id="@+id/add_patient_ph_activity_seekbar"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+                    android:max="4"
+                    android:progress="2"
+                    android:progressBackgroundTint="@color/colorPrimary"
+                    android:progressTint="@color/colorPrimary"
+                    android:thumbTint="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/add_patient_ph_activity_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dialog_edit_user_ph_activity_description_3"
+                    android:textAlignment="center" />
+            </LinearLayout>
+
+        </ScrollView>
+
+        <Button
+            android:id="@+id/add_patient_btn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="@dimen/activity_vertical_margin_big"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_big"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_big"
+            android:background="@drawable/button_rounded"
+            android:text="@string/add_patient_btn_text"
+            android:textColor="@color/almostWhite"
+            android:textStyle="bold" />
+
+        <RelativeLayout
+            android:id="@+id/add_patient_progress_bar_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorBlackOverlay"
+            android:clickable="true"
+            android:focusable="true"
+            android:translationZ="10dp"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/add_patient_progress_bar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorAccent" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</layout>

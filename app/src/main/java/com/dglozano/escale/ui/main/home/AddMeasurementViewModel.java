@@ -94,7 +94,7 @@ public class AddMeasurementViewModel extends ViewModel {
                     )
             );
         } else {
-            mErrorEvent.postValue(new Event<>(R.string.add_measurement_input_error_snackbar));
+            mErrorEvent.postValue(new Event<>(R.string.input_validation_error_snackbar));
         }
     }
 

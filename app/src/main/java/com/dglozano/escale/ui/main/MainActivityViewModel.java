@@ -8,6 +8,7 @@ import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
+import com.dglozano.escale.repository.UserRepository;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.Event;
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
@@ -34,6 +35,7 @@ public class MainActivityViewModel extends ViewModel {
     private PatientRepository mPatientRepository;
     private ChatRepository mChatRepository;
     private DietRepository mDietRepository;
+    private UserRepository mUserRepository;
     private BodyMeasurementRepository mMeasurementRepository;
     private LiveData<Event<Boolean>> mMustChangePassword;
     private LiveData<Integer> mNumberOfUnreadMessages;
@@ -54,10 +56,12 @@ public class MainActivityViewModel extends ViewModel {
 
     @Inject
     public MainActivityViewModel(PatientRepository patientRepository,
+                                 UserRepository userRepository,
                                  BodyMeasurementRepository bodyMeasurementRepository,
                                  SharedPreferences sharedPreferences,
                                  ChatRepository chatRepository, DietRepository dietRepository) {
         disposables = new CompositeDisposable();
+        mUserRepository = userRepository;
         mDietRepository = dietRepository;
         mPatientRepository = patientRepository;
         mChatRepository = chatRepository;
@@ -237,7 +241,7 @@ public class MainActivityViewModel extends ViewModel {
 
     public void logout(Integer logoutMessageResourceId) {
         mLogoutEvent.postValue(new Event<>(logoutMessageResourceId));
-        mPatientRepository.logout();
+        mUserRepository.logout();
     }
 
     private void setupMustChangePasswordObservable() {
@@ -296,11 +300,11 @@ public class MainActivityViewModel extends ViewModel {
 
 
     public LiveData<String> getFirebaseToken() {
-        return mPatientRepository.getFirebaseDeviceToken();
+        return mUserRepository.getFirebaseDeviceToken();
     }
 
     public Boolean isFirebaseTokenSent() {
-        return mPatientRepository.isFirebaseTokenSent();
+        return mUserRepository.isFirebaseTokenSent();
     }
 
     public Long getLoggedPatientId() {

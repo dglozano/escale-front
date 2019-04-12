@@ -265,7 +265,7 @@
             android:layout_marginStart="@dimen/activity_vertical_margin_big"
             android:layout_marginEnd="@dimen/activity_vertical_margin_big"
             android:layout_marginBottom="@dimen/activity_vertical_margin_big"
-            android:background="@drawable/login_button_rounded"
+            android:background="@drawable/button_rounded"
             android:text="@string/add_measurement_btn"
             android:textColor="@color/almostWhite"
             android:textStyle="bold" />

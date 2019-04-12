@@ -46,6 +46,7 @@ public class LogoutHelper {
             Timber.d("Clearing preferences");
             SharedPreferences.Editor editor = mSharedPreferences.edit();
             editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
+            editor.putLong(Constants.LOGGED_DOCTOR_ID_SHARED_PREF, -1L);
             editor.remove(TOKEN_SHARED_PREF);
             editor.remove(REFRESH_TOKEN_SHARED_PREF);
             editor.remove(SCALE_USER_INDEX_SHARED_PREF);

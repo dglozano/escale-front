@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryVeryLight"
+    android:padding="@dimen/padding_medium">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/row_item_patient_picture"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/user_profile_picture"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_user_profile_image_default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riv_corner_radius="30dip"
+        app:riv_mutate_background="true" />
+
+    <TextView
+        android:id="@+id/row_item_patient_weight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_almost_nothing"
+        android:text="79"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/row_item_patient_weight_kg"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/row_item_patient_weight_kg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/kg"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/row_item_patient_weight"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/row_item_patient_fullname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin_small"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_small"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_very_small"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Diego Alejandro Garcia Lozano"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
+        android:textColor="@color/dark_gray"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/row_item_patient_alerts_and_messages"
+        app:layout_constraintEnd_toStartOf="@id/row_item_patient_weight"
+        app:layout_constraintStart_toEndOf="@id/row_item_patient_picture"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/row_item_patient_alerts_and_messages"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/row_item_patient_fullname"
+        app:layout_constraintStart_toStartOf="@id/row_item_patient_fullname"
+        app:layout_constraintTop_toBottomOf="@id/row_item_patient_fullname"
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <ImageView
+            android:id="@+id/row_item_patient_alert_icon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_no_alert"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/row_item_patient_alerts_textview"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/row_item_patient_alerts_textview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_vertical_margin_almost_nothing"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/no_new_patient_alerts"
+            android:textAppearance="@android:style/TextAppearance.Material.Large"
+            android:textColor="@color/colorTextDark"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/row_item_patient_alert_icon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/row_item_patient_messages_icon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="@dimen/activity_vertical_margin_medium"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_no_message"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/row_item_patient_messages_textview"
+            app:layout_constraintStart_toEndOf="@id/row_item_patient_alerts_textview"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/row_item_patient_messages_textview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_vertical_margin_very_small"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/no_new_patient_messages"
+            android:textAppearance="@android:style/TextAppearance.Material.Large"
+            android:textColor="@color/colorTextDark"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/row_item_patient_messages_icon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

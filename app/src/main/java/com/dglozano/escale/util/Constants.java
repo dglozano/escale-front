@@ -47,6 +47,7 @@ public class Constants {
 
     //Shared Prefrences keys
     public static final String LOGGED_USER_ID_SHARED_PREF = "loggedUserId";
+    public static final String LOGGED_DOCTOR_ID_SHARED_PREF = "loggedDoctorId";
     public static final String FIREBASE_TOKEN_SHARED_PREF = "firebaseToken";
     public static final String IS_FIREBASE_TOKEN_SENT_SHARED_PREF = "isFirebaseTokenSent";
     public static final String TOKEN_SHARED_PREF = "token";
@@ -206,4 +207,6 @@ public class Constants {
             UUID.fromString("00002902-0000-1000-8000-00805F9B34FB");
     public static final UUID CHARACTERISTIC_USER_DESCRIPTION =
             UUID.fromString("00002901-0000-1000-8000-00805F9B34FB");
+
+    public static final String ASK_NEW_FIREBASE_TOKEN = "ask_new_firebase_token";
 }
