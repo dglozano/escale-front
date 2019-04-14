@@ -2,14 +2,14 @@ package com.dglozano.escale.web.services;
 
 import android.content.SharedPreferences;
 
+import com.dglozano.escale.repository.AlertRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
+import com.dglozano.escale.repository.DoctorRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.Constants;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-
-import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -27,7 +27,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Inject
     DietRepository dietRepository;
     @Inject
+    DoctorRepository doctorRepository;
+    @Inject
     PatientRepository patientRepository;
+    @Inject
+    AlertRepository alertRepository;
 
     private CompositeDisposable disposables;
 
@@ -72,10 +76,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 handleNewMessageNotification(remoteMessage);
             } else if (type.equals("new_diet")) {
                 handleNewDietNotification(remoteMessage);
-            } else if(type.equals("delete_diet")) {
+            } else if (type.equals("delete_diet")) {
                 handleDeleteDietNotification(remoteMessage);
-            } else if(type.equals("new_goal")) {
+            } else if (type.equals("new_goal")) {
                 handleNewGoalNotification(remoteMessage);
+            } else if (type.equals("new_alert")) {
+                handleNewAlertNotification(remoteMessage);
             }
         }
 
@@ -103,7 +109,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String startDate = remoteMessage.getData().get("date");
         Long size = Long.parseLong(remoteMessage.getData().get("size"));
         disposables.add(dietRepository
-                .saveDietOnNotified(patientRepository.getLoggedPatiendId(), uuid, fileName, startDate, size)
+                .saveDietOnNotified(patientRepository.getLoggedPatientId(), uuid, fileName, startDate, size)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(() -> {
@@ -122,17 +128,30 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String msg = remoteMessage.getData().get("msg");
         Long sender_id = Long.parseLong(remoteMessage.getData().get("sender_id"));
         String date = remoteMessage.getData().get("date");
-        disposables.add(chatRepository
-                .saveMessageOnReceivedFromDoctor(id, chat_id, sender_id, msg, date)
+        disposables.add(doctorRepository.addMessageToPatientInfo(sender_id)
+                .andThen(chatRepository.saveMessageOnReceived(id, chat_id, sender_id, msg, date))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(() -> {
                             Timber.d("Received message from firebase and saved successfully");
-                            Integer current = sharedPreferences.getInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0);
-                            Timber.d("Current amount of unread messages %s", current);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, current + 1);
-                            editor.apply();
+                        },
+                        Timber::e)
+        );
+    }
+
+    private void handleNewAlertNotification(RemoteMessage remoteMessage) {
+        Long id = Long.parseLong(remoteMessage.getData().get("id"));
+        Long patient_id = Long.parseLong(remoteMessage.getData().get("patient_id"));
+        Long doctor_id = Long.parseLong(remoteMessage.getData().get("doctor_id"));
+        Integer alert_type = Integer.parseInt(remoteMessage.getData().get("alert_type"));
+        String alert_msg = remoteMessage.getData().get("alert_msg");
+        String date = remoteMessage.getData().get("date");
+        disposables.add(doctorRepository.addAlertToPatientInfo(patient_id, doctor_id)
+                .andThen(alertRepository.upsertAlert(id, patient_id, doctor_id, alert_type, alert_msg, date))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(() -> {
+                            Timber.d("Received message from firebase and saved successfully");
                         },
                         Timber::e)
         );
@@ -145,7 +164,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String dueDate = remoteMessage.getData().get("due_date");
         Boolean isAccomplished = Boolean.parseBoolean(remoteMessage.getData().get("accomplished"));
         disposables.add(patientRepository
-                .saveNewGoalOnNotified(patientRepository.getLoggedPatiendId(), weightInKg, dueDate)
+                .saveNewGoalOnNotified(patientRepository.getLoggedPatientId(), weightInKg, dueDate)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(() -> Timber.d("Received new goal from firebase and saved successfully"),

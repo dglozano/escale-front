@@ -1,14 +1,7 @@
 package com.dglozano.escale.ui.main.stats;
 
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +11,16 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.ui.main.stats.chart.StatsChartFragment;
 import com.dglozano.escale.ui.main.stats.list.StatsListFragment;
 import com.dglozano.escale.util.ui.MyTabAdapter;
+import com.google.android.material.tabs.TabLayout;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;

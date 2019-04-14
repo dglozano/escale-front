@@ -1,10 +1,10 @@
 package com.dglozano.escale.db.entity;
 
+import java.util.Date;
+
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-
-import java.util.Date;
 
 @Entity
 public class AppUser {
@@ -17,6 +17,12 @@ public class AppUser {
     protected Date lastUpdate;
 
     public AppUser() {
+    }
+
+    @Ignore
+    public AppUser(Long id, Date lastUpdate) {
+        this.id = id;
+        this.lastUpdate = lastUpdate;
     }
 
     @Ignore

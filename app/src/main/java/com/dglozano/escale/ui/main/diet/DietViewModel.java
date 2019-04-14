@@ -1,15 +1,15 @@
 package com.dglozano.escale.ui.main.diet;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
-
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
 
 import java.util.Objects;
 
 import javax.inject.Inject;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 
 public class DietViewModel extends ViewModel {
 
@@ -23,7 +23,7 @@ public class DietViewModel extends ViewModel {
         mPatientRepository = patientRepository;
         mDietRepository = dietRepository;
         mAreDietsEmpty = Transformations.map(mDietRepository.getCurrentDiet(
-                mPatientRepository.getLoggedPatiendId()),
+                mPatientRepository.getLoggedPatientId()),
                 Objects::isNull);
     }
 

@@ -20,7 +20,7 @@ public class DatabaseConverters {
 
     @TypeConverter
     public Integer genderToInt(Patient.Gender gender) {
-        return gender.equals(Patient.Gender.MALE) ? 0 : 1;
+        return gender == null || gender.equals(Patient.Gender.MALE) ? 0 : 1;
     }
 
     @TypeConverter

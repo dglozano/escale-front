@@ -1,7 +1,6 @@
 package com.dglozano.escale.web;
 
 import android.content.SharedPreferences;
-import androidx.annotation.NonNull;
 
 import com.dglozano.escale.util.Constants;
 
@@ -9,6 +8,7 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;

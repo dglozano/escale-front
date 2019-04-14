@@ -7,10 +7,8 @@ import java.util.Optional;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import io.reactivex.Single;
 
 @Dao
 public abstract class DoctorDao extends BaseDao<Doctor> {
@@ -25,4 +23,7 @@ public abstract class DoctorDao extends BaseDao<Doctor> {
 
     @Query("DELETE FROM Doctor")
     public abstract void deleteAll();
+
+    @Query("SELECT * FROM Doctor WHERE id == :id")
+    public abstract Single<Optional<Doctor>> getDoctorByIdSingle(Long id);
 }

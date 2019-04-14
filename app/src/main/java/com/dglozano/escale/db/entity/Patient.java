@@ -38,6 +38,13 @@ public class Patient extends AppUser {
     }
 
     @Ignore
+    public Patient(Long id, Long doctorId, Date timestamp) {
+        this.id = id;
+        this.doctorId = doctorId;
+        this.lastUpdate = timestamp;
+    }
+
+    @Ignore
     public Patient(PatientDTO patientDTO, Date timestamp) {
         super(patientDTO.getId(),
                 patientDTO.getFirstName(),

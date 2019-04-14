@@ -1,6 +1,7 @@
 package com.dglozano.escale.web;
 
 import com.dglozano.escale.db.entity.MeasurementForecast;
+import com.dglozano.escale.db.entity.PatientInfo;
 import com.dglozano.escale.web.dto.AddBodyMeasurementDTO;
 import com.dglozano.escale.web.dto.BodyMeasurementDTO;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
@@ -20,7 +21,6 @@ import com.dglozano.escale.web.dto.UpdatePatientDTO;
 import java.util.List;
 
 import io.reactivex.Completable;
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
@@ -92,6 +92,9 @@ public interface EscaleRestApi {
     @POST("/api/chats/{id}/messages")
     Single<ChatMessageDTO> sendChatMessage(@Path("id") Long chatId, @Body SendChatMessageDTO chatMessageDTO);
 
+    @POST("/api/chats/{id}/messages/seenBy")
+    Completable markSeenByUser(@Path("id") Long chatId, @Query("userId") Long userId);
+
     @Streaming
     @GET("/api/diets/download/{uuid}")
     Call<ResponseBody> downloadDiet(@Path("uuid") String dietId);
@@ -117,8 +120,12 @@ public interface EscaleRestApi {
 
     @POST("/api/doctors/{id}/patients/sign-up")
     Single<PatientDTO> createPatientForDoctor(@Body CreatePatientDTO createPatientDTO,
-                                                  @Path("id") Long doctorId);
+                                              @Path("id") Long doctorId);
 
     @GET("/api/doctors/{id}")
     Single<DoctorDTO> getDoctorById(@Path("id") Long doctorId);
+
+
+    @GET("/api/doctors/{id}/patients/info")
+    Single<List<PatientInfo>> getAllPatientsInfoOfDoctor(@Path("id") Long doctorId);
 }

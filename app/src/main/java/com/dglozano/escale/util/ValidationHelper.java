@@ -1,5 +1,6 @@
 package com.dglozano.escale.util;
 
+import android.text.Editable;
 import android.text.TextUtils;
 
 import com.dglozano.escale.R;
@@ -20,6 +21,10 @@ public class ValidationHelper {
 
     public static boolean isValidName(CharSequence name) {
         return !TextUtils.isEmpty(name) && name.toString().matches("^[\\p{L} .'-]+$");
+    }
+
+    public static boolean isValidFileName(Editable filename) {
+        return !TextUtils.isEmpty(filename) && filename.toString().matches("^[\\w\\-. ]+$");
     }
 
     public static boolean isValidHeight(CharSequence height) {

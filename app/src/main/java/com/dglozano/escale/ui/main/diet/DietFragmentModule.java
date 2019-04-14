@@ -1,7 +1,8 @@
 package com.dglozano.escale.ui.main.diet;
 
-import androidx.fragment.app.FragmentManager;
+import com.dglozano.escale.ui.main.MainActivity;
 
+import androidx.fragment.app.FragmentManager;
 import dagger.Module;
 import dagger.Provides;
 

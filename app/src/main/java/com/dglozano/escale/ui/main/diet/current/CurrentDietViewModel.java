@@ -1,9 +1,5 @@
 package com.dglozano.escale.ui.main.diet.current;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.exception.DietDownloadStateException;
@@ -15,6 +11,9 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -37,7 +36,7 @@ public class CurrentDietViewModel extends ViewModel {
         disposables = new CompositeDisposable();
         mPatientRepository = patientRepository;
         mDietRepository = dietRepository;
-        mCurrentDiet = mDietRepository.getCurrentDiet(mPatientRepository.getLoggedPatiendId());
+        mCurrentDiet = mDietRepository.getCurrentDiet(mPatientRepository.getLoggedPatientId());
         mIsRefreshingDietsList = new MutableLiveData<>();
         mIsRefreshingDietsList.postValue(false);
         mErrorEvent = new MutableLiveData<>();
@@ -54,7 +53,7 @@ public class CurrentDietViewModel extends ViewModel {
     }
 
     public void refreshCurrentDiet() {
-        disposables.add(mDietRepository.refreshDietsSingle(mPatientRepository.getLoggedPatiendId())
+        disposables.add(mDietRepository.refreshDietsSingle(mPatientRepository.getLoggedPatientId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(d -> mIsRefreshingDietsList.postValue(true))

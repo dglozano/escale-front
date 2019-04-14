@@ -107,7 +107,7 @@ public class LoginActivity extends BaseActivity {
 
     private void onLoggedPatientChanged(Event<Long> idEvent) {
         Timber.d("Id onLoggedPatientChanged %s", idEvent.peekContent());
-        if (!idEvent.hasBeenHandled() && idEvent.handleContent() != -1L) {
+        if (!idEvent.hasBeenHandled() && idEvent.handleContent() != -1L && mViewModel.getLoggedDoctorId() == -1L) {
             startMainActivity();
         }
     }

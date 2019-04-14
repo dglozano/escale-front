@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/dialog_add_diet_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryLight"
+        android:elevation="2dp"
+        android:padding="@dimen/padding_small"
+        android:text="@string/add_diet_title"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/dialog_add_diet_filename_inputlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialog_add_diet_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+        android:layout_marginStart="@dimen/activity_vertical_margin_medium"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+        app:counterEnabled="true"
+        app:counterMaxLength="100"
+        app:errorEnabled="true"
+        app:hintEnabled="true">
+
+        <EditText
+            android:id="@+id/dialog_add_diet_filename_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/diet_name_hint"
+            android:imeOptions="actionDone"
+            android:inputType="textUri"
+            android:lines="1"
+            android:maxLines="1"
+            android:minLines="1"
+            android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+            android:textColor="@color/colorTextBlack"
+            android:textColorHint="@color/colorTextDark" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+</RelativeLayout>

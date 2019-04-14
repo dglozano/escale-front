@@ -1,16 +1,13 @@
 package com.dglozano.escale.db.dao;
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-
 import com.dglozano.escale.db.entity.AppUser;
 
 import java.util.List;
 import java.util.Optional;
+
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Query;
 
 @Dao
 public abstract class UserDao extends BaseDao<AppUser>{

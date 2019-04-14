@@ -77,7 +77,7 @@ public class AddMeasurementViewModel extends ViewModel {
                     Float.parseFloat(bones),
                     Float.parseFloat(muscle),
                     true)
-                    .flatMapCompletable(id -> mPatientRepository.getUpdatedForecastFromApi(mPatientRepository.getLoggedPatiendId()))
+                    .flatMapCompletable(id -> mPatientRepository.getUpdatedForecastFromApi(mPatientRepository.getLoggedPatientId()))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe((d) -> mLoading.postValue(true))

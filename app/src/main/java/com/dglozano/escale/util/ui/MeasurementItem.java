@@ -1,8 +1,5 @@
 package com.dglozano.escale.util.ui;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.dglozano.escale.db.entity.BodyMeasurement;
 
 import java.text.DecimalFormat;

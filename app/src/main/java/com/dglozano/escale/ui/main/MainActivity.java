@@ -42,6 +42,7 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
 import java.net.MalformedURLException;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -134,25 +135,38 @@ public class MainActivity extends BaseActivity
         int openFragmentInPosition = 0;
         if (getIntent().getExtras() != null) {
             openFragmentInPosition = handleIntent();
+            mViewModel.setDoctorView(getIntent().getBooleanExtra(Constants.IS_DOCTOR_VIEW_INTENT_EXTRA, false));
         }
         mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
 
-        setSupportActionBar(mToolbar);
-        setActionBarTitleAccordingToFragment(openFragmentInPosition);
-        setupDrawerLayout();
+        if (!mViewModel.isDoctorView()) {
+            mNavigationView.setVisibility(View.VISIBLE);
+            setSupportActionBar(mToolbar);
+            setActionBarTitleAccordingToFragment(openFragmentInPosition);
+            setupDrawerLayout();
+        } else {
+            mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            mNavigationView.setVisibility(View.GONE);
+            setSupportActionBar(mToolbar);
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        }
 
         onKeyboardVisibilityEvent();
 
         setupBottomNav();
         observeIsRefreshing();
         observeUserData();
-        observeChangeDialogEvent();
+        if (!mViewModel.isDoctorView()) {
+            observeChangeDialogEvent();
+            observeNewDietNotification();
+            mViewModel.getLogoutEvent().observe(this, this::onLogoutEvent);
+        }
+
         observeNumberOfUnreadMessages();
         observerFirebaseTokenUpdate();
         observeCurrentFragmentPosition();
-        observeNewDietNotification();
+
         mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
-        mViewModel.getLogoutEvent().observe(this, this::onLogoutEvent);
 
 
         mViewModel.getAppBarShadowStatus().observe(this, showShadow -> {
@@ -212,17 +226,23 @@ public class MainActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
         mViewModel.refreshData();
-        for (int i = 0; i < mNavigationView.getMenu().size(); i++) {
-            mNavigationView.getMenu().getItem(i).setChecked(false);
+        if (!mViewModel.isDoctorView()) {
+            for (int i = 0; i < mNavigationView.getMenu().size(); i++) {
+                mNavigationView.getMenu().getItem(i).setChecked(false);
+            }
         }
     }
 
     private void observeCurrentFragmentPosition() {
         mViewModel.getPositionOfCurrentFragment().observe(this, posFragment -> {
             if (posFragment != null) {
-                if (posFragment == 2) mViewModel.markNewDietAsSeen(true);
-                if (posFragment == 3) mViewModel.markMessagesAsRead();
-                setActionBarTitleAccordingToFragment(posFragment);
+                if (!mViewModel.isDoctorView()) {
+                    if (posFragment == 2) mViewModel.markNewDietAsSeen(true);
+                    if (posFragment == 3) mViewModel.markMessagesAsReadForPatient();
+                    setActionBarTitleAccordingToFragment(posFragment);
+                } else {
+                    if (posFragment == 3) mViewModel.markMessagesAsReadForDoctor();
+                }
             }
         });
     }
@@ -251,14 +271,32 @@ public class MainActivity extends BaseActivity
     }
 
     private void observeNumberOfUnreadMessages() {
-        mViewModel.getNumberOfUnreadMessages().observe(this, unreadMessages -> {
-            if (mMessagesBadge == null) {
-                mMessagesBadge = addBadgeAt(3, 0);
-            }
-            if (unreadMessages != null) {
-                mMessagesBadge.setBadgeNumber(unreadMessages);
-            }
-        });
+        if (!mViewModel.isDoctorView()) {
+            mViewModel.getNumberOfUnreadMessagesByPatient().observe(this, unreadMessages -> {
+                if (mMessagesBadge == null) {
+                    mMessagesBadge = addBadgeAt(3, 0);
+                }
+                if (unreadMessages != null) {
+                    if (mViewModel.getPositionOfCurrentFragment().getValue() != null
+                            && mViewModel.getPositionOfCurrentFragment().getValue() != 3) {
+                        mMessagesBadge.setBadgeNumber(unreadMessages);
+                    }
+                }
+            });
+        } else {
+            mViewModel.getNumberOfUnreadMessagesByDoctor().observe(this, unreadMessages -> {
+                if (mMessagesBadge == null) {
+                    mMessagesBadge = addBadgeAt(3, 0);
+                }
+                if (unreadMessages != null) {
+                    if (mViewModel.getPositionOfCurrentFragment().getValue() != null
+                            && mViewModel.getPositionOfCurrentFragment().getValue() != 3) {
+                        mMessagesBadge.setBadgeNumber(unreadMessages);
+                    }
+                }
+            });
+        }
+
     }
 
     private void observeNewDietNotification() {
@@ -308,23 +346,38 @@ public class MainActivity extends BaseActivity
     }
 
     private void observeUserData() {
-
-
         mViewModel.getLoggedPatient().observe(this, user -> {
             if (user != null) {
-                mNavUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
-                mNavEmail.setText(user.getEmail());
+                if (!mViewModel.isDoctorView()) {
+                    mNavUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
+                    mNavEmail.setText(user.getEmail());
 
-                try {
-                    mPicasso.load(mViewModel.getProfileImageUrlOfLoggedPatient().toString())
-                            .placeholder(R.drawable.ic_user_profile_image_default)
-                            .error(R.drawable.ic_user_profile_image_default)
-                            .into(mNavImageView);
-                } catch (MalformedURLException e) {
-                    Timber.e(e);
+                    try {
+                        mPicasso.load(mViewModel.getProfileImageUrlOfLoggedPatient().toString())
+                                .placeholder(R.drawable.ic_user_profile_image_default)
+                                .error(R.drawable.ic_user_profile_image_default)
+                                .into(mNavImageView);
+                    } catch (MalformedURLException e) {
+                        Timber.e(e);
+                    }
+                } else {
+                    Objects.requireNonNull(getSupportActionBar()).setTitle(user.getLastName());
                 }
+            } else {
+                Timber.e("user is null");
             }
         });
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        Timber.d("ACAAAAAAAAAAAA");
+        if (mViewModel.isDoctorView()) {
+            Timber.d("aaaa");
+            finish();
+            return true;
+        }
+        return false;
     }
 
     private void setupBottomNav() {
@@ -355,7 +408,11 @@ public class MainActivity extends BaseActivity
 
             }
         });
-        mPagerAdapter.addFragments(HomeFragment.newInstance());
+        if (!mViewModel.isDoctorView()) {
+            mPagerAdapter.addFragments(HomeFragment.newInstance());
+        } else {
+            mPagerAdapter.addFragments(new Fragment());
+        }
         mPagerAdapter.addFragments(StatsFragment.newInstance());
         mPagerAdapter.addFragments(DietFragment.newInstance());
         mPagerAdapter.addFragments(MessagesFragment.newInstance());
@@ -366,7 +423,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+        if (!mViewModel.isDoctorView() && mDrawer.isDrawerOpen(GravityCompat.START)) {
             mDrawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -375,20 +432,25 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
+        if (!mViewModel.isDoctorView()) {
+            // Handle navigation view item clicks here.
 
-        if (id == R.id.nav_profile) {
-            startProfileActivity();
-        } else if (id == R.id.nav_settings) {
-            startSettingsActivity();
-        } else if (id == R.id.nav_help) {
+            if (id == R.id.nav_profile) {
+                startProfileActivity();
+            } else if (id == R.id.nav_settings) {
+                startSettingsActivity();
+            } else if (id == R.id.nav_help) {
 
-        } else if (id == R.id.nav_logout) {
-            LogoutDialog.newInstance().show(getSupportFragmentManager(), "showLogoutConfirmDialog");
+            } else if (id == R.id.nav_logout) {
+                LogoutDialog.newInstance().show(getSupportFragmentManager(), "showLogoutConfirmDialog");
+            }
+
+            mDrawer.closeDrawer(GravityCompat.START);
+        } else if (id == android.R.id.home) {
+            Timber.d("back pressed");
+            onBackPressed();
         }
-
-        mDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -425,9 +487,11 @@ public class MainActivity extends BaseActivity
     protected void onStart() {
         super.onStart();
         mNotificationManager.cancelAll();
-        Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
-        Intent intent = new Intent(this, BF600BleService.class);
-        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        if (!mViewModel.isDoctorView()) {
+            Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
+            Intent intent = new Intent(this, BF600BleService.class);
+            bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     @Override

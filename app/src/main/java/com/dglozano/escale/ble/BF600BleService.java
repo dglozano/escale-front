@@ -1,12 +1,9 @@
 package com.dglozano.escale.ble;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
-import androidx.annotation.Nullable;
 import android.util.Pair;
 
 import com.dglozano.escale.db.entity.BodyMeasurement;
@@ -28,6 +25,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import dagger.android.AndroidInjection;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -375,7 +375,7 @@ public class BF600BleService extends BaseBleService {
                 .flatMap(bytesWritten -> singleToRead(Constants.DB_CHANGE_INCREMENT, rxBleConnection))
                 .flatMap(bytesRead -> singleToWrite(Constants.DB_CHANGE_INCREMENT,
                         getNextDbIncrement(bytesToHex(bytesRead)), rxBleConnection))
-                .flatMap(bytesWritten -> patientRepository.setHasToUpdateDataInScale(false, patientRepository.getLoggedPatiendId())
+                .flatMap(bytesWritten -> patientRepository.setHasToUpdateDataInScale(false, patientRepository.getLoggedPatientId())
                         .map(response -> bytesWritten))
                 .observeOn(Schedulers.io())
                 .doOnError(this::throwException);
@@ -413,7 +413,7 @@ public class BF600BleService extends BaseBleService {
                     .flatMap(this::saveMeasurementToDb)
                     .flatMapCompletable(id -> {
                         mIsMeasurementTriggered.postValue(false);
-                        return patientRepository.getUpdatedForecastFromApi(patientRepository.getLoggedPatiendId());
+                        return patientRepository.getUpdatedForecastFromApi(patientRepository.getLoggedPatientId());
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
@@ -456,7 +456,7 @@ public class BF600BleService extends BaseBleService {
 
     private Single<Long> saveMeasurementToDb(BodyMeasurement bodyMeasurement) {
         mIsMeasurementTriggered.postValue(false);
-        bodyMeasurement.setUserId(patientRepository.getLoggedPatiendId());
+        bodyMeasurement.setUserId(patientRepository.getLoggedPatientId());
         bodyMeasurement.setManual(false);
         return bodyMeasurementRepository.addMeasurement(bodyMeasurement);
     }

@@ -8,17 +8,16 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.db.entity.PatientInfo;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.LogoutDialog;
+import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.web.services.FirebaseTokenSenderService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -26,6 +25,9 @@ import javax.inject.Inject;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +49,12 @@ public class DoctorMainActivity extends BaseActivity implements LogoutDialog.Log
     FloatingActionButton mAddPatientButton;
 
     @Inject
+    PatientsListAdapter mPatientsInfoAdapter;
+    @Inject
+    DefaultItemAnimator mDefaultItemAnimator;
+    @Inject
+    DividerItemDecoration mDividerItemDecoration;
+    @Inject
     NotificationManager mNotificationManager;
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -67,8 +75,33 @@ public class DoctorMainActivity extends BaseActivity implements LogoutDialog.Log
 
         mViewModel.getLogoutEvent().observe(this, this::onLogoutEvent);
         mViewModel.getFirebaseToken().observe(this, this::onFirebaseTokenUpdate);
-        mViewModel.getAllPatientInfoForLoggedDoctor().observe(this, this::onListOfPatientInfoReceivedUpdate);
         mViewModel.getLoadingStatus().observe(this, this::onLoadingStatusUpdate);
+
+        setupRecyclerList();
+    }
+
+    private void setupRecyclerList() {
+        mPatientsRecyclerList.setHasFixedSize(true);
+        mPatientsRecyclerList.setLayoutManager(new LinearLayoutManager(this));
+        mPatientsRecyclerList.setItemAnimator(mDefaultItemAnimator);
+        mPatientsRecyclerList.addItemDecoration(mDividerItemDecoration);
+        mPatientsInfoAdapter.setPatientClickListener(patientInfo -> {
+            mViewModel.setPatientId(patientInfo.getPatientId());
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(Constants.IS_DOCTOR_VIEW_INTENT_EXTRA, true);
+            startActivityForResult(intent, Constants.MAIN_ACTIVITY_STARTED_BY_DOCTOR_CODE);
+        });
+        mPatientsRecyclerList.setAdapter(mPatientsInfoAdapter);
+        mViewModel.getAllPatientInfoForLoggedDoctor().observe(this, patientInfos -> {
+            if (patientInfos != null && !patientInfos.isEmpty()) {
+                mNoPatientsLayout.setVisibility(View.GONE);
+                mPatientsRecyclerList.setVisibility(View.VISIBLE);
+                mPatientsInfoAdapter.setItems(patientInfos);
+            } else {
+                mPatientsRecyclerList.setVisibility(View.GONE);
+                mNoPatientsLayout.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private void onLoadingStatusUpdate(Boolean isLoading) {
@@ -78,17 +111,6 @@ public class DoctorMainActivity extends BaseActivity implements LogoutDialog.Log
         } else {
             mDoctorMainProgressBar.setVisibility(View.VISIBLE);
             mAddPatientButton.setVisibility(View.GONE);
-        }
-    }
-
-    private void onListOfPatientInfoReceivedUpdate(List<PatientInfo> patientInfos) {
-        if (patientInfos != null && !patientInfos.isEmpty()) {
-            mNoPatientsLayout.setVisibility(View.GONE);
-            mPatientsRecyclerList.setVisibility(View.VISIBLE);
-            // TODO: add to adapter
-        } else {
-            mPatientsRecyclerList.setVisibility(View.GONE);
-            mNoPatientsLayout.setVisibility(View.VISIBLE);
         }
     }
 

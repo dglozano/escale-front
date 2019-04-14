@@ -12,7 +12,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import androidx.lifecycle.LiveData;
@@ -74,7 +73,7 @@ public class PatientProfileActivityViewModel extends ViewModel {
 
     public void hitUpdateUserHeightAndActivity(int newHeight, int newActivity) {
         disposables.add(mPatientRepository
-                .updateLoggedPatientHeightAndActivity(newHeight, newActivity, mPatientRepository.getLoggedPatiendId())
+                .updateLoggedPatientHeightAndActivity(newHeight, newActivity, mPatientRepository.getLoggedPatientId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe((d) -> mLoading.postValue(true))

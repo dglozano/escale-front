@@ -59,13 +59,13 @@ public class StatsChartViewModel extends ViewModel {
         mSelectedStat.postValue(WEIGHT);
 
         mBodyMeasurementList = Transformations.switchMap(
-                mMeasurementsRepository.getLastBodyMeasurementOfUserWithId(mPatientRepository.getLoggedPatiendId()),
+                mMeasurementsRepository.getLastBodyMeasurementOfUserWithId(mPatientRepository.getLoggedPatientId()),
                 lastBodyMeasurement -> {
                     Calendar cal = Calendar.getInstance();
                     lastBodyMeasurement.ifPresent(bodyMeasurement -> cal.setTime(bodyMeasurement.getDate()));
                     cal.add(Calendar.DATE, -10);
                     return mMeasurementsRepository.getBodyMeasurementsOfUserWithIdSince(
-                            patientRepository.getLoggedPatiendId(), cal.getTime());
+                            patientRepository.getLoggedPatientId(), cal.getTime());
                 });
 
         mGoalEntry = Transformations.map(mPatientRepository.getLoggedPatient(), patient -> {

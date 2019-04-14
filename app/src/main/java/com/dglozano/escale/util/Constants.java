@@ -52,7 +52,6 @@ public class Constants {
     public static final String IS_FIREBASE_TOKEN_SENT_SHARED_PREF = "isFirebaseTokenSent";
     public static final String TOKEN_SHARED_PREF = "token";
     public static final String REFRESH_TOKEN_SHARED_PREF = "refreshToken";
-    public static final String UNREAD_MESSAGES_SHARED_PREF = "unreadMessages";
     public static final String HAS_NEW_UNREAD_DIET_SHARED_PREF = "unseenDiets";
     public static final String SCALE_USER_INDEX_SHARED_PREF = "scaleUserIndex";
     public static final String SCALE_USER_PIN_SHARED_PREF = "scaleUserPin";
@@ -209,4 +208,7 @@ public class Constants {
             UUID.fromString("00002901-0000-1000-8000-00805F9B34FB");
 
     public static final String ASK_NEW_FIREBASE_TOKEN = "ask_new_firebase_token";
+    public static final String IS_DOCTOR_VIEW_INTENT_EXTRA = "isDoctorMainView";
+    public static final int MAIN_ACTIVITY_STARTED_BY_DOCTOR_CODE = 3200;
+    public static final int SELECT_DIET_FILE_TO_ADD = 9375;
 }

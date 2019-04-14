@@ -1,8 +1,8 @@
 package com.dglozano.escale.ui.main.diet.show;
 
-import androidx.lifecycle.ViewModel;
-
 import javax.inject.Inject;
+
+import androidx.lifecycle.ViewModel;
 
 public class ShowDietPdfActivityViewModel extends ViewModel {
 

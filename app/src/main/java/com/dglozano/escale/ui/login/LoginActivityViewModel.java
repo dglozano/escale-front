@@ -118,4 +118,8 @@ public class LoginActivityViewModel extends ViewModel {
     public LiveData<Event<Long>> getDoctorIdChangedEvent() {
         return mDoctorIdChanged;
     }
+
+    public long getLoggedDoctorId() {
+        return mDoctorRepository.getLoggedDoctorId();
+    }
 }

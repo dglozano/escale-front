@@ -1,11 +1,10 @@
 package com.dglozano.escale.ui.main.stats.list;
 
+import com.dglozano.escale.ui.main.MainActivity;
+
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
-import com.dglozano.escale.ui.main.MainActivity;
-
 import dagger.Module;
 import dagger.Provides;
 

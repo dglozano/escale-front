@@ -27,7 +27,7 @@ public class HomeViewModel extends ViewModel {
                          BodyMeasurementRepository bodyMeasurementRepository) {
         mPatientRepository = patientRepository;
         mBodyMeasurementRepository = bodyMeasurementRepository;
-        lastMeasurementOfLoggedUser = mBodyMeasurementRepository.getLastBodyMeasurementOfUserWithId(mPatientRepository.getLoggedPatiendId());
+        lastMeasurementOfLoggedUser = mBodyMeasurementRepository.getLastBodyMeasurementOfUserWithId(mPatientRepository.getLoggedPatientId());
     }
 
     public LiveData<Optional<BodyMeasurement>> getLastBodyMeasurement() {
@@ -55,7 +55,7 @@ public class HomeViewModel extends ViewModel {
     }
 
     public Optional<Float> getGoalOfLoggedPatient() {
-        return mPatientRepository.getGoalOfPatientWithId(mPatientRepository.getLoggedPatiendId());
+        return mPatientRepository.getGoalOfPatientWithId(mPatientRepository.getLoggedPatientId());
     }
 
     public Optional<BodyMeasurement> getLastBodyMeasurementBeforeGoalStarted(Date goalStartDate, Long patientId) {
@@ -67,6 +67,6 @@ public class HomeViewModel extends ViewModel {
     }
 
     public Optional<BodyMeasurement> getLastBodyMeasurementBlocking() {
-        return mBodyMeasurementRepository.getLastBodyMeasurementBlockingOfPatient(mPatientRepository.getLoggedPatiendId());
+        return mBodyMeasurementRepository.getLastBodyMeasurementBlockingOfPatient(mPatientRepository.getLoggedPatientId());
     }
 }

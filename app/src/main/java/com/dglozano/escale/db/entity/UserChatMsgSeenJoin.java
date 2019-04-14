@@ -6,27 +6,28 @@ import androidx.room.ForeignKey;
 
 import static androidx.room.ForeignKey.CASCADE;
 
-@Entity(tableName = "user_chat_join",
-        primaryKeys = { "userId", "chatId" },
+@Entity(tableName = "user_chat_msg_seen_join",
+        primaryKeys = {"userId", "chatMessageId"},
         foreignKeys = {
                 @ForeignKey(entity = AppUser.class,
                         parentColumns = "id",
                         childColumns = "userId",
                         onDelete = CASCADE),
-                @ForeignKey(entity = Chat.class,
+                @ForeignKey(entity = ChatMessage.class,
                         parentColumns = "id",
-                        childColumns = "chatId",
+                        childColumns = "chatMessageId",
                         onDelete = CASCADE)
         })
-public class UserChatJoin {
+public class UserChatMsgSeenJoin {
+
     @NonNull
     private final Long userId;
     @NonNull
-    private final Long chatId;
+    private final Long chatMessageId;
 
-    public UserChatJoin(@NonNull final Long userId, @NonNull final Long chatId) {
+    public UserChatMsgSeenJoin(@NonNull final Long userId, @NonNull final Long chatMessageId) {
         this.userId = userId;
-        this.chatId = chatId;
+        this.chatMessageId = chatMessageId;
     }
 
     @NonNull
@@ -35,7 +36,8 @@ public class UserChatJoin {
     }
 
     @NonNull
-    public Long getChatId() {
-        return chatId;
+    public Long getChatMessageId() {
+        return chatMessageId;
     }
+
 }

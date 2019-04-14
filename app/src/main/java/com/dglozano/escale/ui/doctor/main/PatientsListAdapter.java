@@ -11,9 +11,12 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.PatientInfo;
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.net.MalformedURLException;
 import java.text.DecimalFormat;
+import java.text.MessageFormat;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -23,8 +26,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindColor;
 import butterknife.BindDrawable;
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 public class PatientsListAdapter extends RecyclerView.Adapter<PatientsListAdapter.PatientViewHolder> {
 
@@ -40,8 +45,12 @@ public class PatientsListAdapter extends RecyclerView.Adapter<PatientsListAdapte
     Drawable noMessageDrawable;
     @BindColor(R.color.almostWhite)
     int almostWhite;
-    @BindColor(R.color.colorPrimaryVeryLight)
-    int primaryVeryLight;
+    @BindColor(R.color.colorAccentVeryLight)
+    int accentVeryLight;
+    @BindString(R.string.number_of_new_patient_messages)
+    String newMessagesString;
+    @BindString(R.string.number_of_new_patient_alerts)
+    String newAlertsString;
 
     @Inject
     Picasso mPicasso;
@@ -88,25 +97,22 @@ public class PatientsListAdapter extends RecyclerView.Adapter<PatientsListAdapte
             holder.mPatientFullName.setText(patientInfo.getFullName());
             DecimalFormat df = new DecimalFormat("###.#");
             holder.mPatientWeight.setText(patientInfo.getLastWeight() == null ? "-" : df.format(patientInfo.getLastWeight()));
-            holder.itemView.setBackgroundColor(patientInfo.getAlerts() > 0 || patientInfo.getMessages() > 0 ? primaryVeryLight : almostWhite);
+            holder.itemView.setBackgroundColor(patientInfo.getAlerts() > 0 || patientInfo.getMessages() > 0 ? accentVeryLight : almostWhite);
             holder.mAlertIcon.setImageDrawable(patientInfo.getAlerts() > 0 ? alertDrawable : noAlertDrawable);
             holder.mMessagesIcon.setImageDrawable(patientInfo.getMessages() > 0 ? messageDrawable : noMessageDrawable);
 
-            String alertsText = mContext
-                    .getResources()
-                    .getQuantityString(R.plurals.number_of_new_patient_alerts,
-                            patientInfo.getAlerts(),
-                            patientInfo.getAlerts());
-            String messagesText = mContext
-                    .getResources()
-                    .getQuantityString(R.plurals.number_of_new_patient_messages,
-                            patientInfo.getMessages(),
-                            patientInfo.getMessages());
+            holder.mAlertTextView.setText(MessageFormat.format(newAlertsString, patientInfo.getAlerts()));
+            holder.mMessagesTextView.setText(MessageFormat.format(newMessagesString, patientInfo.getMessages()));
 
-            holder.mAlertTextView.setText(alertsText);
-            holder.mMessagesTextView.setText(messagesText);
-
-            //TODO: Profile picture
+            try {
+                mPicasso.load(mDoctorMainActivityViewModel
+                        .getProfileImageUrlPatient(patientInfo.getPatientId()).toString())
+                        .placeholder(R.drawable.ic_user_profile_image_default)
+                        .error(R.drawable.ic_user_profile_image_default)
+                        .into(holder.mProfilePicture);
+            } catch (MalformedURLException e) {
+                Timber.e(e);
+            }
         }
     }
 

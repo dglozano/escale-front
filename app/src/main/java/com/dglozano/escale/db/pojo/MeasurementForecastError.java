@@ -1,6 +1,7 @@
 package com.dglozano.escale.db.pojo;
 
 import androidx.room.Embedded;
+import androidx.room.Ignore;
 
 public class MeasurementForecastError {
 
@@ -18,6 +19,7 @@ public class MeasurementForecastError {
     public MeasurementForecastError() {
     }
 
+    @Ignore
     public MeasurementForecastError(AttributeForecastError weightError,
                                     AttributeForecastError fatError,
                                     AttributeForecastError muscleError,

@@ -1,12 +1,11 @@
 package com.dglozano.escale.db.dao;
 
-import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.Query;
-
 import com.dglozano.escale.db.entity.Chat;
 
 import java.util.Optional;
+
+import androidx.room.Dao;
+import androidx.room.Query;
 
 @Dao
 public abstract class ChatDao extends BaseDao<Chat> {

@@ -3,7 +3,6 @@ package com.dglozano.escale.util.ui;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import androidx.core.content.ContextCompat;
 import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
@@ -12,6 +11,7 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.scroll.ScrollHandle;
 import com.github.barteksc.pdfviewer.util.Util;
 
+import androidx.core.content.ContextCompat;
 import timber.log.Timber;
 
 public class CustomPdfScrollHandle extends RelativeLayout implements ScrollHandle {

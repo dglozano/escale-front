@@ -1,12 +1,7 @@
 package com.dglozano.escale.ui.main.messages;
 
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +22,11 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -115,21 +115,33 @@ public class MessagesFragment extends Fragment {
                         createdAt, message.getUser().getName(), message.getText());
             }, false);
             Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
+        } else if (id == android.R.id.home) {
+            Timber.d("back pressed");
+            getActivity().onBackPressed();
         }
-
         return true;
     }
 
     private void setupSendListener() {
         mMessageInput.setInputListener(input -> {
             //validate and send message
-            mMessagesViewModel.sendMessage(input.toString());
+            if (!mMainActivityViewModel.isDoctorView()) {
+                mMessagesViewModel.sendMessageAsPatient(input.toString());
+            } else {
+                mMessagesViewModel.sendMessageAsDoctor(input.toString());
+            }
             return true;
         });
     }
 
     private void setupMessagesList() {
-        String senderId = mMainActivityViewModel.getLoggedPatientId().toString();
+        String senderId;
+
+        if (!mMainActivityViewModel.isDoctorView()) {
+            senderId = mMainActivityViewModel.getLoggedPatientId().toString();
+        } else {
+            senderId = mMainActivityViewModel.getLoggedDoctorId().toString();
+        }
         mMessagesListAdapter = new MessagesListAdapter<>(senderId, null);
         mMessagesListAdapter.enableSelectionMode(count -> {
             mMessagesViewModel.setCopyMenuVisible(count > 0);

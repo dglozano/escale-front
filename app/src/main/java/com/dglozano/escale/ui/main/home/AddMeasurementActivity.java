@@ -1,11 +1,7 @@
 package com.dglozano.escale.ui.main.home;
 
 import android.app.Activity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import com.google.android.material.textfield.TextInputLayout;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.View;
@@ -16,11 +12,15 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityAddManualMeasurementBinding;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.util.ui.Event;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Objects;
 
 import javax.inject.Inject;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;

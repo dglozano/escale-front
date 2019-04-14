@@ -2,15 +2,15 @@ package com.dglozano.escale.ui.common;
 
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.util.NetworkUtil;
+import com.google.android.material.snackbar.Snackbar;
 
+import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;

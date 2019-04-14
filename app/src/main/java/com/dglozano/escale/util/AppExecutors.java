@@ -2,7 +2,6 @@ package com.dglozano.escale.util;
 
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
 
 import com.dglozano.escale.di.annotation.ApplicationScope;
 
@@ -10,6 +9,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
 
 @ApplicationScope
 public class AppExecutors {

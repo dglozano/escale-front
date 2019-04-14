@@ -65,7 +65,7 @@ public class BodyMeasurementRepository {
 
     public Single<Long> addMeasurement(float weight, float water, float fat, float bmi, float bones,
                                        float muscle, boolean isManual) {
-        Long patientId = mPatientRepository.getLoggedPatiendId();
+        Long patientId = mPatientRepository.getLoggedPatientId();
         AddBodyMeasurementDTO addDto = new AddBodyMeasurementDTO(patientId, weight, water,
                 fat, bmi, bones, muscle, Calendar.getInstance().getTime(), isManual);
         return mEscaleRestApi.postNewMeasurement(addDto, patientId)

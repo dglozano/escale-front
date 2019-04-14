@@ -7,8 +7,10 @@ import com.dglozano.escale.exception.AccountDisabledException;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
+import com.dglozano.escale.repository.DoctorRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.repository.UserRepository;
+import com.dglozano.escale.util.AbsentLiveData;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.Event;
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
@@ -34,11 +36,11 @@ public class MainActivityViewModel extends ViewModel {
 
     private PatientRepository mPatientRepository;
     private ChatRepository mChatRepository;
+    private DoctorRepository mDoctorRepository;
     private DietRepository mDietRepository;
     private UserRepository mUserRepository;
     private BodyMeasurementRepository mMeasurementRepository;
     private LiveData<Event<Boolean>> mMustChangePassword;
-    private LiveData<Integer> mNumberOfUnreadMessages;
     private final LiveData<Patient> mLoggedPatient;
     private final MutableLiveData<Integer> positionOfCurrentFragment;
     private final SharedPreferences mSharedPreferences;
@@ -48,14 +50,18 @@ public class MainActivityViewModel extends ViewModel {
     private MediatorLiveData<Boolean> mShowAppBarShadow;
     private LiveData<Boolean> mAreDietsEmpty;
     private LiveData<Boolean> mAreMeasurementsEmpty;
+    private LiveData<Integer> mUnreadMessagesByPatient;
+    private LiveData<Integer> mUnreadMessagesByDoctor;
     private MediatorLiveData<Boolean> mIsRefreshing;
     private MutableLiveData<Boolean> mIsRefreshingDiets;
     private MutableLiveData<Boolean> mIsRefreshingMessages;
     private MutableLiveData<Boolean> mIsRefreshingPatient;
     private MutableLiveData<Boolean> mIsRefreshingMeasurements;
+    private boolean isDoctorView;
 
     @Inject
     public MainActivityViewModel(PatientRepository patientRepository,
+                                 DoctorRepository doctorRepository,
                                  UserRepository userRepository,
                                  BodyMeasurementRepository bodyMeasurementRepository,
                                  SharedPreferences sharedPreferences,
@@ -63,6 +69,7 @@ public class MainActivityViewModel extends ViewModel {
         disposables = new CompositeDisposable();
         mUserRepository = userRepository;
         mDietRepository = dietRepository;
+        mDoctorRepository = doctorRepository;
         mPatientRepository = patientRepository;
         mChatRepository = chatRepository;
         mMeasurementRepository = bodyMeasurementRepository;
@@ -72,20 +79,51 @@ public class MainActivityViewModel extends ViewModel {
         positionOfCurrentFragment = new MutableLiveData<>();
         positionOfCurrentFragment.postValue(0);
         mLoggedPatient = mPatientRepository.getLoggedPatient();
+
+        mUnreadMessagesByPatient = Transformations.switchMap(
+                mChatRepository.getAllChatsOfUser(mPatientRepository.getLoggedPatientId()),
+                chats -> chats.isEmpty() ?
+                        AbsentLiveData.create() :
+                        mChatRepository.getUnreadMessagesOfUserInChatAsLiveData(mPatientRepository.getLoggedPatientId(),
+                                chats.get(0).getId()));
+
+        mUnreadMessagesByDoctor = Transformations.switchMap(
+                mChatRepository.getAllChatsOfUser(mPatientRepository.getLoggedPatientId()),
+                chats -> {
+                    Timber.d("Chatis is empty %s", chats.isEmpty());
+                    return chats.isEmpty() ?
+                            AbsentLiveData.create() :
+                            mChatRepository.getUnreadMessagesOfUserInChatAsLiveData(mDoctorRepository.getLoggedDoctorId(),
+                                    chats.get(0).getId());
+                });
+
         setupRefreshingObservable();
         setupMustChangePasswordObservable();
-        setupUnreadMessagesObservable();
         setupAppBarShadowStatus();
+        isDoctorView = false;
+    }
+
+
+    public LiveData<Integer> getNumberOfUnreadMessagesByDoctor() {
+        return mUnreadMessagesByDoctor;
+    }
+
+    public boolean isDoctorView() {
+        return isDoctorView;
+    }
+
+    public void setDoctorView(boolean doctorView) {
+        isDoctorView = doctorView;
     }
 
     private void setupAppBarShadowStatus() {
         mShowAppBarShadow = new MediatorLiveData<>();
         mAreDietsEmpty = Transformations.map(mDietRepository.getCurrentDiet(
-                mPatientRepository.getLoggedPatiendId()),
+                mPatientRepository.getLoggedPatientId()),
                 Objects::isNull);
         mAreMeasurementsEmpty = Transformations.map(
                 mMeasurementRepository.getLastBodyMeasurementOfUserWithId(
-                        mPatientRepository.getLoggedPatiendId()), measurement -> !measurement.isPresent());
+                        mPatientRepository.getLoggedPatientId()), measurement -> !measurement.isPresent());
         mShowAppBarShadow.addSource(mAreDietsEmpty, dietsEmpty -> {
             checkEmptyStateAndFragmentPosition();
         });
@@ -115,7 +153,7 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     public void refreshData() {
-        disposables.add(mPatientRepository.refreshPatient(mPatientRepository.getLoggedPatiendId())
+        disposables.add(mPatientRepository.refreshPatient(mPatientRepository.getLoggedPatientId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(d -> mIsRefreshingPatient.postValue(true))
@@ -128,7 +166,7 @@ public class MainActivityViewModel extends ViewModel {
                                 logout();
                             } else if (error instanceof NoSuchElementException) {
                                 // Means that the user was fresh enough, so didn't have to call api
-                                refreshEverythingElse(mPatientRepository.getLoggedPatiendId());
+                                refreshEverythingElse(mPatientRepository.getLoggedPatientId());
                             } else {
                                 mIsRefreshingPatient.postValue(false);
                                 Timber.e(error);
@@ -143,22 +181,21 @@ public class MainActivityViewModel extends ViewModel {
         mIsRefreshingMessages.postValue(true);
         mIsRefreshingMeasurements.postValue(true);
         mIsRefreshingPatient.postValue(false);
-        refreshMessagesAndCount(loggedPatientId);
+        refreshMessages(loggedPatientId);
         refreshDiets(loggedPatientId);
         refreshMeasurements(loggedPatientId);
     }
 
-    private void refreshMessagesAndCount(Long patientId) {
-        disposables.add(mChatRepository.refreshMessagesAndCountOfPatientWithId(patientId)
+    private void refreshMessages(Long patientId) {
+        disposables.add(mChatRepository.refreshMessagesOfPatientWithId(patientId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(newUnread -> {
+                .subscribe(() -> {
                     mIsRefreshingMessages.postValue(false);
-                    addUnreadMessages(newUnread);
                     Timber.d("Finished refreshing messages");
                 }, error -> {
                     if (error instanceof NoSuchElementException) {
-                        markMessagesAsRead();
+                        markMessagesAsReadForPatient();
                     } else {
                         Timber.e(error);
                     }
@@ -250,18 +287,6 @@ public class MainActivityViewModel extends ViewModel {
         );
     }
 
-    private void setupUnreadMessagesObservable() {
-        mNumberOfUnreadMessages = Transformations.map(mChatRepository.getNumberOfUnreadMessages(), unreadMsg -> {
-            if (positionOfCurrentFragment.getValue() != null
-                    && positionOfCurrentFragment.getValue() == 3
-                    && unreadMsg > 0) {
-                markMessagesAsRead();
-                return 0;
-            }
-            return unreadMsg;
-        });
-    }
-
     public LiveData<Integer> getPositionOfCurrentFragment() {
         return positionOfCurrentFragment;
     }
@@ -294,10 +319,9 @@ public class MainActivityViewModel extends ViewModel {
         return mLogoutEvent;
     }
 
-    public LiveData<Integer> getNumberOfUnreadMessages() {
-        return mNumberOfUnreadMessages;
+    public LiveData<Integer> getNumberOfUnreadMessagesByPatient() {
+        return mUnreadMessagesByPatient;
     }
-
 
     public LiveData<String> getFirebaseToken() {
         return mUserRepository.getFirebaseDeviceToken();
@@ -308,16 +332,31 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     public Long getLoggedPatientId() {
-        return mPatientRepository.getLoggedPatiendId();
+        return mPatientRepository.getLoggedPatientId();
     }
 
-    public void markMessagesAsRead() {
-        mSharedPreferences.edit().putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0).apply();
+    public void markMessagesAsReadForPatient() {
+        disposables.add(mChatRepository.markMessagesAsReadForPatient()
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> Timber.d("mark as seen success"), e -> {
+                    if (e instanceof NoSuchElementException) {
+                        Timber.d("No chat for user, so didn't mark messages as read");
+                    } else {
+                        Timber.e(e);
+                    }
+                }));
     }
 
-    public void addUnreadMessages(int newUnread) {
-        int currentUnread = mSharedPreferences.getInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0);
-        mSharedPreferences.edit().putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, currentUnread + newUnread).apply();
+    public void markMessagesAsReadForDoctor() {
+        disposables.add(mChatRepository.markMessagesAsReadForDoctor()
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> Timber.d("mark as seen success"), e -> {
+                    if (e instanceof NoSuchElementException) {
+                        Timber.d("No chat for user, so didn't mark messages as read");
+                    } else {
+                        Timber.e(e);
+                    }
+                }));
     }
 
     public void markNewDietAsSeen(Boolean hasBeenSeen) {
@@ -334,6 +373,10 @@ public class MainActivityViewModel extends ViewModel {
 
     public URL getProfileImageUrlOfLoggedPatient() throws MalformedURLException {
         return mPatientRepository.getProfileImageUrlOfLoggedPatient();
+    }
+
+    public Long getLoggedDoctorId() {
+        return mDoctorRepository.getLoggedDoctorId();
     }
 }
 

@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.webkit.MimeTypeMap;
 
 import com.google.gson.annotations.SerializedName;
@@ -42,6 +43,28 @@ public class FileUtils {
     public static final String MIME_TYPE_APP = "application/*";
 
     public static final String HIDDEN_PREFIX = ".";
+
+    public static String getFileName(Uri uri, ContentResolver contentResolver) {
+        String result = null;
+        if (uri.getScheme() != null && uri.getScheme().equals("content")) {
+            Cursor cursor = contentResolver.query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                if (cursor != null) cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
+    }
 
     public static boolean writeResponseBodyToDisk(ResponseBody body, File directory, String dietFileName) {
         try {

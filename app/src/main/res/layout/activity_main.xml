@@ -5,6 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
@@ -33,7 +34,6 @@
                 app:menu="@menu/activity_main_foot_nav" />
 
         </net.cachapa.expandablelayout.ExpandableLayout>
-
 
         <com.dglozano.escale.util.ui.NoSwipePager
             android:id="@+id/fragment_viewpager"

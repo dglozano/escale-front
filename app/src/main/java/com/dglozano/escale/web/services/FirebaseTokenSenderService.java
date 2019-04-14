@@ -3,7 +3,6 @@ package com.dglozano.escale.web.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import androidx.annotation.Nullable;
 
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.web.EscaleRestApi;
@@ -11,6 +10,7 @@ import com.dglozano.escale.web.dto.FirebaseTokenUpdateDTO;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
 import dagger.android.AndroidInjection;
 import retrofit2.Call;
 import retrofit2.Response;

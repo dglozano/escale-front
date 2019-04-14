@@ -2,6 +2,7 @@ package com.dglozano.escale.db.entity;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import lombok.NonNull;
 
@@ -27,6 +28,7 @@ public class MeasurementPrediction {
     public MeasurementPrediction() {
     }
 
+    @Ignore
     public MeasurementPrediction(@NonNull Long id,
                                  Long forecastId,
                                  int daysOffset,

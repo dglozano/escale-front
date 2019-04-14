@@ -14,7 +14,7 @@ import static androidx.room.ForeignKey.CASCADE;
 public class PatientInfo {
 
     @PrimaryKey
-    private Long id;
+    private Long patientId;
     private String fullName;
     private int alerts;
     private int messages;
@@ -25,13 +25,13 @@ public class PatientInfo {
     }
 
     @Ignore
-    public PatientInfo(Long id,
+    public PatientInfo(Long patientId,
                        String fullName,
                        int alerts,
                        int messages,
                        float lastWeight,
                        Long doctorId) {
-        this.id = id;
+        this.patientId = patientId;
         this.fullName = fullName;
         this.alerts = alerts;
         this.messages = messages;
@@ -39,12 +39,12 @@ public class PatientInfo {
         this.doctorId = doctorId;
     }
 
-    public Long getId() {
-        return id;
+    public Long getPatientId() {
+        return patientId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPatientId(Long patientId) {
+        this.patientId = patientId;
     }
 
     public String getFullName() {

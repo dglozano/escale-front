@@ -1,12 +1,8 @@
 package com.dglozano.escale.ui.common.pw_change;
 
 import android.app.Activity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -20,6 +16,10 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;

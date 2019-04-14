@@ -1,10 +1,11 @@
 package com.dglozano.escale.util;
 
 
-import androidx.lifecycle.LiveData;
 import android.content.SharedPreferences;
 
 import java.util.Set;
+
+import androidx.lifecycle.LiveData;
 
 public abstract class SharedPreferencesLiveData<T> extends LiveData<T> {
 

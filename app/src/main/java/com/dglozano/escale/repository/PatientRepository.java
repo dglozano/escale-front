@@ -97,16 +97,16 @@ public class PatientRepository {
         return mPatientDao.getPatientById(userId);
     }
 
-    public Long getLoggedPatiendId() {
+    public Long getLoggedPatientId() {
         return mSharedPreferences.getLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
     }
 
     public LiveData<Patient> getLoggedPatient() {
-        return mPatientDao.getPatientById(getLoggedPatiendId());
+        return mPatientDao.getPatientById(getLoggedPatientId());
     }
 
     public Single<Patient> getLoggedPatientSingle() {
-        return mPatientDao.getPatientSingleById(getLoggedPatiendId());
+        return mPatientDao.getPatientSingleById(getLoggedPatientId());
     }
 
     public LiveData<Long> getLoggedPatientIdAsLiveData() {
@@ -200,20 +200,23 @@ public class PatientRepository {
                 MultipartBody.Part.createFormData("file", picture.getName(), requestFile);
 
         // finally, execute the request
-        return mEscaleRestApi.uploadProfilePicture(body, getLoggedPatiendId())
+        return mEscaleRestApi.uploadProfilePicture(body, getLoggedPatientId())
                 .doOnComplete(() -> {
                     Timber.d("Was temp picture deleted? %s", picture.delete());
                 });
     }
 
     public URL getProfileImageUrlOfLoggedPatient() throws MalformedURLException {
-        return new URL(String.format("%s/api/patients/%s/profile_image", baseUrl, getLoggedPatiendId()));
+        return getProfileImageUrlOfPatient(getLoggedPatientId());
+    }
 
+    public URL getProfileImageUrlOfPatient(Long id) throws MalformedURLException {
+        return new URL(String.format("%s/api/patients/%s/profile_image", baseUrl, id));
     }
 
     public Completable updateLoggedPatientHeightAndActivity(int newHeight, int newActivity, Long loggedPatient) {
         UpdatePatientDTO updatePatientDTO = new UpdatePatientDTO(newHeight, newActivity);
-        return mEscaleRestApi.updatePatientWithId(updatePatientDTO, getLoggedPatiendId())
+        return mEscaleRestApi.updatePatientWithId(updatePatientDTO, getLoggedPatientId())
                 .andThen(mPatientDao.getPatientSingleById(loggedPatient))
                 .flatMapCompletable(patient -> {
                     patient.setHeightInCm(newHeight);
@@ -263,5 +266,11 @@ public class PatientRepository {
 
     public MediatorLiveData<Optional<MeasurementForecast>> getMeasurementForecastOfLoggedPatient() {
         return mLastForecastWithPredictions;
+    }
+
+    public void setLoggedPatientId(Long patientId) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, patientId);
+        editor.apply();
     }
 }

@@ -1,5 +1,7 @@
 package com.dglozano.escale.db.pojo;
 
+import androidx.room.Ignore;
+
 public class AttributeForecastError {
     private double mad;
     private double mapd;
@@ -7,6 +9,7 @@ public class AttributeForecastError {
     public AttributeForecastError() {
     }
 
+    @Ignore
     public AttributeForecastError(double mad, double mapd) {
         this.mad = mad;
         this.mapd = mapd;

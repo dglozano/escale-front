@@ -90,7 +90,8 @@
         <activity
             android:name=".ui.drawer.profile.PatientProfileActivity"
             android:label="@string/profile_title" />
-        <activity android:name=".ui.doctor.main.DoctorMainActivity" />
+        <activity android:name=".ui.doctor.main.DoctorMainActivity"
+            android:label="@string/patients"/>
         <activity
             android:name=".ui.doctor.main.AddPatientActivity"
             android:label="@string/add_patient_label"

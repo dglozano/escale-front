@@ -19,6 +19,7 @@ import com.dglozano.escale.web.dto.CreatePatientDTO;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -59,7 +60,7 @@ public class DoctorRepository {
 
     }
 
-    public Single<Long> refreshDoctor(final Long doctorId) {
+    public Completable refreshDoctor(final Long doctorId) {
         return mEscaleRestApi.getDoctorById(doctorId)
                 .map(doctorDto -> {
                     Timber.d("Retrieved doctor with id %s from Api.", doctorId);
@@ -70,6 +71,7 @@ public class DoctorRepository {
                     Timber.d("Saving doctor with id %s ", doctor.getId());
                     return doctor.getId();
                 })
+                .flatMapCompletable(this::refreshPatientInfoForDoctor)
                 .subscribeOn(Schedulers.io());
     }
 
@@ -114,5 +116,51 @@ public class DoctorRepository {
                     return Completable.complete();
                 })
                 .subscribeOn(Schedulers.io());
+    }
+
+    public Completable refreshPatientInfoForDoctor(Long doctorId) {
+        return mEscaleRestApi.getAllPatientsInfoOfDoctor(doctorId)
+                .flatMapCompletable(patientInfos -> {
+                    patientInfos.forEach(patientInfo -> {
+                        mPatientInfoDao.upsert(patientInfo);
+                        mPatientDao.getUserByIdOptional(patientInfo.getPatientId()).ifPresent(patient -> Timber.d("patient %s", patient.getId()));
+                        Patient patientWithNoDataYet = new Patient(patientInfo.getPatientId(), patientInfo.getDoctorId(), Calendar.getInstance().getTime());
+                        mUserDao.upsert(new AppUser(patientWithNoDataYet.getId(), patientWithNoDataYet.getLastUpdate()));
+                        mPatientDao.upsert(patientWithNoDataYet);
+                    });
+                    return Completable.complete();
+                });
+    }
+
+    public Completable addAlertToPatientInfo(Long patient_id, Long doctor_id) {
+        if (getLoggedDoctorId() != -1) {
+            return mPatientInfoDao.getPatientInfoByPatientIdOfDoctor(doctor_id, patient_id)
+                    .flatMapCompletable(patientInfoOptional -> {
+                        patientInfoOptional.ifPresent(patientInfo -> {
+                            patientInfo.setAlerts(patientInfo.getAlerts() + 1);
+                            mPatientInfoDao.upsert(patientInfo);
+                        });
+                        return Completable.complete();
+                    });
+        }
+        return Completable.complete();
+    }
+
+    public Completable addMessageToPatientInfo(Long sender_id) {
+        if (getLoggedDoctorId() != -1 && getLoggedDoctorId() != sender_id.longValue()) {
+            return mPatientInfoDao.getPatientInfoByPatientIdOfDoctor(getLoggedDoctorId(), sender_id)
+                    .flatMapCompletable(patientInfoOptional -> {
+                        patientInfoOptional.ifPresent(patientInfo -> {
+                            patientInfo.setMessages(patientInfo.getMessages() + 1);
+                            mPatientInfoDao.upsert(patientInfo);
+                        });
+                        return Completable.complete();
+                    });
+        }
+        return Completable.complete();
+    }
+
+    public Single<Optional<Doctor>> getLoggedDoctorSingle() {
+        return mDoctorDao.getDoctorByIdSingle(getLoggedDoctorId());
     }
 }

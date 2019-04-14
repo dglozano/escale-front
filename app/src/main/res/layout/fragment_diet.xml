@@ -62,4 +62,19 @@
             android:layout_below="@id/diets_current_or_all_tablayout" />
     </RelativeLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_diet_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_add_24px"
+        android:visibility="gone"
+        app:backgroundTint="@color/colorPrimaryLight" />
+
 </RelativeLayout>

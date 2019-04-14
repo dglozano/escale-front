@@ -1,11 +1,11 @@
 package com.dglozano.escale.db.entity;
 
-import androidx.room.Entity;
-import androidx.room.Ignore;
-
 import com.dglozano.escale.web.dto.DoctorDTO;
 
 import java.util.Date;
+
+import androidx.room.Entity;
+import androidx.room.Ignore;
 
 @Entity
 public class Doctor extends AppUser {

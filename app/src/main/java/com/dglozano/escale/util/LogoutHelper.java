@@ -5,8 +5,10 @@ import android.content.SharedPreferences;
 import com.dglozano.escale.db.EscaleDatabase;
 import com.dglozano.escale.di.annotation.CacheDirectory;
 import com.dglozano.escale.di.annotation.RootFileDirectory;
+import com.dglozano.escale.web.OkHttpClientHolder;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Inject;
 
@@ -18,7 +20,6 @@ import static com.dglozano.escale.util.Constants.REFRESH_TOKEN_SHARED_PREF;
 import static com.dglozano.escale.util.Constants.SCALE_USER_INDEX_SHARED_PREF;
 import static com.dglozano.escale.util.Constants.SCALE_USER_PIN_SHARED_PREF;
 import static com.dglozano.escale.util.Constants.TOKEN_SHARED_PREF;
-import static com.dglozano.escale.util.Constants.UNREAD_MESSAGES_SHARED_PREF;
 
 public class LogoutHelper {
 
@@ -27,14 +28,17 @@ public class LogoutHelper {
     private EscaleDatabase mRoomDatabase;
     private File mRootFileDirectory;
     private File mCacheDirectory;
+    private OkHttpClientHolder okHttpClientHolder;
 
     @Inject
     public LogoutHelper(AppExecutors appExecutors,
                         SharedPreferences sharedPreferences,
                         EscaleDatabase roomDatabase,
+                        OkHttpClientHolder okHttpClientHolder,
                         @RootFileDirectory File rootFileDirectory,
                         @CacheDirectory File cacheDirectory) {
         this.mAppExecutors = appExecutors;
+        this.okHttpClientHolder = okHttpClientHolder;
         this.mSharedPreferences = sharedPreferences;
         this.mRoomDatabase = roomDatabase;
         this.mRootFileDirectory = rootFileDirectory;
@@ -56,8 +60,17 @@ public class LogoutHelper {
             editor.remove(Constants.GAUGE_END);
             editor.putBoolean(IS_FIREBASE_TOKEN_SENT_SHARED_PREF, false);
             editor.putBoolean(HAS_NEW_UNREAD_DIET_SHARED_PREF, false);
-            editor.putInt(UNREAD_MESSAGES_SHARED_PREF, 0);
             editor.apply();
+            if (okHttpClientHolder != null && okHttpClientHolder.getOkHttpClient() != null) {
+                try {
+                    if (okHttpClientHolder.getOkHttpClient().cache() != null) {
+                        Timber.d("Clearing okhttpcache");
+                        okHttpClientHolder.getOkHttpClient().cache().delete();
+                    }
+                } catch (IOException e) {
+                    Timber.e(e);
+                }
+            }
             Timber.d("Clearing db");
             mRoomDatabase.clearAllTables();
             Timber.d("Clearing internal storage");

@@ -1,8 +1,5 @@
 package com.dglozano.escale.ui.main.stats.list;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModel;
-
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.PatientRepository;
@@ -11,6 +8,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class StatsListViewModel extends ViewModel {
@@ -28,7 +27,7 @@ public class StatsListViewModel extends ViewModel {
         mMeasurementsRepository = bodyMeasurementRepository;
         disposables = new CompositeDisposable();
         mBodyMeasurementList = mMeasurementsRepository.getLastBodyMeasurementsOfUserWithId(
-                mPatientRepository.getLoggedPatiendId());
+                mPatientRepository.getLoggedPatientId());
     }
 
     @Override

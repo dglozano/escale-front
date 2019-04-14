@@ -24,17 +24,17 @@ public abstract class UserChatJoinDao extends BaseDao<UserChatJoin> {
             "ON chat.id=user_chat_join.chatId " +
             "WHERE user_chat_join.userId=:patientId " +
             "LIMIT 1")
-    public abstract LiveData<Long> getChatOfLoggedPatientAsLiveData(final Long patientId);
+    public abstract LiveData<Long> getChatOfPatientAsLiveData(final Long patientId);
 
     @Query("SELECT id FROM chat INNER JOIN user_chat_join " +
             "ON chat.id=user_chat_join.chatId " +
             "WHERE user_chat_join.userId=:patientId " +
             "LIMIT 1")
-    public abstract Single<Optional<Long>> getChatOfLoggedPatientAsOptional(final Long patientId);
+    public abstract Single<Optional<Long>> getChatOfPatientAsOptional(final Long patientId);
 
     @Query("SELECT id FROM chat INNER JOIN user_chat_join " +
             "ON chat.id=user_chat_join.chatId " +
             "WHERE user_chat_join.userId=:patientId " +
             "LIMIT 1")
-    public abstract Maybe<Long> getChatOfLoggedPatientAsMaybe(final Long patientId);
+    public abstract Maybe<Long> getChatOfPatientAsMaybe(final Long patientId);
 }

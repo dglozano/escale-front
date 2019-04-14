@@ -8,6 +8,8 @@ import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.repository.UserRepository;
 import com.dglozano.escale.util.ui.Event;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -60,11 +62,11 @@ public class DoctorMainActivityViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(d -> mLoadingStatus.postValue(true))
                 .doFinally(() -> mLoadingStatus.postValue(false))
-                .subscribe(doctorId -> {
+                .subscribe(() -> {
                     Timber.d("Doctor refreshed successfully");
                     //TODO do something else?
                 }, error -> {
-                    Timber.e("Error while refreshing doctor");
+                    Timber.e(error, "Error while refreshing doctor");
                 })
         );
     }
@@ -100,6 +102,14 @@ public class DoctorMainActivityViewModel extends ViewModel {
 
     public MediatorLiveData<Boolean> getLoadingStatus() {
         return mLoadingStatus;
+    }
+
+    public URL getProfileImageUrlPatient(Long patientId) throws MalformedURLException {
+        return mPatientRepository.getProfileImageUrlOfPatient(patientId);
+    }
+
+    public void setPatientId(Long patientId) {
+        mPatientRepository.setLoggedPatientId(patientId);
     }
 }
 

@@ -1,11 +1,8 @@
 package com.dglozano.escale.ui.main.diet.show;
 
 import android.app.Activity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.util.ui.CustomPdfScrollHandle;
@@ -17,6 +14,9 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dagger.android.AndroidInjection;

@@ -1,9 +1,10 @@
 package com.dglozano.escale.util.ui;
 
 import android.content.Context;
-import androidx.viewpager.widget.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+
+import androidx.viewpager.widget.ViewPager;
 
 public class NoSwipePager extends ViewPager {
     private boolean enabled;

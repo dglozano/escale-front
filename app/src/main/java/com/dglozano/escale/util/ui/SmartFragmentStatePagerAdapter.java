@@ -1,11 +1,12 @@
 package com.dglozano.escale.util.ui;
 
+import android.util.SparseArray;
+import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import android.util.SparseArray;
-import android.view.ViewGroup;
 
 /*
    Extension of FragmentStatePagerAdapter which intelligently caches
