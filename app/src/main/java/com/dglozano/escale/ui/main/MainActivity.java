@@ -69,7 +69,7 @@ import q.rorbin.badgeview.Badge;
 import q.rorbin.badgeview.QBadgeView;
 import timber.log.Timber;
 
-import static com.dglozano.escale.ui.main.diet.all.AllDietsFragment.SHOW_PDF_CODE;
+import static com.dglozano.escale.util.Constants.SHOW_PDF_CODE;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -538,10 +538,10 @@ public class MainActivity extends BaseActivity
 
     public void setElevationOfAppBar(float elevation) {
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
+        if (actionBar != null && actionBar.getElevation() != elevation) {
             actionBar.setElevation(elevation);
+            ViewCompat.setElevation(mAppBarLayout, elevation);
         }
-        ViewCompat.setElevation(mAppBarLayout, elevation);
     }
 
     private void setActionBarTitleAccordingToFragment(int fragmentPosition) {

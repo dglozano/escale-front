@@ -157,7 +157,7 @@
     <string name="choose_file_btn">Seleccionar archivo</string>
     <string name="add_diet_submit_btn">Subir Dieta</string>
     <string name="diet_name_too_long">El nombre es muy largo</string>
-    <string name="input_validation_diet_name">Ingresa sólo letras, números, guiones o puntos.</string>
+    <string name="input_validation_diet_name">Ingresa sólo letras, números o .,-_()</string>
     <string name="diet_file_chooser_intent_title">Selecciona la dieta</string>
     <string-array name="scale_user_indexes_array">
         <item>P-01</item>

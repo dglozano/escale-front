@@ -2,6 +2,7 @@ package com.dglozano.escale.ui.main.diet.all;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivity;
+import com.dglozano.escale.util.Constants;
 import com.google.android.material.snackbar.Snackbar;
 
 import javax.inject.Inject;
@@ -30,8 +32,6 @@ import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
 public class AllDietsFragment extends Fragment {
-
-    public static final int SHOW_PDF_CODE = 999;
 
     @BindView(R.id.recycler_view_diets)
     RecyclerView mRecyclerViewDiets;
@@ -90,8 +90,8 @@ public class AllDietsFragment extends Fragment {
             Timber.d("Pdf event fired");
             if (pdfEvent != null && !pdfEvent.hasBeenHandled()) {
                 Intent intent = new Intent(getActivity(), ShowDietPdfActivity.class);
-                intent.putExtra("diet_file_path", pdfEvent.handleContent().getAbsolutePath());
-                startActivityForResult(intent, SHOW_PDF_CODE);
+                intent.putExtra(Constants.DIET_FILE_URI, Uri.fromFile(pdfEvent.handleContent()));
+                startActivityForResult(intent, Constants.SHOW_PDF_CODE);
             }
         });
         mAllDietsViewModel.getErrorEvent().observe(this, errorEvent -> {

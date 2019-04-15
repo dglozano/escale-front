@@ -117,8 +117,6 @@ public class DietFragment extends Fragment {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("application/pdf");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-//        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-
 
         try {
             startActivityForResult(

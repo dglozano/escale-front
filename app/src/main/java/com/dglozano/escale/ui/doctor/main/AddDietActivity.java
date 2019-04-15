@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ui.BaseActivity;
+import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivity;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.MyFileUtils;
 import com.dglozano.escale.util.ValidationHelper;
@@ -42,6 +43,7 @@ import butterknife.OnTextChanged;
 import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
+import static com.dglozano.escale.util.Constants.SHOW_PDF_CODE;
 import static com.dglozano.escale.util.MyFileUtils.getMimeType;
 
 public class AddDietActivity extends BaseActivity {
@@ -143,6 +145,53 @@ public class AddDietActivity extends BaseActivity {
                 mViewModel.hitUploadDiet(dietFile, mediaType, filename);
             }
         }
+    }
+
+    @OnClick(R.id.add_diet_change_btn)
+    public void onChangeDietClick(View v) {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("application/pdf");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            startActivityForResult(
+                    Intent.createChooser(intent, getString(R.string.diet_file_chooser_intent_title)),
+                    Constants.SELECT_DIET_FILE_TO_ADD);
+        } catch (android.content.ActivityNotFoundException ex) {
+            // Potentially direct the user to the Market with a Dialog
+            Timber.e("No file chooser available. Download one");
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && requestCode == Constants.SELECT_DIET_FILE_TO_ADD
+                && data != null && data.getData() != null) {
+            Uri fileUri = data.getData();
+
+            String filename = MyFileUtils.getFileName(this, fileUri);
+
+            mDietNameEditText.setText(filename);
+            mViewModel.setDietFileUri(fileUri);
+
+            pdfView.fromUri(fileUri)
+                    .scrollHandle(mScrollHandle)
+                    .pageSnap(true)
+                    .autoSpacing(true)
+                    .pageFling(true)
+                    .pageFitPolicy(FitPolicy.WIDTH)
+                    .load();
+
+        }
+    }
+
+
+    @OnClick(R.id.add_diet_fullsize_btn)
+    public void onFullScreenDietClick(View v) {
+        Intent intent = new Intent(this, ShowDietPdfActivity.class);
+        intent.putExtra(Constants.DIET_FILE_URI, mViewModel.getDietFileUri());
+        startActivityForResult(intent, SHOW_PDF_CODE);
     }
 
     @Override

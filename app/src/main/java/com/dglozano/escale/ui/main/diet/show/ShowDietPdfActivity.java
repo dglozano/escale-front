@@ -2,9 +2,11 @@ package com.dglozano.escale.ui.main.diet.show;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.CustomPdfScrollHandle;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
@@ -46,10 +48,9 @@ public class ShowDietPdfActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        String filepath = intent.getStringExtra("diet_file_path");
-        File pdf = new File(filepath);
+        Uri fileUri = intent.getParcelableExtra(Constants.DIET_FILE_URI);
 
-        pdfView.fromFile(pdf)
+        pdfView.fromUri(fileUri)
                 .scrollHandle(mScrollHandle)
                 .pageSnap(true)
                 .autoSpacing(true)
