@@ -3,6 +3,7 @@ package com.dglozano.escale.di;
 import com.dglozano.escale.di.annotation.ViewModelKey;
 import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivityViewModel;
 import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivityViewModel;
+import com.dglozano.escale.ui.doctor.main.AddDietActivityViewModel;
 import com.dglozano.escale.ui.doctor.main.AddPatientViewModel;
 import com.dglozano.escale.ui.doctor.main.DoctorMainActivityViewModel;
 import com.dglozano.escale.ui.drawer.profile.PatientProfileActivityViewModel;
@@ -107,6 +108,12 @@ public abstract class ViewModelModule {
     @ViewModelKey(ChangePasswordActivityViewModel.class)
     abstract ViewModel bindChangePasswordActivityViewModel(
             ChangePasswordActivityViewModel changePasswordActivityViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AddDietActivityViewModel.class)
+    abstract ViewModel bindAddDietActivityViewModel(
+            AddDietActivityViewModel addDietActivityViewModel);
 
     @Binds
     @IntoMap

@@ -4,7 +4,7 @@ import android.content.Intent;
 
 import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.entity.Diet;
-import com.dglozano.escale.util.FileUtils;
+import com.dglozano.escale.util.MyFileUtils;
 
 import java.util.Optional;
 
@@ -34,18 +34,18 @@ public class DietDownloadService extends AbstractDownloadService {
                     Response<ResponseBody> response = call.execute();
                     if (!response.isSuccessful() || response.body() == null)
                         throw new Exception("Response was not successful");
-                    boolean writtenToDisk = FileUtils.writeResponseBodyToDisk(response.body(),
+                    boolean writtenToDisk = MyFileUtils.writeResponseBodyToDisk(response.body(),
                             mFileDirectory,
                             diet.getLocalFileName());
                     Timber.d("File download was a success? %s", writtenToDisk);
                     if (writtenToDisk) {
-                        diet.setFileStatus(FileUtils.FileStatus.DOWNLOADED);
+                        diet.setFileStatus(MyFileUtils.FileStatus.DOWNLOADED);
                         dietDao.upsert(diet);
                     } else {
                         throw new Exception("Couldn't write Diet to disk");
                     }
                 } catch (Exception e) {
-                    diet.setFileStatus(FileUtils.FileStatus.NOT_DOWNLOADED);
+                    diet.setFileStatus(MyFileUtils.FileStatus.NOT_DOWNLOADED);
                     dietDao.upsert(diet);
                     Timber.e(e, "Error while downloading diet %s", diet.getFileName());
                 }

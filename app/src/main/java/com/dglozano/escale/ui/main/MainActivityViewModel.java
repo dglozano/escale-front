@@ -17,6 +17,7 @@ import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -156,7 +157,18 @@ public class MainActivityViewModel extends ViewModel {
         disposables.add(mPatientRepository.refreshPatient(mPatientRepository.getLoggedPatientId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(d -> mIsRefreshingPatient.postValue(true))
+                .doOnSubscribe(d -> {
+                    long lastRefresh = mSharedPreferences.getLong(Constants.LAST_FULL_SYNC, -1L);
+                    if (lastRefresh != -1L) {
+                        long diffInMillies = Math.abs(lastRefresh - Calendar.getInstance().getTimeInMillis());
+                        long fourHours = 4 * 3600 * 1000;
+                        if (diffInMillies > fourHours) {
+                            mIsRefreshingPatient.postValue(true);
+                        }
+                    } else {
+                        mIsRefreshingPatient.postValue(true);
+                    }
+                })
                 .subscribe(this::refreshEverythingElse,
                         error -> {
                             if (error instanceof AccountDisabledException
@@ -177,10 +189,17 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     private void refreshEverythingElse(Long loggedPatientId) {
-        mIsRefreshingDiets.postValue(true);
-        mIsRefreshingMessages.postValue(true);
-        mIsRefreshingMeasurements.postValue(true);
-        mIsRefreshingPatient.postValue(false);
+        if (mIsRefreshingPatient.getValue() != null && mIsRefreshingPatient.getValue()) {
+            mIsRefreshingDiets.postValue(true);
+            mIsRefreshingMessages.postValue(true);
+            mIsRefreshingMeasurements.postValue(true);
+            mIsRefreshingPatient.postValue(false);
+            mSharedPreferences.edit()
+                    .putLong(Constants.LAST_FULL_SYNC, Calendar.getInstance().getTimeInMillis())
+                    .apply();
+        }
+
+        //TODO Use zip and only one livedata to represent loading status
         refreshMessages(loggedPatientId);
         refreshDiets(loggedPatientId);
         refreshMeasurements(loggedPatientId);

@@ -96,6 +96,7 @@
             android:name=".ui.doctor.main.AddPatientActivity"
             android:label="@string/add_patient_label"
             android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".ui.doctor.main.AddDietActivity" />
     </application>
 
 </manifest>

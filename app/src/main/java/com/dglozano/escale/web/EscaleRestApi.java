@@ -128,4 +128,8 @@ public interface EscaleRestApi {
 
     @GET("/api/doctors/{id}/patients/info")
     Single<List<PatientInfo>> getAllPatientsInfoOfDoctor(@Path("id") Long doctorId);
+
+    @Multipart
+    @POST("/api/diets/upload")
+    Completable uploadDiet(@Part MultipartBody.Part file, @Query("patientId") Long patientId, @Query("filename") String filename);
 }

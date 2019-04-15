@@ -1,7 +1,6 @@
 package com.dglozano.escale.ui.drawer.profile;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.webkit.MimeTypeMap;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -18,13 +16,12 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Doctor;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.ui.BaseActivity;
-import com.dglozano.escale.util.FileUtils;
+import com.dglozano.escale.util.MyFileUtils;
 import com.dglozano.escale.util.PermissionHelper;
 import com.dglozano.escale.util.ui.Event;
 import com.google.android.material.snackbar.Snackbar;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Callback;
-import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.yalantis.ucrop.UCrop;
 
@@ -43,6 +40,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dagger.android.AndroidInjection;
 import timber.log.Timber;
+
+import static com.dglozano.escale.util.MyFileUtils.getMimeType;
 
 public class PatientProfileActivity extends BaseActivity implements EditPatientDialog.EditPatientDialogListener {
 
@@ -218,11 +217,11 @@ public class PatientProfileActivity extends BaseActivity implements EditPatientD
             if (pictureUri == null) {
                 showSnackbarWithDuration(R.string.upload_picture_error_msg, Snackbar.LENGTH_SHORT);
             } else {
-                String mediaType = getMimeType(pictureUri);
+                String mediaType = getMimeType(pictureUri, getContentResolver());
                 if (mediaType == null) {
                     showSnackbarWithDuration(R.string.upload_picture_error_msg, Snackbar.LENGTH_SHORT);
                 } else {
-                    File picture = FileUtils.getFile(this, pictureUri);
+                    File picture = MyFileUtils.getFile(this, pictureUri);
                     mViewModel.hitUploadPicture(picture, mediaType);
                 }
             }
@@ -237,20 +236,6 @@ public class PatientProfileActivity extends BaseActivity implements EditPatientD
             Timber.d("Permission granted. Starting Image picker intent...");
             pickImage();
         }
-    }
-
-    private String getMimeType(Uri uri) {
-        String mimeType = null;
-        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
-            ContentResolver cr = getContentResolver();
-            mimeType = cr.getType(uri);
-        } else {
-            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
-                    .toString());
-            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                    fileExtension.toLowerCase());
-        }
-        return mimeType;
     }
 
     private void pickImage() {

@@ -17,8 +17,10 @@ import android.webkit.MimeTypeMap;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,15 +28,18 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import okhttp3.ResponseBody;
 import timber.log.Timber;
 
-public class FileUtils {
+public class MyFileUtils {
 
-    private FileUtils() {
+    private MyFileUtils() {
     } //private constructor to enforce Singleton pattern
 
     private static final boolean DEBUG = true; // Set to true to enable logging
+    public static final String DOCUMENTS_DIR = "documents";
 
     public static final String MIME_TYPE_AUDIO = "audio/*";
     public static final String MIME_TYPE_TEXT = "text/*";
@@ -42,28 +47,56 @@ public class FileUtils {
     public static final String MIME_TYPE_VIDEO = "video/*";
     public static final String MIME_TYPE_APP = "application/*";
 
+    // configured android:authorities in AndroidManifest (https://developer.android.com/reference/android/support/v4/content/FileProvider)
+    public static final String AUTHORITY = "com.dglozano.escale.provider";
+
     public static final String HIDDEN_PREFIX = ".";
 
-    public static String getFileName(Uri uri, ContentResolver contentResolver) {
-        String result = null;
-        if (uri.getScheme() != null && uri.getScheme().equals("content")) {
-            Cursor cursor = contentResolver.query(uri, null, null, null, null);
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                }
-            } finally {
-                if (cursor != null) cursor.close();
+    public static String getFileName(@NonNull Context context, Uri uri) {
+        String mimeType = context.getContentResolver().getType(uri);
+        String filename = null;
+
+        if (mimeType == null && context != null) {
+            String path = getPath(context, uri);
+            if (path == null) {
+                filename = getName(uri.toString());
+            } else {
+                File file = new File(path);
+                filename = file.getName();
+            }
+        } else {
+            Cursor returnCursor = context.getContentResolver().query(uri, null,
+                    null, null, null);
+            if (returnCursor != null) {
+                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                returnCursor.moveToFirst();
+                filename = returnCursor.getString(nameIndex);
+                returnCursor.close();
             }
         }
-        if (result == null) {
-            result = uri.getPath();
-            int cut = result.lastIndexOf('/');
-            if (cut != -1) {
-                result = result.substring(cut + 1);
-            }
+
+        return filename;
+    }
+
+    public static String getName(String filename) {
+        if (filename == null) {
+            return null;
         }
-        return result;
+        int index = filename.lastIndexOf('/');
+        return filename.substring(index + 1);
+    }
+
+    public static String getMimeType(Uri uri, ContentResolver cr) {
+        String mimeType;
+        if (uri.getScheme() != null && uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            mimeType = cr.getType(uri);
+        } else {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return mimeType;
     }
 
     public static boolean writeResponseBodyToDisk(ResponseBody body, File directory, String dietFileName) {
@@ -100,6 +133,7 @@ public class FileUtils {
 
                 return true;
             } catch (IOException e) {
+                Timber.e(e);
                 return false;
             } finally {
                 if (inputStream != null) {
@@ -111,6 +145,7 @@ public class FileUtils {
                 }
             }
         } catch (IOException e) {
+            Timber.e(e);
             return false;
         }
     }
@@ -313,11 +348,10 @@ public class FileUtils {
      * @see #isLocal(String)
      * @see #getFile(Context, Uri)
      */
-    public static String getPath(final Context context, final Uri uri) {
+    private static String getLocalPath(final Context context, final Uri uri) {
 
         if (DEBUG)
-            Timber.d(" File -" +
-                    "Authority: " + uri.getAuthority() +
+            Timber.d("Authority: " + uri.getAuthority() +
                     ", Fragment: " + uri.getFragment() +
                     ", Port: " + uri.getPort() +
                     ", Query: " + uri.getQuery() +
@@ -331,27 +365,60 @@ public class FileUtils {
         // DocumentProvider
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
             // LocalStorageProvider
-
+            if (isLocalStorageDocument(uri)) {
+                // The path is the id
+                return DocumentsContract.getDocumentId(uri);
+            }
             // ExternalStorageProvider
-            if (isExternalStorageDocument(uri)) {
+            else if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
                 final String[] split = docId.split(":");
                 final String type = split[0];
 
                 if ("primary".equalsIgnoreCase(type)) {
                     return Environment.getExternalStorageDirectory() + "/" + split[1];
+                } else if ("home".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/documents/" + split[1];
                 }
-
-                // TODO handle non-primary volumes
             }
             // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
 
                 final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
 
-                return getDataColumn(context, contentUri, null, null);
+                if (id != null && id.startsWith("raw:")) {
+                    return id.substring(4);
+                }
+
+                String[] contentUriPrefixesToTry = new String[]{
+                        "content://downloads/public_downloads",
+                        "content://downloads/my_downloads",
+                        "content://downloads/all_downloads"
+                };
+
+                for (String contentUriPrefix : contentUriPrefixesToTry) {
+                    Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.valueOf(id));
+                    try {
+                        String path = getDataColumn(context, contentUri, null, null);
+                        if (path != null) {
+                            return path;
+                        }
+                    } catch (Exception e) {
+                        Timber.e(e);
+                    }
+                }
+
+                // path could not be retrieved using ContentResolver, therefore copy file to accessible cache using streams
+                String fileName = getFileName(context, uri);
+                File cacheDir = getDocumentCacheDir(context);
+                File file = generateFileName(fileName, cacheDir);
+                String destinationPath = null;
+                if (file != null) {
+                    destinationPath = file.getAbsolutePath();
+                    saveFileFromUri(context, uri, destinationPath);
+                }
+
+                return destinationPath;
             }
             // MediaProvider
             else if (isMediaDocument(uri)) {
@@ -380,8 +447,9 @@ public class FileUtils {
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
 
             // Return the remote address
-            if (isGooglePhotosUri(uri))
+            if (isGooglePhotosUri(uri)) {
                 return uri.getLastPathSegment();
+            }
 
             return getDataColumn(context, uri, null, null);
         }
@@ -391,6 +459,97 @@ public class FileUtils {
         }
 
         return null;
+    }
+
+    private static void saveFileFromUri(Context context, Uri uri, String destinationPath) {
+        InputStream is = null;
+        BufferedOutputStream bos = null;
+        try {
+            is = context.getContentResolver().openInputStream(uri);
+            bos = new BufferedOutputStream(new FileOutputStream(destinationPath, false));
+            byte[] buf = new byte[1024];
+            is.read(buf);
+            do {
+                bos.write(buf);
+            } while (is.read(buf) != -1);
+        } catch (IOException e) {
+            Timber.e(e);
+        } finally {
+            try {
+                if (is != null) is.close();
+                if (bos != null) bos.close();
+            } catch (IOException e) {
+                Timber.e(e);
+            }
+        }
+    }
+
+    @Nullable
+    public static File generateFileName(@Nullable String name, File directory) {
+        if (name == null) {
+            return null;
+        }
+
+        File file = new File(directory, name);
+
+        if (file.exists()) {
+            String fileName = name;
+            String extension = "";
+            int dotIndex = name.lastIndexOf('.');
+            if (dotIndex > 0) {
+                fileName = name.substring(0, dotIndex);
+                extension = name.substring(dotIndex);
+            }
+
+            int index = 0;
+
+            while (file.exists()) {
+                index++;
+                name = fileName + '(' + index + ')' + extension;
+                file = new File(directory, name);
+            }
+        }
+
+        try {
+            if (!file.createNewFile()) {
+                return null;
+            }
+        } catch (IOException e) {
+            Timber.w(e);
+            return null;
+        }
+
+        logDir(directory);
+
+        return file;
+    }
+
+    private static void logDir(File dir) {
+        if (!DEBUG) return;
+        Timber.d("Dir=%s", dir);
+        File[] files = dir.listFiles();
+        for (File file : files) {
+            Timber.d("File=%s", file.getPath());
+        }
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is local.
+     */
+    public static boolean isLocalStorageDocument(Uri uri) {
+        return AUTHORITY.equals(uri.getAuthority());
+    }
+
+    public static File getDocumentCacheDir(@NonNull Context context) {
+        File dir = new File(context.getCacheDir(), DOCUMENTS_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        logDir(context.getCacheDir());
+        logDir(dir);
+
+        return dir;
     }
 
     /**
@@ -409,6 +568,40 @@ public class FileUtils {
             }
         }
         return null;
+    }
+
+    public static InputStream getFileInputStream(Context context, Uri uri) {
+        if (uri != null) {
+            String path = getPath(context, uri);
+            if (path != null && isLocal(path)) {
+                try {
+                    return context.getContentResolver().openInputStream(uri);
+                } catch (FileNotFoundException e) {
+                    Timber.e(e);
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Get a file path from a Uri. This will get the the path for Storage Access
+     * Framework Documents, as well as the _data field for the MediaStore and
+     * other file-based ContentProviders.<br>
+     * <br>
+     * Callers should check whether the path is local before assuming it
+     * represents a local file.
+     *
+     * @param context The context.
+     * @param uri     The Uri to query.
+     * @see #isLocal(String)
+     * @see #getFile(Context, Uri)
+     */
+    public static String getPath(final Context context, final Uri uri) {
+        String absolutePath = getLocalPath(context, uri);
+        return absolutePath != null ? absolutePath : uri.toString();
     }
 
     /**
@@ -504,7 +697,7 @@ public class FileUtils {
                                 id,
                                 MediaStore.Video.Thumbnails.MINI_KIND,
                                 null);
-                    } else if (mimeType.contains(FileUtils.MIME_TYPE_IMAGE)) {
+                    } else if (mimeType.contains(MyFileUtils.MIME_TYPE_IMAGE)) {
                         bm = MediaStore.Images.Thumbnails.getThumbnail(
                                 resolver,
                                 id,

@@ -74,9 +74,9 @@ public class LogoutHelper {
             Timber.d("Clearing db");
             mRoomDatabase.clearAllTables();
             Timber.d("Clearing internal storage");
-            FileUtils.deleteContentOfDirectory(mRootFileDirectory);
+            MyFileUtils.deleteContentOfDirectory(mRootFileDirectory);
             Timber.d("Clearing cache directory");
-            FileUtils.deleteContentOfDirectory(mCacheDirectory);
+            MyFileUtils.deleteContentOfDirectory(mCacheDirectory);
         });
     }
 }

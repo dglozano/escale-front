@@ -11,12 +11,11 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.ui.doctor.main.AddDietDialog;
+import com.dglozano.escale.ui.doctor.main.AddDietActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.diet.all.AllDietsFragment;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietFragment;
 import com.dglozano.escale.util.Constants;
-import com.dglozano.escale.util.FileUtils;
 import com.dglozano.escale.util.ui.MyTabAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -36,7 +35,7 @@ import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
-public class DietFragment extends Fragment implements AddDietDialog.AddDietDialogDialogListener {
+public class DietFragment extends Fragment {
 
     @BindView(R.id.diet_view_pager_tabs)
     ViewPager mTabsViewPager;
@@ -57,7 +56,6 @@ public class DietFragment extends Fragment implements AddDietDialog.AddDietDialo
     private Unbinder mViewUnbinder;
     private MainActivityViewModel mMainActivityViewModel;
     private DietViewModel mDietViewModel;
-    private AddDietDialog mAddDietDialog = null;
 
     public DietFragment() {
         // Required empty public constructor
@@ -116,9 +114,11 @@ public class DietFragment extends Fragment implements AddDietDialog.AddDietDialo
     @OnClick(R.id.add_diet_btn)
     public void onAddDietClick(View v) {
 
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("application/pdf");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
+//        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+
 
         try {
             startActivityForResult(
@@ -136,8 +136,9 @@ public class DietFragment extends Fragment implements AddDietDialog.AddDietDialo
         if (resultCode == Activity.RESULT_OK && requestCode == Constants.SELECT_DIET_FILE_TO_ADD
                 && data != null && data.getData() != null) {
             Uri dietFileUri = data.getData();
-            mAddDietDialog = AddDietDialog.newInstance(FileUtils.getFileName(dietFileUri, getActivity().getContentResolver()), dietFileUri);
-            mAddDietDialog.show(getChildFragmentManager(), "showDietAddDialog");
+            Intent intent = new Intent(getActivity(), AddDietActivity.class);
+            intent.putExtra(Constants.DIET_FILE_URI, dietFileUri);
+            startActivityForResult(intent, Constants.ADD_DIET_ACTIVITY_CODE);
         }
     }
 
@@ -146,12 +147,5 @@ public class DietFragment extends Fragment implements AddDietDialog.AddDietDialo
         super.onCreate(savedInstanceState);
         mDietViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DietViewModel.class);
         mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
-    }
-
-    @Override
-    public void onAddDietSubmit() {
-        // TODO
-        Timber.d("On diet submit");
-//        mDietViewModel.hitAddDiet()
     }
 }

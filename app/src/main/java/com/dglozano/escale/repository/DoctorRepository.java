@@ -16,6 +16,7 @@ import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.CreatePatientDTO;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,9 @@ import androidx.lifecycle.LiveData;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import timber.log.Timber;
 
 @ApplicationScope
@@ -162,5 +166,22 @@ public class DoctorRepository {
 
     public Single<Optional<Doctor>> getLoggedDoctorSingle() {
         return mDoctorDao.getDoctorByIdSingle(getLoggedDoctorId());
+    }
+
+    public Completable uploadDiet(File diet, String mediaType, String filename, Long patientId) {
+        // create RequestBody instance from file
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse(mediaType), diet);
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("file", diet.getName(), requestFile);
+
+        // finally, execute the request
+        return mEscaleRestApi.uploadDiet(body, patientId, filename)
+                .doOnComplete(() -> {
+                    Timber.d("Was temp diet deleted? %s", diet.delete());
+                })
+                .subscribeOn(Schedulers.io());
     }
 }

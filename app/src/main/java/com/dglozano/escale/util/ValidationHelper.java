@@ -24,7 +24,7 @@ public class ValidationHelper {
     }
 
     public static boolean isValidFileName(Editable filename) {
-        return !TextUtils.isEmpty(filename) && filename.toString().matches("^[\\w\\-. ]+$");
+        return !TextUtils.isEmpty(filename) && filename.toString().matches("^[\\w\\-_,. ]+$");
     }
 
     public static boolean isValidHeight(CharSequence height) {

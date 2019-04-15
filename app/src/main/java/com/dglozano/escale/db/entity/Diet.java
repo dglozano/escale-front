@@ -1,7 +1,7 @@
 package com.dglozano.escale.db.entity;
 
 import com.dglozano.escale.util.Constants;
-import com.dglozano.escale.util.FileUtils;
+import com.dglozano.escale.util.MyFileUtils;
 import com.dglozano.escale.web.dto.DietDTO;
 
 import java.util.Date;
@@ -27,7 +27,7 @@ public class Diet {
     private String fileName;
     private Date startDate;
     private long size;
-    private FileUtils.FileStatus fileStatus;
+    private MyFileUtils.FileStatus fileStatus;
 
     public Diet() {
 
@@ -40,7 +40,7 @@ public class Diet {
         this.startDate = date;
         this.size = size;
         this.userId = patientId;
-        this.fileStatus = FileUtils.FileStatus.NOT_DOWNLOADED;
+        this.fileStatus = MyFileUtils.FileStatus.NOT_DOWNLOADED;
     }
 
     @Ignore
@@ -80,11 +80,11 @@ public class Diet {
         this.startDate = startDate;
     }
 
-    public FileUtils.FileStatus getFileStatus() {
+    public MyFileUtils.FileStatus getFileStatus() {
         return fileStatus;
     }
 
-    public void setFileStatus(FileUtils.FileStatus fileStatus) {
+    public void setFileStatus(MyFileUtils.FileStatus fileStatus) {
         this.fileStatus = fileStatus;
     }
 

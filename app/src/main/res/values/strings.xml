@@ -112,8 +112,10 @@
     <string name="manual_measurement">Pesaje manual</string>
     <string name="scale_measurement">Pesaje con balanza</string>
     <string name="ucrop_activity_title">Ajustar Foto</string>
-    <string name="upload_picture_success_msg">Foto actualizada correctamente</string>
+    <string name="upload_picture_success_msg">Foto actualizada exitósamente</string>
     <string name="upload_picture_error_msg">Ups! No pudimos actualizar tu foto. Intenta de nuevo más tarde.</string>
+    <string name="upload_diet_success_msg">Dieta subida exitósamente.</string>
+    <string name="upload_diet_error_msg">Ups! No pudimos cargar la nueva dieta. Intenta de nuevo más tarde.</string>
     <string name="profile_title">Perfil</string>
     <string name="drawer_option_help_contact">Ayuda y Contacto</string>
     <string name="edit">Editar</string>
@@ -153,7 +155,7 @@
     <string name="add_diet_title">Agregar dieta</string>
     <string name="diet_name_hint">Nombre de la dieta</string>
     <string name="choose_file_btn">Seleccionar archivo</string>
-    <string name="dialog_add_diet_submit">Agregar Dieta</string>
+    <string name="add_diet_submit_btn">Subir Dieta</string>
     <string name="diet_name_too_long">El nombre es muy largo</string>
     <string name="input_validation_diet_name">Ingresa sólo letras, números, guiones o puntos.</string>
     <string name="diet_file_chooser_intent_title">Selecciona la dieta</string>

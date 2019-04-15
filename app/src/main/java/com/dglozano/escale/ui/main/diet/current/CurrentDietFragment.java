@@ -10,7 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.util.FileUtils;
+import com.dglozano.escale.util.MyFileUtils;
 import com.dglozano.escale.util.ui.CustomPdfScrollHandle;
 import com.dglozano.escale.web.services.DietDownloadService;
 import com.github.barteksc.pdfviewer.PDFView;
@@ -108,7 +108,7 @@ public class CurrentDietFragment extends Fragment {
                         mPdfView.setVisibility(View.GONE);
                         Intent startIntent = new Intent(getActivity(), DietDownloadService.class);
                         startIntent.putExtra("diet-uuid", currentDiet.getId());
-                        currentDiet.setFileStatus(FileUtils.FileStatus.DOWNLOADING);
+                        currentDiet.setFileStatus(MyFileUtils.FileStatus.DOWNLOADING);
                         mViewModel.updateDiet(currentDiet);
                         getActivity().startService(startIntent);
                         break;

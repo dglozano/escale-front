@@ -147,7 +147,7 @@ public class StatsChartFragment extends Fragment {
 
         float xAxisMin = filteredList.get(0).getX() - dayInMilliseconds;
         float xAxisMaxVisible = filteredList.get(filteredList.size() - 1).getX() + 2 * dayInMilliseconds;
-        float xAxisMax = filteredList.get(filteredList.size() - 1).getX() + Constants.FORECAST_AMOUNT * dayInMilliseconds;
+        float xAxisMax = filteredList.get(filteredList.size() - 1).getX() + (Constants.FORECAST_AMOUNT / 2f) * dayInMilliseconds;
 
         filteredList.add(0, new Entry(firstDate - dayInMilliseconds * 2, filteredList.get(0).getY()));
 
@@ -177,15 +177,11 @@ public class StatsChartFragment extends Fragment {
 
         if (mStatsChartViewModel.getSelectedStat().equals(StatsChartViewModel.StatFilter.WEIGHT) &&
                 mStatsChartViewModel.getGoalEntry().getValue() != null) {
-            Timber.d("goal in chart %s", mStatsChartViewModel.getGoalEntry().getValue());
-
             drawGoalLine(mStatsChartViewModel.getGoalEntry().getValue(), lineData, xAxisMin, xAxisMax, xAxisMaxVisible);
         }
 
         if (mStatsChartViewModel.getMeasurementForecast().getValue() != null
                 && mStatsChartViewModel.getMeasurementForecast().getValue().isPresent()) {
-            Timber.d("mf %s", mStatsChartViewModel.getMeasurementForecast().getValue().get());
-
             drawForecastLine(lastEntry,
                     mStatsChartViewModel.getMeasurementForecast().getValue().get(),
                     mStatsChartViewModel.getSelectedStat(), lineData);
@@ -202,7 +198,6 @@ public class StatsChartFragment extends Fragment {
                                   StatsChartViewModel.StatFilter selectedStat,
                                   LineData lineData) {
         if (lineData == null || lineData.getDataSetByLabel(Constants.FORECAST_DATASET, true) == null) {
-            Timber.d("drawing forecast");
             List<Entry> forecastEntryList = new ArrayList<>();
             forecastEntryList.add(lastEntry);
             forecastEntryList.addAll(getExpSmoothForecastEntriesFor(lastEntry, mf, selectedStat));
@@ -265,7 +260,6 @@ public class StatsChartFragment extends Fragment {
 
     private void drawGoalLine(Entry goalEntry, LineData lineData, float xAxisMin, float xAxisMax, float xAxisMaxVisible) {
         if (lineData != null && lineData.getDataSetByLabel(Constants.GOAL_DATASET, true) == null) {
-            Timber.d("drawing goal line");
             float minY = mLineChart.getAxisLeft().getAxisMinimum();
             float maxY = mLineChart.getAxisRight().getAxisMaximum();
 
