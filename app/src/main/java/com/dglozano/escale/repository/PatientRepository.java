@@ -177,15 +177,18 @@ public class PatientRepository {
                 );
     }
 
-    public Completable saveNewGoalOnNotified(Long loggedPatiendId, Float weightInKg, String dueDate) {
+    public Completable saveNewGoalOnNotified(Long loggedPatiendId, Float weightInKg, String dueDateStr, String startDateStr) {
         return mPatientDao.getPatientSingleById(loggedPatiendId)
                 .flatMapCompletable(patient -> Completable.fromCallable(() -> {
                     String format = "yyyy-MM-dd'T'HH:mm:ss.SSS";
                     SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
                     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-                    Date date = sdf.parse(dueDate);
+                    Date dueDate = sdf.parse(dueDateStr);
+                    Date startDate = sdf.parse(startDateStr);
                     patient.setGoalInKg(weightInKg);
-                    patient.setGoalDueDate(date);
+                    patient.setGoalDueDate(dueDate);
+                    patient.setGoalStartDate(startDate);
+
                     mPatientDao.upsert(patient);
                     return Completable.complete();
                 }));

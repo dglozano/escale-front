@@ -14,6 +14,7 @@ import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
+import com.dglozano.escale.web.dto.AddWeightGoalDTO;
 import com.dglozano.escale.web.dto.CreatePatientDTO;
 
 import java.io.File;
@@ -182,6 +183,19 @@ public class DoctorRepository {
                 .doOnComplete(() -> {
                     Timber.d("Was temp diet deleted? %s", diet.delete());
                 })
+                .subscribeOn(Schedulers.io());
+    }
+
+    public Completable addGoal(Long doctorId, Long patientId, Float goalInKg, Date dueDate) {
+        AddWeightGoalDTO dto = new AddWeightGoalDTO(goalInKg, dueDate);
+        return mEscaleRestApi.addGoal(dto, doctorId, patientId)
+                .zipWith(mPatientDao.getPatientSingleById(patientId), (weightGoalDTO, patient) -> {
+                    patient.setGoalInKg(weightGoalDTO.getGoalInKg());
+                    patient.setGoalDueDate(weightGoalDTO.getDueDate());
+                    patient.setGoalStartDate(weightGoalDTO.getStartDate());
+                    mPatientDao.upsert(patient);
+                    return patient;
+                }).flatMapCompletable(patient -> Completable.complete())
                 .subscribeOn(Schedulers.io());
     }
 }

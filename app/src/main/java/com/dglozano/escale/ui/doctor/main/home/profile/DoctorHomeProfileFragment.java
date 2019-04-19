@@ -24,6 +24,8 @@ import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -134,7 +136,7 @@ public class DoctorHomeProfileFragment extends Fragment {
             mBmi.setText("-");
             mFat.setText("-");
         } else {
-            mWeight.setText(String.format("%s kg.", formatDecimal(bodyMeasurement.get().getWeight())));
+            mWeight.setText(formatDecimal(bodyMeasurement.get().getWeight()));
             mBmi.setText(formatDecimal(bodyMeasurement.get().getBmi()));
             mFat.setText(String.format("%s %%", formatDecimal(bodyMeasurement.get().getFat())));
         }
@@ -162,7 +164,11 @@ public class DoctorHomeProfileFragment extends Fragment {
             mPhysicalActivity.setText(patient.getActivityString());
             if (patient.getGoalInKg() != null) {
                 DecimalFormat df = new DecimalFormat("'META' ###.# 'kg'");
-                mGoal.setText(df.format(patient.getGoalInKg()));
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                String goalText = String.format("%s\n%s",
+                        df.format(patient.getGoalInKg()),
+                        sdf.format(patient.getGoalDueDate()));
+                mGoal.setText(goalText);
             } else {
                 mGoal.setText(R.string.no_goal_set);
             }

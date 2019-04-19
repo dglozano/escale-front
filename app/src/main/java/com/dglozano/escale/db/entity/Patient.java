@@ -12,6 +12,7 @@ import java.util.Locale;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
+import lombok.ToString;
 
 import static androidx.room.ForeignKey.CASCADE;
 
@@ -19,6 +20,7 @@ import static androidx.room.ForeignKey.CASCADE;
         parentColumns = "id",
         childColumns = "doctorId",
         onDelete = CASCADE))
+@ToString
 public class Patient extends AppUser {
 
     private Gender gender;
@@ -32,6 +34,7 @@ public class Patient extends AppUser {
     private Date goalStartDate;
     private boolean hasToUpdateDataInScale = true;
     @Ignore
+    @ToString.Exclude
     private MeasurementForecast measurementForecast;
 
     public Patient() {
@@ -163,20 +166,6 @@ public class Patient extends AppUser {
 
     public void setMeasurementForecast(MeasurementForecast measurementForecast) {
         this.measurementForecast = measurementForecast;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("{\n " +
-                "   id: %s \n" +
-                "   firstName: %s \n" +
-                "   lastName: %s \n" +
-                "   email: %s \n" +
-                "   userindex: %s \n" +
-                "   gender: %s \n" +
-                "   height: %s \n" +
-                "   physicalactivity: %s \n" +
-                "}", id, firstName, lastName, email, gender, heightInCm, physicalActivity);
     }
 
     public int getAge() {

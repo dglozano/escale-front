@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -27,8 +28,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
+import butterknife.OnTextChanged;
 import dagger.android.AndroidInjection;
-import timber.log.Timber;
+
+import static com.dglozano.escale.util.ValidationHelper.getGoalDueDateError;
+import static com.dglozano.escale.util.ValidationHelper.getWeightError;
 
 public class AddGoalActivity extends BaseActivity {
 
@@ -73,7 +77,7 @@ public class AddGoalActivity extends BaseActivity {
         mViewModel.getSuccessEvent().observe(this, this::onSuccessEventFired);
     }
 
-    private void onSuccessEventFired(Event<Integer> successEvent) {
+    private void onSuccessEventFired(Event<Boolean> successEvent) {
         setResult(Activity.RESULT_OK);
         finish();
     }
@@ -105,6 +109,14 @@ public class AddGoalActivity extends BaseActivity {
         };
     }
 
+    @OnClick(R.id.add_goal_btn)
+    public void onAddGoalClick(View v) {
+        mViewModel.hitChangeGoal(
+                Objects.requireNonNull(mAddGoalEditText).getText(),
+                Objects.requireNonNull(mDueDateEditText).getText()
+        );
+    }
+
     @OnClick(R.id.add_goal_due_date_edittext)
     public void onDueDateClick(View v) {
         if (!v.hasFocus()) {
@@ -113,7 +125,7 @@ public class AddGoalActivity extends BaseActivity {
             mDueDateEditText.clearFocus();
             View view = this.getCurrentFocus();
             if (view != null) {
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         }
@@ -139,33 +151,34 @@ public class AddGoalActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.add_goal_btn)
-    public void onAddGoalClick(View v) {
-//        String filename = mDietNameEditText.getText().toString();
-//        Uri dietUri = mViewModel.getDietFileUri();
-//        if (dietUri == null) {
-//            Timber.e("dietUri is null");
-//            showSnackbarWithDuration(R.string.upload_diet_error_msg, Snackbar.LENGTH_SHORT);
-//        } else {
-//            String mediaType = getMimeType(dietUri, getContentResolver());
-//            if (mediaType == null) {
-//                Timber.e("mediaType is null");
-//                showSnackbarWithDuration(R.string.upload_diet_error_msg, Snackbar.LENGTH_SHORT);
-//            } else {
-//                InputStream dietInputStream = MyFileUtils.getFileInputStream(this, dietUri);
-//                String randomTempName = UUID.randomUUID().toString() + ".pdf";
-//                File dietFile = new File(getCacheDir(), randomTempName);
-//                try {
-//                    FileUtils.copyInputStreamToFile(dietInputStream, dietFile);
-//                } catch (IOException e) {
-//                    Timber.e(e);
-//                    showSnackbarWithDuration(R.string.upload_diet_error_msg, Snackbar.LENGTH_SHORT);
-//                }
-//
-//                mViewModel.hitChangeGoal(dietFile, mediaType, filename);
-//            }
-//        }
-        Timber.d("clicked");
+    @OnFocusChange(R.id.add_goal_edittext)
+    public void onFocusChangeGoal(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            Integer errorString = getWeightError(((EditText) v).getText().toString());
+            mAddGoalInputLayout.setError(errorString == null ? null : getString(errorString));
+        }
+    }
+
+    @OnTextChanged(value = R.id.add_goal_edittext,
+            callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    protected void afterEditTextChangedGoal(Editable editable) {
+        Integer errorString = getWeightError(editable.toString());
+        mAddGoalInputLayout.setError(errorString == null ? null : getString(errorString));
+    }
+
+    @OnFocusChange(R.id.add_goal_due_date_edittext)
+    public void onFocusChangeBirthday(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            Integer errorString = getGoalDueDateError(((EditText) v).getText());
+            mDueDateInputLayout.setError(errorString == null ? null : getString(errorString));
+        }
+    }
+
+    @OnTextChanged(value = R.id.add_goal_due_date_edittext,
+            callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    protected void afterEditTextBirthday(Editable editable) {
+        Integer errorString = getGoalDueDateError(editable);
+        mDueDateInputLayout.setError(errorString == null ? null : getString(errorString));
     }
 
     @Override

@@ -40,6 +40,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -231,9 +232,12 @@ public class HomeFragment extends Fragment
             if (patient != null && patient.getGoalInKg() != null && patient.getGoalInKg() > 0f
                     && patient.getGoalDueDate() != null
                     && Calendar.getInstance().getTime().before(patient.getGoalDueDate())) {
-                Timber.d("patient observer triggered");
                 DecimalFormat df = new DecimalFormat("'META' ###.# 'kg'");
-                mGoalTextView.setText(df.format(patient.getGoalInKg()));
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                String goalText = String.format("%s\n%s",
+                        df.format(patient.getGoalInKg()),
+                        sdf.format(patient.getGoalDueDate()));
+                mGoalTextView.setText(goalText);
                 setupGaugeLimits(patient);
             } else {
                 mGoalTextView.setText(R.string.no_goal_set);

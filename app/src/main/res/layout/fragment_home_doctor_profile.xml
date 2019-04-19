@@ -133,7 +133,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="-"
+            android:text="115"
+            android:textAlignment="center"
             android:textAppearance="@android:style/TextAppearance.Material"
             android:textColor="@color/colorPrimary"
             android:textSize="24sp"
@@ -146,6 +147,7 @@
             android:layout_below="@id/home_doctor_weight"
             android:layout_centerHorizontal="true"
             android:text="@string/no_goal_set"
+            android:textAlignment="center"
             android:textAppearance="@android:style/TextAppearance.Material"
             android:textColor="@color/colorPrimary"
             android:textSize="12sp" />

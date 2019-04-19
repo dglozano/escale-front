@@ -102,6 +102,7 @@
                 android:layout_below="@id/weight_gauge_text"
                 android:layout_centerHorizontal="true"
                 android:text="@string/no_goal_set"
+                android:textAlignment="center"
                 android:textAppearance="@android:style/TextAppearance.Material"
                 android:textColor="@color/colorPrimary"
                 android:textSize="12sp"

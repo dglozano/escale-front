@@ -4,6 +4,7 @@ import com.dglozano.escale.db.entity.Alert;
 import com.dglozano.escale.db.entity.MeasurementForecast;
 import com.dglozano.escale.db.entity.PatientInfo;
 import com.dglozano.escale.web.dto.AddBodyMeasurementDTO;
+import com.dglozano.escale.web.dto.AddWeightGoalDTO;
 import com.dglozano.escale.web.dto.BodyMeasurementDTO;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.ChatDTO;
@@ -18,11 +19,11 @@ import com.dglozano.escale.web.dto.PasswordDTO;
 import com.dglozano.escale.web.dto.PatientDTO;
 import com.dglozano.escale.web.dto.SendChatMessageDTO;
 import com.dglozano.escale.web.dto.UpdatePatientDTO;
+import com.dglozano.escale.web.dto.WeightGoalDTO;
 
 import java.util.List;
 
 import io.reactivex.Completable;
-import io.reactivex.CompletableSource;
 import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
@@ -143,4 +144,10 @@ public interface EscaleRestApi {
 
     @POST("/api/patients/{id}/alerts/markAllAsSeen")
     Completable markAllAlertsAsSeenByDoctor(@Path("id") Long patientId);
+
+    @POST("/api/doctors/{doctorId}/patients/{patientId}/add-goal")
+    Single<WeightGoalDTO> addGoal(@Body AddWeightGoalDTO addWeightGoalDTO,
+                                  @Path("doctorId") Long doctorId,
+                                  @Path("patientId") Long patientId);
+
 }

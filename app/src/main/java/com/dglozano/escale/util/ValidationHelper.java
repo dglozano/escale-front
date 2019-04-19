@@ -34,17 +34,17 @@ public class ValidationHelper {
 
     public static boolean isValidWeight(CharSequence weight) {
         float value = Float.parseFloat(weight.toString());
-        return !TextUtils.isEmpty(weight)  && value >= 40 && value <= 250;
+        return !TextUtils.isEmpty(weight) && value >= 40 && value <= 250;
     }
 
     public static boolean isValidBmi(CharSequence bmi) {
         float value = Float.parseFloat(bmi.toString());
-        return !TextUtils.isEmpty(bmi)  && value >= 10 && value <= 60;
+        return !TextUtils.isEmpty(bmi) && value >= 10 && value <= 60;
     }
 
     public static boolean isValidPercentage(CharSequence percentage) {
         float value = Float.parseFloat(percentage.toString());
-        return !TextUtils.isEmpty(percentage) && value > 0  && value < 100;
+        return !TextUtils.isEmpty(percentage) && value > 0 && value < 100;
     }
 
     public static boolean isValidBirthday(CharSequence birthday) {
@@ -61,6 +61,22 @@ public class ValidationHelper {
             }
         } catch (ParseException e) {
             Timber.e("Birthday parse error");
+            return false;
+        }
+    }
+
+    public static boolean isValidGoalDueDate(CharSequence goalDueDateStr) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        try {
+            if (!TextUtils.isEmpty(goalDueDateStr)) {
+                Date goalDueDate = sdf.parse(goalDueDateStr.toString());
+                Date today = Calendar.getInstance().getTime();
+                return goalDueDate.after(today);
+            } else {
+                return false;
+            }
+        } catch (ParseException e) {
+            Timber.e("Due date parse error");
             return false;
         }
     }
@@ -100,6 +116,13 @@ public class ValidationHelper {
             return R.string.input_validation_empty_error;
         else
             return isValidBirthday(birthday) ? null : R.string.input_validation_birthday_error;
+    }
+
+    public static Integer getGoalDueDateError(CharSequence goalDueDate) {
+        if (TextUtils.isEmpty(goalDueDate))
+            return R.string.input_validation_empty_error;
+        else
+            return isValidGoalDueDate(goalDueDate) ? null : R.string.input_validation_goal_due_date_error;
     }
 
     public static Integer getHeightError(CharSequence height) {

@@ -171,6 +171,7 @@
     <string name="add_goal_hint">Nueva meta (kg.)</string>
     <string name="add_goal_due_date_hint">Fecha de Finalización</string>
     <string name="current_goal">Meta actual:</string>
+    <string name="input_validation_goal_due_date_error">La finalización de la meta debe ser después de hoy.</string>
     <string-array name="scale_user_indexes_array">
         <item>P-01</item>
         <item>P-02</item>

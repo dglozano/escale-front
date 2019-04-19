@@ -35,7 +35,6 @@
             android:textColor="@color/colorTextDark" />
     </RelativeLayout>
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/doctor_patients_rv_list"
         android:layout_width="match_parent"

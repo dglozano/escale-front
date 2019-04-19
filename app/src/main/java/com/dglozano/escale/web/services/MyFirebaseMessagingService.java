@@ -165,7 +165,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String dueDate = remoteMessage.getData().get("due_date");
         Boolean isAccomplished = Boolean.parseBoolean(remoteMessage.getData().get("accomplished"));
         disposables.add(patientRepository
-                .saveNewGoalOnNotified(patientRepository.getLoggedPatientId(), weightInKg, dueDate)
+                .saveNewGoalOnNotified(patientRepository.getLoggedPatientId(), weightInKg, dueDate, startDate)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(() -> Timber.d("Received new goal from firebase and saved successfully"),
