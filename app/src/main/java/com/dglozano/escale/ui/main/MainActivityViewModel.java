@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.exception.AccountDisabledException;
+import com.dglozano.escale.repository.AlertRepository;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
@@ -100,8 +101,9 @@ public class MainActivityViewModel extends ViewModel {
 
         setupRefreshingObservable();
         setupMustChangePasswordObservable();
-        setupAppBarShadowStatus();
         isDoctorView = false;
+
+        setupAppBarShadowStatus();
     }
 
 
@@ -144,9 +146,13 @@ public class MainActivityViewModel extends ViewModel {
                 && positionOfCurrentFragment.getValue() == 2;
         boolean fragmentPositionMeasurement = positionOfCurrentFragment.getValue() != null
                 && positionOfCurrentFragment.getValue() == 1;
+        boolean fragmentPositionHome = positionOfCurrentFragment.getValue() != null
+                && positionOfCurrentFragment.getValue() == 0;
         if (dietsNotEmpty && fragmentPositionDiets) {
             mShowAppBarShadow.postValue(false);
         } else if (measurementsNotEmpty && fragmentPositionMeasurement) {
+            mShowAppBarShadow.postValue(false);
+        } else if (isDoctorView && fragmentPositionHome) {
             mShowAppBarShadow.postValue(false);
         } else {
             mShowAppBarShadow.postValue(true);
@@ -155,35 +161,36 @@ public class MainActivityViewModel extends ViewModel {
 
     public void refreshData() {
         disposables.add(mPatientRepository.refreshPatient(mPatientRepository.getLoggedPatientId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(d -> {
-                    long lastRefresh = mSharedPreferences.getLong(Constants.LAST_FULL_SYNC, -1L);
-                    if (lastRefresh != -1L) {
-                        long diffInMillies = Math.abs(lastRefresh - Calendar.getInstance().getTimeInMillis());
-                        long fourHours = 4 * 3600 * 1000;
-                        if (diffInMillies > fourHours) {
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe(d -> {
+//                    long lastRefresh = mSharedPreferences.getLong(Constants.LAST_FULL_SYNC, -1L);
+//                    if (lastRefresh != -1L) {
+//                        long diffInMillies = Math.abs(lastRefresh - Calendar.getInstance().getTimeInMillis());
+//                        long fourHours = 4 * 3600 * 1000;
+//                        if (diffInMillies > fourHours) {
+//                            mIsRefreshingPatient.postValue(true);
+//                        }
+//                    } else {
+//                        mIsRefreshingPatient.postValue(true);
+//                    }
                             mIsRefreshingPatient.postValue(true);
-                        }
-                    } else {
-                        mIsRefreshingPatient.postValue(true);
-                    }
-                })
-                .subscribe(this::refreshEverythingElse,
-                        error -> {
-                            if (error instanceof AccountDisabledException
-                                    || (error instanceof HttpException && error.getMessage().contains("401"))) {
-                                Timber.d("The user's account was disabled or token is not valid");
-                                mIsRefreshingPatient.postValue(false);
-                                logout();
-                            } else if (error instanceof NoSuchElementException) {
-                                // Means that the user was fresh enough, so didn't have to call api
-                                refreshEverythingElse(mPatientRepository.getLoggedPatientId());
-                            } else {
-                                mIsRefreshingPatient.postValue(false);
-                                Timber.e(error);
-                            }
                         })
+                        .subscribe(this::refreshEverythingElse,
+                                error -> {
+                                    if (error instanceof AccountDisabledException
+                                            || (error instanceof HttpException && error.getMessage().contains("401"))) {
+                                        Timber.d("The user's account was disabled or token is not valid");
+                                        mIsRefreshingPatient.postValue(false);
+                                        logout();
+                                    } else if (error instanceof NoSuchElementException) {
+                                        // Means that the user was fresh enough, so didn't have to call api
+                                        refreshEverythingElse(mPatientRepository.getLoggedPatientId());
+                                    } else {
+                                        mIsRefreshingPatient.postValue(false);
+                                        Timber.e(error);
+                                    }
+                                })
 
         );
     }

@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.doctor.main;
+package com.dglozano.escale.ui.doctor.main.add_patient;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.repository.DoctorRepository;

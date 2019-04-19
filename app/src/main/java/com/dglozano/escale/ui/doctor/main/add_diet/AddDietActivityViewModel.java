@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.doctor.main;
+package com.dglozano.escale.ui.doctor.main.add_diet;
 
 import android.net.Uri;
 

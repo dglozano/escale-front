@@ -32,6 +32,21 @@ public class ValidationHelper {
         return !TextUtils.isEmpty(height) && value >= 100 && value <= 250;
     }
 
+    public static boolean isValidWeight(CharSequence weight) {
+        float value = Float.parseFloat(weight.toString());
+        return !TextUtils.isEmpty(weight)  && value >= 40 && value <= 250;
+    }
+
+    public static boolean isValidBmi(CharSequence bmi) {
+        float value = Float.parseFloat(bmi.toString());
+        return !TextUtils.isEmpty(bmi)  && value >= 10 && value <= 60;
+    }
+
+    public static boolean isValidPercentage(CharSequence percentage) {
+        float value = Float.parseFloat(percentage.toString());
+        return !TextUtils.isEmpty(percentage) && value > 0  && value < 100;
+    }
+
     public static boolean isValidBirthday(CharSequence birthday) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         try {
@@ -92,5 +107,19 @@ public class ValidationHelper {
             return R.string.input_validation_empty_error;
         else
             return isValidHeight(height) ? null : R.string.input_validation_height_range_error;
+    }
+
+    public static Integer getWeightError(CharSequence weight) {
+        if (TextUtils.isEmpty(weight))
+            return R.string.input_validation_empty_error;
+        else
+            return isValidWeight(weight) ? null : R.string.input_validation_weight_error;
+    }
+
+    public static Integer getBmiError(CharSequence bmi) {
+        if (TextUtils.isEmpty(bmi))
+            return R.string.input_validation_empty_error;
+        else
+            return isValidBmi(bmi) ? null : R.string.input_validation_bmi_error;
     }
 }

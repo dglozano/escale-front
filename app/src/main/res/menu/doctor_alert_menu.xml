@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_doctor_profile_mark_as_seen"
+        android:icon="@drawable/ic_mark_alerts_as_seen"
+        android:title="@string/mark_as_seen"
+        app:showAsAction="ifRoom" />
+</menu>

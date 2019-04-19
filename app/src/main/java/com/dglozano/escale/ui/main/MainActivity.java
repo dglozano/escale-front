@@ -19,6 +19,7 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BF600BleService;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivity;
+import com.dglozano.escale.ui.doctor.main.home.DoctorHomeFragment;
 import com.dglozano.escale.ui.drawer.profile.PatientProfileActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.diet.DietFragment;
@@ -137,17 +138,17 @@ public class MainActivity extends BaseActivity
             openFragmentInPosition = handleIntent();
             mViewModel.setDoctorView(getIntent().getBooleanExtra(Constants.IS_DOCTOR_VIEW_INTENT_EXTRA, false));
         }
+        setSupportActionBar(mToolbar);
+
         mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
 
         if (!mViewModel.isDoctorView()) {
             mNavigationView.setVisibility(View.VISIBLE);
-            setSupportActionBar(mToolbar);
             setActionBarTitleAccordingToFragment(openFragmentInPosition);
             setupDrawerLayout();
         } else {
             mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             mNavigationView.setVisibility(View.GONE);
-            setSupportActionBar(mToolbar);
             Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         }
 
@@ -167,7 +168,6 @@ public class MainActivity extends BaseActivity
         observeCurrentFragmentPosition();
 
         mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
-
 
         mViewModel.getAppBarShadowStatus().observe(this, showShadow -> {
             if (showShadow != null && !showShadow) {
@@ -202,7 +202,10 @@ public class MainActivity extends BaseActivity
                 mMainProgressBar.setVisibility(isRefreshing ? View.VISIBLE : View.GONE);
                 mNoSwipePager.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
                 mExpandableBottomBar.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
-                if (!isRefreshing) {
+                if (isRefreshing) {
+                    getSupportActionBar().hide();
+                } else {
+                    getSupportActionBar().show();
                     addFragmentsToBottomNav(mViewModel.getPositionOfCurrentFragment().getValue());
                 }
             }
@@ -347,7 +350,7 @@ public class MainActivity extends BaseActivity
 
     private void observeUserData() {
         mViewModel.getLoggedPatient().observe(this, user -> {
-            if (user != null) {
+            if (user != null && user.isFullyLoaded()) {
                 if (!mViewModel.isDoctorView()) {
                     mNavUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
                     mNavEmail.setText(user.getEmail());
@@ -361,19 +364,19 @@ public class MainActivity extends BaseActivity
                         Timber.e(e);
                     }
                 } else {
-                    Objects.requireNonNull(getSupportActionBar()).setTitle(user.getLastName());
+                    String firstName = user.getFirstName().split(" ", 2)[0];
+                    Objects.requireNonNull(getSupportActionBar())
+                            .setTitle(String.format("%s, %s", user.getLastName(), firstName));
                 }
             } else {
-                Timber.e("user is null");
+                Timber.e("User is null");
             }
         });
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        Timber.d("ACAAAAAAAAAAAA");
         if (mViewModel.isDoctorView()) {
-            Timber.d("aaaa");
             finish();
             return true;
         }
@@ -411,7 +414,7 @@ public class MainActivity extends BaseActivity
         if (!mViewModel.isDoctorView()) {
             mPagerAdapter.addFragments(HomeFragment.newInstance());
         } else {
-            mPagerAdapter.addFragments(new Fragment());
+            mPagerAdapter.addFragments(DoctorHomeFragment.newInstance());
         }
         mPagerAdapter.addFragments(StatsFragment.newInstance());
         mPagerAdapter.addFragments(DietFragment.newInstance());
@@ -448,7 +451,6 @@ public class MainActivity extends BaseActivity
 
             mDrawer.closeDrawer(GravityCompat.START);
         } else if (id == android.R.id.home) {
-            Timber.d("back pressed");
             onBackPressed();
         }
         return true;
@@ -540,8 +542,8 @@ public class MainActivity extends BaseActivity
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null && actionBar.getElevation() != elevation) {
             actionBar.setElevation(elevation);
-            ViewCompat.setElevation(mAppBarLayout, elevation);
         }
+        ViewCompat.setElevation(mAppBarLayout, elevation);
     }
 
     private void setActionBarTitleAccordingToFragment(int fragmentPosition) {

@@ -3,9 +3,13 @@ package com.dglozano.escale.di;
 import com.dglozano.escale.di.annotation.ViewModelKey;
 import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivityViewModel;
 import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivityViewModel;
-import com.dglozano.escale.ui.doctor.main.AddDietActivityViewModel;
-import com.dglozano.escale.ui.doctor.main.AddPatientViewModel;
 import com.dglozano.escale.ui.doctor.main.DoctorMainActivityViewModel;
+import com.dglozano.escale.ui.doctor.main.add_diet.AddDietActivityViewModel;
+import com.dglozano.escale.ui.doctor.main.add_goal.AddGoalActivityViewModel;
+import com.dglozano.escale.ui.doctor.main.add_patient.AddPatientViewModel;
+import com.dglozano.escale.ui.doctor.main.home.DoctorHomeViewModel;
+import com.dglozano.escale.ui.doctor.main.home.alerts.DoctorHomeAlertListViewModel;
+import com.dglozano.escale.ui.doctor.main.home.profile.DoctorHomeProfileViewModel;
 import com.dglozano.escale.ui.drawer.profile.PatientProfileActivityViewModel;
 import com.dglozano.escale.ui.login.LoginActivityViewModel;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
@@ -47,6 +51,21 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(HomeViewModel.class)
     abstract ViewModel bindHomeFragmentViewModel(HomeViewModel homeViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(DoctorHomeProfileViewModel.class)
+    abstract ViewModel bindDoctorHomeProfileFragmentViewModel(DoctorHomeProfileViewModel doctorHomeProfileViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(DoctorHomeViewModel.class)
+    abstract ViewModel bindDoctorHomeFragmentViewModel(DoctorHomeViewModel doctorHomeViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(DoctorHomeAlertListViewModel.class)
+    abstract ViewModel bindDoctorHomeAlertListFragmentViewModel(DoctorHomeAlertListViewModel doctorHomeAlertListViewModel);
 
     @Binds
     @IntoMap
@@ -102,6 +121,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(AddPatientViewModel.class)
     abstract ViewModel bindAddPatientViewModel(AddPatientViewModel addPatientViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AddGoalActivityViewModel.class)
+    abstract ViewModel bindAddGoalViewModel(AddGoalActivityViewModel addGoalActivityViewModel);
 
     @Binds
     @IntoMap

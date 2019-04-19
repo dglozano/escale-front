@@ -3,6 +3,7 @@ package com.dglozano.escale.ui.main.stats;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -63,6 +64,8 @@ public class StatsFragment extends Fragment {
 
         setupViewPager(mTabsViewPager);
 
+        setHasOptionsMenu(true);
+
         mStatsViewModel.areMeasurementsEmpty().observe(this, measurementsEmpty -> {
             if (measurementsEmpty != null && !measurementsEmpty) {
                 mStatsMainContainer.setVisibility(View.VISIBLE);
@@ -77,6 +80,11 @@ public class StatsFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        menu.clear();
     }
 
     private void setupViewPager(ViewPager viewPager) {

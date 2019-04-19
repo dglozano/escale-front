@@ -1,5 +1,6 @@
 package com.dglozano.escale.web;
 
+import com.dglozano.escale.db.entity.Alert;
 import com.dglozano.escale.db.entity.MeasurementForecast;
 import com.dglozano.escale.db.entity.PatientInfo;
 import com.dglozano.escale.web.dto.AddBodyMeasurementDTO;
@@ -21,6 +22,7 @@ import com.dglozano.escale.web.dto.UpdatePatientDTO;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
@@ -129,7 +131,16 @@ public interface EscaleRestApi {
     @GET("/api/doctors/{id}/patients/info")
     Single<List<PatientInfo>> getAllPatientsInfoOfDoctor(@Path("id") Long doctorId);
 
+    @GET("/api/patients/{id}/alerts")
+    Single<List<Alert>> getAllAlertsOfPatient(@Path("id") Long patiendId);
+
+    @POST("/api/patients/{id}/alerts/toggleSeenByDoctor")
+    Completable toggleSeenByDoctor(@Path("id") Long patientId, @Query("alertId") Long alertId);
+
     @Multipart
     @POST("/api/diets/upload")
     Completable uploadDiet(@Part MultipartBody.Part file, @Query("patientId") Long patientId, @Query("filename") String filename);
+
+    @POST("/api/patients/{id}/alerts/markAllAsSeen")
+    Completable markAllAlertsAsSeenByDoctor(@Path("id") Long patientId);
 }

@@ -65,7 +65,8 @@
         <activity
             android:name=".ui.login.LoginActivity"
             android:parentActivityName="androidx.appcompat.app.AppCompatActivity"
-            android:theme="@style/AppTheme.SplashTheme">
+            android:theme="@style/AppTheme.SplashTheme"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="androidx.appcompat.app.AppCompatActivity" />
@@ -78,7 +79,9 @@
         </activity>
         <activity
             android:name=".ui.common.pw_change.ChangePasswordActivity"
-            android:label="@string/change_password_title" />
+
+            android:label="@string/change_password_title"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.common.pw_recovery.RecoverPasswordActivity"
             android:label="@string/recover_password_activity_label" />
@@ -86,17 +89,27 @@
         <activity android:name=".ui.main.diet.show.ShowDietPdfActivity" />
         <activity
             android:name=".ui.main.home.AddMeasurementActivity"
-            android:label="@string/add_body_measurement" />
+
+            android:label="@string/add_body_measurement"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.drawer.profile.PatientProfileActivity"
             android:label="@string/profile_title" />
-        <activity android:name=".ui.doctor.main.DoctorMainActivity"
-            android:label="@string/patients"/>
         <activity
-            android:name=".ui.doctor.main.AddPatientActivity"
+            android:name=".ui.doctor.main.DoctorMainActivity"
+            android:label="@string/patients" />
+        <activity
+            android:name=".ui.doctor.main.add_patient.AddPatientActivity"
             android:label="@string/add_patient_label"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".ui.doctor.main.AddDietActivity" />
+        <activity
+            android:name=".ui.doctor.main.add_diet.AddDietActivity"
+            android:label="@string/add_diet_title"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".ui.doctor.main.add_goal.AddGoalActivity"
+            android:label="@string/add_goal"
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>

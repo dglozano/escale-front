@@ -53,6 +53,7 @@ public class PatientRepository {
     private PatientDao mPatientDao;
     private ForecastDao mForecastDao;
     private DoctorRepository mDoctorRepository;
+    private AlertRepository mAlertRepository;
     private UserDao mUserDao;
     private EscaleRestApi mEscaleRestApi;
     private AppExecutors mAppExecutors;
@@ -65,6 +66,7 @@ public class PatientRepository {
     public PatientRepository(PatientDao patientDao,
                              EscaleRestApi escaleRestApi,
                              DoctorRepository doctorRepository,
+                             AlertRepository alertRepository,
                              UserDao userDao,
                              ForecastDao forecastDao,
                              AppExecutors executors,
@@ -73,6 +75,7 @@ public class PatientRepository {
         this.baseUrl = baseUrl;
         this.mForecastDao = forecastDao;
         mUserDao = userDao;
+        mAlertRepository = alertRepository;
         mDoctorRepository = doctorRepository;
         mPatientDao = patientDao;
         mEscaleRestApi = escaleRestApi;
@@ -121,7 +124,7 @@ public class PatientRepository {
                 new ChangePasswordDataDTO(currentPassword,
                         newPassword, newPasswordRepeat), userId)
                 .flatMap(changePasswordResponse -> {
-                    if (changePasswordResponse.code() == 200) {
+                    if (changePasswordResponse.isSuccessful()) {
                         return mEscaleRestApi.getPatientById(userId);
                     } else {
                         Timber.d("Error change password, check");
@@ -168,10 +171,10 @@ public class PatientRepository {
                     mPatientDao.upsert(patient);
                     return patient;
                 }))
-                .flatMap(patient -> {
-                    return getUpdatedForecastFromApi(patient)
-                            .andThen(Single.just(patient.getId()));
-                });
+                .flatMap(patient ->
+                        Completable.mergeArray(getUpdatedForecastFromApi(patient), mAlertRepository.refreshAlertsOfPatient(patient.getId()))
+                                .andThen(Single.just(patient.getId()))
+                );
     }
 
     public Completable saveNewGoalOnNotified(Long loggedPatiendId, Float weightInKg, String dueDate) {

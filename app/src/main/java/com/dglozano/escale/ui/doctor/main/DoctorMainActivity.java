@@ -4,11 +4,15 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.db.entity.PatientInfo;
 import com.dglozano.escale.ui.BaseActivity;
+import com.dglozano.escale.ui.doctor.main.add_patient.AddPatientActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.LogoutDialog;
 import com.dglozano.escale.ui.main.MainActivity;
@@ -18,11 +22,14 @@ import com.dglozano.escale.web.services.FirebaseTokenSenderService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -35,7 +42,8 @@ import butterknife.OnClick;
 import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
-public class DoctorMainActivity extends BaseActivity implements LogoutDialog.LogoutDialogListener {
+public class DoctorMainActivity extends BaseActivity
+        implements LogoutDialog.LogoutDialogListener, SearchView.OnQueryTextListener {
 
     private static final int ADD_PATIENT_CODE = 234;
 
@@ -96,7 +104,7 @@ public class DoctorMainActivity extends BaseActivity implements LogoutDialog.Log
             if (patientInfos != null && !patientInfos.isEmpty()) {
                 mNoPatientsLayout.setVisibility(View.GONE);
                 mPatientsRecyclerList.setVisibility(View.VISIBLE);
-                mPatientsInfoAdapter.setItems(patientInfos);
+                mPatientsInfoAdapter.replaceAll(patientInfos);
             } else {
                 mPatientsRecyclerList.setVisibility(View.GONE);
                 mNoPatientsLayout.setVisibility(View.VISIBLE);
@@ -138,6 +146,45 @@ public class DoctorMainActivity extends BaseActivity implements LogoutDialog.Log
             startActivity(intent);
             finish();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_doctor_menu, menu);
+
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String query) {
+        if (mViewModel.getAllPatientInfoForLoggedDoctor().getValue() != null) {
+            final List<PatientInfo> filteredModelList = filter(mViewModel.getAllPatientInfoForLoggedDoctor().getValue(), query);
+            mPatientsInfoAdapter.replaceAll(filteredModelList);
+            mPatientsRecyclerList.scrollToPosition(0);
+        }
+        return true;
+    }
+
+    private static List<PatientInfo> filter(List<PatientInfo> models, String query) {
+        final String lowerCaseQuery = query.toLowerCase();
+
+        final List<PatientInfo> filteredModelList = new ArrayList<>();
+        for (PatientInfo model : models) {
+            final String text = model.getFullName().toLowerCase();
+            if (text.contains(lowerCaseQuery)) {
+                filteredModelList.add(model);
+            }
+        }
+        return filteredModelList;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
     }
 
     @Override

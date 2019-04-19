@@ -4,10 +4,16 @@ import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivity;
 import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivityModule;
 import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivity;
 import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivityModule;
-import com.dglozano.escale.ui.doctor.main.AddDietActivity;
-import com.dglozano.escale.ui.doctor.main.AddDietModule;
-import com.dglozano.escale.ui.doctor.main.AddPatientActivity;
-import com.dglozano.escale.ui.doctor.main.AddPatientModule;
+import com.dglozano.escale.ui.doctor.main.add_diet.AddDietActivity;
+import com.dglozano.escale.ui.doctor.main.add_diet.AddDietModule;
+import com.dglozano.escale.ui.doctor.main.add_goal.AddGoalActivity;
+import com.dglozano.escale.ui.doctor.main.add_goal.AddGoalModule;
+import com.dglozano.escale.ui.doctor.main.add_patient.AddPatientActivity;
+import com.dglozano.escale.ui.doctor.main.add_patient.AddPatientModule;
+import com.dglozano.escale.ui.doctor.main.home.DoctorHomeFragmentProvider;
+import com.dglozano.escale.ui.doctor.main.home.alerts.DoctorHomeAlertListFragment;
+import com.dglozano.escale.ui.doctor.main.home.alerts.DoctorHomeAlertListProvider;
+import com.dglozano.escale.ui.doctor.main.home.profile.DoctorHomeProfileFragmentProvider;
 import com.dglozano.escale.ui.doctor.main.DoctorMainActivity;
 import com.dglozano.escale.ui.doctor.main.DoctorMainActivityModule;
 import com.dglozano.escale.ui.drawer.profile.PatientProfileActivity;
@@ -39,6 +45,9 @@ public abstract class ActivityBuilder {
             MainActivityModule.class,
             HomeFragmentProvider.class,
             StatsFragmentProvider.class,
+            DoctorHomeProfileFragmentProvider.class,
+            DoctorHomeAlertListProvider.class,
+            DoctorHomeFragmentProvider.class,
             StatsChartProvider.class,
             StatsListProvider.class,
             DietFragmentProvider.class,
@@ -92,4 +101,9 @@ public abstract class ActivityBuilder {
             AddDietModule.class
     })
     public abstract AddDietActivity bindAddDietActivity();
+
+    @ContributesAndroidInjector(modules = {
+            AddGoalModule.class
+    })
+    public abstract AddGoalActivity bindAddGoalActivity();
 }

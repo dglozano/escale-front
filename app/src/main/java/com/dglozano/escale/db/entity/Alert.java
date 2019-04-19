@@ -1,5 +1,7 @@
 package com.dglozano.escale.db.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Date;
 
 import androidx.room.Entity;
@@ -8,6 +10,11 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import static androidx.room.ForeignKey.CASCADE;
+import static com.dglozano.escale.db.entity.Alert.AlertType.FORECAST_PREDICTS_GOAL_WILL_FAIL;
+import static com.dglozano.escale.db.entity.Alert.AlertType.GOAL_FAILED;
+import static com.dglozano.escale.db.entity.Alert.AlertType.GOAL_SUCCESS;
+import static com.dglozano.escale.db.entity.Alert.AlertType.MANUAL_MEASUREMENT;
+import static com.dglozano.escale.db.entity.Alert.AlertType.NO_RECENT_MEASUREMENT;
 
 @Entity(foreignKeys = {
         @ForeignKey(entity = Doctor.class,
@@ -28,7 +35,7 @@ public class Alert {
     private Date dateCreated;
     private boolean seenByDoctor;
     private boolean seenByPatient;
-    private int alertType;
+    private AlertType alertType;
     private String message;
 
     public Alert() {
@@ -36,7 +43,7 @@ public class Alert {
 
     @Ignore
     public Alert(
-            Long id, Long patientId, Long doctorId, int alertType, String alertMsg, Date date) {
+            Long id, Long patientId, Long doctorId, AlertType alertType, String alertMsg, Date date) {
         this.id = id;
         this.patientId = patientId;
         this.doctorId = doctorId;
@@ -93,11 +100,11 @@ public class Alert {
         this.seenByPatient = seenByPatient;
     }
 
-    public int getAlertType() {
+    public AlertType getAlertType() {
         return alertType;
     }
 
-    public void setAlertType(int alertType) {
+    public void setAlertType(AlertType alertType) {
         this.alertType = alertType;
     }
 
@@ -107,5 +114,56 @@ public class Alert {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public enum AlertType {
+        @SerializedName("1")
+        FORECAST_PREDICTS_GOAL_WILL_FAIL,
+        @SerializedName("2")
+        GOAL_FAILED,
+        @SerializedName("3")
+        MANUAL_MEASUREMENT,
+        @SerializedName("4")
+        NO_RECENT_MEASUREMENT,
+        @SerializedName("5")
+        GOAL_SUCCESS
+    }
+
+    public static Alert.AlertType intToAlertType(Integer i) {
+        switch (i) {
+            case 1:
+                return FORECAST_PREDICTS_GOAL_WILL_FAIL;
+            case 2:
+                return GOAL_FAILED;
+            case 3:
+                return MANUAL_MEASUREMENT;
+            case 4:
+                return NO_RECENT_MEASUREMENT;
+            case 5:
+                return GOAL_SUCCESS;
+            default:
+                return null;
+        }
+    }
+
+    public static Integer alertTypeToInt(AlertType alertType) {
+        if (alertType == null) {
+            return -1;
+        } else {
+            switch (alertType) {
+                case FORECAST_PREDICTS_GOAL_WILL_FAIL:
+                    return 1;
+                case GOAL_FAILED:
+                    return 2;
+                case MANUAL_MEASUREMENT:
+                    return 3;
+                case NO_RECENT_MEASUREMENT:
+                    return 4;
+                case GOAL_SUCCESS:
+                    return 5;
+                default:
+                    return -1;
+            }
+        }
     }
 }

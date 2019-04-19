@@ -213,6 +213,10 @@ public class Patient extends AppUser {
         return goalInKg != null && goalDueDate != null && today.before(goalDueDate);
     }
 
+    public boolean isFullyLoaded() {
+        return birthday != null && firstName != null && lastName != null && email != null;
+    }
+
     public enum Gender {
         @SerializedName("1")
         MALE,

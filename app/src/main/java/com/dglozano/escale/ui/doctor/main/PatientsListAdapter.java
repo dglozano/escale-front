@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SortedList;
 import butterknife.BindColor;
 import butterknife.BindDrawable;
 import butterknife.BindString;
@@ -57,7 +58,44 @@ public class PatientsListAdapter extends RecyclerView.Adapter<PatientsListAdapte
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
 
-    private List<PatientInfo> mPatientsInfoList;
+//    private List<PatientInfo> mPatientsInfoList;
+
+    private final SortedList<PatientInfo> mPatientsInfoList = new SortedList<>(PatientInfo.class, new SortedList.Callback<PatientInfo>() {
+        @Override
+        public int compare(PatientInfo a, PatientInfo b) {
+            return a.compareTo(b);
+        }
+
+        @Override
+        public void onInserted(int position, int count) {
+            notifyItemRangeInserted(position, count);
+        }
+
+        @Override
+        public void onRemoved(int position, int count) {
+            notifyItemRangeRemoved(position, count);
+        }
+
+        @Override
+        public void onMoved(int fromPosition, int toPosition) {
+            notifyItemMoved(fromPosition, toPosition);
+        }
+
+        @Override
+        public void onChanged(int position, int count) {
+            notifyItemRangeChanged(position, count);
+        }
+
+        @Override
+        public boolean areContentsTheSame(PatientInfo oldItem, PatientInfo newItem) {
+            return oldItem.equals(newItem);
+        }
+
+        @Override
+        public boolean areItemsTheSame(PatientInfo item1, PatientInfo item2) {
+            return item1.getPatientId() == item2.getPatientId();
+        }
+    });
     private PatientClickListener mClickListener;
     private DoctorMainActivityViewModel mDoctorMainActivityViewModel;
     private Context mContext;
@@ -84,9 +122,41 @@ public class PatientsListAdapter extends RecyclerView.Adapter<PatientsListAdapte
         return new PatientViewHolder(itemView, mClickListener);
     }
 
-    public void setItems(List<PatientInfo> patientInfoList) {
-        mPatientsInfoList = patientInfoList;
-        notifyDataSetChanged();
+//    public void setItems(List<PatientInfo> patientInfoList) {
+//        mPatientsInfoList = patientInfoList;
+//        notifyDataSetChanged();
+//    }
+
+    public void add(PatientInfo model) {
+        mPatientsInfoList.add(model);
+    }
+
+    public void remove(PatientInfo model) {
+        mPatientsInfoList.remove(model);
+    }
+
+    public void add(List<PatientInfo> models) {
+        mPatientsInfoList.addAll(models);
+    }
+
+    public void remove(List<PatientInfo> models) {
+        mPatientsInfoList.beginBatchedUpdates();
+        for (PatientInfo model : models) {
+            mPatientsInfoList.remove(model);
+        }
+        mPatientsInfoList.endBatchedUpdates();
+    }
+
+    public void replaceAll(List<PatientInfo> models) {
+        mPatientsInfoList.beginBatchedUpdates();
+        for (int i = mPatientsInfoList.size() - 1; i >= 0; i--) {
+            final PatientInfo model = mPatientsInfoList.get(i);
+            if (!models.contains(model)) {
+                mPatientsInfoList.remove(model);
+            }
+        }
+        mPatientsInfoList.addAll(models);
+        mPatientsInfoList.endBatchedUpdates();
     }
 
     // Replace the contents of a view (invoked by the layout manager)

@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.ui.doctor.main.AddDietActivity;
+import com.dglozano.escale.ui.doctor.main.add_diet.AddDietActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.diet.all.AllDietsFragment;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietFragment;

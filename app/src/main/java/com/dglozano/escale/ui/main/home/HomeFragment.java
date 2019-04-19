@@ -524,20 +524,25 @@ public class HomeFragment extends Fragment
     private void showLoader(boolean isScanningOrConnecting) {
         if (isScanningOrConnecting) {
             Timber.d("Bluetooth BLE Scan start. Showing loader...");
-            mMeasurementLayout.setVisibility(View.GONE);
-            mLoaderLayout.setVisibility(View.VISIBLE);
+            if (mMeasurementLayout.getVisibility() != View.GONE)
+                mMeasurementLayout.setVisibility(View.GONE);
+            if (mLoaderLayout.getVisibility() != View.VISIBLE)
+                mLoaderLayout.setVisibility(View.VISIBLE);
         } else {
             Timber.d("Bluetooth BLE Scan stop. Hiding loader...");
-            mLoaderLayout.setVisibility(View.GONE);
-            mMeasurementLayout.setVisibility(View.VISIBLE);
+            if (mLoaderLayout.getVisibility() != View.GONE) mLoaderLayout.setVisibility(View.GONE);
+            if (mMeasurementLayout.getVisibility() != View.VISIBLE)
+                mMeasurementLayout.setVisibility(View.VISIBLE);
         }
     }
 
     private void showStepOnScale(Boolean isMeasurementTriggered) {
         if (isMeasurementTriggered) {
-            mStepOnScaleLayout.setVisibility(View.VISIBLE);
+            if (mStepOnScaleLayout.getVisibility() != View.VISIBLE)
+                mStepOnScaleLayout.setVisibility(View.VISIBLE);
         } else {
-            mStepOnScaleLayout.setVisibility(View.GONE);
+            if (mStepOnScaleLayout.getVisibility() != View.GONE)
+                mStepOnScaleLayout.setVisibility(View.GONE);
         }
     }
 

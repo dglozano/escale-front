@@ -122,6 +122,18 @@ public class MessagesFragment extends Fragment {
         return true;
     }
 
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem addGoal = menu.findItem(R.id.menu_doctor_profile_add_goal);
+        MenuItem markAsSeenAlerts = menu.findItem(R.id.menu_doctor_profile_mark_as_seen);
+        if (markAsSeenAlerts != null)
+            markAsSeenAlerts.setVisible(false);
+        if (addGoal != null) {
+            addGoal.setVisible(false);
+        }
+    }
+
     private void setupSendListener() {
         mMessageInput.setInputListener(input -> {
             //validate and send message

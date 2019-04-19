@@ -2,6 +2,7 @@ package com.dglozano.escale.web.services;
 
 import android.content.SharedPreferences;
 
+import com.dglozano.escale.db.entity.Alert;
 import com.dglozano.escale.repository.AlertRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
@@ -147,7 +148,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String alert_msg = remoteMessage.getData().get("alert_msg");
         String date = remoteMessage.getData().get("date");
         disposables.add(doctorRepository.addAlertToPatientInfo(patient_id, doctor_id)
-                .andThen(alertRepository.upsertAlert(id, patient_id, doctor_id, alert_type, alert_msg, date))
+                .andThen(alertRepository.upsertAlert(id, patient_id, doctor_id, Alert.intToAlertType(alert_type), alert_msg, date))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(() -> {

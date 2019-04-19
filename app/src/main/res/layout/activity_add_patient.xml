@@ -6,7 +6,7 @@
 
         <variable
             name="viewmodel"
-            type="com.dglozano.escale.ui.doctor.main.AddPatientViewModel" />
+            type="com.dglozano.escale.ui.doctor.main.add_patient.AddPatientViewModel" />
     </data>
 
     <RelativeLayout

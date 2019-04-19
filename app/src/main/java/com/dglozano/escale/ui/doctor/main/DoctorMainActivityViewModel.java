@@ -34,6 +34,7 @@ public class DoctorMainActivityViewModel extends ViewModel {
 
     private final MutableLiveData<Event<Integer>> mLogoutEvent;
     private final MediatorLiveData<Boolean> mLoadingStatus;
+    private final LiveData<List<PatientInfo>> mPatientInfos;
 
 
     @Inject
@@ -49,6 +50,7 @@ public class DoctorMainActivityViewModel extends ViewModel {
         mMeasurementRepository = bodyMeasurementRepository;
         mUserRepository = userRepository;
         mDoctorRepository = doctorRepository;
+        mPatientInfos = mDoctorRepository.getAllPatientInfoForLoggedDoctor();
 
         mLogoutEvent = new MutableLiveData<>();
         mLoadingStatus = new MediatorLiveData<>();
@@ -97,7 +99,7 @@ public class DoctorMainActivityViewModel extends ViewModel {
     }
 
     public LiveData<List<PatientInfo>> getAllPatientInfoForLoggedDoctor() {
-        return mDoctorRepository.getAllPatientInfoForLoggedDoctor();
+        return mPatientInfos;
     }
 
     public MediatorLiveData<Boolean> getLoadingStatus() {

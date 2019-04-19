@@ -1,4 +1,4 @@
-package com.dglozano.escale.ui.doctor.main;
+package com.dglozano.escale.ui.doctor.main.add_patient;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;

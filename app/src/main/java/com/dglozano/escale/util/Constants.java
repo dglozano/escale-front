@@ -217,4 +217,5 @@ public class Constants {
     public static final String DIET_FILE_NAME_EXTRA = "diet_filename_extra";
     public static final String DIET_FILE_URI = "diet_file_uri_extra";
     public static final int SHOW_PDF_CODE = 999;
+    public static final int ADD_GOAL_ACTIVITY_CODE = 55478;
 }

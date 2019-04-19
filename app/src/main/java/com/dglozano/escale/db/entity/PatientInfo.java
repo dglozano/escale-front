@@ -1,5 +1,7 @@
 package com.dglozano.escale.db.entity;
 
+import java.util.Objects;
+
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
@@ -11,7 +13,7 @@ import static androidx.room.ForeignKey.CASCADE;
         parentColumns = "id",
         childColumns = "doctorId",
         onDelete = CASCADE))
-public class PatientInfo {
+public class PatientInfo implements Comparable<PatientInfo> {
 
     @PrimaryKey
     private Long patientId;
@@ -85,5 +87,32 @@ public class PatientInfo {
 
     public void setDoctorId(Long doctorId) {
         this.doctorId = doctorId;
+    }
+
+    @Override
+    public int compareTo(PatientInfo patientInfo) {
+        if (this.getAlerts() != patientInfo.getAlerts()) {
+            return patientInfo.getAlerts() - this.getAlerts();
+        } else if (this.getMessages() != patientInfo.getMessages()) {
+            return patientInfo.getMessages() - this.getMessages();
+        } else return this.getFullName().compareTo(patientInfo.getFullName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PatientInfo that = (PatientInfo) o;
+        return alerts == that.alerts &&
+                messages == that.messages &&
+                Objects.equals(patientId, that.patientId) &&
+                Objects.equals(fullName, that.fullName) &&
+                Objects.equals(lastWeight, that.lastWeight) &&
+                Objects.equals(doctorId, that.doctorId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(patientId, fullName, alerts, messages, lastWeight, doctorId);
     }
 }
