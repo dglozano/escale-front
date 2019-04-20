@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import com.dglozano.escale.R;
 import com.dglozano.escale.ui.main.stats.chart.StatsChartFragment;
 import com.dglozano.escale.ui.main.stats.list.StatsListFragment;
+import com.dglozano.escale.util.ui.FragmentWithViewPager;
 import com.dglozano.escale.util.ui.MyTabAdapter;
 import com.google.android.material.tabs.TabLayout;
 
@@ -28,7 +29,7 @@ import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
-public class StatsFragment extends Fragment {
+public class StatsFragment extends Fragment implements FragmentWithViewPager {
 
     @BindView(R.id.stats_view_pager_tabs)
     ViewPager mTabsViewPager;
@@ -64,8 +65,6 @@ public class StatsFragment extends Fragment {
 
         setupViewPager(mTabsViewPager);
 
-        setHasOptionsMenu(true);
-
         mStatsViewModel.areMeasurementsEmpty().observe(this, measurementsEmpty -> {
             if (measurementsEmpty != null && !measurementsEmpty) {
                 mStatsMainContainer.setVisibility(View.VISIBLE);
@@ -80,11 +79,6 @@ public class StatsFragment extends Fragment {
         });
 
         return view;
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-        menu.clear();
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -107,8 +101,18 @@ public class StatsFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        menu.clear();
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mStatsViewModel = ViewModelProviders.of(this, mViewModelFactory).get(StatsViewModel.class);
+    }
+
+    @Override
+    public MyTabAdapter getPagerAdapter() {
+        return mTabsAdapter;
     }
 }

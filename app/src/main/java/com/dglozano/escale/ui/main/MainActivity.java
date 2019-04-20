@@ -154,6 +154,7 @@ public class MainActivity extends BaseActivity
 
         onKeyboardVisibilityEvent();
 
+        addFragmentsToBottomNav(openFragmentInPosition);
         setupBottomNav();
         observeIsRefreshing();
         observeUserData();
@@ -176,6 +177,10 @@ public class MainActivity extends BaseActivity
                 setElevationOfAppBar(10f);
             }
         });
+
+        invalidateOptionsMenu();
+
+//        invalidateOptionsMenu(openFragmentInPosition);
     }
 
     private void onLogoutEvent(Event<Integer> logoutEvent) {
@@ -206,7 +211,6 @@ public class MainActivity extends BaseActivity
                     getSupportActionBar().hide();
                 } else {
                     getSupportActionBar().show();
-                    addFragmentsToBottomNav(mViewModel.getPositionOfCurrentFragment().getValue());
                 }
             }
         });
@@ -279,10 +283,11 @@ public class MainActivity extends BaseActivity
                 if (mMessagesBadge == null) {
                     mMessagesBadge = addBadgeAt(3, 0);
                 }
-                if (unreadMessages != null) {
-                    if (mViewModel.getPositionOfCurrentFragment().getValue() != null
-                            && mViewModel.getPositionOfCurrentFragment().getValue() != 3) {
+                if (unreadMessages != null && mViewModel.getPositionOfCurrentFragment().getValue() != null) {
+                    if (mViewModel.getPositionOfCurrentFragment().getValue() != 3) {
                         mMessagesBadge.setBadgeNumber(unreadMessages);
+                    } else {
+                        mMessagesBadge.setBadgeNumber(0);
                     }
                 }
             });
@@ -291,10 +296,11 @@ public class MainActivity extends BaseActivity
                 if (mMessagesBadge == null) {
                     mMessagesBadge = addBadgeAt(3, 0);
                 }
-                if (unreadMessages != null) {
-                    if (mViewModel.getPositionOfCurrentFragment().getValue() != null
-                            && mViewModel.getPositionOfCurrentFragment().getValue() != 3) {
+                if (unreadMessages != null && mViewModel.getPositionOfCurrentFragment().getValue() != null) {
+                    if (mViewModel.getPositionOfCurrentFragment().getValue() != 3) {
                         mMessagesBadge.setBadgeNumber(unreadMessages);
+                    } else {
+                        mMessagesBadge.setBadgeNumber(0);
                     }
                 }
             });
@@ -393,7 +399,7 @@ public class MainActivity extends BaseActivity
 
     private void addFragmentsToBottomNav(int currentFragmentPosition) {
         mNoSwipePager.setPagingEnabled(false);
-        mNoSwipePager.setOffscreenPageLimit(0);
+        mNoSwipePager.setOffscreenPageLimit(4);
         mNoSwipePager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -404,6 +410,8 @@ public class MainActivity extends BaseActivity
             public void onPageSelected(int position) {
                 Timber.d("New fragment position %s", position);
                 mViewModel.setPositionOfCurrentFragment(position);
+//                invalidateOptionsMenu(position);
+                invalidateOptionsMenu();
             }
 
             @Override
@@ -423,6 +431,7 @@ public class MainActivity extends BaseActivity
         mBnv.setupWithViewPager(mNoSwipePager);
         mNoSwipePager.setCurrentItem(currentFragmentPosition);
     }
+
 
     @Override
     public void onBackPressed() {

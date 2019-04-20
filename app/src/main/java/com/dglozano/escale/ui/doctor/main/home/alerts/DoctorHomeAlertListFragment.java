@@ -65,27 +65,7 @@ public class DoctorHomeAlertListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home_doctor_alerts, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
 
-        setHasOptionsMenu(true);
-
         return view;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.doctor_alert_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.menu_doctor_profile_mark_as_seen) {
-            mDoctorHomeAlertListViewModel.markAllAsSeen();
-        } else if (id == android.R.id.home) {
-            getActivity().onBackPressed();
-        }
-        return true;
     }
 
     @Override

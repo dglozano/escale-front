@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -16,6 +17,7 @@ import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.diet.all.AllDietsFragment;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietFragment;
 import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.ui.FragmentWithViewPager;
 import com.dglozano.escale.util.ui.MyTabAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -27,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,7 +38,7 @@ import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
-public class DietFragment extends Fragment {
+public class DietFragment extends Fragment implements FragmentWithViewPager {
 
     @BindView(R.id.diet_view_pager_tabs)
     ViewPager mTabsViewPager;
@@ -111,6 +114,11 @@ public class DietFragment extends Fragment {
         mViewUnbinder.unbind();
     }
 
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        menu.clear();
+    }
+
     @OnClick(R.id.add_diet_btn)
     public void onAddDietClick(View v) {
 
@@ -145,5 +153,10 @@ public class DietFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mDietViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DietViewModel.class);
         mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+    }
+
+    @Override
+    public MyTabAdapter getPagerAdapter() {
+        return mTabsAdapter;
     }
 }

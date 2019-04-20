@@ -64,6 +64,7 @@ public class MessagesFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_messages, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
+
         setHasOptionsMenu(true);
 
         return view;
@@ -97,7 +98,6 @@ public class MessagesFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.messages_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
         MenuItem item = menu.findItem(R.id.menu_messages_copy);
         item.setVisible(mMessagesViewModel.isCopyMenuVisible());
     }

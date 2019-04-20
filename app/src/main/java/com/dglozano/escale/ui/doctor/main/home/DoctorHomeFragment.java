@@ -1,8 +1,12 @@
 package com.dglozano.escale.ui.doctor.main.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -10,9 +14,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.ui.doctor.main.add_goal.AddGoalActivity;
 import com.dglozano.escale.ui.doctor.main.home.alerts.DoctorHomeAlertListFragment;
 import com.dglozano.escale.ui.doctor.main.home.profile.DoctorHomeProfileFragment;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
+import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.ui.FragmentWithViewPager;
 import com.dglozano.escale.util.ui.MyTabAdapter;
 import com.google.android.material.tabs.TabLayout;
 
@@ -30,7 +37,7 @@ import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
-public class DoctorHomeFragment extends Fragment {
+public class DoctorHomeFragment extends Fragment implements FragmentWithViewPager {
 
     @BindView(R.id.profile_or_alerts_tablayout_viewpager)
     ViewPager mTabsViewPager;
@@ -63,6 +70,15 @@ public class DoctorHomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home_doctor, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
 
+        setHasOptionsMenu(true);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         setupViewPager(mTabsViewPager);
 
         mMainActivityViewModel.isRefreshing().observe(this, isRefreshing -> {
@@ -92,9 +108,23 @@ public class DoctorHomeFragment extends Fragment {
                 }
             }
         });
-
-        return view;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.menu_doctor_profile_mark_as_seen) {
+            mDoctorHomeViewModel.markAllAsSeen();
+        } else if (id == R.id.menu_doctor_profile_add_goal) {
+            Intent intent = new Intent(getActivity(), AddGoalActivity.class);
+            startActivityForResult(intent, Constants.ADD_GOAL_ACTIVITY_CODE);
+        } else if (id == android.R.id.home) {
+            getActivity().onBackPressed();
+        }
+        return true;
+    }
+
 
     private void setupViewPager(ViewPager viewPager) {
         mTabsAdapter.addFragment(DoctorHomeProfileFragment.newInstance(), getString(R.string.home_doctor_profile_title));
@@ -123,9 +153,19 @@ public class DoctorHomeFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.doctor_profile_menu, menu);
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDoctorHomeViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DoctorHomeViewModel.class);
         mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+    }
+
+    @Override
+    public MyTabAdapter getPagerAdapter() {
+        return mTabsAdapter;
     }
 }

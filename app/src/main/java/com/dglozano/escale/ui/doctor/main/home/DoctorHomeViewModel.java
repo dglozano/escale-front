@@ -33,4 +33,10 @@ public class DoctorHomeViewModel extends ViewModel {
     public LiveData<Integer> getUnseenAlertsForDoctor() {
         return mAlertRepository.getCountOfPatientAlertsNotSeenByDoctor(mDoctorRepository.getLoggedDoctorId(), mPatientRepository.getLoggedPatientId());
     }
+
+    public void markAllAsSeen() {
+        disposables.add(mAlertRepository.markAllAsSeen(mDoctorRepository.getLoggedDoctorId(), mPatientRepository.getLoggedPatientId())
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> Timber.d("successfuly toggled seen by docter"), Timber::e));
+    }
 }

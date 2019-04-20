@@ -89,6 +89,8 @@ public class DoctorHomeProfileFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        mViewModel.getLoggedPatient().observe(this, this::updatePatientData);
+        mViewModel.getLastBodyMeasurement().observe(this, this::updateLastMeasurement);
     }
 
     @Override
@@ -103,31 +105,7 @@ public class DoctorHomeProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home_doctor_profile, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
 
-        mViewModel.getLoggedPatient().observe(this, this::updatePatientData);
-        mViewModel.getLastBodyMeasurement().observe(this, this::updateLastMeasurement);
-
-        setHasOptionsMenu(true);
-
         return view;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.doctor_profile_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.menu_doctor_profile_add_goal) {
-            Intent intent = new Intent(getActivity(), AddGoalActivity.class);
-            startActivityForResult(intent, Constants.ADD_GOAL_ACTIVITY_CODE);
-        } else if (id == android.R.id.home) {
-            getActivity().onBackPressed();
-        }
-        return true;
     }
 
     private void updateLastMeasurement(Optional<BodyMeasurement> bodyMeasurement) {

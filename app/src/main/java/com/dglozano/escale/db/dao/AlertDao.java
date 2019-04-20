@@ -11,7 +11,7 @@ import io.reactivex.Single;
 
 @Dao
 public abstract class AlertDao extends BaseDao<Alert> {
-    @Query("SELECT * FROM Alert WHERE doctorId == :doctorId AND patientId == :patientId ORDER BY seenByDoctor ASC, dateCreated DESC")
+    @Query("SELECT * FROM Alert WHERE doctorId == :doctorId AND patientId == :patientId ORDER BY dateCreated DESC")
     public abstract LiveData<List<Alert>> getAllPatientAlertForDoctor(Long doctorId, Long patientId);
 
     @Query("SELECT * FROM Alert WHERE doctorId == :doctorId AND patientId == :patientId")

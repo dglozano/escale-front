@@ -293,14 +293,18 @@ public class ChatRepository {
         return mUserChatJoinDao.getChatOfPatientAsMaybe(mPatientRepository.getLoggedPatientId())
                 .switchIfEmpty(refreshChatsOfUserAsMaybe(mPatientRepository.getLoggedPatientId()))
                 .toSingle()
-                .flatMapCompletable(chatId -> mEscaleRestApi
-                        .markSeenByUser(chatId, mPatientRepository.getLoggedPatientId())
+                .flatMap(chatId -> mEscaleRestApi.markSeenByUser(chatId, mPatientRepository.getLoggedPatientId())
                         .andThen(Completable.fromAction(() -> {
                             mChatMessageDao.getAllMessagesOfChat(chatId).stream()
                                     .map(chatMessage -> new UserChatMsgSeenJoin(mPatientRepository.getLoggedPatientId(), chatMessage.getId()))
                                     .forEach(userChatMsgSeenJoin -> mUserChatMsgSeenJoinDao.upsert(userChatMsgSeenJoin));
                         }))
-                );
+                        .andThen(Single.just(chatId)))
+                .flatMapCompletable(chatid -> Completable.fromAction(() -> {
+                    mChatDao.getChatById(chatid).ifPresent(chat -> {
+                        mChatDao.upsert(chat);
+                    });
+                }));
     }
 
     // TODO: DO NOT UPDATE ALL MESSAGES EVERYTIME.
@@ -308,7 +312,7 @@ public class ChatRepository {
         return mUserChatJoinDao.getChatOfPatientAsMaybe(mPatientRepository.getLoggedPatientId())
                 .switchIfEmpty(refreshChatsOfUserAsMaybe(mPatientRepository.getLoggedPatientId()))
                 .toSingle()
-                .flatMapCompletable(chatId -> mEscaleRestApi
+                .flatMap(chatId -> mEscaleRestApi
                         .markSeenByUser(chatId, mDoctorRepository.getLoggedDoctorId())
                         .andThen(Completable.fromAction(() -> {
                             mChatMessageDao.getAllMessagesOfChat(chatId).stream()
@@ -316,7 +320,12 @@ public class ChatRepository {
                                     .map(chatMessage -> new UserChatMsgSeenJoin(mDoctorRepository.getLoggedDoctorId(), chatMessage.getId()))
                                     .forEach(userChatMsgSeenJoin -> mUserChatMsgSeenJoinDao.upsert(userChatMsgSeenJoin));
                         }))
-                );
+                        .andThen(Single.just(chatId)))
+                .flatMapCompletable(chatid -> Completable.fromAction(() -> {
+                    mChatDao.getChatById(chatid).ifPresent(chat -> {
+                        mChatDao.upsert(chat);
+                    });
+                }));
     }
 
     public Completable saveMessageOnReceived(Long id, Long chat_id, Long sender_id, String msg, String date) {

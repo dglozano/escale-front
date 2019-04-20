@@ -81,6 +81,8 @@ public class MainActivityViewModel extends ViewModel {
         positionOfCurrentFragment = new MutableLiveData<>();
         positionOfCurrentFragment.postValue(0);
         mLoggedPatient = mPatientRepository.getLoggedPatient();
+        mIsRefreshing = new MediatorLiveData<>();
+        setupRefreshingObservable();
 
         mUnreadMessagesByPatient = Transformations.switchMap(
                 mChatRepository.getAllChatsOfUser(mPatientRepository.getLoggedPatientId()),
@@ -99,7 +101,6 @@ public class MainActivityViewModel extends ViewModel {
                                     chats.get(0).getId());
                 });
 
-        setupRefreshingObservable();
         setupMustChangePasswordObservable();
         isDoctorView = false;
 
@@ -263,16 +264,14 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     private void setupRefreshingObservable() {
-        mIsRefreshing = new MediatorLiveData<>();
-        mIsRefreshing.setValue(true);
         mIsRefreshingMessages = new MutableLiveData<>();
         mIsRefreshingPatient = new MutableLiveData<>();
         mIsRefreshingDiets = new MutableLiveData<>();
         mIsRefreshingMeasurements = new MutableLiveData<>();
-        mIsRefreshingMessages.setValue(false);
-        mIsRefreshingPatient.setValue(false);
-        mIsRefreshingDiets.setValue(false);
-        mIsRefreshingMeasurements.setValue(false);
+        mIsRefreshingMessages.setValue(true);
+        mIsRefreshingPatient.setValue(true);
+        mIsRefreshingDiets.setValue(true);
+        mIsRefreshingMeasurements.setValue(true);
 
         mIsRefreshing.addSource(mIsRefreshingDiets, isRefreshingDiets ->
                 mIsRefreshing.postValue(isRefreshingDiets ||

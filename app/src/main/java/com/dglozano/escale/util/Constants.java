@@ -39,7 +39,7 @@ public class Constants {
 
     // Web
     public static final String BASE_HEROKU_URL = "https://escale-api.herokuapp.com";
-    public static final String BASE_LOCALHOST_URL = "http://192.168.0.3:8080";
+    public static final String BASE_LOCALHOST_URL = "http://192.168.43.31:8080";
     public static final int FRESH_TIMEOUT = 30;
     public static final String TOKEN_HEADER_KEY = "token";
     public static final String REFRESH_TOKEN_HEADER_KEY = "refreshToken";

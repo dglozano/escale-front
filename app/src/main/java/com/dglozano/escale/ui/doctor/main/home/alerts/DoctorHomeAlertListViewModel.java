@@ -48,10 +48,4 @@ public class DoctorHomeAlertListViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .subscribe(() -> Timber.d("successfuly toggled seen by docter"), Timber::e));
     }
-
-    public void markAllAsSeen() {
-        disposables.add(mAlertRepository.markAllAsSeen(mDoctorRepository.getLoggedDoctorId(), mPatientRepository.getLoggedPatientId())
-                .subscribeOn(Schedulers.io())
-                .subscribe(() -> Timber.d("successfuly toggled seen by docter"), Timber::e));
-    }
 }
