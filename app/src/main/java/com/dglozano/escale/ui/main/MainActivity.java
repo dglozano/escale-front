@@ -133,6 +133,14 @@ public class MainActivity extends BaseActivity
 
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainActivityViewModel.class);
 
+        mViewModel.getAppBarShadowStatus().observe(this, showShadow -> {
+            if (showShadow != null && !showShadow) {
+                setElevationOfAppBar(0f);
+            } else {
+                setElevationOfAppBar(10f);
+            }
+        });
+
         int openFragmentInPosition = 0;
         if (getIntent().getExtras() != null) {
             openFragmentInPosition = handleIntent();
@@ -170,17 +178,7 @@ public class MainActivity extends BaseActivity
 
         mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
 
-        mViewModel.getAppBarShadowStatus().observe(this, showShadow -> {
-            if (showShadow != null && !showShadow) {
-                setElevationOfAppBar(0f);
-            } else {
-                setElevationOfAppBar(10f);
-            }
-        });
-
         invalidateOptionsMenu();
-
-//        invalidateOptionsMenu(openFragmentInPosition);
     }
 
     private void onLogoutEvent(Event<Integer> logoutEvent) {

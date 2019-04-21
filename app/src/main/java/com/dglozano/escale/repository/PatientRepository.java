@@ -56,9 +56,9 @@ public class PatientRepository {
     private AlertRepository mAlertRepository;
     private UserDao mUserDao;
     private EscaleRestApi mEscaleRestApi;
-    private AppExecutors mAppExecutors;
     private SharedPreferences mSharedPreferences;
     private LiveData<Long> mLoggedUserId;
+    private AppExecutors appExecutors;
     private MediatorLiveData<Optional<MeasurementForecast>> mLastForecastWithPredictions;
     private String baseUrl;
 
@@ -69,7 +69,7 @@ public class PatientRepository {
                              AlertRepository alertRepository,
                              UserDao userDao,
                              ForecastDao forecastDao,
-                             AppExecutors executors,
+                             AppExecutors appExecutors,
                              SharedPreferences sharedPreferences,
                              @BaseUrl String baseUrl) {
         this.baseUrl = baseUrl;
@@ -77,22 +77,24 @@ public class PatientRepository {
         mUserDao = userDao;
         mAlertRepository = alertRepository;
         mDoctorRepository = doctorRepository;
+        this.appExecutors = appExecutors;
         mPatientDao = patientDao;
         mEscaleRestApi = escaleRestApi;
-        mAppExecutors = executors;
         mSharedPreferences = sharedPreferences;
         mLoggedUserId = new SharedPreferencesLiveData.SharedPreferenceLongLiveData(mSharedPreferences,
                 Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
 
         mLastForecastWithPredictions = new MediatorLiveData<>();
-        mLastForecastWithPredictions.addSource(
-                Transformations.switchMap(mLoggedUserId, id -> mForecastDao.getLastForecastOfUserWithIdAsLiveData(id)),
-                mfOpt -> {
-                    mfOpt.ifPresent(mf -> mAppExecutors.getDiskIO().execute(() -> {
-                        Timber.d("mf livedata present %s", mf);
-                        mLastForecastWithPredictions.postValue(mForecastDao.getForecastWithPredictions(mf.getId()));
-                    }));
-                });
+        mLastForecastWithPredictions.addSource(Transformations.switchMap(mLoggedUserId, id -> mForecastDao.getLastForecastOfUserWithIdAsLiveData(getLoggedPatientId())),
+                        mfOpt -> {
+                            if (mfOpt.isPresent()) {
+                                this.appExecutors.getDiskIO().execute(() -> {
+                                    mLastForecastWithPredictions.postValue(mForecastDao.getForecastWithPredictions(mfOpt.get().getId()));
+                                });
+                            } else {
+                                mLastForecastWithPredictions.postValue(Optional.empty());
+                            }
+                        });
     }
 
     @Nullable
@@ -247,7 +249,7 @@ public class PatientRepository {
     }
 
     public Completable getUpdatedForecastFromApi(Patient patient) {
-        return mEscaleRestApi.getMeasurementForecastOfUser(patient.getId(), Constants.FORECAST_AMOUNT, true)
+        return mEscaleRestApi.getMeasurementForecastOfUser(patient.getId(), Constants.FORECAST_AMOUNT, false)
                 .flatMap(measurementForecastResponse -> {
                     if (measurementForecastResponse.code() == 200) {
                         mForecastDao.deleteAllByUserId(patient.getId());
@@ -259,7 +261,7 @@ public class PatientRepository {
     }
 
     public Completable getUpdatedForecastFromApi(Long loggedPatientId) {
-        return mEscaleRestApi.getMeasurementForecastOfUser(loggedPatientId, Constants.FORECAST_AMOUNT, true)
+        return mEscaleRestApi.getMeasurementForecastOfUser(loggedPatientId, Constants.FORECAST_AMOUNT, false)
                 .zipWith(mPatientDao.getPatientSingleById(loggedPatientId), (measurementForecastResponse, patient) -> {
                     if (measurementForecastResponse.code() == 200) {
                         mForecastDao.deleteAllByUserId(loggedPatientId);
@@ -270,7 +272,7 @@ public class PatientRepository {
                 .subscribeOn(Schedulers.io());
     }
 
-    public MediatorLiveData<Optional<MeasurementForecast>> getMeasurementForecastOfLoggedPatient() {
+    public LiveData<Optional<MeasurementForecast>> getMeasurementForecastOfLoggedPatient() {
         return mLastForecastWithPredictions;
     }
 

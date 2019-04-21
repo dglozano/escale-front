@@ -164,19 +164,7 @@ public class MainActivityViewModel extends ViewModel {
         disposables.add(mPatientRepository.refreshPatient(mPatientRepository.getLoggedPatientId())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .doOnSubscribe(d -> {
-//                    long lastRefresh = mSharedPreferences.getLong(Constants.LAST_FULL_SYNC, -1L);
-//                    if (lastRefresh != -1L) {
-//                        long diffInMillies = Math.abs(lastRefresh - Calendar.getInstance().getTimeInMillis());
-//                        long fourHours = 4 * 3600 * 1000;
-//                        if (diffInMillies > fourHours) {
-//                            mIsRefreshingPatient.postValue(true);
-//                        }
-//                    } else {
-//                        mIsRefreshingPatient.postValue(true);
-//                    }
-                            mIsRefreshingPatient.postValue(true);
-                        })
+                        .doOnSubscribe(d -> mIsRefreshingPatient.postValue(true))
                         .subscribe(this::refreshEverythingElse,
                                 error -> {
                                     if (error instanceof AccountDisabledException
