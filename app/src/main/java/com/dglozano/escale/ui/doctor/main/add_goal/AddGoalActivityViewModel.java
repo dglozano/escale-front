@@ -47,7 +47,7 @@ public class AddGoalActivityViewModel extends ViewModel {
         return isValidWeight(goalInKg) && isValidGoalDueDate(dueDate);
     }
 
-    public void hitChangeGoal(CharSequence goalInKgStr, CharSequence goalDueDateStr) {
+    public void hitChangeGoal(CharSequence goalInKgStr, CharSequence goalDueDateStr, boolean isLoseGoal) {
         if (isInputValid(goalInKgStr, goalDueDateStr)) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -55,7 +55,7 @@ public class AddGoalActivityViewModel extends ViewModel {
                 Float goalInKg = Float.parseFloat(goalInKgStr.toString());
                 disposables.add(
                         mDoctorRepository.addGoal(mDoctorRepository.getLoggedDoctorId(),
-                                mPatientRepository.getLoggedPatientId(), goalInKg, goalDueDate)
+                                mPatientRepository.getLoggedPatientId(), goalInKg, goalDueDate, isLoseGoal)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .doOnSubscribe((d) -> mLoading.postValue(true))

@@ -29,6 +29,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
+import co.ceryle.radiorealbutton.RadioRealButtonGroup;
 import dagger.android.AndroidInjection;
 
 import static com.dglozano.escale.util.ValidationHelper.getGoalDueDateError;
@@ -46,6 +47,8 @@ public class AddGoalActivity extends BaseActivity {
     EditText mDueDateEditText;
     @BindView(R.id.add_goal_progress_bar_container)
     RelativeLayout mProgressBarContainer;
+    @BindView(R.id.add_goal_direction_group)
+    RadioRealButtonGroup mGoalDirectionGroup;
 
     DatePickerDialog.OnDateSetListener onDateSetListener;
     DatePickerDialog mDatePickerDialog = null;
@@ -113,7 +116,8 @@ public class AddGoalActivity extends BaseActivity {
     public void onAddGoalClick(View v) {
         mViewModel.hitChangeGoal(
                 Objects.requireNonNull(mAddGoalEditText).getText(),
-                Objects.requireNonNull(mDueDateEditText).getText()
+                Objects.requireNonNull(mDueDateEditText).getText(),
+                mGoalDirectionGroup.getPosition() == 0
         );
     }
 

@@ -186,13 +186,14 @@ public class DoctorRepository {
                 .subscribeOn(Schedulers.io());
     }
 
-    public Completable addGoal(Long doctorId, Long patientId, Float goalInKg, Date dueDate) {
-        AddWeightGoalDTO dto = new AddWeightGoalDTO(goalInKg, dueDate);
+    public Completable addGoal(Long doctorId, Long patientId, Float goalInKg, Date dueDate, boolean isLoseGoal) {
+        AddWeightGoalDTO dto = new AddWeightGoalDTO(goalInKg, dueDate, isLoseGoal);
         return mEscaleRestApi.addGoal(dto, doctorId, patientId)
                 .zipWith(mPatientDao.getPatientSingleById(patientId), (weightGoalDTO, patient) -> {
                     patient.setGoalInKg(weightGoalDTO.getGoalInKg());
                     patient.setGoalDueDate(weightGoalDTO.getDueDate());
                     patient.setGoalStartDate(weightGoalDTO.getStartDate());
+                    patient.setLoseGoal(weightGoalDTO.isLoseGoal());
                     mPatientDao.upsert(patient);
                     return patient;
                 }).flatMapCompletable(patient -> Completable.complete())

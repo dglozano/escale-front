@@ -6,13 +6,23 @@ public class AddWeightGoalDTO {
 
     private Float goalInKg;
     private Date dueDate;
+    private boolean loseGoal;
 
     public AddWeightGoalDTO() {
     }
 
-    public AddWeightGoalDTO(Float goalInKg, Date dueDate) {
+    public AddWeightGoalDTO(Float goalInKg, Date dueDate, boolean isLoseGoal) {
         this.goalInKg = goalInKg;
         this.dueDate = dueDate;
+        this.loseGoal = isLoseGoal;
+    }
+
+    public boolean isLoseGoal() {
+        return loseGoal;
+    }
+
+    public void setLoseGoal(boolean loseGoal) {
+        this.loseGoal = loseGoal;
     }
 
     public Float getGoalInKg() {

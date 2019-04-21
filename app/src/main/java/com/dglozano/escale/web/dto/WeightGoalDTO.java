@@ -9,16 +9,26 @@ public class WeightGoalDTO {
     private Date startDate;
     private Date dueDate;
     private boolean isAccomplished;
+    private boolean loseGoal;
 
     public WeightGoalDTO() {
     }
 
-    public WeightGoalDTO(Long id, float goalInKg, Date startDate, Date dueDate, boolean isAccomplished) {
+    public WeightGoalDTO(Long id, float goalInKg, Date startDate, Date dueDate, boolean isAccomplished, boolean isLoseGoal) {
         this.id = id;
         this.goalInKg = goalInKg;
         this.startDate = startDate;
         this.dueDate = dueDate;
         this.isAccomplished = isAccomplished;
+        this.loseGoal = isLoseGoal;
+    }
+
+    public boolean isLoseGoal() {
+        return loseGoal;
+    }
+
+    public void setLoseGoal(boolean loseGoal) {
+        this.loseGoal = loseGoal;
     }
 
     public Long getId() {

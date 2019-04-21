@@ -207,6 +207,7 @@ public class StatsChartFragment extends Fragment {
             forecastDataSet.setDrawCircleHole(false);
             forecastDataSet.setDrawCircles(false);
             forecastDataSet.enableDashedLine(10f, 10f, 0);
+            //TODO: draw all values except the first one
             forecastDataSet.setDrawValues(false);
             forecastDataSet.setColor(lightGray);
 

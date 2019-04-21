@@ -202,13 +202,12 @@ public class HomeFragment extends Fragment
                     int endValue = sharedPreferences.getInt(Constants.GAUGE_END, 100);
                     boolean hasToSetGaugeStart = sharedPreferences.getBoolean(Constants.GAUGE_HAS_TO_SET_START, false);
 
+                    // TODO: fix gauge according to goal type (lose or gain)
+
                     if (goal.isPresent()) {
-                        Timber.d("New bm - goal is present");
                         if (hasToSetGaugeStart) {
-                            Timber.d("New bm - hasToSetGaugeStart");
                             calculateAndSetGaugeParameters(goal.get(), bodyMeasurement.get());
                         } else {
-                            Timber.d("New bm - not hasToSetGaugeStart");
                             int gaugeValue = getGaugeValue(bodyMeasurement.get(), goal.get(), startValue, endValue);
                             mCustomGauge.setStartValue(startValue);
                             mCustomGauge.setEndValue(endValue);
@@ -216,7 +215,6 @@ public class HomeFragment extends Fragment
                             mCustomGauge.invalidate();
                         }
                     } else {
-                        Timber.d("New bm - goal is not present");
                         mCustomGauge.setStartValue(0);
                         mCustomGauge.setEndValue(100);
                         mCustomGauge.setValue(100);

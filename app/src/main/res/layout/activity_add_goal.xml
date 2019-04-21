@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/almostWhite"
     android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:background="@color/almostWhite">
+    android:focusableInTouchMode="true">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/add_goal_inputlayout"
@@ -63,6 +63,66 @@
             android:textColor="@color/colorTextBlack"
             android:textColorHint="@color/colorTextDark" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <co.ceryle.radiorealbutton.RadioRealButtonGroup
+        android:id="@+id/add_goal_direction_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin_very_big"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_very_big"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_big"
+        android:layout_weight="1"
+        android:elevation="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_goal_due_date_inputlayout"
+        app:rrbg_borderColor="#E6E6E6"
+        app:rrbg_borderSize="1dp"
+        app:rrbg_bottomLineSize="0dp"
+        app:rrbg_buttonsPaddingBottom="@dimen/padding_medium"
+        app:rrbg_buttonsPaddingLeft="@dimen/padding_small"
+        app:rrbg_buttonsPaddingRight="@dimen/padding_small"
+        app:rrbg_buttonsPaddingTop="@dimen/padding_medium"
+        app:rrbg_checkedPosition="0"
+        app:rrbg_dividerColor="#EEEEEE"
+        app:rrbg_dividerPadding="0dp"
+        app:rrbg_dividerSize="1dp"
+        app:rrbg_radius="28dp"
+        app:rrbg_selectorColor="@color/colorPrimaryLight"
+        app:rrbg_selectorSize="10dp">
+
+        <co.ceryle.radiorealbutton.RadioRealButton
+            android:id="@+id/goal_lose_radio_button"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            app:rrb_drawable="@drawable/ic_lose_weight"
+            app:rrb_drawableGravity="top"
+            app:rrb_drawableHeight="18dp"
+            app:rrb_drawablePadding="4dp"
+            app:rrb_drawableTint="@color/dark_gray"
+            app:rrb_drawableWidth="18dp"
+            app:rrb_ripple="true"
+            app:rrb_rippleColor="@color/colorPrimaryLight"
+            app:rrb_text="PERDER PESO"
+            app:rrb_textColor="@color/colorTextDark"
+            app:rrb_textSize="10sp" />
+
+        <co.ceryle.radiorealbutton.RadioRealButton
+            android:id="@+id/goal_gain_radio_button"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            app:rrb_drawable="@drawable/ic_gain_weight"
+            app:rrb_drawableGravity="top"
+            app:rrb_drawableHeight="18dp"
+            app:rrb_drawablePadding="4dp"
+            app:rrb_drawableTint="@color/dark_gray"
+            app:rrb_drawableWidth="18dp"
+            app:rrb_ripple="true"
+            app:rrb_rippleColor="@color/colorPrimaryLight"
+            app:rrb_text="GANAR PESO"
+            app:rrb_textColor="@color/colorTextDark"
+            app:rrb_textSize="10sp" />
+    </co.ceryle.radiorealbutton.RadioRealButtonGroup>
 
     <Button
         android:id="@+id/add_goal_btn"

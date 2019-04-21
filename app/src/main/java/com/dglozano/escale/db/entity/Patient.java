@@ -33,6 +33,7 @@ public class Patient extends AppUser {
     private Date goalDueDate;
     private Date goalStartDate;
     private boolean hasToUpdateDataInScale = true;
+    private boolean isLoseGoal = true;
     @Ignore
     @ToString.Exclude
     private MeasurementForecast measurementForecast;
@@ -64,11 +65,21 @@ public class Patient extends AppUser {
             this.goalDueDate = patientDTO.getCurrentWeightGoal().getDueDate();
             this.goalInKg = patientDTO.getCurrentWeightGoal().getGoalInKg();
             this.goalStartDate = patientDTO.getCurrentWeightGoal().getStartDate();
+            this.isLoseGoal = patientDTO.getCurrentWeightGoal().isLoseGoal();
         } else {
             this.goalDueDate = null;
             this.goalInKg = null;
             this.goalStartDate = null;
+            this.isLoseGoal = true;
         }
+    }
+
+    public boolean isLoseGoal() {
+        return isLoseGoal;
+    }
+
+    public void setLoseGoal(boolean loseGoal) {
+        isLoseGoal = loseGoal;
     }
 
     public Gender getGender() {
