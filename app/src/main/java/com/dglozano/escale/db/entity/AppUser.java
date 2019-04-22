@@ -1,10 +1,10 @@
 package com.dglozano.escale.db.entity;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
-
 import java.util.Date;
+
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 @Entity
 public class AppUser {
@@ -15,17 +15,26 @@ public class AppUser {
     protected String lastName;
     protected String email;
     protected Date lastUpdate;
+    private boolean changedDefaultPassword;
 
     public AppUser() {
     }
 
     @Ignore
-    public AppUser(Long id, String firstName, String lastName, String email, Date lastUpdate) {
+    public AppUser(Long id, Date lastUpdate) {
+        this.id = id;
+        this.lastUpdate = lastUpdate;
+        this.changedDefaultPassword = true;
+    }
+
+    @Ignore
+    public AppUser(Long id, String firstName, String lastName, String email, Date lastUpdate, Boolean hasChangedDefaultPassword) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.lastUpdate = lastUpdate;
+        this.changedDefaultPassword = hasChangedDefaultPassword;
     }
 
     @Ignore
@@ -35,6 +44,15 @@ public class AppUser {
         this.lastName = appUser.getLastName();
         this.email = appUser.getEmail();
         this.lastUpdate = appUser.getLastUpdate();
+        this.changedDefaultPassword = appUser.hasChangedDefaultPassword();
+    }
+
+    public boolean hasChangedDefaultPassword() {
+        return changedDefaultPassword;
+    }
+
+    public void setChangedDefaultPassword(boolean changedDefaultPassword) {
+        this.changedDefaultPassword = changedDefaultPassword;
     }
 
     public Long getId() {

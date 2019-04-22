@@ -25,7 +25,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
-            android:background="@drawable/login_button_rounded"
+            android:background="@drawable/button_rounded"
             android:checked="true"
             android:paddingStart="@dimen/padding_small"
             android:paddingEnd="@dimen/padding_small"

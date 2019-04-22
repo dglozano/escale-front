@@ -1,28 +1,30 @@
 package com.dglozano.escale.ui.main.diet.all;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.ui.main.diet.show.ShowDietPdfActivity;
+import com.dglozano.escale.util.Constants;
+import com.google.android.material.snackbar.Snackbar;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -30,8 +32,6 @@ import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
 public class AllDietsFragment extends Fragment {
-
-    private static final int SHOW_PDF_CODE = 999;
 
     @BindView(R.id.recycler_view_diets)
     RecyclerView mRecyclerViewDiets;
@@ -90,8 +90,8 @@ public class AllDietsFragment extends Fragment {
             Timber.d("Pdf event fired");
             if (pdfEvent != null && !pdfEvent.hasBeenHandled()) {
                 Intent intent = new Intent(getActivity(), ShowDietPdfActivity.class);
-                intent.putExtra("diet_file_path", pdfEvent.handleContent().getAbsolutePath());
-                startActivityForResult(intent, SHOW_PDF_CODE);
+                intent.putExtra(Constants.DIET_FILE_URI, Uri.fromFile(pdfEvent.handleContent()));
+                startActivityForResult(intent, Constants.SHOW_PDF_CODE);
             }
         });
         mAllDietsViewModel.getErrorEvent().observe(this, errorEvent -> {

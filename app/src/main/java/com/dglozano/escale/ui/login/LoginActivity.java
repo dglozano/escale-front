@@ -1,10 +1,7 @@
 package com.dglozano.escale.ui.login;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -15,12 +12,17 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityLoginBinding;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.common.pw_recovery.RecoverPasswordActivity;
+import com.dglozano.escale.ui.doctor.main.DoctorMainActivity;
 import com.dglozano.escale.ui.main.MainActivity;
+import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.web.EscaleRestApi;
 
 import javax.inject.Inject;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -65,20 +67,16 @@ public class LoginActivity extends BaseActivity {
         binding.setViewmodel(mViewModel);
 
         Bundle extras = getIntent().getExtras();
-        if (extras != null && extras.getBoolean(MainActivity.ASK_NEW_FIREBASE_TOKEN, false)) {
+        if (extras != null && extras.getBoolean(Constants.ASK_NEW_FIREBASE_TOKEN, false)) {
             mViewModel.askForNewFirebaseToken();
         }
 
         ButterKnife.bind(this);
-        mViewModel.getUserIdChangeEvent().observe(this, this::onLoggedUserChange);
+        mViewModel.getPatientIdChangedEvent().observe(this, this::onLoggedPatientChanged);
+        mViewModel.getDoctorIdChangedEvent().observe(this, this::onLoggedDoctorChanged);
+
         mViewModel.getLoading().observe(this, this::onLoadingStateChange);
         mViewModel.getErrorEvent().observe(this, this::onErrorEventFired);
-    }
-
-    private void startMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
     }
 
     @OnClick(R.id.login_sign_in_button)
@@ -94,9 +92,10 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RECOVER_PASSWORD_CODE && resultCode == RESULT_OK) {
             String email = data.getStringExtra("email");
-            if(email == null || email.isEmpty()) email = "tu cuenta";
+            if (email == null || email.isEmpty()) email = "tu cuenta";
             showSnackbarWithOkDismiss(String.format(getString(R.string.email_sent_to_recover_snak_msg), email));
         }
     }
@@ -106,11 +105,30 @@ public class LoginActivity extends BaseActivity {
         return findViewById(android.R.id.content);
     }
 
-    private void onLoggedUserChange(Event<Long> idEvent) {
-        Timber.d("Id onLoggedUserChange %s", idEvent.peekContent());
-        if (!idEvent.hasBeenHandled() && idEvent.handleContent() != -1L) {
+    private void onLoggedPatientChanged(Event<Long> idEvent) {
+        Timber.d("Id onLoggedPatientChanged %s", idEvent.peekContent());
+        if (!idEvent.hasBeenHandled() && idEvent.handleContent() != -1L && mViewModel.getLoggedDoctorId() == -1L) {
             startMainActivity();
         }
+    }
+
+    private void onLoggedDoctorChanged(Event<Long> idEvent) {
+        Timber.d("Id onLoggedDoctorChanged %s", idEvent.peekContent());
+        if (!idEvent.hasBeenHandled() && idEvent.handleContent() != -1L) {
+            startDoctorMainActivity();
+        }
+    }
+
+    private void startMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void startDoctorMainActivity() {
+        Intent intent = new Intent(this, DoctorMainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void onLoadingStateChange(Boolean isLoading) {

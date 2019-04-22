@@ -1,53 +1,45 @@
 package com.dglozano.escale.db.dao;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
-
 import com.dglozano.escale.db.entity.Diet;
 
 import java.util.List;
 import java.util.Optional;
 
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Query;
+import io.reactivex.Single;
+
 @Dao
-public interface DietDao {
+public abstract class DietDao extends BaseDao<Diet> {
 
     @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC")
-    LiveData<List<Diet>> getAllDietsOfUserWithIdAsLiveData(Long userId);
+    public abstract LiveData<List<Diet>> getAllDietsOfUserWithIdAsLiveData(Long userId);
 
     @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC")
-    List<Diet> getAllDietsOfUserWithId(Long userId);
+    public abstract List<Diet> getAllDietsOfUserWithId(Long userId);
+
+    @Query("SELECT * FROM Diet")
+    public abstract Single<List<Diet>> getAllDiets();
+
+    @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC")
+    public abstract Single<List<Diet>> getAllDietsOfUserWithIdAsSingle(Long userId);
 
     @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC LIMIT 1")
-    LiveData<Diet> getCurrenDietOfUserWithIdAsLiveData(Long userId);
+    public abstract LiveData<Diet> getCurrenDietOfUserWithIdAsLiveData(Long userId);
 
     @Query("SELECT * FROM Diet WHERE userId == :userId ORDER BY startDate DESC LIMIT 1")
-    LiveData<Optional<Diet>> getCurrenDietOfUserWithIdLiveOptional(Long userId);
+    public abstract LiveData<Optional<Diet>> getCurrenDietOfUserWithIdLiveOptional(Long userId);
 
     @Query("SELECT * FROM Diet WHERE id == :id")
-    Optional<Diet> getDietById(String id);
+    public abstract Optional<Diet> getDietById(String id);
 
-    @Update
-    void updateDiet(Diet diet);
-
-    //FIXME: Borrar REPLACE cuando entre en produccion
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertDiet(Diet diet);
-
-    @Query("SELECT COUNT(*) FROM Diet WHERE id == :id")
-    Integer dietExists(String id);
-
+    @Query("SELECT EXISTS(SELECT 1 FROM Diet WHERE id == :id LIMIT 1)")
+    public abstract Integer dietExists(String id);
 
     @Query("SELECT COUNT(*) FROM Diet WHERE userId == :userId")
-    LiveData<Integer> dietsCountOfPatient(Long userId);
-
-    @Delete
-    void deleteDiet(Diet diet);
+    public abstract LiveData<Integer> dietsCountOfPatient(Long userId);
 
     @Query("DELETE FROM Diet WHERE id == :uuid")
-    void deleteDietById(String uuid);
+    public abstract void deleteDietById(String uuid);
 }

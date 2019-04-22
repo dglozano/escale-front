@@ -1,14 +1,8 @@
 package com.dglozano.escale.ui.main.diet.current;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.util.FileUtils;
+import com.dglozano.escale.util.MyFileUtils;
 import com.dglozano.escale.util.ui.CustomPdfScrollHandle;
 import com.dglozano.escale.web.services.DietDownloadService;
 import com.github.barteksc.pdfviewer.PDFView;
@@ -24,6 +18,12 @@ import com.github.barteksc.pdfviewer.util.FitPolicy;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -108,7 +108,7 @@ public class CurrentDietFragment extends Fragment {
                         mPdfView.setVisibility(View.GONE);
                         Intent startIntent = new Intent(getActivity(), DietDownloadService.class);
                         startIntent.putExtra("diet-uuid", currentDiet.getId());
-                        currentDiet.setFileStatus(FileUtils.FileStatus.DOWNLOADING);
+                        currentDiet.setFileStatus(MyFileUtils.FileStatus.DOWNLOADING);
                         mViewModel.updateDiet(currentDiet);
                         getActivity().startService(startIntent);
                         break;

@@ -1,10 +1,5 @@
 package com.dglozano.escale.db.entity;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
-
 import com.dglozano.escale.web.dto.BodyMeasurementDTO;
 
 import java.text.DateFormat;
@@ -12,7 +7,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(foreignKeys = @ForeignKey(entity = Patient.class,
         parentColumns = "id",
@@ -48,6 +48,20 @@ public class BodyMeasurement {
         this.bones = dto.getBones();
         this.muscles = dto.getMuscles();
         this.isManual = dto.isManual();
+    }
+
+    @Ignore
+    public BodyMeasurement(Long id, Long userId, Date date, float weight, float bmi, float fat, float water, float muscles, boolean isManual) {
+        this.id = id;
+        this.userId = userId;
+        this.date = date;
+        this.weight = weight;
+        this.bmi = bmi;
+        this.fat = fat;
+        this.water = water;
+        this.bones = 0;
+        this.muscles = muscles;
+        this.isManual = isManual;
     }
 
     @Ignore

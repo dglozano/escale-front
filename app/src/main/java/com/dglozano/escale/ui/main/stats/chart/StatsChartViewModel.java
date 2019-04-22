@@ -1,12 +1,7 @@
 package com.dglozano.escale.ui.main.stats.chart;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Transformations;
-import android.arch.lifecycle.ViewModel;
-
 import com.dglozano.escale.db.entity.BodyMeasurement;
+import com.dglozano.escale.db.entity.MeasurementForecast;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.ui.Event;
@@ -19,11 +14,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.disposables.CompositeDisposable;
+import timber.log.Timber;
 
 import static com.dglozano.escale.ui.main.stats.chart.StatsChartViewModel.StatFilter.WEIGHT;
 import static com.dglozano.escale.ui.main.stats.chart.StatsChartViewModel.StatFilter.valueOf;
@@ -35,9 +37,12 @@ public class StatsChartViewModel extends ViewModel {
     private CompositeDisposable disposables;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
     private final LiveData<List<BodyMeasurement>> mBodyMeasurementList;
+    private final LiveData<Entry> mGoalEntry;
+    private final LiveData<Optional<MeasurementForecast>> mMeasurementForecast;
     private final MutableLiveData<StatFilter> mSelectedStat;
     private final MutableLiveData<Boolean> mFilterExpandedState;
     private final MediatorLiveData<List<Entry>> mChartEntriesList;
+
 
     @Inject
     public StatsChartViewModel(BodyMeasurementRepository bodyMeasurementRepository,
@@ -54,14 +59,24 @@ public class StatsChartViewModel extends ViewModel {
         mSelectedStat.postValue(WEIGHT);
 
         mBodyMeasurementList = Transformations.switchMap(
-                mMeasurementsRepository.getLastBodyMeasurementOfUserWithId(mPatientRepository.getLoggedPatiendId()),
+                mMeasurementsRepository.getLastBodyMeasurementOfUserWithId(mPatientRepository.getLoggedPatientId()),
                 lastBodyMeasurement -> {
                     Calendar cal = Calendar.getInstance();
                     lastBodyMeasurement.ifPresent(bodyMeasurement -> cal.setTime(bodyMeasurement.getDate()));
                     cal.add(Calendar.DATE, -10);
                     return mMeasurementsRepository.getBodyMeasurementsOfUserWithIdSince(
-                            patientRepository.getLoggedPatiendId(), cal.getTime());
+                            patientRepository.getLoggedPatientId(), cal.getTime());
                 });
+
+        mGoalEntry = Transformations.map(mPatientRepository.getLoggedPatient(), patient -> {
+            if (patient != null && patient.hasActiveGoal(Calendar.getInstance().getTime())) {
+                return new Entry(patient.getGoalDueDate().getTime(), patient.getGoalInKg());
+            } else {
+                return null;
+            }
+        });
+
+        mMeasurementForecast = mPatientRepository.getMeasurementForecastOfLoggedPatient();
 
         mChartEntriesList = new MediatorLiveData<>();
         mChartEntriesList.addSource(mBodyMeasurementList, newList -> {
@@ -69,6 +84,14 @@ public class StatsChartViewModel extends ViewModel {
         });
         mChartEntriesList.addSource(getSelectedStatAsLiveData(), statFilter -> {
             mChartEntriesList.postValue(getEntriesListFromMeasurement(mBodyMeasurementList.getValue(), statFilter == null ? WEIGHT : statFilter));
+        });
+        mChartEntriesList.addSource(mMeasurementForecast, forecast -> {
+            Timber.d("forecast in viewmodelstats");
+            mChartEntriesList.postValue(getEntriesListFromMeasurement(mBodyMeasurementList.getValue(), getSelectedStat()));
+        });
+        mChartEntriesList.addSource(mGoalEntry, goal -> {
+            Timber.d("goal in viewmodelstats");
+            mChartEntriesList.postValue(getEntriesListFromMeasurement(mBodyMeasurementList.getValue(), getSelectedStat()));
         });
     }
 
@@ -145,6 +168,14 @@ public class StatsChartViewModel extends ViewModel {
 
     public void toggleFiltersExpansion() {
         mFilterExpandedState.postValue(mFilterExpandedState.getValue() != null && !mFilterExpandedState.getValue());
+    }
+
+    public LiveData<Entry> getGoalEntry() {
+        return mGoalEntry;
+    }
+
+    public LiveData<Optional<MeasurementForecast>> getMeasurementForecast() {
+        return mMeasurementForecast;
     }
 
     protected enum StatFilter {

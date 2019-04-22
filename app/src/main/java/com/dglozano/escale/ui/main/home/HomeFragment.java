@@ -1,23 +1,14 @@
 package com.dglozano.escale.ui.main.home;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,21 +25,35 @@ import android.widget.Toast;
 import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BF600BleService;
 import com.dglozano.escale.ble.CommunicationHelper;
+import com.dglozano.escale.db.entity.BodyMeasurement;
+import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
+import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.PermissionHelper;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.util.ui.MeasurementItem;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindColor;
 import butterknife.BindDrawable;
 import butterknife.BindString;
@@ -130,6 +136,10 @@ public class HomeFragment extends Fragment
     DecimalFormat decimalFormat;
     @Inject
     SimpleDateFormat dateFormat;
+    @Inject
+    AppExecutors appExecutors;
+    @Inject
+    SharedPreferences sharedPreferences;
 
     private Unbinder mViewUnbinder;
     private HomeViewModel mHomeViewModel;
@@ -186,6 +196,31 @@ public class HomeFragment extends Fragment
                 mFatTextView.setText(formatDecimal(bodyMeasurement.get().getFat()));
                 mLastRowImageView.setVisibility(View.VISIBLE);
                 mLastRowText.setText(String.format("%shs", dateFormat.format(bodyMeasurement.get().getDate())));
+                appExecutors.getDiskIO().execute(() -> {
+                    Optional<Float> goal = mHomeViewModel.getGoalOfLoggedPatient();
+                    int startValue = sharedPreferences.getInt(Constants.GAUGE_START, 0);
+                    int endValue = sharedPreferences.getInt(Constants.GAUGE_END, 100);
+                    boolean hasToSetGaugeStart = sharedPreferences.getBoolean(Constants.GAUGE_HAS_TO_SET_START, false);
+
+                    // TODO: fix gauge according to goal type (lose or gain)
+
+                    if (goal.isPresent()) {
+                        if (hasToSetGaugeStart) {
+                            calculateAndSetGaugeParameters(goal.get(), bodyMeasurement.get());
+                        } else {
+                            int gaugeValue = getGaugeValue(bodyMeasurement.get(), goal.get(), startValue, endValue);
+                            mCustomGauge.setStartValue(startValue);
+                            mCustomGauge.setEndValue(endValue);
+                            mCustomGauge.setValue(gaugeValue);
+                            mCustomGauge.invalidate();
+                        }
+                    } else {
+                        mCustomGauge.setStartValue(0);
+                        mCustomGauge.setEndValue(100);
+                        mCustomGauge.setValue(100);
+                    }
+
+                });
             }
             mMeasurementListAdapter.setItems(MeasurementItem.getMeasurementList(
                     bodyMeasurement == null ? Optional.empty() : bodyMeasurement));
@@ -196,13 +231,75 @@ public class HomeFragment extends Fragment
                     && patient.getGoalDueDate() != null
                     && Calendar.getInstance().getTime().before(patient.getGoalDueDate())) {
                 DecimalFormat df = new DecimalFormat("'META' ###.# 'kg'");
-                mGoalTextView.setText(df.format(patient.getGoalInKg()));
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                String goalText = String.format("%s\n%s",
+                        df.format(patient.getGoalInKg()),
+                        sdf.format(patient.getGoalDueDate()));
+                mGoalTextView.setText(goalText);
+                setupGaugeLimits(patient);
             } else {
                 mGoalTextView.setText(R.string.no_goal_set);
+                mCustomGauge.setStartValue(0);
+                mCustomGauge.setEndValue(100);
+                mCustomGauge.setValue(100);
             }
         });
+    }
 
-        mCustomGauge.setValue(1000);
+    private int getGaugeValue(@NonNull BodyMeasurement bodyMeasurement, @NonNull Float goal, int startValue, int endValue) {
+        Timber.d("getGaugeValue");
+        float difference = Math.abs(goal - bodyMeasurement.getWeight());
+        int gaugeValue = Math.round(goal * 100 - difference * 100);
+        gaugeValue = gaugeValue < startValue ? startValue : gaugeValue > endValue ? endValue : gaugeValue;
+        return gaugeValue;
+    }
+
+    private void setupGaugeLimits(Patient patient) {
+        Timber.d("setupGaugeLimits");
+        appExecutors.getDiskIO().execute(() -> {
+            Optional<BodyMeasurement> lastBeforeGoalStarted =
+                    mHomeViewModel.getLastBodyMeasurementBeforeGoalStarted(patient.getGoalStartDate(), patient.getId());
+            Optional<BodyMeasurement> firstAfterGoalStarted =
+                    mHomeViewModel.getFirstBodyMeasurementAfterGoalStarted(patient.getGoalStartDate(), patient.getId());
+            Optional<BodyMeasurement> initialBodyMeasurement;
+            if (lastBeforeGoalStarted.isPresent()) {
+                initialBodyMeasurement = lastBeforeGoalStarted;
+            } else initialBodyMeasurement = firstAfterGoalStarted;
+
+            if (initialBodyMeasurement.isPresent()) {
+                Timber.d("initialBodyMeasurement.isPresent()");
+                calculateAndSetGaugeParameters(patient.getGoalInKg(), initialBodyMeasurement.get());
+            } else {
+                Timber.d("initialBodyMeasurement is not present");
+                mCustomGauge.setStartValue(0);
+                mCustomGauge.setEndValue(Math.round(patient.getGoalInKg()) * 100);
+                mCustomGauge.setValue(0);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(Constants.GAUGE_HAS_TO_SET_START, true);
+                editor.apply();
+            }
+            mCustomGauge.invalidate();
+        });
+    }
+
+    private void calculateAndSetGaugeParameters(Float goal, BodyMeasurement initialBodyMeasurement) {
+        Timber.d("calculateAndSetGaugeParameters");
+        float difference = Math.abs(goal - initialBodyMeasurement.getWeight());
+        int startValue = Math.round(goal * 100 - difference * 1.20f * 100);
+        int endValue = Math.round(goal * 100);
+        final int finalStartValue = startValue < 0 ? 0 : startValue;
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(Constants.GAUGE_START, startValue);
+        editor.putInt(Constants.GAUGE_END, endValue);
+        editor.putBoolean(Constants.GAUGE_HAS_TO_SET_START, false);
+        editor.apply();
+
+        mCustomGauge.setStartValue(startValue);
+        mCustomGauge.setEndValue(endValue);
+        Optional<BodyMeasurement> lastBodyMeasurementOpt = mHomeViewModel.getLastBodyMeasurementBlocking();
+        int gaugeValue = lastBodyMeasurementOpt.map(bm -> getGaugeValue(bm, goal, finalStartValue, endValue)).orElse(1000);
+        mCustomGauge.setValue(gaugeValue);
     }
 
     private void showBatteryLevel(Integer batteryLevel) {
@@ -211,7 +308,7 @@ public class HomeFragment extends Fragment
         } else {
             mHomeViewModel.setBatteryLevel(batteryLevel);
         }
-        getActivity().invalidateOptionsMenu();
+        mMainActivity.invalidateOptionsMenu();
     }
 
     @Override
@@ -247,7 +344,7 @@ public class HomeFragment extends Fragment
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.home_menu_battery_almost_empty ||
@@ -255,7 +352,15 @@ public class HomeFragment extends Fragment
                 id == R.id.home_menu_battery_percent50 ||
                 id == R.id.home_menu_battery_percent80 ||
                 id == R.id.home_menu_battery_almost_full) {
-            Toast.makeText(getActivity(), String.format("%s %% Bateria de Balanza", mHomeViewModel.getBatteryLevel()), Toast.LENGTH_SHORT).show();
+            View menuItemView = mMainActivity.findViewById(id);
+            String batteryLevel = String.format("%s %% Bateria", mHomeViewModel.getBatteryLevel());
+            PopupMenu popupMenu = new PopupMenu(mMainActivity, menuItemView);
+            popupMenu.getMenu().add(batteryLevel);
+            popupMenu.setOnMenuItemClickListener(menuItem -> {
+                popupMenu.dismiss();
+                return true;
+            });
+            popupMenu.show();
         }
 
         return true;
@@ -421,20 +526,25 @@ public class HomeFragment extends Fragment
     private void showLoader(boolean isScanningOrConnecting) {
         if (isScanningOrConnecting) {
             Timber.d("Bluetooth BLE Scan start. Showing loader...");
-            mMeasurementLayout.setVisibility(View.GONE);
-            mLoaderLayout.setVisibility(View.VISIBLE);
+            if (mMeasurementLayout.getVisibility() != View.GONE)
+                mMeasurementLayout.setVisibility(View.GONE);
+            if (mLoaderLayout.getVisibility() != View.VISIBLE)
+                mLoaderLayout.setVisibility(View.VISIBLE);
         } else {
             Timber.d("Bluetooth BLE Scan stop. Hiding loader...");
-            mLoaderLayout.setVisibility(View.GONE);
-            mMeasurementLayout.setVisibility(View.VISIBLE);
+            if (mLoaderLayout.getVisibility() != View.GONE) mLoaderLayout.setVisibility(View.GONE);
+            if (mMeasurementLayout.getVisibility() != View.VISIBLE)
+                mMeasurementLayout.setVisibility(View.VISIBLE);
         }
     }
 
     private void showStepOnScale(Boolean isMeasurementTriggered) {
         if (isMeasurementTriggered) {
-            mStepOnScaleLayout.setVisibility(View.VISIBLE);
+            if (mStepOnScaleLayout.getVisibility() != View.VISIBLE)
+                mStepOnScaleLayout.setVisibility(View.VISIBLE);
         } else {
-            mStepOnScaleLayout.setVisibility(View.GONE);
+            if (mStepOnScaleLayout.getVisibility() != View.GONE)
+                mStepOnScaleLayout.setVisibility(View.GONE);
         }
     }
 

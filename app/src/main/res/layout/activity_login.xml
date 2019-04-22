@@ -9,7 +9,7 @@
             type="com.dglozano.escale.ui.login.LoginActivityViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/login_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -48,7 +48,7 @@
                 android:textAppearance="@android:style/TextAppearance.Material.Small"
                 android:textColor="@color/almostWhite" />
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/login_email_inputlayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,9 +71,9 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Small.Inverse"
                     android:textColor="@color/colorTextBlack"
                     android:textColorHint="@color/colorTextDark" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/login_password_inputlayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
                     android:textColor="@color/colorTextBlack"
                     android:textColorHint="@color/colorTextDark" />
 
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Button
                 android:id="@+id/login_sign_in_button"
@@ -105,7 +105,7 @@
                 android:layout_height="@dimen/height"
                 android:layout_below="@id/login_password_inputlayout"
                 android:layout_marginTop="@dimen/activity_vertical_margin_medium"
-                android:background="@drawable/login_button_rounded"
+                android:background="@drawable/button_rounded"
                 android:text="@string/login_button_text"
                 android:textColor="@color/almostWhite"
                 android:textStyle="bold" />
@@ -142,6 +142,6 @@
 
         </RelativeLayout>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

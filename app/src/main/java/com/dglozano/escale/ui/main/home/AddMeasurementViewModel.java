@@ -1,24 +1,23 @@
 package com.dglozano.escale.ui.main.home;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
-
 import com.dglozano.escale.R;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.ui.Event;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
+
+import static com.dglozano.escale.util.ValidationHelper.isValidBmi;
+import static com.dglozano.escale.util.ValidationHelper.isValidPercentage;
+import static com.dglozano.escale.util.ValidationHelper.isValidWeight;
 
 public class AddMeasurementViewModel extends ViewModel {
 
@@ -41,20 +40,9 @@ public class AddMeasurementViewModel extends ViewModel {
         mLoading.postValue(false);
     }
 
-    private boolean isInputValid(String weight, String water, String fat, String bones,
-                                 String bmi, String muscle) {
-        String[] input = new String[]{weight, water, fat, bones, bmi, muscle};
-        List<Float> inputFloat = Arrays.stream(input)
-                .filter(s -> s != null && !s.isEmpty())
-                .map(Float::parseFloat)
-                .filter(f -> f >= 0f)
-                .collect(Collectors.toList());
-        if(inputFloat.size() < input.length)
-            return false;
-        if(inputFloat.get(1) > 100f || inputFloat.get(2) > 100f || inputFloat.get(5) > 100f) {
-            return false;
-        }
-        return true;
+    private boolean isInputValid(String weightStr, String waterStr, String fatStr, String bonesStr,
+                                 String bmiStr, String muscleStr) {
+        return isValidPercentage(waterStr) && isValidPercentage(fatStr) && isValidPercentage(muscleStr) && isValidWeight(weightStr) && isValidBmi(bmiStr);
     }
 
     public LiveData<Boolean> getLoading() {
@@ -69,7 +57,7 @@ public class AddMeasurementViewModel extends ViewModel {
         return mSuccessEvent;
     }
 
-    public void hitAddMeasurement(String weight, String water, String fat, String bmi,  String bones, String muscle) {
+    public void hitAddMeasurement(String weight, String water, String fat, String bmi, String bones, String muscle) {
         if (isInputValid(weight, water, fat, bones, bmi, muscle)) {
             disposables.add(mMeasurementRepository.addMeasurement(Float.parseFloat(weight),
                     Float.parseFloat(water),
@@ -78,23 +66,24 @@ public class AddMeasurementViewModel extends ViewModel {
                     Float.parseFloat(bones),
                     Float.parseFloat(muscle),
                     true)
+                    .flatMapCompletable(id -> mPatientRepository.getUpdatedForecastFromApi(mPatientRepository.getLoggedPatientId()))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe((d) -> mLoading.postValue(true))
                     .subscribe(
-                            insertedId -> {
-                                Timber.d("Inserted body measurement in server with id %s", insertedId);
+                            () -> {
+                                Timber.d("Inserted body measurement in server and updated forecast");
                                 mSuccessEvent.postValue(new Event<>(true));
                                 mLoading.postValue(false);
                             },
-                            onError -> {
+                            error -> {
                                 mLoading.postValue(false);
                                 mErrorEvent.postValue(new Event<>(R.string.add_measurement_error_snackbar));
                             }
                     )
             );
         } else {
-            mErrorEvent.postValue(new Event<>(R.string.add_measurement_input_error_snackbar));
+            mErrorEvent.postValue(new Event<>(R.string.input_validation_error_snackbar));
         }
     }
 

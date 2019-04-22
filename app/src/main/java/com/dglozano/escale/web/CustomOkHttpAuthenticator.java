@@ -1,15 +1,16 @@
 package com.dglozano.escale.web;
 
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 
 import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.LogoutHelper;
 import com.dglozano.escale.web.dto.LoginResponse;
 
 import java.io.IOException;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import okhttp3.Authenticator;
 import okhttp3.Request;
 import okhttp3.Route;
@@ -20,11 +21,15 @@ public class CustomOkHttpAuthenticator implements Authenticator {
 
     private ApiServiceHolder escaleRestApiHolder;
     private SharedPreferences sharedPreferences;
+    private LogoutHelper logoutHelper;
 
     @Inject
-    public CustomOkHttpAuthenticator(ApiServiceHolder escaleRestApiHolder, SharedPreferences sharedPreferences) {
+    public CustomOkHttpAuthenticator(ApiServiceHolder escaleRestApiHolder,
+                                     SharedPreferences sharedPreferences,
+                                     LogoutHelper logoutHelper) {
         this.escaleRestApiHolder = escaleRestApiHolder;
         this.sharedPreferences = sharedPreferences;
+        this.logoutHelper = logoutHelper;
     }
 
     @Override
@@ -37,16 +42,16 @@ public class CustomOkHttpAuthenticator implements Authenticator {
             Timber.d("OkHttpAuthenticator - ERROR 401");
             String refreshToken = sharedPreferences.getString("refreshToken", null);
             String refreshTokenRequest = response.request().header("refreshToken");
-            Timber.d("OkHttpAuthenticator - refreshToken in SharedPref %s", refreshToken);
-            Timber.d("OkHttpAuthenticator - refreshToken in Request %s", refreshTokenRequest);
             if (refreshToken == null || refreshToken.equals(refreshTokenRequest)) {
+                // If the refresh token is not present or it was used in the previous request and
+                // failed again (it was expired, or didn't match the JTI), then logout user
+                logoutHelper.logout();
+
                 return null;
             }
 
             Call<LoginResponse> refreshCall = escaleRestApiHolder.getApiService().refreshToken(refreshToken);
 
-
-            // TODO: Check if I have to change to async execution using enqueue() method instead.
             // According to the Authenticator contract, the operations here has to be sync apparently.
             retrofit2.Response<LoginResponse> refreshResponse = refreshCall.execute();
 
@@ -54,14 +59,11 @@ public class CustomOkHttpAuthenticator implements Authenticator {
                 String newToken = refreshResponse.headers().get("token");
                 String newRefreshToken = refreshResponse.headers().get("refreshToken");
 
-                Timber.d("OkHttpAuthenticator - new token %s", newToken);
-                Timber.d("OkHttpAuthenticator - new refreshToken %s", newRefreshToken);
-
                 updateSharedPreferencesWithNewTokens(newToken, newRefreshToken);
 
                 return response.request().newBuilder()
-                            .header("token", newToken)
-                            .build();
+                        .header("token", newToken)
+                        .build();
             } else {
                 return null;
             }

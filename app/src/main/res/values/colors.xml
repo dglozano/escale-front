@@ -6,6 +6,8 @@
     <color name="colorPrimary">#03a9f4</color>
     <color name="colorPrimaryDark">#0277bd</color>
     <color name="colorPrimaryLight">#29b6f6</color>
+    <color name="colorPrimaryVeryLight">#2003a9f4</color>
+    <color name="colorAccentVeryLight">#4D1DE9B6</color>
     <color name="colorAccent">#1de9b6</color>
     <color name="colorTextBlack">#202020</color>
     <color name="colorTextDark">#616161</color>
@@ -18,7 +20,5 @@
     <color name="colorBlackOverlay">#e0313131</color>
     <color name="almostWhiteOverlay">#e0fafafa</color>
     <color name="colorPrimaryDarkTransparent">#a9023246</color>
-    <color name="colorCenterProfileGradientOverlay">#c881d4fa</color>
-    <color name="colorEdgeProfileGradientOverlay">#960288d1</color>
     <color name="colorPrimaryVeryDark">#01579b</color>
 </resources>

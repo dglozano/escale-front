@@ -2,8 +2,6 @@ package com.dglozano.escale.ble;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import com.dglozano.escale.R;
 import com.polidea.rxandroidble2.exceptions.BleScanException;
@@ -14,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
 import timber.log.Timber;
 
 /**

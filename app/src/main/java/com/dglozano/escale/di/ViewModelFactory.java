@@ -1,15 +1,15 @@
 package com.dglozano.escale.di;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
-import android.support.annotation.NonNull;
-
 import com.dglozano.escale.di.annotation.ApplicationScope;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 @ApplicationScope
 public class ViewModelFactory implements ViewModelProvider.Factory {

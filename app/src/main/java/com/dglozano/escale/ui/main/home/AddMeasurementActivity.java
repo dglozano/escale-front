@@ -1,11 +1,7 @@
 package com.dglozano.escale.ui.main.home;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.View;
@@ -16,17 +12,24 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityAddManualMeasurementBinding;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.util.ui.Event;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Objects;
 
 import javax.inject.Inject;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
 import dagger.android.AndroidInjection;
+
+import static com.dglozano.escale.util.ValidationHelper.getBmiError;
+import static com.dglozano.escale.util.ValidationHelper.getWeightError;
 
 public class AddMeasurementActivity extends BaseActivity {
 
@@ -104,8 +107,7 @@ public class AddMeasurementActivity extends BaseActivity {
     @OnFocusChange(R.id.add_measurement_weight_input_edittext)
     public void onFocusChangeWeight(View v, boolean hasFocus) {
         if (!hasFocus) {
-            Integer errorString = validateEditText(((EditText) v).getText(), false);
-            mWeightInputLayout.setError(errorString == null ? null : getString(errorString));
+            setErrorInInputLayout(getWeightError(((EditText) v).getText()), mWeightInputLayout);
         }
     }
 
@@ -113,7 +115,7 @@ public class AddMeasurementActivity extends BaseActivity {
     @OnFocusChange(R.id.add_measurement_water_input)
     public void onFocusChangeWater(View v, boolean hasFocus) {
         if (!hasFocus) {
-            Integer errorString = validateEditText(((EditText) v).getText(), true);
+            Integer errorString = validatePercentage(((EditText) v).getText());
             mWaterInputLayout.setError(errorString == null ? null : getString(errorString));
         }
     }
@@ -122,7 +124,7 @@ public class AddMeasurementActivity extends BaseActivity {
     @OnFocusChange(R.id.add_measurement_fat_input)
     public void onFocusChangeFat(View v, boolean hasFocus) {
         if (!hasFocus) {
-            Integer errorString = validateEditText(((EditText) v).getText(), true);
+            Integer errorString = validatePercentage(((EditText) v).getText());
             mFatInputLayout.setError(errorString == null ? null : getString(errorString));
         }
     }
@@ -130,15 +132,14 @@ public class AddMeasurementActivity extends BaseActivity {
     @OnFocusChange(R.id.add_measurement_imc_input)
     public void onFocusBmi(View v, boolean hasFocus) {
         if (!hasFocus) {
-            Integer errorString = validateEditText(((EditText) v).getText(), false);
-            mBmiInputLayout.setError(errorString == null ? null : getString(errorString));
+            setErrorInInputLayout(getBmiError(((EditText) v).getText()), mBmiInputLayout);
         }
     }
 
     @OnFocusChange(R.id.add_measurement_muscles_input)
     public void onFocusChangeMuscle(View v, boolean hasFocus) {
         if (!hasFocus) {
-            Integer errorString = validateEditText(((EditText) v).getText(), true);
+            Integer errorString = validatePercentage(((EditText) v).getText());
             mMusclesInputLayout.setError(errorString == null ? null : getString(errorString));
         }
     }
@@ -146,49 +147,50 @@ public class AddMeasurementActivity extends BaseActivity {
     @OnTextChanged(value = R.id.add_measurement_muscles_input,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextChangedMuscle(Editable editable) {
-        Integer errorString = validateEditText(editable, true);
+        Integer errorString = validatePercentage(editable);
         mMusclesInputLayout.setError(errorString == null ? null : getString(errorString));
     }
 
     @OnTextChanged(value = R.id.add_measurement_weight_input_edittext,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextChangedWeight(Editable editable) {
-        Integer errorString = validateEditText(editable, false);
-        mWeightInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(getWeightError(editable.toString()), mWeightInputLayout);
     }
 
     @OnTextChanged(value = R.id.add_measurement_water_input,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextChangedWater(Editable editable) {
-        Integer errorString = validateEditText(editable, true);
+        Integer errorString = validatePercentage(editable);
         mWaterInputLayout.setError(errorString == null ? null : getString(errorString));
     }
 
     @OnTextChanged(value = R.id.add_measurement_fat_input,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextChangedFat(Editable editable) {
-        Integer errorString = validateEditText(editable, true);
+        Integer errorString = validatePercentage(editable);
         mFatInputLayout.setError(errorString == null ? null : getString(errorString));
     }
-
 
     @OnTextChanged(value = R.id.add_measurement_imc_input,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextChangedImc(Editable editable) {
-        Integer errorString = validateEditText(editable, true);
-        mBmiInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(getBmiError(editable.toString()), mBmiInputLayout);
     }
 
-    private Integer validateEditText(Editable inputLayout, boolean isPercentage) {
+    private void setErrorInInputLayout(Integer error, TextInputLayout inputLayout) {
+        if (error != null) {
+            inputLayout.setError(getString(error));
+        } else {
+            inputLayout.setError(null);
+        }
+    }
+
+    private Integer validatePercentage(Editable inputLayout) {
         if (!TextUtils.isEmpty(inputLayout)) {
             float value = Float.parseFloat(inputLayout.toString());
-            if (isPercentage) {
-                return value >= 0f && value <= 100f ? null : R.string.add_measurement_percentage_range_error;
-            } else {
-                return value >= 0f ? null : R.string.add_measurement_percentage_range_error;
-            }
+            return value >= 0f && value <= 100f ? null : R.string.add_measurement_percentage_range_error;
         } else {
-            return R.string.add_measurement_empty_error;
+            return R.string.input_validation_empty_error;
         }
     }
 

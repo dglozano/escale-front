@@ -1,13 +1,12 @@
 package com.dglozano.escale.util.ui;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-
 import com.dglozano.escale.ui.main.MainActivity;
-import com.dglozano.escale.util.ui.SmartFragmentStatePagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 public class BottomBarAdapter extends SmartFragmentStatePagerAdapter {
     private final List<Fragment> fragments = new ArrayList<>();

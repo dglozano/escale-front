@@ -1,6 +1,5 @@
 package com.dglozano.escale.ui.main.messages;
 
-import com.dglozano.escale.db.entity.AppUser;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
 

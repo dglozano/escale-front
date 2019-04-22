@@ -1,11 +1,10 @@
 package com.dglozano.escale.db.entity;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(tableName = "user_chat_join",
         primaryKeys = { "userId", "chatId" },
@@ -25,15 +24,17 @@ public class UserChatJoin {
     @NonNull
     private final Long chatId;
 
-    public UserChatJoin(final Long userId, final Long chatId) {
+    public UserChatJoin(@NonNull final Long userId, @NonNull final Long chatId) {
         this.userId = userId;
         this.chatId = chatId;
     }
 
+    @NonNull
     public Long getUserId() {
         return userId;
     }
 
+    @NonNull
     public Long getChatId() {
         return chatId;
     }

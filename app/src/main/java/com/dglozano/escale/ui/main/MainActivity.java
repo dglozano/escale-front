@@ -2,8 +2,6 @@ package com.dglozano.escale.ui.main;
 
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,19 +9,6 @@ import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -34,16 +19,22 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.ble.BF600BleService;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivity;
+import com.dglozano.escale.ui.doctor.main.home.DoctorHomeFragment;
 import com.dglozano.escale.ui.drawer.profile.PatientProfileActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.diet.DietFragment;
 import com.dglozano.escale.ui.main.home.HomeFragment;
 import com.dglozano.escale.ui.main.messages.MessagesFragment;
 import com.dglozano.escale.ui.main.stats.StatsFragment;
+import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.BottomBarAdapter;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.util.ui.NoSwipePager;
 import com.dglozano.escale.web.services.FirebaseTokenSenderService;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.bottomnavigation.LabelVisibilityMode;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
@@ -52,9 +43,22 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
 import java.net.MalformedURLException;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,14 +70,14 @@ import q.rorbin.badgeview.Badge;
 import q.rorbin.badgeview.QBadgeView;
 import timber.log.Timber;
 
+import static com.dglozano.escale.util.Constants.SHOW_PDF_CODE;
+
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         HasSupportFragmentInjector, LogoutDialog.LogoutDialogListener {
 
     private static final int CHANGE_PASSWORD_CODE = 123;
     public static final int ADD_MEASUREMENT_CODE = 456;
-
-    public static final String ASK_NEW_FIREBASE_TOKEN = "ask_new_firebase_token";
 
     // Binding views with Butterknife
     @BindView(R.id.bnve)
@@ -129,32 +133,6 @@ public class MainActivity extends BaseActivity
 
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainActivityViewModel.class);
 
-        int openFragmentInPosition = 0;
-        if (getIntent().getExtras() != null) {
-            openFragmentInPosition = handleFirebaseIntent();
-        }
-
-        setSupportActionBar(mToolbar);
-        setActionBarTitleAccordingToFragment(openFragmentInPosition);
-        setupDrawerLayout();
-        setupBottomNav();
-
-        onKeyboardVisibilityEvent();
-
-        observeIsRefreshing();
-        observeUserData();
-        observeChangeDialogEvent();
-        observeNumberOfUnreadMessages();
-        observerFirebaseTokenUpdate();
-        observeCurrentFragmentPosition();
-        observeNewDietNotification();
-        mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
-        mViewModel.getLogoutEvent().observe(this, this::onLogoutEvent);
-
-        addFragmentsToBottomNav(openFragmentInPosition);
-
-        mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
-
         mViewModel.getAppBarShadowStatus().observe(this, showShadow -> {
             if (showShadow != null && !showShadow) {
                 setElevationOfAppBar(0f);
@@ -162,12 +140,55 @@ public class MainActivity extends BaseActivity
                 setElevationOfAppBar(10f);
             }
         });
+
+        int openFragmentInPosition = 0;
+        if (getIntent().getExtras() != null) {
+            openFragmentInPosition = handleIntent();
+            mViewModel.setDoctorView(getIntent().getBooleanExtra(Constants.IS_DOCTOR_VIEW_INTENT_EXTRA, false));
+        }
+        setSupportActionBar(mToolbar);
+
+        mViewModel.setPositionOfCurrentFragment(openFragmentInPosition);
+
+        if (!mViewModel.isDoctorView()) {
+            mNavigationView.setVisibility(View.VISIBLE);
+            setActionBarTitleAccordingToFragment(openFragmentInPosition);
+            setupDrawerLayout();
+        } else {
+            mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            mNavigationView.setVisibility(View.GONE);
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        }
+
+        onKeyboardVisibilityEvent();
+
+        addFragmentsToBottomNav(openFragmentInPosition);
+        setupBottomNav();
+        observeIsRefreshing();
+        observeUserData();
+        if (!mViewModel.isDoctorView()) {
+            observeChangeDialogEvent();
+            observeNewDietNotification();
+            mViewModel.getLogoutEvent().observe(this, this::onLogoutEvent);
+        }
+
+        observeNumberOfUnreadMessages();
+        observerFirebaseTokenUpdate();
+        observeCurrentFragmentPosition();
+
+        mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
+
+        invalidateOptionsMenu();
+
+        if (mViewModel.isDoctorView() && openFragmentInPosition == 0) {
+            setElevationOfAppBar(0f);
+        }
     }
 
     private void onLogoutEvent(Event<Integer> logoutEvent) {
         if (logoutEvent != null && !logoutEvent.hasBeenHandled()) {
             Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra(ASK_NEW_FIREBASE_TOKEN, true);
+            intent.putExtra(Constants.ASK_NEW_FIREBASE_TOKEN, true);
             startActivity(intent);
             mBF600BleService.disposeConnection();
             finish();
@@ -188,11 +209,16 @@ public class MainActivity extends BaseActivity
                 mMainProgressBar.setVisibility(isRefreshing ? View.VISIBLE : View.GONE);
                 mNoSwipePager.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
                 mExpandableBottomBar.setVisibility(isRefreshing ? View.GONE : View.VISIBLE);
+                if (isRefreshing) {
+                    getSupportActionBar().hide();
+                } else {
+                    getSupportActionBar().show();
+                }
             }
         });
     }
 
-    private int handleFirebaseIntent() {
+    private int handleIntent() {
         int openFragment = 0;
         String msgType = getIntent().getExtras().getString("type");
         if (msgType != null) {
@@ -208,17 +234,24 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        for (int i = 0; i < mNavigationView.getMenu().size(); i++) {
-            mNavigationView.getMenu().getItem(i).setChecked(false);
+        mViewModel.refreshData();
+        if (!mViewModel.isDoctorView()) {
+            for (int i = 0; i < mNavigationView.getMenu().size(); i++) {
+                mNavigationView.getMenu().getItem(i).setChecked(false);
+            }
         }
     }
 
     private void observeCurrentFragmentPosition() {
         mViewModel.getPositionOfCurrentFragment().observe(this, posFragment -> {
             if (posFragment != null) {
-                if (posFragment == 2) mViewModel.markNewDietAsSeen(true);
-                if (posFragment == 3) mViewModel.markMessagesAsRead();
-                setActionBarTitleAccordingToFragment(posFragment);
+                if (!mViewModel.isDoctorView()) {
+                    if (posFragment == 2) mViewModel.markNewDietAsSeen(true);
+                    if (posFragment == 3) mViewModel.markMessagesAsReadForPatient();
+                    setActionBarTitleAccordingToFragment(posFragment);
+                } else {
+                    if (posFragment == 3) mViewModel.markMessagesAsReadForDoctor();
+                }
             }
         });
     }
@@ -230,7 +263,7 @@ public class MainActivity extends BaseActivity
                 Timber.d("Sending token %s to server for user %s", token, patientId);
                 Intent startIntent = new Intent(this, FirebaseTokenSenderService.class);
                 startIntent.putExtra("token", token);
-                startIntent.putExtra("patientId", patientId);
+                startIntent.putExtra("userId", patientId);
                 startService(startIntent);
             }
         });
@@ -247,14 +280,34 @@ public class MainActivity extends BaseActivity
     }
 
     private void observeNumberOfUnreadMessages() {
-        mViewModel.getNumberOfUnreadMessages().observe(this, unreadMessages -> {
-            if (mMessagesBadge == null) {
-                mMessagesBadge = addBadgeAt(3, 0);
-            }
-            if (unreadMessages != null) {
-                mMessagesBadge.setBadgeNumber(unreadMessages);
-            }
-        });
+        if (!mViewModel.isDoctorView()) {
+            mViewModel.getNumberOfUnreadMessagesByPatient().observe(this, unreadMessages -> {
+                if (mMessagesBadge == null) {
+                    mMessagesBadge = addBadgeAt(3, 0);
+                }
+                if (unreadMessages != null && mViewModel.getPositionOfCurrentFragment().getValue() != null) {
+                    if (mViewModel.getPositionOfCurrentFragment().getValue() != 3) {
+                        mMessagesBadge.setBadgeNumber(unreadMessages);
+                    } else {
+                        mMessagesBadge.setBadgeNumber(0);
+                    }
+                }
+            });
+        } else {
+            mViewModel.getNumberOfUnreadMessagesByDoctor().observe(this, unreadMessages -> {
+                if (mMessagesBadge == null) {
+                    mMessagesBadge = addBadgeAt(3, 0);
+                }
+                if (unreadMessages != null && mViewModel.getPositionOfCurrentFragment().getValue() != null) {
+                    if (mViewModel.getPositionOfCurrentFragment().getValue() != 3) {
+                        mMessagesBadge.setBadgeNumber(unreadMessages);
+                    } else {
+                        mMessagesBadge.setBadgeNumber(0);
+                    }
+                }
+            });
+        }
+
     }
 
     private void observeNewDietNotification() {
@@ -304,36 +357,51 @@ public class MainActivity extends BaseActivity
     }
 
     private void observeUserData() {
-
-
         mViewModel.getLoggedPatient().observe(this, user -> {
-            if (user != null) {
-                mNavUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
-                mNavEmail.setText(user.getEmail());
+            if (user != null && user.isFullyLoaded()) {
+                if (!mViewModel.isDoctorView()) {
+                    mNavUsername.setText(String.format("%1$s %2$s", user.getFirstName(), user.getLastName()));
+                    mNavEmail.setText(user.getEmail());
 
-                try {
-                    mPicasso.load(mViewModel.getProfileImageUrlOfLoggedPatient().toString())
-                            .placeholder(R.drawable.ic_user_profile_image_default)
-                            .error(R.drawable.ic_user_profile_image_default)
-                            .into(mNavImageView);
-                } catch (MalformedURLException e) {
-                    Timber.e(e);
+                    try {
+                        mPicasso.load(mViewModel.getProfileImageUrlOfLoggedPatient().toString())
+                                .placeholder(R.drawable.ic_user_profile_image_default)
+                                .error(R.drawable.ic_user_profile_image_default)
+                                .into(mNavImageView);
+                    } catch (MalformedURLException e) {
+                        Timber.e(e);
+                    }
+                } else {
+                    String firstName = user.getFirstName().split(" ", 2)[0];
+                    Objects.requireNonNull(getSupportActionBar())
+                            .setTitle(String.format("%s, %s", user.getLastName(), firstName));
                 }
+            } else {
+                Timber.e("User is null");
             }
         });
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        if (mViewModel.isDoctorView()) {
+            finish();
+            return true;
+        }
+        return false;
+    }
+
     private void setupBottomNav() {
         mBnv.enableAnimation(true);
-        mBnv.enableShiftingMode(false);
-        mBnv.enableItemShiftingMode(false);
+        mBnv.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED); // for enableShiftingMode(false)
+        mBnv.setItemHorizontalTranslationEnabled(false); // for enableItemShiftingMode(false)
         mBnv.setTextVisibility(false);
         mBnv.setIconSizeAt(0, 28, 28);
     }
 
     private void addFragmentsToBottomNav(int currentFragmentPosition) {
         mNoSwipePager.setPagingEnabled(false);
-        mNoSwipePager.setOffscreenPageLimit(0);
+        mNoSwipePager.setOffscreenPageLimit(4);
         mNoSwipePager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -344,6 +412,8 @@ public class MainActivity extends BaseActivity
             public void onPageSelected(int position) {
                 Timber.d("New fragment position %s", position);
                 mViewModel.setPositionOfCurrentFragment(position);
+//                invalidateOptionsMenu(position);
+                invalidateOptionsMenu();
             }
 
             @Override
@@ -351,7 +421,11 @@ public class MainActivity extends BaseActivity
 
             }
         });
-        mPagerAdapter.addFragments(HomeFragment.newInstance());
+        if (!mViewModel.isDoctorView()) {
+            mPagerAdapter.addFragments(HomeFragment.newInstance());
+        } else {
+            mPagerAdapter.addFragments(DoctorHomeFragment.newInstance());
+        }
         mPagerAdapter.addFragments(StatsFragment.newInstance());
         mPagerAdapter.addFragments(DietFragment.newInstance());
         mPagerAdapter.addFragments(MessagesFragment.newInstance());
@@ -360,9 +434,10 @@ public class MainActivity extends BaseActivity
         mNoSwipePager.setCurrentItem(currentFragmentPosition);
     }
 
+
     @Override
     public void onBackPressed() {
-        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+        if (!mViewModel.isDoctorView() && mDrawer.isDrawerOpen(GravityCompat.START)) {
             mDrawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -371,28 +446,34 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
+        if (!mViewModel.isDoctorView()) {
+            // Handle navigation view item clicks here.
 
-        if (id == R.id.nav_profile) {
-            startProfileActivity();
-        } else if (id == R.id.nav_settings) {
-            startSettingsActivity();
-        } else if (id == R.id.nav_help) {
+            if (id == R.id.nav_profile) {
+                startProfileActivity();
+            } else if (id == R.id.nav_settings) {
+                showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
+            } else if (id == R.id.nav_help) {
+                showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
+            } else if (id == R.id.nav_logout) {
+                LogoutDialog.newInstance().show(getSupportFragmentManager(), "showLogoutConfirmDialog");
+            } else if (id == R.id.nav_change_password) {
+                startChangePasswordActivity();
+            }
 
-        } else if (id == R.id.nav_logout) {
-            LogoutDialog.newInstance().show(getSupportFragmentManager(), "showLogoutConfirmDialog");
+            mDrawer.closeDrawer(GravityCompat.START);
+        } else if (id == android.R.id.home) {
+            onBackPressed();
         }
-
-        mDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private void startSettingsActivity() {
+    private void startChangePasswordActivity() {
         Intent intent = new Intent(this, ChangePasswordActivity.class);
+        intent.putExtra(Constants.CHANGE_PW_USER_ID_EXTRA, mViewModel.getLoggedPatientId());
         startActivityForResult(intent, CHANGE_PASSWORD_CODE);
     }
-
 
     // Add notifications' number to bottomNav icon at position
     private Badge addBadgeAt(int position, int number) {
@@ -410,6 +491,7 @@ public class MainActivity extends BaseActivity
                 .setPositiveButton(R.string.change_password_title, (dialog, which) -> {
                     Intent intent = new Intent(this, ChangePasswordActivity.class);
                     intent.putExtra("forced_to_change_pass", true);
+                    intent.putExtra(Constants.CHANGE_PW_USER_ID_EXTRA, mViewModel.getLoggedPatientId());
                     mViewModel.handleMustChangePasswordEvent();
                     startActivityForResult(intent, CHANGE_PASSWORD_CODE);
                 })
@@ -420,11 +502,12 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
-        mViewModel.refreshData();
         mNotificationManager.cancelAll();
-        Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
-        Intent intent = new Intent(this, BF600BleService.class);
-        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        if (!mViewModel.isDoctorView()) {
+            Timber.d("onStart(). Sending intent to Bind Bluetooth Service.");
+            Intent intent = new Intent(this, BF600BleService.class);
+            bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     @Override
@@ -457,19 +540,21 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CHANGE_PASSWORD_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 showSnackbarWithDuration(R.string.snackbar_password_change_success_msg, Snackbar.LENGTH_SHORT);
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 showSnackbarWithOkDismiss(R.string.change_password_canceled_msg);
             }
+        } else if (requestCode == SHOW_PDF_CODE) {
+            mViewModel.setPositionOfCurrentFragment(2);
         }
     }
 
     public void setElevationOfAppBar(float elevation) {
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
+        if (actionBar != null && actionBar.getElevation() != elevation) {
             actionBar.setElevation(elevation);
         }
         ViewCompat.setElevation(mAppBarLayout, elevation);
@@ -514,6 +599,7 @@ public class MainActivity extends BaseActivity
             mBleServiceIsBound = true;
             BF600BleService.LocalBinder localBinder = (BF600BleService.LocalBinder) binder;
             mBF600BleService = localBinder.getService();
+            mBF600BleService.disposeConnection();
             observeServiceLiveData();
         }
 

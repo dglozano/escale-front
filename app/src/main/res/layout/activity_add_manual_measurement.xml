@@ -41,7 +41,7 @@
                         android:layout_margin="@dimen/activity_vertical_margin_small"
                         android:src="@drawable/home_ic_weight_kg" />
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/add_measurement_weight_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
                             android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
                             android:textColor="@color/colorTextBlack"
                             android:textColorHint="@color/colorTextDark" />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:id="@+id/add_measurement_weight_unit"
@@ -86,7 +86,7 @@
                         android:layout_margin="@dimen/activity_vertical_margin_small"
                         android:src="@drawable/home_ic_drop_colored" />
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/add_measurement_water_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
                             android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
                             android:textColor="@color/colorTextBlack"
                             android:textColorHint="@color/colorTextDark" />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:id="@+id/add_measurement_water_unit"
@@ -131,7 +131,7 @@
                         android:layout_margin="@dimen/activity_vertical_margin_small"
                         android:src="@drawable/home_ic_pizza_slice_colored" />
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/add_measurement_fat_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -150,7 +150,7 @@
                             android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
                             android:textColor="@color/colorTextBlack"
                             android:textColorHint="@color/colorTextDark" />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:id="@+id/add_measurement_fat_unit"
@@ -176,7 +176,7 @@
                         android:layout_margin="@dimen/activity_vertical_margin_small"
                         android:src="@drawable/home_ic_bmi_colored" />
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/add_measurement_imc_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -195,7 +195,7 @@
                             android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
                             android:textColor="@color/colorTextBlack"
                             android:textColorHint="@color/colorTextDark" />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:id="@+id/add_measurement_bmi_unit"
@@ -221,7 +221,7 @@
                         android:layout_margin="@dimen/activity_vertical_margin_small"
                         android:src="@drawable/home_ic_muscle_colored" />
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/add_measurement_muscles_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -240,7 +240,7 @@
                             android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
                             android:textColor="@color/colorTextBlack"
                             android:textColorHint="@color/colorTextDark" />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:id="@+id/add_measurement_muscle_unit"
@@ -265,7 +265,7 @@
             android:layout_marginStart="@dimen/activity_vertical_margin_big"
             android:layout_marginEnd="@dimen/activity_vertical_margin_big"
             android:layout_marginBottom="@dimen/activity_vertical_margin_big"
-            android:background="@drawable/login_button_rounded"
+            android:background="@drawable/button_rounded"
             android:text="@string/add_measurement_btn"
             android:textColor="@color/almostWhite"
             android:textStyle="bold" />

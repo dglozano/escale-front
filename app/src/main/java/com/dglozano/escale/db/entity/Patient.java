@@ -1,9 +1,5 @@
 package com.dglozano.escale.db.entity;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
-
 import com.dglozano.escale.web.dto.PatientDTO;
 import com.google.gson.annotations.SerializedName;
 
@@ -13,25 +9,42 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import lombok.ToString;
+
+import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(foreignKeys = @ForeignKey(entity = Doctor.class,
         parentColumns = "id",
         childColumns = "doctorId",
         onDelete = CASCADE))
+@ToString
 public class Patient extends AppUser {
 
     private Gender gender;
     private int heightInCm;
     private int physicalActivity;
     private Date birthday;
-    private boolean changedDefaultPassword;
     private Long doctorId;
     private Float goalInKg;
     private Date goalDueDate;
+    private Date goalStartDate;
     private boolean hasToUpdateDataInScale = true;
+    private boolean isLoseGoal = true;
+    @Ignore
+    @ToString.Exclude
+    private MeasurementForecast measurementForecast;
 
     public Patient() {
+    }
+
+    @Ignore
+    public Patient(Long id, Long doctorId, Date timestamp) {
+        this.id = id;
+        this.doctorId = doctorId;
+        this.lastUpdate = timestamp;
     }
 
     @Ignore
@@ -40,20 +53,32 @@ public class Patient extends AppUser {
                 patientDTO.getFirstName(),
                 patientDTO.getLastName(),
                 patientDTO.getEmail(),
-                timestamp);
+                timestamp,
+                patientDTO.hasChangedDefaultPassword());
         this.gender = patientDTO.getGender();
         this.heightInCm = patientDTO.getHeightInCm();
         this.physicalActivity = patientDTO.getPhysicalActivity();
         this.birthday = patientDTO.getBirthday();
         this.doctorId = patientDTO.getDoctorDTO().getId();
-        this.changedDefaultPassword = patientDTO.hasChangedDefaultPassword();
         if (patientDTO.getCurrentWeightGoal() != null) {
             this.goalDueDate = patientDTO.getCurrentWeightGoal().getDueDate();
             this.goalInKg = patientDTO.getCurrentWeightGoal().getGoalInKg();
+            this.goalStartDate = patientDTO.getCurrentWeightGoal().getStartDate();
+            this.isLoseGoal = patientDTO.getCurrentWeightGoal().isLoseGoal();
         } else {
             this.goalDueDate = null;
             this.goalInKg = null;
+            this.goalStartDate = null;
+            this.isLoseGoal = true;
         }
+    }
+
+    public boolean isLoseGoal() {
+        return isLoseGoal;
+    }
+
+    public void setLoseGoal(boolean loseGoal) {
+        isLoseGoal = loseGoal;
     }
 
     public Gender getGender() {
@@ -117,12 +142,8 @@ public class Patient extends AppUser {
                 && otherPatient.email.equals(this.email);
     }
 
-    public boolean hasChangedDefaultPassword() {
-        return changedDefaultPassword;
-    }
-
-    public void setChangedDefaultPassword(boolean changedDefaultPassword) {
-        this.changedDefaultPassword = changedDefaultPassword;
+    public void setGoalStartDate(Date goalStartDate) {
+        this.goalStartDate = goalStartDate;
     }
 
     public Float getGoalInKg() {
@@ -141,18 +162,12 @@ public class Patient extends AppUser {
         this.goalDueDate = goalDueDate;
     }
 
-    @Override
-    public String toString() {
-        return String.format("{\n " +
-                "   id: %s \n" +
-                "   firstName: %s \n" +
-                "   lastName: %s \n" +
-                "   email: %s \n" +
-                "   userindex: %s \n" +
-                "   gender: %s \n" +
-                "   height: %s \n" +
-                "   physicalactivity: %s \n" +
-                "}", id, firstName, lastName, email, gender, heightInCm, physicalActivity);
+    public MeasurementForecast getMeasurementForecast() {
+        return measurementForecast;
+    }
+
+    public void setMeasurementForecast(MeasurementForecast measurementForecast) {
+        this.measurementForecast = measurementForecast;
     }
 
     public int getAge() {
@@ -178,6 +193,19 @@ public class Patient extends AppUser {
             default:
                 return "Media";
         }
+    }
+
+
+    public Date getGoalStartDate() {
+        return goalStartDate;
+    }
+
+    public boolean hasActiveGoal(Date today) {
+        return goalInKg != null && goalDueDate != null && today.before(goalDueDate);
+    }
+
+    public boolean isFullyLoaded() {
+        return birthday != null && firstName != null && lastName != null && email != null;
     }
 
     public enum Gender {

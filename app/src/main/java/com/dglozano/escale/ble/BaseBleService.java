@@ -1,11 +1,8 @@
 package com.dglozano.escale.ble;
 
 import android.app.Service;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.util.Constants;
@@ -24,6 +21,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import androidx.annotation.Nullable;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;

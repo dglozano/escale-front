@@ -1,18 +1,25 @@
 package com.dglozano.escale.web;
 
+import com.dglozano.escale.db.entity.Alert;
+import com.dglozano.escale.db.entity.MeasurementForecast;
+import com.dglozano.escale.db.entity.PatientInfo;
 import com.dglozano.escale.web.dto.AddBodyMeasurementDTO;
+import com.dglozano.escale.web.dto.AddWeightGoalDTO;
 import com.dglozano.escale.web.dto.BodyMeasurementDTO;
 import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.ChatDTO;
 import com.dglozano.escale.web.dto.ChatMessageDTO;
+import com.dglozano.escale.web.dto.CreatePatientDTO;
 import com.dglozano.escale.web.dto.Credentials;
 import com.dglozano.escale.web.dto.DietDTO;
+import com.dglozano.escale.web.dto.DoctorDTO;
 import com.dglozano.escale.web.dto.FirebaseTokenUpdateDTO;
 import com.dglozano.escale.web.dto.LoginResponse;
 import com.dglozano.escale.web.dto.PasswordDTO;
 import com.dglozano.escale.web.dto.PatientDTO;
 import com.dglozano.escale.web.dto.SendChatMessageDTO;
 import com.dglozano.escale.web.dto.UpdatePatientDTO;
+import com.dglozano.escale.web.dto.WeightGoalDTO;
 
 import java.util.List;
 
@@ -47,13 +54,27 @@ public interface EscaleRestApi {
     @PUT("/api/patients/{id}/update")
     Completable updatePatientWithId(@Body UpdatePatientDTO updatePatientDTO, @Path("id") Long patientId);
 
-    @GET("/api/patients/{id}/measurements")
-    Call<List<BodyMeasurementDTO>> getAllBodyMeasurement(@Path("id") Long patientId);
-
     @GET("/api/patients/{id}/last_measurements")
     Single<List<BodyMeasurementDTO>> getLastBodyMeasurements(@Path("id") Long patientId,
                                                              @Query("from") String isoFromDate,
                                                              @Query("limit") Integer limit);
+
+    @GET("/api/patients/{id}/measurements/forecast")
+    Single<Response<MeasurementForecast>> getMeasurementForecastOfUser(@Path("id") Long patientId,
+                                                                       @Query("force") boolean force);
+
+    @GET("/api/patients/{id}/measurements/forecast")
+    Single<Response<MeasurementForecast>> getMeasurementForecastOfUser(@Path("id") Long patientId,
+                                                                       @Query("predictionsNumber") int predictionsNumber,
+                                                                       @Query("force") boolean force);
+
+
+    @GET("/api/patients/{id}/measurements/forecast")
+    Single<Response<MeasurementForecast>> getMeasurementForecastOfUser(@Path("id") Long patientId,
+                                                                       @Query("alpha") double alpha,
+                                                                       @Query("gamma") double gamma,
+                                                                       @Query("predictionsNumber") int predictionsNumber,
+                                                                       @Query("force") boolean force);
 
     @POST("/api/patients/{id}/measurements/add")
     Single<BodyMeasurementDTO> postNewMeasurement(@Body AddBodyMeasurementDTO addBodyMeasurementDTO,
@@ -73,6 +94,9 @@ public interface EscaleRestApi {
 
     @POST("/api/chats/{id}/messages")
     Single<ChatMessageDTO> sendChatMessage(@Path("id") Long chatId, @Body SendChatMessageDTO chatMessageDTO);
+
+    @POST("/api/chats/{id}/messages/seenBy")
+    Completable markSeenByUser(@Path("id") Long chatId, @Query("userId") Long userId);
 
     @Streaming
     @GET("/api/diets/download/{uuid}")
@@ -96,5 +120,34 @@ public interface EscaleRestApi {
     @Multipart
     @POST("/api/patients/{id}/profile_image/upload")
     Completable uploadProfilePicture(@Part MultipartBody.Part file, @Path("id") Long userId);
+
+    @POST("/api/doctors/{id}/patients/sign-up")
+    Single<PatientDTO> createPatientForDoctor(@Body CreatePatientDTO createPatientDTO,
+                                              @Path("id") Long doctorId);
+
+    @GET("/api/doctors/{id}")
+    Single<DoctorDTO> getDoctorById(@Path("id") Long doctorId);
+
+
+    @GET("/api/doctors/{id}/patients/info")
+    Single<List<PatientInfo>> getAllPatientsInfoOfDoctor(@Path("id") Long doctorId);
+
+    @GET("/api/patients/{id}/alerts")
+    Single<List<Alert>> getAllAlertsOfPatient(@Path("id") Long patiendId);
+
+    @POST("/api/patients/{id}/alerts/toggleSeenByDoctor")
+    Completable toggleSeenByDoctor(@Path("id") Long patientId, @Query("alertId") Long alertId);
+
+    @Multipart
+    @POST("/api/diets/upload")
+    Completable uploadDiet(@Part MultipartBody.Part file, @Query("patientId") Long patientId, @Query("filename") String filename);
+
+    @POST("/api/patients/{id}/alerts/markAllAsSeen")
+    Completable markAllAlertsAsSeenByDoctor(@Path("id") Long patientId);
+
+    @POST("/api/doctors/{doctorId}/patients/{patientId}/add-goal")
+    Single<WeightGoalDTO> addGoal(@Body AddWeightGoalDTO addWeightGoalDTO,
+                                  @Path("doctorId") Long doctorId,
+                                  @Path("patientId") Long patientId);
 
 }

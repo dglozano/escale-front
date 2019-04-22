@@ -4,8 +4,6 @@
     <string name="disconnected">Desconectado</string>
     <string name="navigation_drawer_open">Nav drawer open</string>
     <string name="navigation_drawer_close">Nav drawer close</string>
-    <string name="measurement_item_holder_value">%1$s %2$s</string>
-    <string name="decimal_format">###,###.##</string>
     <string name="loading">Cargando…</string>
     <string name="user_profile_picture">Foto de perfil de usuario</string>
     <string name="error_bluetooth_not_available">Su dispositivo no tiene conectividad Bluetooth.</string>
@@ -31,11 +29,10 @@
     <string name="login_reset_password_text"><u>¿Olvidaste tu contraseña?</u></string>
     <string name="login_first_time_message">Si es tu primera vez, busca en tu bandeja de entrada el mail de bienvenida con la contraseña inicial.</string>
     <string name="ok">OK</string>
-    <string name="login_error_not_patient">La app es solo para pacientes. Si eres un doctor, ingresa a www.escale.com.ar</string>
+    <string name="login_error_not_mobile_user">No puedes usar la versión móvil de la app.</string>
     <string name="login_error_bad_credentials">Ups! Las credenciales ingresadas no son válidas. Pruebe nuevamente.</string>
     <string name="login_error_could_not_reach_server">No pudimos conectarnos con el servidor. Revisa tu conexión a internet.</string>
     <string name="drawer_option_profile">Perfil</string>
-    <string name="drawer_option_doctor">Doctor</string>
     <string name="drawer_option_settings">Configuración</string>
     <string name="drawer_option_logout">Salir</string>
     <string name="change_pass_instructions">Ingrese su contraseña actual seguido de su nueva contraseña.\n\nLa nueva contraseña debe tener <b>como mínimo 8 caracteres</b>, incluir <b>al menos una letra minúscula</b> y por lo menos <b>un dígito</b>.
@@ -47,7 +44,7 @@
     <string name="change_password_canceled_msg">No has cambiado tu contraseña. Recuerda que puedes cambiarla ingresando a tu perfil.</string>
     <string name="snackbar_password_change_success_msg">La password se ha cambiado correctamente.</string>
     <string name="change_password_title">Cambiar contraseña</string>
-    <string name="dialog_change_password">¡Bienvenido! Parece que es la primera vez que utilizas tu cuenta de Escale, por lo que debes cambiar tu contraseña inicial.</string>
+    <string name="dialog_change_password">¡Hola! Parece que has iniciado sesión utilizando una contraseña temporal, por lo que deberás cambiarla.</string>
     <string name="dialog_title_error">Ups!</string>
     <string name="must_change_password_error_msg_dialog">Por cuestiones de seguridad, usted debe modificar su contraseña inicial.</string>
     <string name="no_internet_text">Ups! Parece que has perdido la conexión a Internet. Asegurate de estar conectado y vuelve a intentarlo.</string>
@@ -56,60 +53,44 @@
     <string name="change_password_error_snackbar">No pudimos cambiar la contraseña. Revisa los datos e intenta nuevamente.</string>
     <string name="add_measurement_error_snackbar">No pudimos agregar la medición. Pruebe nuevamente más tarde.</string>
     <string name="logout_title">Cerrar sesion</string>
-    <string name="confirm_logout_msg">¿Está seguro que desea salir?</string>
-    <string name="yes">Si</string>
-    <string name="no">No</string>
-    <string name="drawer_option_home">Principal</string>
     <string name="no_diets_text">Parece que aún no se te ha asignado ninguna dieta. Comunicate con tu doctor para solicitar una.</string>
     <string name="current_diet_title">Actual</string>
     <string name="all_diets_title">Todas</string>
     <string name="error_diet_not_downloaded_yet">Debes descargar la dieta antes de poder visualizarla</string>
-    <string name="error_diet_download_generic">Ups! Hubo un error al intentar descargar la dieta.</string>
-    <string name="error_diet_cancel_download_generic">Ups! Hubo un error al intentar cancelar la descarga.</string>
     <string name="error_diet_delete_generic">Ups! Hubo un error al intentar borrar la dieta</string>
-    <string name="open_diet_pdf">Abrir dieta</string>
-    <string name="error_open_pdf_install_viewer">Ups! Parece que no tienes un lector de PDF. Instala uno y prueba de nuevo.</string>
-    <string name="old_diets_title">Anteriores</string>
     <string name="send_message_hint">Escribe un mensaje</string>
     <string name="error_sending_message">No se pudo enviar el mensaje. Intente nuevamente.</string>
     <string name="copy">Copiar</string>
     <string name="add_body_measurement">Agregar medición</string>
-    <string name="add_body_measurement_with_scale">Agregar peso con balanza</string>
-    <string name="add_body_measurement_manually">Agregar peso manualmente</string>
     <string name="copied">Copiado al portapapeles</string>
-    <string name="logout_error">Ups! No pudimos desloguearte. Intente nuevamente más tarde.</string>
-    <string name="no_stats_yet_text_in_chart">Aún no tienes ningun pesaje cargado</string>
     <string name="show_filter_stats">Ver Filtros</string>
     <string name="hide_filter_stats">OCULTAR FILTROS</string>
-    <string name="no_body_measurement_yet">No tienes tienen pesaje cargado aún.</string>
+    <string name="no_body_measurement_yet_short">Sin pesajes</string>
+    <string name="no_body_measurement_yet">No tienes ningún pesaje cargado aún.</string>
     <string name="add_measurement_btn">Agregar medición</string>
     <string name="weight">Peso</string>
     <string name="water">Agua corporal</string>
     <string name="fat">Grasa corporal</string>
-    <string name="bones">Masa ósea</string>
     <string name="imc">IMC</string>
     <string name="muscles">Masa muscular</string>
-    <string name="add_measurement_input_error_snackbar">
+    <string name="input_validation_error_snackbar">
         Revisa los datos ingresados e intenta nuevamente
     </string>
     <string name="add_measurement_percentage_range_error">Ingresa un valor entre 0% y 100%</string>
-    <string name="add_measurement_negative_number_error">Ingresa un valor positivo</string>
-    <string name="add_measurement_empty_error">Este campo no puede estar vacío</string>
+    <string name="input_validation_empty_error">Este campo no puede estar vacío</string>
     <string name="home_step_on_scale">
         Sáquese zapatillas y medias, súbase a la balanza y espere a que termine la medición.
     </string>
     <string name="no_stats_text">
         Aún no tienes pesajes. Ve a la pantalla inicial para agregar tu primer pesaje.
     </string>
-    <string name="list_stats_title">Lista</string>
+    <string name="list_stats_title">Historial</string>
     <string name="chart_stats_title">Gráfico</string>
-    <string name="scale_login_error">Error al iniciar sesión en la balanza</string>
     <string name="dialog_credentials_create_new_user_btn">Nuevo Usuario</string>
     <string name="ask_for_scale_credentials_dialog_instructions">
         Ingrese el <b>Índice</b> y <b>PIN</b> de su usuario en la balanza. Con el botón SET y las flechas
         en la balanza puede moverse entre los usuarios. \n\n Si no tiene un usuario,
         seleccione <i>\"Crear usuario\"</i>.</string>
-    <string name="scale_index">Índice</string>
     <string name="scale_pin">PIN</string>
     <string name="dialog_credentials_title">Ingrese Índice y PIN</string>
     <string name="ble_scale_login_error">El PIN del usuario de la balanza ingresado no es correcto.</string>
@@ -132,12 +113,13 @@
     <string name="manual_measurement">Pesaje manual</string>
     <string name="scale_measurement">Pesaje con balanza</string>
     <string name="ucrop_activity_title">Ajustar Foto</string>
-    <string name="upload_picture_success_msg">Foto actualizada correctamente</string>
+    <string name="upload_picture_success_msg">Foto actualizada exitósamente</string>
     <string name="upload_picture_error_msg">Ups! No pudimos actualizar tu foto. Intenta de nuevo más tarde.</string>
+    <string name="upload_diet_success_msg">Dieta subida exitósamente.</string>
+    <string name="upload_diet_error_msg">Ups! No pudimos cargar la nueva dieta. Intenta de nuevo más tarde.</string>
     <string name="profile_title">Perfil</string>
-    <string name="drawer_option_help_contact">Ayuda y Contacto</string>
+    <string name="help_and_contact_title">Ayuda y Contacto</string>
     <string name="edit">Editar</string>
-    <string name="edit_user_dialog_instructions">Ingrese los datos a modificar.</string>
     <string name="height_in_cm">Altura (cm.)</string>
     <string name="physical_actvitiy_label">Actividad Física</string>
     <string name="dialog_edit_user_ph_activity_description_1"><b>NINGUNA</b>\n\nNo realizas ningún tipo de actividad física.</string>
@@ -146,7 +128,7 @@
     <string name="dialog_edit_user_ph_activity_description_4"><b>ALTA</b>\n\nEjercicio físico en sesiones de 30 minutos, de 4 a 6 veces por semana como mínimo</string>
     <string name="dialog_edit_user_ph_activity_description_5"><b>MUY ALTA</b>\n\nEjercicios físicos intensivos, entrenamiento intensivo o trabajo corporal duro, diariamente, al menos 30 minutos cada día</string>
     <string name="dialog_edit_user_submit">Aceptar</string>
-    <string name="height_range_error">Ingresa una altura entre 100 cm. y 250 cm.</string>
+    <string name="input_validation_height_range_error">Ingresa una altura entre 100 cm. y 250 cm.</string>
     <string name="update_user_data_success">Datos actualizados correctamente.</string>
     <string name="update_user_data_error_msg">Ups! No pudimos actualizar tus datos. Intenta de nuevo más tarde.</string>
     <string name="home_title">Inicio</string>
@@ -154,7 +136,53 @@
     <string name="diets_title">Dietas</string>
     <string name="chats_title">Chat</string>
     <string name="dialog_logout_title">Cerrar sesión</string>
-    <string name="dialog_logout_instructions"><b>¿Está seguro que desea sailr?</b> De hacerlo, se borrarán todos sus datos almacenados localmente en su teléfono, como los chats con su médico y las dietas que haya descargado.</string>
+    <string name="dialog_logout_instructions"><b>¿Está seguro que desea sailr?</b> De hacerlo, se borrarán todos sus datos almacenados localmente en su teléfono.</string>
+    <string name="no_patients_text">Parece que aún no tienes pacientes cargados. Haga click en el botón de abajo a la derecha para dar de alta el primero.</string>
+    <string name="kg">kg.</string>
+    <string name="first_name">Nombre</string>
+    <string name="last_name">Apellido</string>
+    <string name="add_patient_btn_text">Agregar paciente</string>
+    <string name="birthday">Fecha de nacimiento</string>
+    <string name="genre_label">Sexo</string>
+    <string name="add_patient_label">Alta Paciente</string>
+    <string name="input_default_validation_error">El dato ingresado no es válido</string>
+    <string name="input_validation_birthday_error">Ingrese una fecha de nacimiento válida</string>
+    <string name="add_patient_error_snackbar">Ups! No pudimos dar de alta el paciente. Revisa los datos ingresados e intenta de nuevo.</string>
+    <string name="input_validation_email_error">Ingrese un email válido</string>
+    <string name="patient_added_successfully">Paciente agregado exitosamente</string>
+    <string name="number_of_new_patient_messages">{0,choice,0#Sin Mensajes|1#1 mensaje|1&lt;{0} mensajes}</string>
+    <string name="number_of_new_patient_alerts">{0,choice,0#Sin alertas|1#1 alerta|1&lt;{0} alertas}</string>
+    <string name="patients">Pacientes</string>
+    <string name="add_diet_title">Agregar dieta</string>
+    <string name="diet_name_hint">Nombre de la dieta</string>
+    <string name="choose_file_btn">Seleccionar archivo</string>
+    <string name="add_diet_submit_btn">Subir Dieta</string>
+    <string name="diet_name_too_long">El nombre es muy largo</string>
+    <string name="input_validation_diet_name">Ingresa sólo letras, números o .,-_()</string>
+    <string name="diet_file_chooser_intent_title">Selecciona la dieta</string>
+    <string name="home_doctor_profile_title">PERFIL</string>
+    <string name="home_doctor_alerts_title">ALERTAS</string>
+    <string name="no_alerts_text">Aún no has recibido ninguna alerta para esta paciente.</string>
+    <string name="input_validation_weight_error">Ingresa un valor entre 40 y 250</string>
+    <string name="input_validation_bmi_error">Ingresa un valor entre 10 y 60.</string>
+    <string name="action_search">Buscar</string>
+    <string name="add_goal">Cambiar meta</string>
+    <string name="mark_as_seen">Marcar alertas como ya vistas</string>
+    <string name="change_goal_error_msg">No se pudo cambiar la meta</string>
+    <string name="add_goal_hint">Nueva meta (kg.)</string>
+    <string name="add_goal_due_date_hint">Fecha de Finalización</string>
+    <string name="current_goal">Meta actual:</string>
+    <string name="input_validation_goal_due_date_error">La finalización de la meta debe ser después de hoy.</string>
+    <string name="settings">Configuraciones</string>
+    <string name="not_implemented_yet">Funcionalidad no implementada todavía</string>
+    <string name="patient_settings">Configuraciones paciente</string>
+    <string name="password_validation_no_digits_error">La contraseña debe tener al menos un número</string>
+    <string name="password_validation_no_letters_error">La contraseña debe tener al menos una letra</string>
+    <string name="password_validation_not_long_enough_error">La contraseña debe tener al menos 8 caracteres</string>
+    <string name="password_validation_not_valid_char_error">La contraseña debe tener solo letras y números</string>
+    <string name="password_validation_too_long_error">La contraseña es demasiado larga</string>
+    <string name="password_validation_same_password_error">La nueva contraseña no puede ser igual a la anterior</string>
+    <string name="password_validation_password_mismatch_error">Las contraseñas no coinciden</string>
     <string-array name="scale_user_indexes_array">
         <item>P-01</item>
         <item>P-02</item>

@@ -1,29 +1,33 @@
 package com.dglozano.escale.ui.main;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Transformations;
-import android.arch.lifecycle.ViewModel;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.entity.Patient;
-import com.dglozano.escale.di.annotation.BaseUrl;
-import com.dglozano.escale.exception.AccountDisabledException;
+import com.dglozano.escale.util.exception.AccountDisabledException;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
+import com.dglozano.escale.repository.DoctorRepository;
 import com.dglozano.escale.repository.PatientRepository;
+import com.dglozano.escale.repository.UserRepository;
+import com.dglozano.escale.util.AbsentLiveData;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.Event;
+import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -33,10 +37,11 @@ public class MainActivityViewModel extends ViewModel {
 
     private PatientRepository mPatientRepository;
     private ChatRepository mChatRepository;
+    private DoctorRepository mDoctorRepository;
     private DietRepository mDietRepository;
+    private UserRepository mUserRepository;
     private BodyMeasurementRepository mMeasurementRepository;
     private LiveData<Event<Boolean>> mMustChangePassword;
-    private LiveData<Integer> mNumberOfUnreadMessages;
     private final LiveData<Patient> mLoggedPatient;
     private final MutableLiveData<Integer> positionOfCurrentFragment;
     private final SharedPreferences mSharedPreferences;
@@ -46,19 +51,26 @@ public class MainActivityViewModel extends ViewModel {
     private MediatorLiveData<Boolean> mShowAppBarShadow;
     private LiveData<Boolean> mAreDietsEmpty;
     private LiveData<Boolean> mAreMeasurementsEmpty;
+    private LiveData<Integer> mUnreadMessagesByPatient;
+    private LiveData<Integer> mUnreadMessagesByDoctor;
     private MediatorLiveData<Boolean> mIsRefreshing;
     private MutableLiveData<Boolean> mIsRefreshingDiets;
     private MutableLiveData<Boolean> mIsRefreshingMessages;
     private MutableLiveData<Boolean> mIsRefreshingPatient;
     private MutableLiveData<Boolean> mIsRefreshingMeasurements;
+    private boolean isDoctorView;
 
     @Inject
     public MainActivityViewModel(PatientRepository patientRepository,
+                                 DoctorRepository doctorRepository,
+                                 UserRepository userRepository,
                                  BodyMeasurementRepository bodyMeasurementRepository,
                                  SharedPreferences sharedPreferences,
                                  ChatRepository chatRepository, DietRepository dietRepository) {
         disposables = new CompositeDisposable();
+        mUserRepository = userRepository;
         mDietRepository = dietRepository;
+        mDoctorRepository = doctorRepository;
         mPatientRepository = patientRepository;
         mChatRepository = chatRepository;
         mMeasurementRepository = bodyMeasurementRepository;
@@ -68,20 +80,53 @@ public class MainActivityViewModel extends ViewModel {
         positionOfCurrentFragment = new MutableLiveData<>();
         positionOfCurrentFragment.postValue(0);
         mLoggedPatient = mPatientRepository.getLoggedPatient();
+        mIsRefreshing = new MediatorLiveData<>();
         setupRefreshingObservable();
+
+        mUnreadMessagesByPatient = Transformations.switchMap(
+                mChatRepository.getAllChatsOfUser(mPatientRepository.getLoggedPatientId()),
+                chats -> chats.isEmpty() ?
+                        AbsentLiveData.create() :
+                        mChatRepository.getUnreadMessagesOfUserInChatAsLiveData(mPatientRepository.getLoggedPatientId(),
+                                chats.get(0).getId()));
+
+        mUnreadMessagesByDoctor = Transformations.switchMap(
+                mChatRepository.getAllChatsOfUser(mPatientRepository.getLoggedPatientId()),
+                chats -> {
+                    Timber.d("Chatis is empty %s", chats.isEmpty());
+                    return chats.isEmpty() ?
+                            AbsentLiveData.create() :
+                            mChatRepository.getUnreadMessagesOfUserInChatAsLiveData(mDoctorRepository.getLoggedDoctorId(),
+                                    chats.get(0).getId());
+                });
+
         setupMustChangePasswordObservable();
-        setupUnreadMessagesObservable();
+        isDoctorView = false;
+
         setupAppBarShadowStatus();
+    }
+
+
+    public LiveData<Integer> getNumberOfUnreadMessagesByDoctor() {
+        return mUnreadMessagesByDoctor;
+    }
+
+    public boolean isDoctorView() {
+        return isDoctorView;
+    }
+
+    public void setDoctorView(boolean doctorView) {
+        isDoctorView = doctorView;
     }
 
     private void setupAppBarShadowStatus() {
         mShowAppBarShadow = new MediatorLiveData<>();
         mAreDietsEmpty = Transformations.map(mDietRepository.getCurrentDiet(
-                mPatientRepository.getLoggedPatiendId()),
+                mPatientRepository.getLoggedPatientId()),
                 Objects::isNull);
         mAreMeasurementsEmpty = Transformations.map(
                 mMeasurementRepository.getLastBodyMeasurementOfUserWithId(
-                        mPatientRepository.getLoggedPatiendId()), measurement -> !measurement.isPresent());
+                        mPatientRepository.getLoggedPatientId()), measurement -> !measurement.isPresent());
         mShowAppBarShadow.addSource(mAreDietsEmpty, dietsEmpty -> {
             checkEmptyStateAndFragmentPosition();
         });
@@ -101,9 +146,13 @@ public class MainActivityViewModel extends ViewModel {
                 && positionOfCurrentFragment.getValue() == 2;
         boolean fragmentPositionMeasurement = positionOfCurrentFragment.getValue() != null
                 && positionOfCurrentFragment.getValue() == 1;
+        boolean fragmentPositionHome = positionOfCurrentFragment.getValue() != null
+                && positionOfCurrentFragment.getValue() == 0;
         if (dietsNotEmpty && fragmentPositionDiets) {
             mShowAppBarShadow.postValue(false);
         } else if (measurementsNotEmpty && fragmentPositionMeasurement) {
+            mShowAppBarShadow.postValue(false);
+        } else if (isDoctorView && fragmentPositionHome) {
             mShowAppBarShadow.postValue(false);
         } else {
             mShowAppBarShadow.postValue(true);
@@ -111,49 +160,56 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     public void refreshData() {
-        disposables.add(mPatientRepository.refreshPatient(mPatientRepository.getLoggedPatiendId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(d -> mIsRefreshingPatient.postValue(true))
-                .subscribe(this::refreshEverythingElse,
-                        error -> {
-                            if (error instanceof AccountDisabledException) {
-                                Timber.d("The user's account was disabled");
-                                mIsRefreshingPatient.postValue(false);
-                                logout();
-                            } else if (error instanceof NoSuchElementException) {
-                                // Means that the user was fresh enough, so didn't have to call api
-                                refreshEverythingElse(mPatientRepository.getLoggedPatiendId());
-                            } else {
-                                mIsRefreshingPatient.postValue(false);
-                                Timber.e(error);
-                            }
-                        })
+        disposables.add(mPatientRepository.refreshPatient(mPatientRepository.getLoggedPatientId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe(d -> mIsRefreshingPatient.postValue(true))
+                        .subscribe(this::refreshEverythingElse,
+                                error -> {
+                                    if (error instanceof AccountDisabledException
+                                            || (error instanceof HttpException && error.getMessage().contains("401"))) {
+                                        Timber.d("The user's account was disabled or token is not valid");
+                                        mIsRefreshingPatient.postValue(false);
+                                        logout();
+                                    } else if (error instanceof NoSuchElementException) {
+                                        // Means that the user was fresh enough, so didn't have to call api
+                                        refreshEverythingElse(mPatientRepository.getLoggedPatientId());
+                                    } else {
+                                        mIsRefreshingPatient.postValue(false);
+                                        Timber.e(error);
+                                    }
+                                })
 
         );
     }
 
     private void refreshEverythingElse(Long loggedPatientId) {
-        mIsRefreshingDiets.postValue(true);
-        mIsRefreshingMessages.postValue(true);
-        mIsRefreshingMeasurements.postValue(true);
-        mIsRefreshingPatient.postValue(false);
-        refreshMessagesAndCount(loggedPatientId);
+        if (mIsRefreshingPatient.getValue() != null && mIsRefreshingPatient.getValue()) {
+            mIsRefreshingDiets.postValue(true);
+            mIsRefreshingMessages.postValue(true);
+            mIsRefreshingMeasurements.postValue(true);
+            mIsRefreshingPatient.postValue(false);
+            mSharedPreferences.edit()
+                    .putLong(Constants.LAST_FULL_SYNC, Calendar.getInstance().getTimeInMillis())
+                    .apply();
+        }
+
+        //TODO Use zip and only one livedata to represent loading status
+        refreshMessages(loggedPatientId);
         refreshDiets(loggedPatientId);
         refreshMeasurements(loggedPatientId);
     }
 
-    private void refreshMessagesAndCount(Long patientId) {
-        disposables.add(mChatRepository.refreshMessagesAndCountOfPatientWithId(patientId)
+    private void refreshMessages(Long patientId) {
+        disposables.add(mChatRepository.refreshMessagesOfPatientWithId(patientId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(newUnread -> {
+                .subscribe(() -> {
                     mIsRefreshingMessages.postValue(false);
-                    addUnreadMessages(newUnread);
                     Timber.d("Finished refreshing messages");
                 }, error -> {
                     if (error instanceof NoSuchElementException) {
-                        markMessagesAsRead();
+                        markMessagesAsReadForPatient();
                     } else {
                         Timber.e(error);
                     }
@@ -195,16 +251,14 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     private void setupRefreshingObservable() {
-        mIsRefreshing = new MediatorLiveData<>();
-        mIsRefreshing.setValue(true);
         mIsRefreshingMessages = new MutableLiveData<>();
         mIsRefreshingPatient = new MutableLiveData<>();
         mIsRefreshingDiets = new MutableLiveData<>();
         mIsRefreshingMeasurements = new MutableLiveData<>();
-        mIsRefreshingMessages.setValue(false);
-        mIsRefreshingPatient.setValue(false);
-        mIsRefreshingDiets.setValue(false);
-        mIsRefreshingMeasurements.setValue(false);
+        mIsRefreshingMessages.setValue(true);
+        mIsRefreshingPatient.setValue(true);
+        mIsRefreshingDiets.setValue(true);
+        mIsRefreshingMeasurements.setValue(true);
 
         mIsRefreshing.addSource(mIsRefreshingDiets, isRefreshingDiets ->
                 mIsRefreshing.postValue(isRefreshingDiets ||
@@ -236,25 +290,13 @@ public class MainActivityViewModel extends ViewModel {
 
     public void logout(Integer logoutMessageResourceId) {
         mLogoutEvent.postValue(new Event<>(logoutMessageResourceId));
-        mPatientRepository.logout();
+        mUserRepository.logout();
     }
 
     private void setupMustChangePasswordObservable() {
         mMustChangePassword = Transformations.map(mLoggedPatient,
                 patient -> new Event<>(patient != null && !patient.hasChangedDefaultPassword())
         );
-    }
-
-    private void setupUnreadMessagesObservable() {
-        mNumberOfUnreadMessages = Transformations.map(mChatRepository.getNumberOfUnreadMessages(), unreadMsg -> {
-            if (positionOfCurrentFragment.getValue() != null
-                    && positionOfCurrentFragment.getValue() == 3
-                    && unreadMsg > 0) {
-                markMessagesAsRead();
-                return 0;
-            }
-            return unreadMsg;
-        });
     }
 
     public LiveData<Integer> getPositionOfCurrentFragment() {
@@ -289,30 +331,44 @@ public class MainActivityViewModel extends ViewModel {
         return mLogoutEvent;
     }
 
-    public LiveData<Integer> getNumberOfUnreadMessages() {
-        return mNumberOfUnreadMessages;
+    public LiveData<Integer> getNumberOfUnreadMessagesByPatient() {
+        return mUnreadMessagesByPatient;
     }
 
-
     public LiveData<String> getFirebaseToken() {
-        return mPatientRepository.getFirebaseDeviceToken();
+        return mUserRepository.getFirebaseDeviceToken();
     }
 
     public Boolean isFirebaseTokenSent() {
-        return mPatientRepository.isFirebaseTokenSent();
+        return mUserRepository.isFirebaseTokenSent();
     }
 
     public Long getLoggedPatientId() {
-        return mPatientRepository.getLoggedPatiendId();
+        return mPatientRepository.getLoggedPatientId();
     }
 
-    public void markMessagesAsRead() {
-        mSharedPreferences.edit().putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0).apply();
+    public void markMessagesAsReadForPatient() {
+        disposables.add(mChatRepository.markMessagesAsReadForPatient()
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> Timber.d("mark as seen success"), e -> {
+                    if (e instanceof NoSuchElementException) {
+                        Timber.d("No chat for user, so didn't mark messages as read");
+                    } else {
+                        Timber.e(e);
+                    }
+                }));
     }
 
-    public void addUnreadMessages(int newUnread) {
-        int currentUnread = mSharedPreferences.getInt(Constants.UNREAD_MESSAGES_SHARED_PREF, 0);
-        mSharedPreferences.edit().putInt(Constants.UNREAD_MESSAGES_SHARED_PREF, currentUnread + newUnread).apply();
+    public void markMessagesAsReadForDoctor() {
+        disposables.add(mChatRepository.markMessagesAsReadForDoctor()
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> Timber.d("mark as seen success"), e -> {
+                    if (e instanceof NoSuchElementException) {
+                        Timber.d("No chat for user, so didn't mark messages as read");
+                    } else {
+                        Timber.e(e);
+                    }
+                }));
     }
 
     public void markNewDietAsSeen(Boolean hasBeenSeen) {
@@ -329,6 +385,10 @@ public class MainActivityViewModel extends ViewModel {
 
     public URL getProfileImageUrlOfLoggedPatient() throws MalformedURLException {
         return mPatientRepository.getProfileImageUrlOfLoggedPatient();
+    }
+
+    public Long getLoggedDoctorId() {
+        return mDoctorRepository.getLoggedDoctorId();
     }
 }
 

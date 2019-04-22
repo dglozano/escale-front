@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/almostWhite"
+    tools:context=".ui.main.diet.show.ShowDietPdfActivity">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/add_diet_filename_inputlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin_big"
+        android:layout_marginTop="@dimen/activity_vertical_margin_big"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_big"
+        app:counterEnabled="true"
+        app:counterMaxLength="100"
+        app:errorEnabled="true"
+        app:hintEnabled="true"
+        app:layout_constraintBottom_toTopOf="@id/add_diet_pdf_preview_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <EditText
+            android:id="@+id/add_diet_filename_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/diet_name_hint"
+            android:imeOptions="actionDone"
+            android:inputType="textUri"
+            android:lines="1"
+            android:maxLines="1"
+            android:minLines="1"
+            android:textAppearance="@android:style/TextAppearance.Material.Small.Inverse"
+            android:textColor="@color/colorTextBlack"
+            android:textColorHint="@color/colorTextDark" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <FrameLayout
+        android:id="@+id/add_diet_pdf_preview_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/activity_vertical_margin_big"
+        android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_big"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+        android:background="@drawable/diet_shadow_pdf_full"
+        app:layout_constraintBottom_toTopOf="@id/add_diet_btn"
+        app:layout_constraintDimensionRatio="W,2:3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_diet_filename_inputlayout">
+
+        <com.github.barteksc.pdfviewer.PDFView
+            android:id="@+id/add_diet_pdf_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.github.barteksc.pdfviewer.PDFView>
+
+    </FrameLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_diet_change_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin_medium"
+        android:layout_marginTop="@dimen/activity_vertical_margin_very_small"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="center"
+        android:src="@drawable/ic_baseline_attach_file_24px"
+        android:visibility="visible"
+        app:backgroundTint="@color/colorPrimaryLight"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@id/add_diet_fullsize_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/add_diet_pdf_preview_container"
+        app:layout_constraintTop_toTopOf="@id/add_diet_pdf_preview_container" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_diet_fullsize_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin_medium"
+        android:layout_marginTop="@dimen/activity_vertical_margin_medium"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="center"
+        android:src="@drawable/ic_baseline_fullscreen_24px"
+        android:visibility="visible"
+        app:backgroundTint="@color/colorPrimaryLight"
+        app:fabSize="mini"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/add_diet_pdf_preview_container"
+        app:layout_constraintTop_toBottomOf="@id/add_diet_change_btn" />
+
+    <Button
+        android:id="@+id/add_diet_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height"
+        android:layout_marginStart="@dimen/activity_vertical_margin_big"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_big"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_big"
+        android:background="@drawable/button_rounded"
+        android:text="@string/add_diet_submit_btn"
+        android:textColor="@color/almostWhite"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <RelativeLayout
+        android:id="@+id/diet_progress_bar_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBlackOverlay"
+        android:clickable="true"
+        android:focusable="true"
+        android:translationZ="10dp"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/diet_progress_bar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorAccent" />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

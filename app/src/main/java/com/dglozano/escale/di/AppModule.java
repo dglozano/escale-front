@@ -2,18 +2,21 @@ package com.dglozano.escale.di;
 
 import android.app.Application;
 import android.app.NotificationManager;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.EscaleDatabase;
+import com.dglozano.escale.db.dao.AlertDao;
 import com.dglozano.escale.db.dao.BodyMeasurementDao;
 import com.dglozano.escale.db.dao.ChatDao;
 import com.dglozano.escale.db.dao.ChatMessageDao;
 import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.dao.DoctorDao;
+import com.dglozano.escale.db.dao.ForecastDao;
 import com.dglozano.escale.db.dao.PatientDao;
+import com.dglozano.escale.db.dao.PatientInfoDao;
 import com.dglozano.escale.db.dao.UserChatJoinDao;
+import com.dglozano.escale.db.dao.UserChatMsgSeenJoinDao;
 import com.dglozano.escale.db.dao.UserDao;
 import com.dglozano.escale.di.annotation.ApplicationContext;
 import com.dglozano.escale.di.annotation.ApplicationScope;
@@ -29,10 +32,12 @@ import com.dglozano.escale.web.DateDeserializer;
 import com.dglozano.escale.web.DateSerializer;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.HeaderTokenInterceptor;
+import com.dglozano.escale.web.OkHttpClientHolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.polidea.rxandroidble2.RxBleClient;
+import com.squareup.picasso.LruCache;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
@@ -42,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import androidx.room.Room;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
@@ -59,7 +65,7 @@ public class AppModule {
     @ApplicationContext
     @ApplicationScope
     Context provideContext(Application application) {
-        return application;
+        return application.getApplicationContext();
     }
 
     @Provides
@@ -78,6 +84,12 @@ public class AppModule {
 
     @Provides
     @ApplicationScope
+    ForecastDao provideForecastDao(EscaleDatabase db) {
+        return db.forecastDao();
+    }
+
+    @Provides
+    @ApplicationScope
     BodyMeasurementDao provideBodyMeasurementDao(EscaleDatabase db) {
         return db.bodyMeasurementDao();
     }
@@ -86,6 +98,12 @@ public class AppModule {
     @ApplicationScope
     UserDao provideUserDao(EscaleDatabase db) {
         return db.userDao();
+    }
+
+    @Provides
+    @ApplicationScope
+    PatientInfoDao providePatientInfoDao(EscaleDatabase db) {
+        return db.patientInfoDao();
     }
 
     @Provides
@@ -114,8 +132,20 @@ public class AppModule {
 
     @Provides
     @ApplicationScope
+    UserChatMsgSeenJoinDao provideUserChaatMsgSeenJoinDao(EscaleDatabase db) {
+        return db.userChatMsgSeenJoinDao();
+    }
+
+    @Provides
+    @ApplicationScope
     DietDao provideDietDao(EscaleDatabase db) {
         return db.dietDao();
+    }
+
+    @Provides
+    @ApplicationScope
+    AlertDao provideAlertDao(EscaleDatabase db) {
+        return db.alertDao();
     }
 
     @Provides
@@ -186,15 +216,18 @@ public class AppModule {
     @ApplicationScope
     OkHttpClient provideOkhttpClient(HttpLoggingInterceptor httpLoggingInterceptor,
                                      CustomOkHttpAuthenticator customAuthenticator,
-                                     HeaderTokenInterceptor headerTokenInterceptor) {
+                                     HeaderTokenInterceptor headerTokenInterceptor,
+                                     OkHttpClientHolder okHttpClientHolder) {
         OkHttpClient.Builder client = new OkHttpClient.Builder();
-        client.connectTimeout(15, TimeUnit.SECONDS);
-        client.readTimeout(15, TimeUnit.SECONDS);
-        client.writeTimeout(15, TimeUnit.SECONDS);
+        client.connectTimeout(5, TimeUnit.SECONDS);
+        client.readTimeout(10, TimeUnit.SECONDS);
+        client.writeTimeout(10, TimeUnit.SECONDS);
         client.addInterceptor(httpLoggingInterceptor);
         client.addNetworkInterceptor(headerTokenInterceptor);
         client.authenticator(customAuthenticator);
-        return client.build();
+        OkHttpClient okHttpClient = client.build();
+        okHttpClientHolder.setOkHttpClient(okHttpClient);
+        return okHttpClient;
     }
 
     @Provides
@@ -239,7 +272,13 @@ public class AppModule {
 
     @Provides
     @ApplicationScope
-    public Picasso picasso(@ApplicationContext Context context, OkHttp3Downloader okHttp3Downloader){
+    OkHttpClientHolder provideOkHttpClienteHolder() {
+        return new OkHttpClientHolder();
+    }
+
+    @Provides
+    @ApplicationScope
+    public Picasso picasso(@ApplicationContext Context context, OkHttp3Downloader okHttp3Downloader) {
         return new Picasso.Builder(context)
                 .loggingEnabled(true)
                 .indicatorsEnabled(true)
@@ -249,7 +288,7 @@ public class AppModule {
 
     @Provides
     @ApplicationScope
-    public OkHttp3Downloader okHttp3Downloader(OkHttpClient okHttpClient){
+    public OkHttp3Downloader okHttp3Downloader(OkHttpClient okHttpClient) {
         return new OkHttp3Downloader(okHttpClient);
     }
 

@@ -47,14 +47,25 @@ public class Constants {
 
     //Shared Prefrences keys
     public static final String LOGGED_USER_ID_SHARED_PREF = "loggedUserId";
+    public static final String LOGGED_DOCTOR_ID_SHARED_PREF = "loggedDoctorId";
     public static final String FIREBASE_TOKEN_SHARED_PREF = "firebaseToken";
     public static final String IS_FIREBASE_TOKEN_SENT_SHARED_PREF = "isFirebaseTokenSent";
     public static final String TOKEN_SHARED_PREF = "token";
     public static final String REFRESH_TOKEN_SHARED_PREF = "refreshToken";
-    public static final String UNREAD_MESSAGES_SHARED_PREF = "unreadMessages";
     public static final String HAS_NEW_UNREAD_DIET_SHARED_PREF = "unseenDiets";
     public static final String SCALE_USER_INDEX_SHARED_PREF = "scaleUserIndex";
     public static final String SCALE_USER_PIN_SHARED_PREF = "scaleUserPin";
+    public static final String GAUGE_START = "startGauge";
+    public static final String GAUGE_END = "endGauge";
+    public static final String GAUGE_HAS_TO_SET_START = "hasToSetStartGauge";
+    public static final String LAST_FULL_SYNC = "lastFullSync";
+
+    //Chart
+    public static final String GOAL_DATASET = "GOAL";
+    public static final String FORECAST_DATASET = "FORECAST";
+    public static final String GOAL_LABEL_DATASET = "GOALLABEL";
+    public static final int FORECAST_AMOUNT = 10;
+
 
     /**
      * 1: Patient index
@@ -196,4 +207,15 @@ public class Constants {
             UUID.fromString("00002902-0000-1000-8000-00805F9B34FB");
     public static final UUID CHARACTERISTIC_USER_DESCRIPTION =
             UUID.fromString("00002901-0000-1000-8000-00805F9B34FB");
+
+    public static final String ASK_NEW_FIREBASE_TOKEN = "ask_new_firebase_token";
+    public static final String IS_DOCTOR_VIEW_INTENT_EXTRA = "isDoctorMainView";
+    public static final String DIET_FILE_URI = "diet_file_uri_extra";
+    public static final String CHANGE_PW_USER_ID_EXTRA = "user_id";
+    public static final int MAIN_ACTIVITY_STARTED_BY_DOCTOR_CODE = 3200;
+    public static final int SELECT_DIET_FILE_TO_ADD = 9375;
+    public static final int ADD_DIET_ACTIVITY_CODE = 2611;
+    public static final int SHOW_PDF_CODE = 999;
+    public static final int ADD_GOAL_ACTIVITY_CODE = 55478;
+    public static final int CHANGE_PASSWORD_DOCTOR_CODE = 64895;
 }

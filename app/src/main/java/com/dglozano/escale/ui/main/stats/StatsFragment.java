@@ -1,15 +1,9 @@
 package com.dglozano.escale.ui.main.stats;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -17,17 +11,25 @@ import android.widget.RelativeLayout;
 import com.dglozano.escale.R;
 import com.dglozano.escale.ui.main.stats.chart.StatsChartFragment;
 import com.dglozano.escale.ui.main.stats.list.StatsListFragment;
+import com.dglozano.escale.util.ui.FragmentWithViewPager;
 import com.dglozano.escale.util.ui.MyTabAdapter;
+import com.google.android.material.tabs.TabLayout;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
-public class StatsFragment extends Fragment {
+public class StatsFragment extends Fragment implements FragmentWithViewPager {
 
     @BindView(R.id.stats_view_pager_tabs)
     ViewPager mTabsViewPager;
@@ -63,9 +65,7 @@ public class StatsFragment extends Fragment {
 
         setupViewPager(mTabsViewPager);
 
-        Timber.d("hola");
         mStatsViewModel.areMeasurementsEmpty().observe(this, measurementsEmpty -> {
-            Timber.d("hola %s", measurementsEmpty);
             if (measurementsEmpty != null && !measurementsEmpty) {
                 mStatsMainContainer.setVisibility(View.VISIBLE);
                 mTabLayout.setVisibility(View.VISIBLE);
@@ -88,7 +88,7 @@ public class StatsFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
     }
@@ -101,8 +101,18 @@ public class StatsFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        menu.clear();
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mStatsViewModel = ViewModelProviders.of(this, mViewModelFactory).get(StatsViewModel.class);
+    }
+
+    @Override
+    public MyTabAdapter getPagerAdapter() {
+        return mTabsAdapter;
     }
 }

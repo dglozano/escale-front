@@ -1,12 +1,7 @@
 package com.dglozano.escale.ui.main.messages;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +22,11 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -64,6 +64,7 @@ public class MessagesFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_messages, container, false);
         mViewUnbinder = ButterKnife.bind(this, view);
+
         setHasOptionsMenu(true);
 
         return view;
@@ -97,7 +98,6 @@ public class MessagesFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.messages_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
         MenuItem item = menu.findItem(R.id.menu_messages_copy);
         item.setVisible(mMessagesViewModel.isCopyMenuVisible());
     }
@@ -115,21 +115,45 @@ public class MessagesFragment extends Fragment {
                         createdAt, message.getUser().getName(), message.getText());
             }, false);
             Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
+        } else if (id == android.R.id.home) {
+            Timber.d("back pressed");
+            getActivity().onBackPressed();
         }
-
         return true;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem addGoal = menu.findItem(R.id.menu_doctor_profile_add_goal);
+        MenuItem markAsSeenAlerts = menu.findItem(R.id.menu_doctor_profile_mark_as_seen);
+        if (markAsSeenAlerts != null)
+            markAsSeenAlerts.setVisible(false);
+        if (addGoal != null) {
+            addGoal.setVisible(false);
+        }
     }
 
     private void setupSendListener() {
         mMessageInput.setInputListener(input -> {
             //validate and send message
-            mMessagesViewModel.sendMessage(input.toString());
+            if (!mMainActivityViewModel.isDoctorView()) {
+                mMessagesViewModel.sendMessageAsPatient(input.toString());
+            } else {
+                mMessagesViewModel.sendMessageAsDoctor(input.toString());
+            }
             return true;
         });
     }
 
     private void setupMessagesList() {
-        String senderId = mMainActivityViewModel.getLoggedPatientId().toString();
+        String senderId;
+
+        if (!mMainActivityViewModel.isDoctorView()) {
+            senderId = mMainActivityViewModel.getLoggedPatientId().toString();
+        } else {
+            senderId = mMainActivityViewModel.getLoggedDoctorId().toString();
+        }
         mMessagesListAdapter = new MessagesListAdapter<>(senderId, null);
         mMessagesListAdapter.enableSelectionMode(count -> {
             mMessagesViewModel.setCopyMenuVisible(count > 0);

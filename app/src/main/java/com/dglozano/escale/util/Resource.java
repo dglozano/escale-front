@@ -1,8 +1,8 @@
 package com.dglozano.escale.util;
 
-import android.support.annotation.NonNull;
-
 import javax.annotation.Nullable;
+
+import androidx.annotation.NonNull;
 
 // A generic class that contains data and status about loading this data.
 public class Resource<T> {

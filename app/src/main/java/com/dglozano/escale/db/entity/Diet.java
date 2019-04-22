@@ -1,18 +1,18 @@
 package com.dglozano.escale.db.entity;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
-
 import com.dglozano.escale.util.Constants;
-import com.dglozano.escale.util.FileUtils;
+import com.dglozano.escale.util.MyFileUtils;
 import com.dglozano.escale.web.dto.DietDTO;
 
 import java.util.Date;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(foreignKeys = @ForeignKey(entity = Patient.class,
         parentColumns = "id",
@@ -27,8 +27,7 @@ public class Diet {
     private String fileName;
     private Date startDate;
     private long size;
-    private FileUtils.FileStatus fileStatus;
-    private int downloadId;
+    private MyFileUtils.FileStatus fileStatus;
 
     public Diet() {
 
@@ -41,21 +40,12 @@ public class Diet {
         this.startDate = date;
         this.size = size;
         this.userId = patientId;
-        this.fileStatus = FileUtils.FileStatus.NOT_DOWNLOADED;
-        this.downloadId = -1;
+        this.fileStatus = MyFileUtils.FileStatus.NOT_DOWNLOADED;
     }
 
     @Ignore
     public Diet(DietDTO dietDTO, Long userId) {
         this(userId, dietDTO.getUuid(), dietDTO.getFileName(), dietDTO.getStartDate(), dietDTO.getSize());
-    }
-
-    public int getDownloadId() {
-        return downloadId;
-    }
-
-    public void setDownloadId(int downloadId) {
-        this.downloadId = downloadId;
     }
 
     public String getFileName() {
@@ -90,14 +80,12 @@ public class Diet {
         this.startDate = startDate;
     }
 
-    public FileUtils.FileStatus getFileStatus() {
+    public MyFileUtils.FileStatus getFileStatus() {
         return fileStatus;
     }
 
-    public void setFileStatus(FileUtils.FileStatus fileStatus) {
+    public void setFileStatus(MyFileUtils.FileStatus fileStatus) {
         this.fileStatus = fileStatus;
-        if (fileStatus.equals(FileUtils.FileStatus.NOT_DOWNLOADED))
-            this.downloadId = -1;
     }
 
     public long getSize() {

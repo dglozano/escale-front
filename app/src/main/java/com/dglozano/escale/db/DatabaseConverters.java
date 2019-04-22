@@ -1,11 +1,12 @@
 package com.dglozano.escale.db;
 
-import android.arch.persistence.room.TypeConverter;
-
+import com.dglozano.escale.db.entity.Alert;
 import com.dglozano.escale.db.entity.Patient;
-import com.dglozano.escale.util.FileUtils;
+import com.dglozano.escale.util.MyFileUtils;
 
 import java.util.Date;
+
+import androidx.room.TypeConverter;
 
 public class DatabaseConverters {
     @TypeConverter
@@ -20,7 +21,17 @@ public class DatabaseConverters {
 
     @TypeConverter
     public Integer genderToInt(Patient.Gender gender) {
-        return gender.equals(Patient.Gender.MALE) ? 0 : 1;
+        return gender == null || gender.equals(Patient.Gender.MALE) ? 0 : 1;
+    }
+
+    @TypeConverter
+    public Integer alertTypeToInt(Alert.AlertType alertType) {
+        return Alert.alertTypeToInt(alertType);
+    }
+
+    @TypeConverter
+    public Alert.AlertType intToAlertType(Integer i) {
+        return Alert.intToAlertType(i);
     }
 
     @TypeConverter
@@ -29,7 +40,7 @@ public class DatabaseConverters {
     }
 
     @TypeConverter
-    public Integer fileStatusToInt(FileUtils.FileStatus fileStatus) {
+    public Integer fileStatusToInt(MyFileUtils.FileStatus fileStatus) {
         switch (fileStatus) {
             case DOWNLOADING:
                 return 1;
@@ -42,15 +53,15 @@ public class DatabaseConverters {
     }
 
     @TypeConverter
-    public FileUtils.FileStatus intToFileStatus(Integer integer) {
+    public MyFileUtils.FileStatus intToFileStatus(Integer integer) {
         switch (integer) {
             case 1:
-                return FileUtils.FileStatus.DOWNLOADING;
+                return MyFileUtils.FileStatus.DOWNLOADING;
             case 2:
-                return FileUtils.FileStatus.DOWNLOADED;
+                return MyFileUtils.FileStatus.DOWNLOADED;
             case 3:
-                return FileUtils.FileStatus.NOT_DOWNLOADED;
+                return MyFileUtils.FileStatus.NOT_DOWNLOADED;
         }
-        return FileUtils.FileStatus.NOT_DOWNLOADED;
+        return MyFileUtils.FileStatus.NOT_DOWNLOADED;
     }
 }

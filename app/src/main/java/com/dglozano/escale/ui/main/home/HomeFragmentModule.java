@@ -1,12 +1,10 @@
 package com.dglozano.escale.ui.main.home;
 
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.view.animation.AlphaAnimation;
-
 import com.dglozano.escale.ui.main.MainActivity;
 
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.Module;
 import dagger.Provides;
 

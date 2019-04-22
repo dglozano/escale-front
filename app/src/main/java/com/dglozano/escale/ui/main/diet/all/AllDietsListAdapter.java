@@ -1,11 +1,8 @@
 package com.dglozano.escale.ui.main.diet.all;
 
-import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +13,7 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.ui.main.MainActivity;
-import com.dglozano.escale.util.FileUtils;
+import com.dglozano.escale.util.MyFileUtils;
 import com.dglozano.escale.web.services.DietDownloadService;
 
 import java.text.SimpleDateFormat;
@@ -24,6 +21,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -136,7 +136,7 @@ public class AllDietsListAdapter extends RecyclerView.Adapter<AllDietsListAdapte
                 }
             } else {
                 holder.mProgressBar.setVisibility(
-                        diet.getFileStatus().equals(FileUtils.FileStatus.DOWNLOADING) ? View.VISIBLE : View.GONE);
+                        diet.getFileStatus().equals(MyFileUtils.FileStatus.DOWNLOADING) ? View.VISIBLE : View.GONE);
                 holder.mDietBtnImageView.setVisibility(View.GONE);
             }
 
@@ -165,7 +165,7 @@ public class AllDietsListAdapter extends RecyclerView.Adapter<AllDietsListAdapte
         Intent startIntent = new Intent(mContext,
                 DietDownloadService.class);
         startIntent.putExtra("diet-uuid", diet.getId());
-        diet.setFileStatus(FileUtils.FileStatus.DOWNLOADING);
+        diet.setFileStatus(MyFileUtils.FileStatus.DOWNLOADING);
         mAllDietsViewModel.updateDiet(diet);
         mContext.startService(startIntent);
     }

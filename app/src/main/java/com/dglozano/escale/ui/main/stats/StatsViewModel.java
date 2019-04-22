@@ -1,16 +1,13 @@
 package com.dglozano.escale.ui.main.stats;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
-import android.arch.lifecycle.ViewModel;
-
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.PatientRepository;
 
-import java.util.Objects;
-
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 import timber.log.Timber;
 
 public class StatsViewModel extends ViewModel {
@@ -26,7 +23,7 @@ public class StatsViewModel extends ViewModel {
         mMeasurementsRepository = measurementRepository;
         mAreMeasurementsEmpty = Transformations.map(
                 mMeasurementsRepository.getLastBodyMeasurementOfUserWithId(
-                        mPatientRepository.getLoggedPatiendId()), measurement -> {
+                        mPatientRepository.getLoggedPatientId()), measurement -> {
                     Timber.d("measurement %s", measurement.isPresent());
                     return !measurement.isPresent();
                 });

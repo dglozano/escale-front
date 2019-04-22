@@ -1,33 +1,44 @@
 package com.dglozano.escale.ui.main.diet;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.util.ui.MyTabAdapter;
+import com.dglozano.escale.ui.doctor.main.add_diet.AddDietActivity;
+import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.ui.main.diet.all.AllDietsFragment;
 import com.dglozano.escale.ui.main.diet.current.CurrentDietFragment;
+import com.dglozano.escale.util.Constants;
+import com.dglozano.escale.util.ui.FragmentWithViewPager;
+import com.dglozano.escale.util.ui.MyTabAdapter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
-public class DietFragment extends Fragment {
+public class DietFragment extends Fragment implements FragmentWithViewPager {
 
     @BindView(R.id.diet_view_pager_tabs)
     ViewPager mTabsViewPager;
@@ -37,6 +48,8 @@ public class DietFragment extends Fragment {
     RelativeLayout mNoDietsLayout;
     @BindView(R.id.diets_main_container)
     RelativeLayout mDietsMainContainer;
+    @BindView(R.id.add_diet_btn)
+    FloatingActionButton addDietBtn;
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -44,6 +57,7 @@ public class DietFragment extends Fragment {
     MyTabAdapter mTabsAdapter;
 
     private Unbinder mViewUnbinder;
+    private MainActivityViewModel mMainActivityViewModel;
     private DietViewModel mDietViewModel;
 
     public DietFragment() {
@@ -76,6 +90,8 @@ public class DietFragment extends Fragment {
             }
         });
 
+        addDietBtn.setVisibility(mMainActivityViewModel.isDoctorView() ? View.VISIBLE : View.GONE);
+
         return view;
     }
 
@@ -99,8 +115,48 @@ public class DietFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        menu.clear();
+    }
+
+    @OnClick(R.id.add_diet_btn)
+    public void onAddDietClick(View v) {
+
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("application/pdf");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            startActivityForResult(
+                    Intent.createChooser(intent, getString(R.string.diet_file_chooser_intent_title)),
+                    Constants.SELECT_DIET_FILE_TO_ADD);
+        } catch (android.content.ActivityNotFoundException ex) {
+            // Potentially direct the user to the Market with a Dialog
+            Timber.e("No file chooser available. Download one");
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && requestCode == Constants.SELECT_DIET_FILE_TO_ADD
+                && data != null && data.getData() != null) {
+            Uri dietFileUri = data.getData();
+            Intent intent = new Intent(getActivity(), AddDietActivity.class);
+            intent.putExtra(Constants.DIET_FILE_URI, dietFileUri);
+            startActivityForResult(intent, Constants.ADD_DIET_ACTIVITY_CODE);
+        }
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDietViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DietViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+    }
+
+    @Override
+    public MyTabAdapter getPagerAdapter() {
+        return mTabsAdapter;
     }
 }

@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/home_doctor_profile_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@color/almostWhite">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/profile_background"
+        app:layout_constraintBottom_toTopOf="@id/home_doctor_container"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/home_doctor_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/almostWhite"
+        android:translationZ="-5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.75"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/home_doctor_user_picture"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:adjustViewBounds="true"
+        android:clickable="true"
+        android:contentDescription="@string/user_profile_picture"
+        android:focusable="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_user_profile_image_default"
+        app:layout_constraintBottom_toTopOf="@id/home_doctor_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/home_doctor_container"
+        app:riv_border_color="@color/almostWhite"
+        app:riv_border_width="4dp"
+        app:riv_corner_radius="100dp"
+        app:riv_mutate_background="true" />
+
+    <TextView
+        android:id="@+id/home_doctor_user_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin_small"
+        android:layout_marginTop="@dimen/activity_vertical_margin_small"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_small"
+        android:text="-"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/home_doctor_user_picture" />
+
+    <TextView
+        android:id="@+id/home_doctor_user_email"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_vertical_margin_small"
+        android:layout_marginTop="@dimen/activity_vertical_margin_very_small"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_small"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_small"
+        android:text="-"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium.Inverse"
+        android:textColor="@color/gray"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/home_doctor_user_name" />
+
+    <!--Height wrapper-->
+    <RelativeLayout
+        android:id="@+id/home_doctor_height_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/home_doctor_profile_age_wrapper"
+        app:layout_constraintEnd_toStartOf="@id/home_doctor_user_picture"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/home_doctor_user_height"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="@dimen/activity_vertical_margin_big"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_big"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_almost_nothing"
+            android:text="-"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/home_doctor_user_height_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/home_doctor_user_height"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="@dimen/activity_vertical_margin_small"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_small"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+            android:text="ALTURA"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/lightGray"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <!--Age wrapper-->
+    <RelativeLayout
+        android:id="@+id/home_doctor_profile_age_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/home_doctor_weight_wrapper"
+        app:layout_constraintEnd_toEndOf="@id/home_doctor_user_picture"
+        app:layout_constraintStart_toStartOf="@id/home_doctor_user_picture"
+        app:layout_constraintTop_toBottomOf="@id/home_doctor_user_email"
+        app:layout_constraintVertical_chainStyle="spread">
+
+        <TextView
+            android:id="@+id/home_doctor_user_age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="@dimen/activity_vertical_margin_big"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_big"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_almost_nothing"
+            android:text="-"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/home_doctor_user_age_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/home_doctor_user_age"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="@dimen/activity_vertical_margin_small"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_small"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+            android:text="EDAD"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/lightGray"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <!--Ph Activity wrapper-->
+    <RelativeLayout
+        android:id="@+id/home_doctor_user_activity_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/home_doctor_profile_age_wrapper"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/home_doctor_user_picture">
+
+        <TextView
+            android:id="@+id/home_doctor_user_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="@dimen/activity_vertical_margin_big"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_big"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_almost_nothing"
+            android:text="-"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/home_doctor_user_activity_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/home_doctor_user_activity"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="@dimen/activity_vertical_margin_small"
+            android:layout_marginEnd="@dimen/activity_vertical_margin_small"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_medium"
+            android:text="ACTIVIDAD"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/lightGray"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <!--Bmi wrapper-->
+    <RelativeLayout
+        android:id="@+id/home_doctor_bmi_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/home_doctor_weight_wrapper"
+        app:layout_constraintEnd_toStartOf="@id/home_doctor_user_picture"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/home_doctor_bmi_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="-"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/home_doctor_bmi_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/home_doctor_bmi_number"
+            android:layout_centerHorizontal="true"
+            android:text="IMC"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/lightGray"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
+    <!--Weight wrapper-->
+    <RelativeLayout
+        android:id="@+id/home_doctor_weight_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/home_doctor_bottom_info_wrapper"
+        app:layout_constraintEnd_toEndOf="@id/home_doctor_user_picture"
+        app:layout_constraintStart_toStartOf="@id/home_doctor_user_picture"
+        app:layout_constraintTop_toBottomOf="@id/home_doctor_profile_age_wrapper"
+        app:layout_constraintVertical_chainStyle="spread">
+
+        <TextView
+            android:id="@+id/home_doctor_weight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="-"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/home_doctor_weight_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/home_doctor_weight"
+            android:layout_centerHorizontal="true"
+            android:text="PESO"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/lightGray"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <!--Fat wrapper-->
+    <RelativeLayout
+        android:id="@+id/home_doctor_user_fat_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/home_doctor_weight_wrapper"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/home_doctor_user_picture">
+
+        <TextView
+            android:id="@+id/home_doctor_fat_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="-"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/home_doctor_fat_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/home_doctor_fat_number"
+            android:layout_centerHorizontal="true"
+            android:text="GRASA"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/lightGray"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/home_doctor_bottom_info_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin_small"
+        android:background="@drawable/home_doctor_last_row_background"
+        android:orientation="horizontal"
+        android:weightSum="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <RelativeLayout
+            android:id="@+id/home_doctor_profile_date_of_last_bm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:paddingStart="@dimen/padding_medium"
+            android:paddingEnd="@dimen/padding_medium">
+
+            <ImageView
+                android:id="@+id/home_doctor_profile_date_of_last_bm_image"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/activity_vertical_margin_very_small"
+                android:visibility="visible"
+                app:srcCompat="@drawable/home_ic_scale_colored" />
+
+            <TextView
+                android:id="@+id/home_doctor_profile_date_of_last_bm_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="@dimen/activity_vertical_margin_very_small"
+                android:layout_marginBottom="@dimen/activity_vertical_margin_very_small"
+                android:layout_toEndOf="@id/home_doctor_profile_date_of_last_bm_image"
+                android:text="@string/loading"
+                android:textAppearance="@android:style/TextAppearance.Material"
+                android:textColor="@color/colorTextDark"
+                android:textSize="12sp" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/home_doctor_profile_goal_wrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:paddingStart="@dimen/padding_medium"
+            android:paddingEnd="@dimen/padding_medium">
+
+            <ImageView
+                android:id="@+id/home_doctor_profile_goal_image"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/activity_vertical_margin_very_small"
+                android:visibility="visible"
+                app:srcCompat="@drawable/ic_goal_colored" />
+
+            <TextView
+                android:id="@+id/home_doctor_profile_goal_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="@dimen/activity_vertical_margin_very_small"
+                android:layout_marginBottom="@dimen/activity_vertical_margin_very_small"
+                android:layout_toEndOf="@id/home_doctor_profile_goal_image"
+                android:text="@string/loading"
+                android:textAppearance="@android:style/TextAppearance.Material"
+                android:textColor="@color/colorTextDark"
+                android:textSize="12sp" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/home_doctor_progress_bar_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBlackOverlay"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/home_doctor_progress_bar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorAccent" />
+
+    </RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,16 +1,14 @@
 package com.dglozano.escale.ui.common.pw_recovery;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
-
 import com.dglozano.escale.R;
-import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.web.EscaleRestApi;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
