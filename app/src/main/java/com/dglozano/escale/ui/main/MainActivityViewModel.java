@@ -3,8 +3,7 @@ package com.dglozano.escale.ui.main;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.entity.Patient;
-import com.dglozano.escale.exception.AccountDisabledException;
-import com.dglozano.escale.repository.AlertRepository;
+import com.dglozano.escale.util.exception.AccountDisabledException;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;

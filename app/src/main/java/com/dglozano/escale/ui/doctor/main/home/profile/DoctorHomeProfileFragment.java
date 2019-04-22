@@ -2,12 +2,8 @@ package com.dglozano.escale.ui.doctor.main.home.profile;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -15,10 +11,8 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.db.entity.Patient;
-import com.dglozano.escale.ui.doctor.main.add_goal.AddGoalActivity;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
-import com.dglozano.escale.util.Constants;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
@@ -62,8 +56,12 @@ public class DoctorHomeProfileFragment extends Fragment {
     TextView mBmi;
     @BindView(R.id.home_doctor_fat_number)
     TextView mFat;
-    @BindView(R.id.home_doctor_goal)
+    @BindView(R.id.home_doctor_profile_goal_text)
     TextView mGoal;
+    @BindView(R.id.home_doctor_profile_date_of_last_bm_text)
+    TextView mLastBmDateText;
+    @Inject
+    SimpleDateFormat dateFormat;
     @Inject
     DecimalFormat decimalFormat;
     @Inject
@@ -113,10 +111,12 @@ public class DoctorHomeProfileFragment extends Fragment {
             mWeight.setText("-");
             mBmi.setText("-");
             mFat.setText("-");
+            mLastBmDateText.setText(R.string.no_body_measurement_yet_short);
         } else {
-            mWeight.setText(formatDecimal(bodyMeasurement.get().getWeight()));
+            mWeight.setText(String.format("%s kg", formatDecimal(bodyMeasurement.get().getWeight())));
             mBmi.setText(formatDecimal(bodyMeasurement.get().getBmi()));
             mFat.setText(String.format("%s %%", formatDecimal(bodyMeasurement.get().getFat())));
+            mLastBmDateText.setText(String.format("%shs", dateFormat.format(bodyMeasurement.get().getDate())));
         }
     }
 
@@ -128,8 +128,7 @@ public class DoctorHomeProfileFragment extends Fragment {
         if (patient != null && patient.isFullyLoaded()) {
             try {
                 picasso.load(mViewModel.getProfileImageUrlOfLoggedPatient().toString())
-                        .placeholder(R.color.almostWhite)
-                        .noFade()
+                        .placeholder(R.drawable.ic_user_profile_image_default)
                         .error(R.drawable.ic_user_profile_image_default)
                         .into(mProfilePicture);
             } catch (MalformedURLException e) {
@@ -141,14 +140,16 @@ public class DoctorHomeProfileFragment extends Fragment {
             mHeight.setText(String.format("%s cm.", patient.getHeightInCm()));
             mPhysicalActivity.setText(patient.getActivityString());
             if (patient.getGoalInKg() != null) {
-                DecimalFormat df = new DecimalFormat("'META' ###.# 'kg'");
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                String goalText = String.format("%s\n%s",
+                DecimalFormat df = new DecimalFormat("###.# 'kg'");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+                String goalText = String.format("%s al %s",
                         df.format(patient.getGoalInKg()),
                         sdf.format(patient.getGoalDueDate()));
                 mGoal.setText(goalText);
             } else {
-                mGoal.setText(R.string.no_goal_set);
+                String noGoalStr = getString(R.string.no_goal_set).toLowerCase();
+                noGoalStr = noGoalStr.substring(0, 1).toUpperCase() + noGoalStr.substring(1);
+                mGoal.setText(noGoalStr);
             }
         }
     }

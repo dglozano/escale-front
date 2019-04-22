@@ -6,6 +6,7 @@ import com.dglozano.escale.util.ui.Event;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -87,7 +88,14 @@ public class AddPatientViewModel extends ViewModel {
         if (isInputValid(firstName, lastName, email, birthdayString, heightInCmString, genre, phActivity)) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                Date birthday = sdf.parse(birthdayString.toString());
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(sdf.parse(birthdayString.toString()));
+                calendar.set(Calendar.HOUR, 12);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 100);
+                Date birthday = calendar.getTime();
+
                 int heightInCm = Integer.parseInt(heightInCmString.toString());
                 disposables.add(mDoctorRepository
                         .addPatient(

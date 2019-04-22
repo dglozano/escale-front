@@ -44,7 +44,7 @@
     <string name="change_password_canceled_msg">No has cambiado tu contraseña. Recuerda que puedes cambiarla ingresando a tu perfil.</string>
     <string name="snackbar_password_change_success_msg">La password se ha cambiado correctamente.</string>
     <string name="change_password_title">Cambiar contraseña</string>
-    <string name="dialog_change_password">¡Bienvenido! Parece que es la primera vez que utilizas tu cuenta de Escale, por lo que debes cambiar tu contraseña inicial.</string>
+    <string name="dialog_change_password">¡Hola! Parece que has iniciado sesión utilizando una contraseña temporal, por lo que deberás cambiarla.</string>
     <string name="dialog_title_error">Ups!</string>
     <string name="must_change_password_error_msg_dialog">Por cuestiones de seguridad, usted debe modificar su contraseña inicial.</string>
     <string name="no_internet_text">Ups! Parece que has perdido la conexión a Internet. Asegurate de estar conectado y vuelve a intentarlo.</string>
@@ -65,7 +65,8 @@
     <string name="copied">Copiado al portapapeles</string>
     <string name="show_filter_stats">Ver Filtros</string>
     <string name="hide_filter_stats">OCULTAR FILTROS</string>
-    <string name="no_body_measurement_yet">No tienes tienen pesaje cargado aún.</string>
+    <string name="no_body_measurement_yet_short">Sin pesajes</string>
+    <string name="no_body_measurement_yet">No tienes ningún pesaje cargado aún.</string>
     <string name="add_measurement_btn">Agregar medición</string>
     <string name="weight">Peso</string>
     <string name="water">Agua corporal</string>
@@ -117,7 +118,7 @@
     <string name="upload_diet_success_msg">Dieta subida exitósamente.</string>
     <string name="upload_diet_error_msg">Ups! No pudimos cargar la nueva dieta. Intenta de nuevo más tarde.</string>
     <string name="profile_title">Perfil</string>
-    <string name="drawer_option_help_contact">Ayuda y Contacto</string>
+    <string name="help_and_contact_title">Ayuda y Contacto</string>
     <string name="edit">Editar</string>
     <string name="height_in_cm">Altura (cm.)</string>
     <string name="physical_actvitiy_label">Actividad Física</string>
@@ -172,6 +173,16 @@
     <string name="add_goal_due_date_hint">Fecha de Finalización</string>
     <string name="current_goal">Meta actual:</string>
     <string name="input_validation_goal_due_date_error">La finalización de la meta debe ser después de hoy.</string>
+    <string name="settings">Configuraciones</string>
+    <string name="not_implemented_yet">Funcionalidad no implementada todavía</string>
+    <string name="patient_settings">Configuraciones paciente</string>
+    <string name="password_validation_no_digits_error">La contraseña debe tener al menos un número</string>
+    <string name="password_validation_no_letters_error">La contraseña debe tener al menos una letra</string>
+    <string name="password_validation_not_long_enough_error">La contraseña debe tener al menos 8 caracteres</string>
+    <string name="password_validation_not_valid_char_error">La contraseña debe tener solo letras y números</string>
+    <string name="password_validation_too_long_error">La contraseña es demasiado larga</string>
+    <string name="password_validation_same_password_error">La nueva contraseña no puede ser igual a la anterior</string>
+    <string name="password_validation_password_mismatch_error">Las contraseñas no coinciden</string>
     <string-array name="scale_user_indexes_array">
         <item>P-01</item>
         <item>P-02</item>

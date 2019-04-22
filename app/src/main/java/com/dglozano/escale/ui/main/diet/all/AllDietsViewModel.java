@@ -2,7 +2,7 @@ package com.dglozano.escale.ui.main.diet.all;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.Diet;
-import com.dglozano.escale.exception.DietDownloadStateException;
+import com.dglozano.escale.util.exception.DietDownloadStateException;
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.ui.Event;

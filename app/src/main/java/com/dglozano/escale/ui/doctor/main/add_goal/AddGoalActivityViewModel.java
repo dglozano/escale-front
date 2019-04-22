@@ -6,6 +6,7 @@ import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.util.ui.Event;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -51,7 +52,13 @@ public class AddGoalActivityViewModel extends ViewModel {
         if (isInputValid(goalInKgStr, goalDueDateStr)) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                Date goalDueDate = sdf.parse(goalDueDateStr.toString());
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(sdf.parse(goalDueDateStr.toString()));
+                calendar.set(Calendar.HOUR, 12);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 100);
+                Date goalDueDate = calendar.getTime();
                 Float goalInKg = Float.parseFloat(goalInKgStr.toString());
                 disposables.add(
                         mDoctorRepository.addGoal(mDoctorRepository.getLoggedDoctorId(),

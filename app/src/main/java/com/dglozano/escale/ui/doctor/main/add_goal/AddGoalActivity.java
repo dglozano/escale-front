@@ -109,6 +109,13 @@ public class AddGoalActivity extends BaseActivity {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
             mDueDateEditText.setText(sdf.format(myCalendar.getTime()));
+
+            mDueDateEditText.clearFocus();
+            View focusView = this.getCurrentFocus();
+            if (focusView != null) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+            }
         };
     }
 

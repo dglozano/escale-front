@@ -179,6 +179,10 @@ public class MainActivity extends BaseActivity
         mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
 
         invalidateOptionsMenu();
+
+        if (mViewModel.isDoctorView() && openFragmentInPosition == 0) {
+            setElevationOfAppBar(0f);
+        }
     }
 
     private void onLogoutEvent(Event<Integer> logoutEvent) {
@@ -449,11 +453,13 @@ public class MainActivity extends BaseActivity
             if (id == R.id.nav_profile) {
                 startProfileActivity();
             } else if (id == R.id.nav_settings) {
-                startSettingsActivity();
+                showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
             } else if (id == R.id.nav_help) {
-
+                showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
             } else if (id == R.id.nav_logout) {
                 LogoutDialog.newInstance().show(getSupportFragmentManager(), "showLogoutConfirmDialog");
+            } else if (id == R.id.nav_change_password) {
+                startChangePasswordActivity();
             }
 
             mDrawer.closeDrawer(GravityCompat.START);
@@ -463,11 +469,11 @@ public class MainActivity extends BaseActivity
         return true;
     }
 
-    private void startSettingsActivity() {
+    private void startChangePasswordActivity() {
         Intent intent = new Intent(this, ChangePasswordActivity.class);
+        intent.putExtra(Constants.CHANGE_PW_USER_ID_EXTRA, mViewModel.getLoggedPatientId());
         startActivityForResult(intent, CHANGE_PASSWORD_CODE);
     }
-
 
     // Add notifications' number to bottomNav icon at position
     private Badge addBadgeAt(int position, int number) {
@@ -485,6 +491,7 @@ public class MainActivity extends BaseActivity
                 .setPositiveButton(R.string.change_password_title, (dialog, which) -> {
                     Intent intent = new Intent(this, ChangePasswordActivity.class);
                     intent.putExtra("forced_to_change_pass", true);
+                    intent.putExtra(Constants.CHANGE_PW_USER_ID_EXTRA, mViewModel.getLoggedPatientId());
                     mViewModel.handleMustChangePasswordEvent();
                     startActivityForResult(intent, CHANGE_PASSWORD_CODE);
                 })

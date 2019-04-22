@@ -7,10 +7,13 @@ import com.dglozano.escale.web.DateSerializer;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.AddBodyMeasurementDTO;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -75,6 +78,17 @@ public class BodyMeasurementRepository {
                     return bm.getId();
                 })
                 .subscribeOn(Schedulers.io());
+    }
+
+    public Completable addMeasurementOnNotified(long id, long patientId, float weight, float fat, float bmi,
+                                                float muscle, float water, boolean isManual, String dateStr) {
+        return Completable.fromAction(() -> {
+            String format = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+            SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+            Date date = sdf.parse(dateStr);
+            mBodyMeasurementDao.upsert(new BodyMeasurement(id, patientId, date, weight, bmi, fat, water, muscle, isManual));
+        }).subscribeOn(Schedulers.io());
     }
 
     public Single<Long> addMeasurement(BodyMeasurement bodyMeasurement) {

@@ -1,25 +1,33 @@
 package com.dglozano.escale.repository;
 
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 
 import com.dglozano.escale.db.dao.PatientDao;
 import com.dglozano.escale.db.dao.UserDao;
+import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
-import com.dglozano.escale.exception.AccountDisabledException;
-import com.dglozano.escale.exception.BadCredentialsException;
-import com.dglozano.escale.exception.NotMobileAppUser;
+import com.dglozano.escale.util.exception.AccountDisabledException;
+import com.dglozano.escale.util.exception.BadCredentialsException;
+import com.dglozano.escale.util.exception.ChangePasswordException;
+import com.dglozano.escale.util.exception.NotMobileAppUser;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.LogoutHelper;
 import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
+import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.Credentials;
 import com.dglozano.escale.web.dto.LoginResponse;
+
+import java.util.Calendar;
+import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 
 import androidx.lifecycle.LiveData;
 import io.reactivex.Completable;
+import io.reactivex.Single;
 import timber.log.Timber;
 
 @ApplicationScope
@@ -86,6 +94,32 @@ public class UserRepository {
                 throw new BadCredentialsException();
             }
         });
+    }
+
+    public Single<Long> changePassword(Long userId,
+                                       String currentPassword,
+                                       String newPassword,
+                                       String newPasswordRepeat) {
+        return mEscaleRestApi.changePassword(
+                new ChangePasswordDataDTO(currentPassword,
+                        newPassword, newPasswordRepeat), userId)
+                .map(changePasswordResponse -> {
+                    if (changePasswordResponse.isSuccessful()) {
+                        return mUserDao.getUserById(userId);
+                    } else {
+                        Timber.d("Error change password, check");
+                        throw new ChangePasswordException();
+                    }
+                })
+                .map(userOpt -> {
+                    if(userOpt.isPresent()) {
+                        userOpt.get().setChangedDefaultPassword(true);
+                        mUserDao.upsert(userOpt.get());
+                        return userOpt.get().getId();
+                    } else {
+                        throw new ChangePasswordException();
+                    }
+                });
     }
 
     public LiveData<String> getFirebaseDeviceToken() {

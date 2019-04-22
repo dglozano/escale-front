@@ -3,6 +3,8 @@ package com.dglozano.escale.ui.common.pw_change;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -10,7 +12,9 @@ import android.widget.RelativeLayout;
 import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityChangePasswordBinding;
 import com.dglozano.escale.ui.BaseActivity;
+import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.Event;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Objects;
 
@@ -23,18 +27,28 @@ import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
+import butterknife.OnTextChanged;
 import dagger.android.AndroidInjection;
+
+import static com.dglozano.escale.util.ValidationHelper.getPasswordError;
 
 public class ChangePasswordActivity extends BaseActivity {
 
     @BindView(R.id.change_password_progress_bar_container)
     RelativeLayout mProgressBarContainer;
-    @BindView(R.id.current_password_input)
-    EditText mCurrentPasswordInput;
-    @BindView(R.id.new_password_input)
-    EditText mNewPasswordEditInput;
-    @BindView(R.id.new_password_repeat_input)
-    EditText mNewPasswordRepeatInput;
+    @BindView(R.id.current_password_edittext)
+    EditText mCurrentPasswordEditText;
+    @BindView(R.id.new_password_edittext)
+    EditText mNewPasswordEditText;
+    @BindView(R.id.new_password_repeat_edittext)
+    EditText mNewPasswordRepeatEditText;
+    @BindView(R.id.current_password_inputlayout)
+    TextInputLayout mCurrentPasswordInputLayout;
+    @BindView(R.id.new_password_inputlayout)
+    TextInputLayout mNewPasswordInputLayout;
+    @BindView(R.id.new_password_repeat_inputlayout)
+    TextInputLayout mNewPasswordRepeatInputLayout;
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -57,6 +71,7 @@ public class ChangePasswordActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
+        mViewModel.setUserId(intent.getLongExtra(Constants.CHANGE_PW_USER_ID_EXTRA, -1L));
         isForcedToChangePassword = intent.getBooleanExtra("forced_to_change_pass", false);
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -74,6 +89,9 @@ public class ChangePasswordActivity extends BaseActivity {
     private void onErrorEventFired(Event<Integer> errorEvent) {
         if (errorEvent != null && !errorEvent.hasBeenHandled()) {
             showSnackbarWithOkDismiss(errorEvent.handleContent());
+            validateCurrentPassword(mCurrentPasswordEditText.getText());
+            validateNewPassword(mNewPasswordEditText.getText().toString(), mNewPasswordInputLayout, mNewPasswordRepeatInputLayout);
+            validateNewPassword(mNewPasswordRepeatEditText.getText().toString(), mNewPasswordRepeatInputLayout, mNewPasswordInputLayout);
         }
     }
 
@@ -113,10 +131,98 @@ public class ChangePasswordActivity extends BaseActivity {
     @OnClick(R.id.change_password_btn)
     public void changePassword() {
         mViewModel.hitChangePassword(
-                mCurrentPasswordInput.getText().toString(),
-                mNewPasswordEditInput.getText().toString(),
-                mNewPasswordRepeatInput.getText().toString()
+                mCurrentPasswordEditText.getText().toString(),
+                mNewPasswordEditText.getText().toString(),
+                mNewPasswordRepeatEditText.getText().toString()
         );
+    }
+
+    @OnFocusChange(R.id.current_password_edittext)
+    public void onFocusChangeCurrentPassword(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            validateCurrentPassword(((EditText) v).getText());
+        }
+    }
+
+    @OnTextChanged(value = R.id.current_password_edittext,
+            callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    protected void afterEditTextCurrentPassword(Editable editable) {
+        validateCurrentPassword(editable);
+    }
+
+    @OnFocusChange(R.id.new_password_edittext)
+    public void onFocusChangeNewPassword(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            validateNewPassword(((EditText) v).getText(),
+                    mNewPasswordInputLayout,
+                    mNewPasswordRepeatInputLayout);
+        }
+    }
+
+    @OnTextChanged(value = R.id.new_password_edittext,
+            callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    protected void afterEditTextNewPassword(Editable editable) {
+        validateNewPassword(editable,
+                mNewPasswordInputLayout,
+                mNewPasswordRepeatInputLayout);
+    }
+
+    @OnFocusChange(R.id.new_password_repeat_edittext)
+    public void onFocusChangeNewPasswordRepeat(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            validateNewPassword(((EditText) v).getText(),
+                    mNewPasswordRepeatInputLayout,
+                    mNewPasswordInputLayout);
+        }
+    }
+
+    @OnTextChanged(value = R.id.new_password_repeat_edittext,
+            callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    protected void afterEditTextNewPasswordRepeat(Editable editable) {
+        validateNewPassword(editable,
+                mNewPasswordRepeatInputLayout,
+                mNewPasswordInputLayout);
+    }
+
+    private void validateNewPassword(CharSequence password, TextInputLayout inputToSetError, TextInputLayout otherInput) {
+        Integer error = getPasswordError(password);
+        if (error == null) {
+            if (mCurrentPasswordEditText.getText().toString()
+                    .equals(mNewPasswordEditText.getText().toString())) {
+                error = R.string.password_validation_same_password_error;
+            } else if (!TextUtils.isEmpty(otherInput.getEditText().getText())
+                    && !mNewPasswordEditText.getText().toString().equals(mNewPasswordRepeatEditText.getText().toString())) {
+                error = R.string.password_validation_password_mismatch_error;
+            } else if (otherInput.getError() != null
+                    && otherInput.getError()
+                    .equals(getString(R.string.password_validation_password_mismatch_error))) {
+                otherInput.setError(null);
+            }
+        }
+        setErrorInInputLayout(error, inputToSetError);
+    }
+
+    private void validateCurrentPassword(CharSequence currentPassword) {
+        Integer error = getPasswordError(currentPassword);
+        if (mNewPasswordRepeatInputLayout.getError() != null
+                && mNewPasswordRepeatInputLayout.getError()
+                .equals(getString(R.string.password_validation_same_password_error))) {
+            mNewPasswordRepeatInputLayout.setError(null);
+        }
+        if (mNewPasswordInputLayout.getError() != null
+                && mNewPasswordInputLayout.getError()
+                .equals(getString(R.string.password_validation_same_password_error))) {
+            mNewPasswordInputLayout.setError(null);
+        }
+        setErrorInInputLayout(error, mCurrentPasswordInputLayout);
+    }
+
+    private void setErrorInInputLayout(Integer error, TextInputLayout inputLayout) {
+        if (error != null) {
+            inputLayout.setError(getString(error));
+        } else {
+            inputLayout.setError(null);
+        }
     }
 
     @Override

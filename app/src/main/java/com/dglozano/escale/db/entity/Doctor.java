@@ -10,13 +10,12 @@ import androidx.room.Ignore;
 @Entity
 public class Doctor extends AppUser {
 
-
     public Doctor() {
     }
 
     @Ignore
-    public Doctor(Long id, String firstName, String lastName, String email, Date lastUpdate) {
-        super(id, firstName, lastName, email, lastUpdate);
+    public Doctor(Long id, String firstName, String lastName, String email, Date lastUpdate, boolean hasChangedDefaultPassword) {
+        super(id, firstName, lastName, email, lastUpdate, hasChangedDefaultPassword);
     }
 
     @Ignore
@@ -25,6 +24,7 @@ public class Doctor extends AppUser {
                 doctorDTO.getFirstName(),
                 doctorDTO.getLastName(),
                 doctorDTO.getEmail(),
-                timestamp);
+                timestamp,
+                doctorDTO.hasChangedDefaultPassword());
     }
 }

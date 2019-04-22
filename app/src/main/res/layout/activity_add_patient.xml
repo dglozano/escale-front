@@ -16,11 +16,9 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/add_patient_btn"
             android:layout_centerVertical="true"
             android:layout_margin="@dimen/activity_vertical_margin_big"
-            android:background="@color/almostWhite"
-            android:fadeScrollbars="false">
+            android:background="@color/almostWhite">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -234,22 +232,19 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dialog_edit_user_ph_activity_description_3"
                     android:textAlignment="center" />
+
+                <Button
+                    android:id="@+id/add_patient_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/height"
+                    android:layout_marginTop="@dimen/activity_vertical_margin_big"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_small"
+                    android:background="@drawable/button_rounded"
+                    android:text="@string/add_patient_btn_text"
+                    android:textColor="@color/almostWhite"
+                    android:textStyle="bold" />
             </LinearLayout>
-
         </ScrollView>
-
-        <Button
-            android:id="@+id/add_patient_btn"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/height"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="@dimen/activity_vertical_margin_big"
-            android:layout_marginEnd="@dimen/activity_vertical_margin_big"
-            android:layout_marginBottom="@dimen/activity_vertical_margin_big"
-            android:background="@drawable/button_rounded"
-            android:text="@string/add_patient_btn_text"
-            android:textColor="@color/almostWhite"
-            android:textStyle="bold" />
 
         <RelativeLayout
             android:id="@+id/add_patient_progress_bar_container"
@@ -269,9 +264,6 @@
                 android:layout_centerInParent="true"
                 android:indeterminate="true"
                 android:indeterminateTint="@color/colorAccent" />
-
         </RelativeLayout>
-
     </RelativeLayout>
-
 </layout>

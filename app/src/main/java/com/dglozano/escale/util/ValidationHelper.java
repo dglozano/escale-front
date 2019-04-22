@@ -23,6 +23,18 @@ public class ValidationHelper {
         return !TextUtils.isEmpty(name) && name.toString().matches("^[\\p{L} .'-]+$");
     }
 
+    /**
+     * ^                 # start-of-string
+     * (?=.*[0-9])       # a digit must occur at least once
+     * (?=.*[a-zA-Z)     # a letter must occur at least once
+     * (?=\S+$)          # no whitespace allowed in the entire string
+     * .{8,100}          # anything, at least eight places and max 100
+     * $                 # end-of-string
+     */
+    public static boolean isValidPassword(CharSequence password) {
+        return !TextUtils.isEmpty(password) && password.toString().matches("^(?=.*[0-9])(?=.*[a-zA-Z])(?=\\S+$).{8,100}$");
+    }
+
     public static boolean isValidFileName(Editable filename) {
         return !TextUtils.isEmpty(filename) && filename.toString().matches("^(?!\\.)(?!.*\\.$)(?!.*?\\.\\.)^[\\w\\-_,(). ]+$");
     }
@@ -144,5 +156,23 @@ public class ValidationHelper {
             return R.string.input_validation_empty_error;
         else
             return isValidBmi(bmi) ? null : R.string.input_validation_bmi_error;
+    }
+
+    public static Integer getPasswordError(CharSequence password) {
+        if (TextUtils.isEmpty(password))
+            return R.string.input_validation_empty_error;
+        else if (isValidPassword(password)) {
+            return null;
+        } else if (!password.toString().matches(".*\\d.*")) {
+            return R.string.password_validation_no_digits_error;
+        } else if (!password.toString().matches(".*[a-zA-Z].*")) {
+            return R.string.password_validation_no_letters_error;
+        } else if (password.toString().length() < 8) {
+            return R.string.password_validation_not_long_enough_error;
+        } else if (password.toString().length() > 100) {
+            return R.string.password_validation_too_long_error;
+        } else {
+            return R.string.password_validation_not_valid_char_error;
+        }
     }
 }

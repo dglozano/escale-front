@@ -39,7 +39,7 @@ public class Constants {
 
     // Web
     public static final String BASE_HEROKU_URL = "https://escale-api.herokuapp.com";
-    public static final String BASE_LOCALHOST_URL = "http://192.168.43.31:8080";
+    public static final String BASE_LOCALHOST_URL = "http://192.168.0.65:8080";
     public static final int FRESH_TIMEOUT = 30;
     public static final String TOKEN_HEADER_KEY = "token";
     public static final String REFRESH_TOKEN_HEADER_KEY = "refreshToken";
@@ -210,12 +210,12 @@ public class Constants {
 
     public static final String ASK_NEW_FIREBASE_TOKEN = "ask_new_firebase_token";
     public static final String IS_DOCTOR_VIEW_INTENT_EXTRA = "isDoctorMainView";
+    public static final String DIET_FILE_URI = "diet_file_uri_extra";
+    public static final String CHANGE_PW_USER_ID_EXTRA = "user_id";
     public static final int MAIN_ACTIVITY_STARTED_BY_DOCTOR_CODE = 3200;
     public static final int SELECT_DIET_FILE_TO_ADD = 9375;
     public static final int ADD_DIET_ACTIVITY_CODE = 2611;
-    public static final String DIET_FILE_PATH_EXTRA = "diet_file_path_extra";
-    public static final String DIET_FILE_NAME_EXTRA = "diet_filename_extra";
-    public static final String DIET_FILE_URI = "diet_file_uri_extra";
     public static final int SHOW_PDF_CODE = 999;
     public static final int ADD_GOAL_ACTIVITY_CODE = 55478;
+    public static final int CHANGE_PASSWORD_DOCTOR_CODE = 64895;
 }

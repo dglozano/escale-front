@@ -94,6 +94,10 @@ public class DoctorRepository {
         return mSharedPreferences.getLong(Constants.LOGGED_DOCTOR_ID_SHARED_PREF, -1L);
     }
 
+    public LiveData<Doctor> getLoggedDoctor() {
+        return getDoctorById(getLoggedDoctorId());
+    }
+
     public LiveData<Long> getLoggedDoctorIdAsLiveData() {
         return mLoggedDoctorId;
     }
@@ -143,6 +147,20 @@ public class DoctorRepository {
                     .flatMapCompletable(patientInfoOptional -> {
                         patientInfoOptional.ifPresent(patientInfo -> {
                             patientInfo.setAlerts(patientInfo.getAlerts() + 1);
+                            mPatientInfoDao.upsert(patientInfo);
+                        });
+                        return Completable.complete();
+                    });
+        }
+        return Completable.complete();
+    }
+
+    public Completable addWeightToPatientInfo(long patientId, float weight) {
+        if (getLoggedDoctorId() != -1) {
+            return mPatientInfoDao.getPatientInfoByPatientIdOfDoctor(getLoggedDoctorId(), patientId)
+                    .flatMapCompletable(patientInfoOptional -> {
+                        patientInfoOptional.ifPresent(patientInfo -> {
+                            patientInfo.setLastWeight(weight);
                             mPatientInfoDao.upsert(patientInfo);
                         });
                         return Completable.complete();

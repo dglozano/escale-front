@@ -27,7 +27,6 @@ public class Patient extends AppUser {
     private int heightInCm;
     private int physicalActivity;
     private Date birthday;
-    private boolean changedDefaultPassword;
     private Long doctorId;
     private Float goalInKg;
     private Date goalDueDate;
@@ -54,13 +53,13 @@ public class Patient extends AppUser {
                 patientDTO.getFirstName(),
                 patientDTO.getLastName(),
                 patientDTO.getEmail(),
-                timestamp);
+                timestamp,
+                patientDTO.hasChangedDefaultPassword());
         this.gender = patientDTO.getGender();
         this.heightInCm = patientDTO.getHeightInCm();
         this.physicalActivity = patientDTO.getPhysicalActivity();
         this.birthday = patientDTO.getBirthday();
         this.doctorId = patientDTO.getDoctorDTO().getId();
-        this.changedDefaultPassword = patientDTO.hasChangedDefaultPassword();
         if (patientDTO.getCurrentWeightGoal() != null) {
             this.goalDueDate = patientDTO.getCurrentWeightGoal().getDueDate();
             this.goalInKg = patientDTO.getCurrentWeightGoal().getGoalInKg();
@@ -141,14 +140,6 @@ public class Patient extends AppUser {
                 && otherPatient.firstName.equals(this.firstName)
                 && otherPatient.lastName.equals(this.lastName)
                 && otherPatient.email.equals(this.email);
-    }
-
-    public boolean hasChangedDefaultPassword() {
-        return changedDefaultPassword;
-    }
-
-    public void setChangedDefaultPassword(boolean changedDefaultPassword) {
-        this.changedDefaultPassword = changedDefaultPassword;
     }
 
     public void setGoalStartDate(Date goalStartDate) {

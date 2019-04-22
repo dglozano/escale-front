@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.PatientInfo;
 import com.dglozano.escale.ui.BaseActivity;
+import com.dglozano.escale.ui.common.pw_change.ChangePasswordActivity;
 import com.dglozano.escale.ui.doctor.main.add_patient.AddPatientActivity;
 import com.dglozano.escale.ui.login.LoginActivity;
 import com.dglozano.escale.ui.main.LogoutDialog;
@@ -28,7 +29,9 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
@@ -68,6 +71,7 @@ public class DoctorMainActivity extends BaseActivity
     ViewModelProvider.Factory mViewModelFactory;
 
     private DoctorMainActivityViewModel mViewModel;
+    private AlertDialog activeDialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +88,7 @@ public class DoctorMainActivity extends BaseActivity
         mViewModel.getLogoutEvent().observe(this, this::onLogoutEvent);
         mViewModel.getFirebaseToken().observe(this, this::onFirebaseTokenUpdate);
         mViewModel.getLoadingStatus().observe(this, this::onLoadingStatusUpdate);
+        mViewModel.watchMustChangePassword().observe(this, this::onMustChangePasswordEvent);
 
         setupRecyclerList();
     }
@@ -120,6 +125,25 @@ public class DoctorMainActivity extends BaseActivity
             mDoctorMainProgressBar.setVisibility(View.VISIBLE);
             mAddPatientButton.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.doctor_action_change_password) {
+            Intent intent = new Intent(this, ChangePasswordActivity.class);
+            intent.putExtra(Constants.CHANGE_PW_USER_ID_EXTRA, mViewModel.getLoggedDoctorId());
+            startActivityForResult(intent, Constants.CHANGE_PASSWORD_DOCTOR_CODE);
+        } else if (id == R.id.doctor_action_settings) {
+            showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
+        } else if (id == R.id.doctor_action_help_and_contact) {
+            showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
+        } else if (id == android.R.id.home) {
+            LogoutDialog.newInstance().show(getSupportFragmentManager(), "showLogoutConfirmDialog");
+        }
+
+        return true;
     }
 
     private void onFirebaseTokenUpdate(String token) {
@@ -195,10 +219,45 @@ public class DoctorMainActivity extends BaseActivity
         }
     }
 
+    private void onMustChangePasswordEvent(Event<Boolean> mustChangePassEvent) {
+        if (mustChangePassEvent != null && !mustChangePassEvent.hasBeenHandled()) {
+            if (mustChangePassEvent.peekContent() && activeDialog == null) {
+                activeDialog = showChangePasswordDialog();
+            } else if (!mustChangePassEvent.peekContent() && activeDialog != null) {
+                activeDialog.dismiss();
+                activeDialog = null;
+            }
+        }
+    }
+
+    private AlertDialog showChangePasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        return builder.setTitle(getString(R.string.change_password_title))
+                .setMessage(getString(R.string.dialog_change_password))
+                .setPositiveButton(R.string.change_password_title, (dialog, which) -> {
+                    Intent intent = new Intent(this, ChangePasswordActivity.class);
+                    intent.putExtra("forced_to_change_pass", true);
+                    intent.putExtra(Constants.CHANGE_PW_USER_ID_EXTRA, mViewModel.getLoggedDoctorId());
+                    mViewModel.handleMustChangePasswordEvent();
+                    startActivityForResult(intent, Constants.CHANGE_PASSWORD_DOCTOR_CODE);
+                })
+                .setCancelable(false)
+                .show();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         mViewModel.refreshData();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (activeDialog != null) {
+            activeDialog.dismiss();
+            activeDialog = null;
+        }
     }
 
     @Override

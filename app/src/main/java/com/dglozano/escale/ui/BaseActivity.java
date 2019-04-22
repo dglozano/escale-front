@@ -16,21 +16,21 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected abstract View getRootLayout();
 
-    protected void showSnackbarWithOkDismiss(int stringResource) {
+    public void showSnackbarWithOkDismiss(int stringResource) {
         showSnackbarWithOkDismiss(getResources().getString(stringResource));
     }
 
-    protected void showSnackbarWithDuration(int stringResource, int duration) {
+    public void showSnackbarWithDuration(int stringResource, int duration) {
         showSnackbarWithDuration(getResources().getString(stringResource), duration);
     }
 
-    protected void showSnackbarWithDuration(String text, int duration) {
+    public void showSnackbarWithDuration(String text, int duration) {
         Snackbar snackbar = Snackbar.make(getRootLayout(), text, duration);
         setSnackbarStyle(snackbar);
         snackbar.show();
     }
 
-    protected void showSnackbarWithOkDismiss(String text) {
+    public void showSnackbarWithOkDismiss(String text) {
         Snackbar snackbar = Snackbar.make(getRootLayout(), text, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.ok, v -> {
                     // By default, the snackbar will be dismissed on click.

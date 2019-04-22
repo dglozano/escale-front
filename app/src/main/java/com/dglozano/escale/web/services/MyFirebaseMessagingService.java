@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.entity.Alert;
 import com.dglozano.escale.repository.AlertRepository;
+import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.DoctorRepository;
@@ -25,6 +26,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     SharedPreferences sharedPreferences;
     @Inject
     ChatRepository chatRepository;
+    @Inject
+    BodyMeasurementRepository measurementRepository;
     @Inject
     DietRepository dietRepository;
     @Inject
@@ -83,6 +86,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 handleNewGoalNotification(remoteMessage);
             } else if (type.equals("new_alert")) {
                 handleNewAlertNotification(remoteMessage);
+            } else if (type.equals("new_measurement")) {
+                handleNewMeasurementNotification(remoteMessage);
             }
         }
 
@@ -90,6 +95,26 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (remoteMessage.getNotification() != null) {
             Timber.d("Message Notification Body: %s", remoteMessage.getNotification().getBody());
         }
+    }
+
+    private void handleNewMeasurementNotification(RemoteMessage remoteMessage) {
+        long id = Long.parseLong(remoteMessage.getData().get("id"));
+        long patientId = Long.parseLong(remoteMessage.getData().get("patient_id"));
+        float weight = Float.parseFloat(remoteMessage.getData().get("weight"));
+        float fat = Float.parseFloat(remoteMessage.getData().get("fat"));
+        float bmi = Float.parseFloat(remoteMessage.getData().get("bmi"));
+        float muscle = Float.parseFloat(remoteMessage.getData().get("muscle"));
+        float water = Float.parseFloat(remoteMessage.getData().get("water"));
+        boolean isManual = Boolean.parseBoolean(remoteMessage.getData().get("is_manual"));
+        String date = remoteMessage.getData().get("date");
+        disposables.add(doctorRepository.addWeightToPatientInfo(patientId, weight)
+                .andThen(measurementRepository.addMeasurementOnNotified(id, patientId, weight, fat, bmi, muscle, water, isManual, date))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(() -> {
+                    Timber.d("Received measurement from firebase and saved successfully");
+                }, Timber::e)
+        );
     }
 
     private void handleDeleteDietNotification(RemoteMessage remoteMessage) {

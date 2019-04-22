@@ -51,6 +51,20 @@ public class BodyMeasurement {
     }
 
     @Ignore
+    public BodyMeasurement(Long id, Long userId, Date date, float weight, float bmi, float fat, float water, float muscles, boolean isManual) {
+        this.id = id;
+        this.userId = userId;
+        this.date = date;
+        this.weight = weight;
+        this.bmi = bmi;
+        this.fat = fat;
+        this.water = water;
+        this.bones = 0;
+        this.muscles = muscles;
+        this.isManual = isManual;
+    }
+
+    @Ignore
     private BodyMeasurement(Long id, Long userId, Date date, float weight) {
         this.id = id;
         this.userId = userId;

@@ -11,8 +11,8 @@ import com.dglozano.escale.db.entity.MeasurementForecast;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BaseUrl;
-import com.dglozano.escale.exception.AccountDisabledException;
-import com.dglozano.escale.exception.ChangePasswordException;
+import com.dglozano.escale.util.exception.AccountDisabledException;
+import com.dglozano.escale.util.exception.ChangePasswordException;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.SharedPreferencesLiveData;
@@ -116,28 +116,6 @@ public class PatientRepository {
 
     public LiveData<Long> getLoggedPatientIdAsLiveData() {
         return mLoggedUserId;
-    }
-
-    public Single<Long> changePassword(String currentPassword,
-                                       String newPassword,
-                                       String newPasswordRepeat) {
-        Long userId = getLoggedPatientIdAsLiveData().getValue() == null ? -1L : getLoggedPatientIdAsLiveData().getValue();
-        return mEscaleRestApi.changePassword(
-                new ChangePasswordDataDTO(currentPassword,
-                        newPassword, newPasswordRepeat), userId)
-                .flatMap(changePasswordResponse -> {
-                    if (changePasswordResponse.isSuccessful()) {
-                        return mEscaleRestApi.getPatientById(userId);
-                    } else {
-                        Timber.d("Error change password, check");
-                        throw new ChangePasswordException();
-                    }
-                })
-                .flatMap(patientDTO -> {
-                    Patient patient = new Patient(patientDTO, Calendar.getInstance().getTime());
-                    mPatientDao.upsert(patient);
-                    return Single.just(patient.getId());
-                });
     }
 
     public Single<Long> refreshPatient(final Long userId) {

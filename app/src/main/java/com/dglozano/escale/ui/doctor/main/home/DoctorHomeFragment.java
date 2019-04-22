@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.ui.doctor.main.add_goal.AddGoalActivity;
 import com.dglozano.escale.ui.doctor.main.home.alerts.DoctorHomeAlertListFragment;
 import com.dglozano.escale.ui.doctor.main.home.profile.DoctorHomeProfileFragment;
@@ -21,6 +22,7 @@ import com.dglozano.escale.ui.main.MainActivityViewModel;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.ui.FragmentWithViewPager;
 import com.dglozano.escale.util.ui.MyTabAdapter;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import javax.inject.Inject;
@@ -121,6 +123,8 @@ public class DoctorHomeFragment extends Fragment implements FragmentWithViewPage
             startActivityForResult(intent, Constants.ADD_GOAL_ACTIVITY_CODE);
         } else if (id == android.R.id.home) {
             getActivity().onBackPressed();
+        } else if (id == R.id.menu_doctor_profile_patient_settings) {
+            ((BaseActivity) getActivity()).showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
         }
         return true;
     }

@@ -43,7 +43,7 @@ import androidx.room.TypeConverters;
         MeasurementPrediction.class,
         PatientInfo.class,
         Doctor.class,},
-        version = 33,
+        version = 34,
         exportSchema = false)
 @TypeConverters(DatabaseConverters.class)
 public abstract class EscaleDatabase extends RoomDatabase {

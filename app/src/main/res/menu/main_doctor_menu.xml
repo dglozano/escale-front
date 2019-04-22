@@ -1,8 +1,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_search"
+    <item
+        android:id="@+id/action_search"
         android:title="@string/action_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/doctor_action_settings"
+        android:icon="@drawable/drawer_ic_menu_settings"
+        android:title="@string/settings"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/doctor_action_change_password"
+        android:icon="@drawable/ic_change_password"
+        android:title="@string/change_password_title"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/doctor_action_help_and_contact"
+        android:icon="@drawable/drawer_ic_menu_help"
+        android:title="@string/help_and_contact_title"
+        app:showAsAction="never" />
 </menu>
