@@ -38,8 +38,7 @@ public class Constants {
     public static final String USER_DELETE_CMD = "03%1$s"; //INDEX
 
     // Web
-    public static final String BASE_HEROKU_URL = "https://escale-api.herokuapp.com";
-    public static final String BASE_LOCALHOST_URL = "http://192.168.0.65:8080";
+    public static final String BASE_ESCALE_URL = "https://escale.com.ar";
     public static final int FRESH_TIMEOUT = 30;
     public static final String TOKEN_HEADER_KEY = "token";
     public static final String REFRESH_TOKEN_HEADER_KEY = "refreshToken";

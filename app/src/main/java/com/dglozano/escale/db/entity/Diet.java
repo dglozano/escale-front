@@ -96,10 +96,6 @@ public class Diet {
         this.size = size;
     }
 
-    public String getDownloadUri() {
-        return Constants.BASE_HEROKU_URL + "diets/download/" + getId();
-    }
-
     public String getLocalFileName() {
         return this.id + this.fileName;
     }
