@@ -190,7 +190,7 @@ public class AppModule {
     @Provides
     @BaseUrl
     String provideBaseUrl() {
-        return Constants.BASE_LOCALHOST_URL;
+        return Constants.BASE_ESCALE_URL;
     }
 
     @Provides
@@ -219,9 +219,9 @@ public class AppModule {
                                      HeaderTokenInterceptor headerTokenInterceptor,
                                      OkHttpClientHolder okHttpClientHolder) {
         OkHttpClient.Builder client = new OkHttpClient.Builder();
-        client.connectTimeout(5, TimeUnit.SECONDS);
-        client.readTimeout(10, TimeUnit.SECONDS);
-        client.writeTimeout(10, TimeUnit.SECONDS);
+        client.connectTimeout(10, TimeUnit.SECONDS);
+        client.readTimeout(15, TimeUnit.SECONDS);
+        client.writeTimeout(15, TimeUnit.SECONDS);
         client.addInterceptor(httpLoggingInterceptor);
         client.addNetworkInterceptor(headerTokenInterceptor);
         client.authenticator(customAuthenticator);
