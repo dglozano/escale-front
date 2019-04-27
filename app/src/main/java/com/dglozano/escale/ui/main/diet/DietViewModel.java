@@ -1,7 +1,5 @@
 package com.dglozano.escale.ui.main.diet;
 
-import android.net.Uri;
-
 import com.dglozano.escale.repository.DietRepository;
 import com.dglozano.escale.repository.PatientRepository;
 

@@ -193,6 +193,6 @@ public class MessagesFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate().");
         mMessagesViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MessagesViewModel.class);
-        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity(), mViewModelFactory).get(MainActivityViewModel.class);
     }
 }

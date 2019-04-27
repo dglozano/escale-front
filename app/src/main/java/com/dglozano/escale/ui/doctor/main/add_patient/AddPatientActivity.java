@@ -143,6 +143,8 @@ public class AddPatientActivity extends BaseActivity {
                     myCalendar.get(Calendar.DAY_OF_MONTH));
             mDatePickerDialog.setOnDismissListener(dialogInterface -> mDatePickerDialog = null);
             mDatePickerDialog.show();
+            // FIXME FOR PRE LOLLIPOP RELEASE
+            mDatePickerDialog.getDatePicker().getTouchables().get(0).performClick();
         }
     }
 
