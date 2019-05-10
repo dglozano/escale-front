@@ -11,11 +11,13 @@ import com.dglozano.escale.db.entity.Doctor;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.db.entity.PatientInfo;
 import com.dglozano.escale.di.annotation.ApplicationScope;
+import com.dglozano.escale.exception.EmailAlreadyUsedException;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
 import com.dglozano.escale.web.dto.AddWeightGoalDTO;
 import com.dglozano.escale.web.dto.CreatePatientDTO;
+import com.dglozano.escale.web.dto.PatientDTO;
 
 import java.io.File;
 import java.util.Calendar;
@@ -117,7 +119,15 @@ public class DoctorRepository {
                 new CreatePatientDTO(firstName, lastName, email, birthday,
                         heightInCm, genre, phActivity, getLoggedDoctorId());
         return mEscaleRestApi.createPatientForDoctor(createPatientDTO, getLoggedDoctorId())
-                .map(patientDTO -> new Patient(patientDTO, Calendar.getInstance().getTime()))
+                .map(response -> {
+                    PatientDTO dto = response.body();
+                    if(response.code() == 409) {
+                        throw new EmailAlreadyUsedException(email);
+                    } else if (dto == null) {
+                        throw new Exception();
+                    }
+                    return new Patient(dto, Calendar.getInstance().getTime());
+                })
                 .flatMapCompletable(patient -> {
                     AppUser user = new AppUser(patient);
                     mUserDao.upsert(user);

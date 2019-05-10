@@ -6,7 +6,7 @@ import com.dglozano.escale.db.dao.DietDao;
 import com.dglozano.escale.db.entity.Diet;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.RootFileDirectory;
-import com.dglozano.escale.util.exception.DietDownloadStateException;
+import com.dglozano.escale.exception.DietDownloadStateException;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.MyFileUtils;

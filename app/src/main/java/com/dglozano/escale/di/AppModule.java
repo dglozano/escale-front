@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.dglozano.escale.BuildConfig;
 import com.dglozano.escale.db.EscaleDatabase;
 import com.dglozano.escale.db.dao.AlertDao;
 import com.dglozano.escale.db.dao.BodyMeasurementDao;
@@ -37,7 +38,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.polidea.rxandroidble2.RxBleClient;
-import com.squareup.picasso.LruCache;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
@@ -190,7 +190,10 @@ public class AppModule {
     @Provides
     @BaseUrl
     String provideBaseUrl() {
-        return Constants.BASE_ESCALE_URL;
+        if (BuildConfig.DEBUG)
+            return Constants.BASE_LOCAL_URL;
+        else
+            return Constants.BASE_ESCALE_URL;
     }
 
     @Provides

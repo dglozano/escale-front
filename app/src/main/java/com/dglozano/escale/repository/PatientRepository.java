@@ -11,13 +11,11 @@ import com.dglozano.escale.db.entity.MeasurementForecast;
 import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.di.annotation.ApplicationScope;
 import com.dglozano.escale.di.annotation.BaseUrl;
-import com.dglozano.escale.util.exception.AccountDisabledException;
-import com.dglozano.escale.util.exception.ChangePasswordException;
+import com.dglozano.escale.exception.AccountDisabledException;
 import com.dglozano.escale.util.AppExecutors;
 import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.SharedPreferencesLiveData;
 import com.dglozano.escale.web.EscaleRestApi;
-import com.dglozano.escale.web.dto.ChangePasswordDataDTO;
 import com.dglozano.escale.web.dto.UpdatePatientDTO;
 
 import java.io.File;

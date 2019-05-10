@@ -3,7 +3,7 @@ package com.dglozano.escale.ui.main;
 import android.content.SharedPreferences;
 
 import com.dglozano.escale.db.entity.Patient;
-import com.dglozano.escale.util.exception.AccountDisabledException;
+import com.dglozano.escale.exception.AccountDisabledException;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;
 import com.dglozano.escale.repository.DietRepository;
@@ -78,7 +78,7 @@ public class MainActivityViewModel extends ViewModel {
         mErrorEvent = new MutableLiveData<>();
         mLogoutEvent = new MutableLiveData<>();
         positionOfCurrentFragment = new MutableLiveData<>();
-        positionOfCurrentFragment.postValue(0);
+        positionOfCurrentFragment.setValue(0);
         mLoggedPatient = mPatientRepository.getLoggedPatient();
         mIsRefreshing = new MediatorLiveData<>();
         setupRefreshingObservable();
@@ -121,6 +121,7 @@ public class MainActivityViewModel extends ViewModel {
 
     private void setupAppBarShadowStatus() {
         mShowAppBarShadow = new MediatorLiveData<>();
+        mShowAppBarShadow.setValue(false);
         mAreDietsEmpty = Transformations.map(mDietRepository.getCurrentDiet(
                 mPatientRepository.getLoggedPatientId()),
                 Objects::isNull);
@@ -135,6 +136,11 @@ public class MainActivityViewModel extends ViewModel {
         });
         mShowAppBarShadow.addSource(positionOfCurrentFragment, positionFragment -> {
             checkEmptyStateAndFragmentPosition();
+        });
+        mShowAppBarShadow.addSource(mIsRefreshing, isLoading -> {
+            if(!isLoading) {
+                checkEmptyStateAndFragmentPosition();
+            }
         });
     }
 

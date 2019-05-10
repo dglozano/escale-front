@@ -1,9 +1,9 @@
 package com.dglozano.escale.ui.login;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.util.exception.AccountDisabledException;
-import com.dglozano.escale.util.exception.BadCredentialsException;
-import com.dglozano.escale.util.exception.NotMobileAppUser;
+import com.dglozano.escale.exception.AccountDisabledException;
+import com.dglozano.escale.exception.BadCredentialsException;
+import com.dglozano.escale.exception.NotMobileAppUser;
 import com.dglozano.escale.repository.DoctorRepository;
 import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.repository.UserRepository;
