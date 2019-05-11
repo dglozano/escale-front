@@ -152,7 +152,7 @@ public class DietFragment extends Fragment implements FragmentWithViewPager {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDietViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DietViewModel.class);
-        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity(), mViewModelFactory).get(MainActivityViewModel.class);
     }
 
     @Override

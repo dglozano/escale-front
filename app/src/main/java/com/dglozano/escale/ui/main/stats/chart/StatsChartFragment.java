@@ -399,12 +399,17 @@ public class StatsChartFragment extends Fragment {
         float axisMin = newMinY - range * 1.10f;
         float axisMax = newMaxY + range * 1.10f;
         switch (mStatsChartViewModel.getSelectedStat()) {
-            case IMC:
             case FAT:
             case WATER:
             case MUSCLE:
-                mLineChart.getAxisLeft().setAxisMinimum(axisMin < 0 ? 0 : range == 0 ? axisMin * 0.95f : axisMin);
-                mLineChart.getAxisLeft().setAxisMaximum(axisMax > 100 ? 100 : range == 0 ? axisMax * 1.05f : axisMax);
+                float percentageMin = newMinY - 10f;
+                float percentageMax = newMaxY + 10f;
+                mLineChart.getAxisLeft().setAxisMinimum(percentageMin < 0 ? 0 : percentageMin);
+                mLineChart.getAxisLeft().setAxisMaximum(percentageMax > 100 ? 100 : percentageMax);
+                break;
+            case IMC:
+                mLineChart.getAxisLeft().setAxisMinimum(axisMin < 10 ? 10 : range == 0 ? axisMin * 0.95f : axisMin);
+                mLineChart.getAxisLeft().setAxisMaximum(axisMax > 60 ? 60 : range == 0 ? axisMax * 1.05f : axisMax);
                 break;
             case WEIGHT:
             default:
@@ -448,7 +453,7 @@ public class StatsChartFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mMainActivityViewModel = ViewModelProviders.of(mMainActivity).get(MainActivityViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(mMainActivity, mViewModelFactory).get(MainActivityViewModel.class);
     }
 
     private class MyLineChartRenderer extends LineChartRenderer {

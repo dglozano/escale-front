@@ -122,7 +122,7 @@ public interface EscaleRestApi {
     Completable uploadProfilePicture(@Part MultipartBody.Part file, @Path("id") Long userId);
 
     @POST("/api/doctors/{id}/patients/sign-up")
-    Single<PatientDTO> createPatientForDoctor(@Body CreatePatientDTO createPatientDTO,
+    Single<Response<PatientDTO>> createPatientForDoctor(@Body CreatePatientDTO createPatientDTO,
                                               @Path("id") Long doctorId);
 
     @GET("/api/doctors/{id}")

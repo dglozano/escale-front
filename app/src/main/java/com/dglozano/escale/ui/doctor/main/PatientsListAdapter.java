@@ -93,7 +93,7 @@ public class PatientsListAdapter extends RecyclerView.Adapter<PatientsListAdapte
 
         @Override
         public boolean areItemsTheSame(PatientInfo item1, PatientInfo item2) {
-            return item1.getPatientId() == item2.getPatientId();
+            return item1.getPatientId().equals(item2.getPatientId());
         }
     });
     private PatientClickListener mClickListener;

@@ -1,6 +1,7 @@
 package com.dglozano.escale.ui.doctor.main.add_patient;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.exception.EmailAlreadyUsedException;
 import com.dglozano.escale.repository.DoctorRepository;
 import com.dglozano.escale.util.ui.Event;
 
@@ -118,7 +119,11 @@ public class AddPatientViewModel extends ViewModel {
                                 error -> {
                                     Timber.e(error);
                                     mLoading.postValue(false);
-                                    mErrorEvent.postValue(new Event<>(R.string.add_patient_error_snackbar));
+                                    if(error instanceof EmailAlreadyUsedException) {
+                                        mErrorEvent.postValue(new Event<>(R.string.email_already_exists));
+                                    } else {
+                                        mErrorEvent.postValue(new Event<>(R.string.add_patient_error_snackbar));
+                                    }
                                 }
                         )
                 );

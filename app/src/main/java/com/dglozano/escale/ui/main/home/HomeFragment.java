@@ -202,24 +202,27 @@ public class HomeFragment extends Fragment
                     int endValue = sharedPreferences.getInt(Constants.GAUGE_END, 100);
                     boolean hasToSetGaugeStart = sharedPreferences.getBoolean(Constants.GAUGE_HAS_TO_SET_START, false);
 
+                    BodyMeasurement lastBodyMeasurement = mHomeViewModel.getLastBodyMeasurementBlocking().orElse(null);
+
                     // TODO: fix gauge according to goal type (lose or gain)
 
-                    if (goal.isPresent()) {
-                        if (hasToSetGaugeStart) {
-                            calculateAndSetGaugeParameters(goal.get(), bodyMeasurement.get());
+                    mMainActivity.runOnUiThread(() -> {
+                        if (goal.isPresent()) {
+                            if (hasToSetGaugeStart) {
+                                calculateAndSetGaugeParameters(goal.get(), bodyMeasurement.get(), lastBodyMeasurement);
+                            } else {
+                                int gaugeValue = getGaugeValue(bodyMeasurement.get(), goal.get(), startValue, endValue);
+                                mCustomGauge.setStartValue(startValue);
+                                mCustomGauge.setEndValue(endValue);
+                                mCustomGauge.setValue(gaugeValue);
+                                mCustomGauge.invalidate();
+                            }
                         } else {
-                            int gaugeValue = getGaugeValue(bodyMeasurement.get(), goal.get(), startValue, endValue);
-                            mCustomGauge.setStartValue(startValue);
-                            mCustomGauge.setEndValue(endValue);
-                            mCustomGauge.setValue(gaugeValue);
-                            mCustomGauge.invalidate();
+                            mCustomGauge.setStartValue(0);
+                            mCustomGauge.setEndValue(100);
+                            mCustomGauge.setValue(100);
                         }
-                    } else {
-                        mCustomGauge.setStartValue(0);
-                        mCustomGauge.setEndValue(100);
-                        mCustomGauge.setValue(100);
-                    }
-
+                    });
                 });
             }
             mMeasurementListAdapter.setItems(MeasurementItem.getMeasurementList(
@@ -266,23 +269,27 @@ public class HomeFragment extends Fragment
                 initialBodyMeasurement = lastBeforeGoalStarted;
             } else initialBodyMeasurement = firstAfterGoalStarted;
 
-            if (initialBodyMeasurement.isPresent()) {
-                Timber.d("initialBodyMeasurement.isPresent()");
-                calculateAndSetGaugeParameters(patient.getGoalInKg(), initialBodyMeasurement.get());
-            } else {
-                Timber.d("initialBodyMeasurement is not present");
-                mCustomGauge.setStartValue(0);
-                mCustomGauge.setEndValue(Math.round(patient.getGoalInKg()) * 100);
-                mCustomGauge.setValue(0);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(Constants.GAUGE_HAS_TO_SET_START, true);
-                editor.apply();
-            }
-            mCustomGauge.invalidate();
+            BodyMeasurement lastBodyMeasurement = mHomeViewModel.getLastBodyMeasurementBlocking().orElse(null);
+
+            mMainActivity.runOnUiThread(() -> {
+                if (initialBodyMeasurement.isPresent()) {
+                    Timber.d("initialBodyMeasurement.isPresent()");
+                    calculateAndSetGaugeParameters(patient.getGoalInKg(), initialBodyMeasurement.get(), lastBodyMeasurement);
+                } else {
+                    Timber.d("initialBodyMeasurement is not present");
+                    mCustomGauge.setStartValue(0);
+                    mCustomGauge.setEndValue(Math.round(patient.getGoalInKg()) * 100);
+                    mCustomGauge.setValue(0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean(Constants.GAUGE_HAS_TO_SET_START, true);
+                    editor.apply();
+                }
+                mCustomGauge.invalidate();
+            });
         });
     }
 
-    private void calculateAndSetGaugeParameters(Float goal, BodyMeasurement initialBodyMeasurement) {
+    private void calculateAndSetGaugeParameters(Float goal, BodyMeasurement initialBodyMeasurement, @Nullable BodyMeasurement lastMeasurement) {
         Timber.d("calculateAndSetGaugeParameters");
         float difference = Math.abs(goal - initialBodyMeasurement.getWeight());
         int startValue = Math.round(goal * 100 - difference * 1.20f * 100);
@@ -297,8 +304,7 @@ public class HomeFragment extends Fragment
 
         mCustomGauge.setStartValue(startValue);
         mCustomGauge.setEndValue(endValue);
-        Optional<BodyMeasurement> lastBodyMeasurementOpt = mHomeViewModel.getLastBodyMeasurementBlocking();
-        int gaugeValue = lastBodyMeasurementOpt.map(bm -> getGaugeValue(bm, goal, finalStartValue, endValue)).orElse(1000);
+        int gaugeValue = lastMeasurement == null ? 1000 : getGaugeValue(lastMeasurement, goal, finalStartValue, endValue);
         mCustomGauge.setValue(gaugeValue);
     }
 
@@ -430,7 +436,7 @@ public class HomeFragment extends Fragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity(), mViewModelFactory).get(MainActivityViewModel.class);
     }
 
     @Override

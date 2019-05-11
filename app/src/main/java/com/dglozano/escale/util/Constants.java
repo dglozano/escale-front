@@ -39,6 +39,7 @@ public class Constants {
 
     // Web
     public static final String BASE_ESCALE_URL = "https://escale.com.ar";
+    public static final String BASE_LOCAL_URL = "http://192.168.0.65:8080";
     public static final int FRESH_TIMEOUT = 30;
     public static final String TOKEN_HEADER_KEY = "token";
     public static final String REFRESH_TOKEN_HEADER_KEY = "refreshToken";

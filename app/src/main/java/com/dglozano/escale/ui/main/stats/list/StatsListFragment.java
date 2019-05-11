@@ -99,6 +99,6 @@ public class StatsListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity(), mViewModelFactory).get(MainActivityViewModel.class);
     }
 }

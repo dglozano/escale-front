@@ -183,6 +183,7 @@
     <string name="password_validation_too_long_error">La contraseña es demasiado larga</string>
     <string name="password_validation_same_password_error">La nueva contraseña no puede ser igual a la anterior</string>
     <string name="password_validation_password_mismatch_error">Las contraseñas no coinciden</string>
+    <string name="email_already_exists">Ups! Al parecer ya hay un usuario registrado con el email ingresado.</string>
     <string-array name="scale_user_indexes_array">
         <item>P-01</item>
         <item>P-02</item>

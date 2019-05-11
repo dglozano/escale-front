@@ -165,7 +165,7 @@ public class DoctorHomeFragment extends Fragment implements FragmentWithViewPage
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDoctorHomeViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DoctorHomeViewModel.class);
-        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity(), mViewModelFactory).get(MainActivityViewModel.class);
     }
 
     @Override

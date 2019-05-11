@@ -33,26 +33,23 @@ public class EscaleApp extends Application implements HasActivityInjector, HasSe
                 .build()
                 .inject(this);
 
-        //Timber.plant(new Timber.DebugTree());
-
-        Timber.plant(new Timber.DebugTree() {
-            //Add the line number to the tag
-            @Override
-            protected @Nullable
-            String createStackElementTag(@NotNull StackTraceElement element) {
-                return "BleDebug - " + super.createStackElementTag(element) + '@' + element.getLineNumber();
-            }
-        });
-
-        /*if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree()) {
+        if (BuildConfig.DEBUG)
+            Timber.plant(new Timber.DebugTree() {
                 //Add the line number to the tag
                 @Override
-                protected @Nullable String createStackElementTag(@NotNull StackTraceElement element) {
-                    return super.createStackElementTag(element) + ':' + element.getLineNumber();
+                protected @Nullable
+                String createStackElementTag(@NotNull StackTraceElement element) {
+                    return "EscaleDebug - " + super.createStackElementTag(element) + '@' + element.getLineNumber();
                 }
             });
-        */
+        else
+            Timber.plant(new Timber.Tree() {
+                @Override
+                protected void log(int priority, @org.jetbrains.annotations.Nullable String tag, @NotNull String message, @org.jetbrains.annotations.Nullable Throwable t) {
+
+                }
+            });
+
         super.onCreate();
     }
 

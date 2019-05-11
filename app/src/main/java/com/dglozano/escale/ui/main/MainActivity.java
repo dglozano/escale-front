@@ -179,10 +179,6 @@ public class MainActivity extends BaseActivity
         mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
 
         invalidateOptionsMenu();
-
-        if (mViewModel.isDoctorView() && openFragmentInPosition == 0) {
-            setElevationOfAppBar(0f);
-        }
     }
 
     private void onLogoutEvent(Event<Integer> logoutEvent) {
@@ -390,6 +386,7 @@ public class MainActivity extends BaseActivity
         }
         return false;
     }
+
 
     private void setupBottomNav() {
         mBnv.enableAnimation(true);

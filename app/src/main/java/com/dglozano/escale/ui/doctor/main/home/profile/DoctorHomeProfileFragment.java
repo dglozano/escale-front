@@ -2,17 +2,21 @@ package com.dglozano.escale.ui.doctor.main.home.profile;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.BodyMeasurement;
 import com.dglozano.escale.db.entity.Patient;
+import com.dglozano.escale.ui.doctor.main.add_goal.AddGoalActivity;
 import com.dglozano.escale.ui.main.MainActivity;
 import com.dglozano.escale.ui.main.MainActivityViewModel;
+import com.dglozano.escale.util.Constants;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
@@ -31,6 +35,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
@@ -154,6 +159,12 @@ public class DoctorHomeProfileFragment extends Fragment {
         }
     }
 
+    @OnClick(R.id.home_doctor_profile_goal_wrapper)
+    public void onGoalClicked(View v) {
+        Intent intent = new Intent(getActivity(), AddGoalActivity.class);
+        startActivityForResult(intent, Constants.ADD_GOAL_ACTIVITY_CODE);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -164,7 +175,7 @@ public class DoctorHomeProfileFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mMainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        mMainActivityViewModel = ViewModelProviders.of(getActivity(), mViewModelFactory).get(MainActivityViewModel.class);
     }
 
     @Override
