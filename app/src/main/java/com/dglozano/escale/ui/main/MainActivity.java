@@ -76,9 +76,8 @@ public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         HasSupportFragmentInjector, LogoutDialog.LogoutDialogListener {
 
-    private static final int CHANGE_PASSWORD_CODE = 123;
     public static final int ADD_MEASUREMENT_CODE = 456;
-
+    private static final int CHANGE_PASSWORD_CODE = 123;
     // Binding views with Butterknife
     @BindView(R.id.bnve)
     BottomNavigationViewEx mBnv;
@@ -119,7 +118,6 @@ public class MainActivity extends BaseActivity
     private TextView mNavUsername;
     private TextView mNavEmail;
     private RoundedImageView mNavImageView;
-
 
     private ServiceConnection mServiceConnection = new MyServiceConnection();
 
@@ -176,7 +174,7 @@ public class MainActivity extends BaseActivity
         observerFirebaseTokenUpdate();
         observeCurrentFragmentPosition();
 
-        mViewModel.getErrorEvent().observe(this, this::showSnackbarError);
+        mViewModel.getErrorEvent().observe(this, this::onErrorEventFired);
 
         invalidateOptionsMenu();
     }
@@ -190,13 +188,6 @@ public class MainActivity extends BaseActivity
             finish();
         }
     }
-
-    private void showSnackbarError(Event<Integer> errorEvent) {
-        if (errorEvent != null && errorEvent.peekContent() != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.handleContent());
-        }
-    }
-
 
     private void observeIsRefreshing() {
         mViewModel.isRefreshing().observe(this, isRefreshing -> {
@@ -449,11 +440,13 @@ public class MainActivity extends BaseActivity
 
             if (id == R.id.nav_profile) {
                 startProfileActivity();
-            } else if (id == R.id.nav_settings) {
-                showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
-            } else if (id == R.id.nav_help) {
-                showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
-            } else if (id == R.id.nav_logout) {
+            }
+//            else if (id == R.id.nav_settings) {
+//                showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
+//            } else if (id == R.id.nav_help) {
+//                showSnackbarWithDuration(R.string.not_implemented_yet, Snackbar.LENGTH_SHORT);
+//            }
+            else if (id == R.id.nav_logout) {
                 LogoutDialog.newInstance().show(getSupportFragmentManager(), "showLogoutConfirmDialog");
             } else if (id == R.id.nav_change_password) {
                 startChangePasswordActivity();
@@ -580,7 +573,7 @@ public class MainActivity extends BaseActivity
     }
 
     private void observeServiceLiveData() {
-        mBF600BleService.getErrorEvent().observe(this, this::showSnackbarError);
+        mBF600BleService.getErrorEvent().observe(this, this::onErrorEventFired);
     }
 
     @Override

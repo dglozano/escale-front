@@ -15,8 +15,10 @@ import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.util.ui.Event;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -31,6 +33,7 @@ import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
 import co.ceryle.radiorealbutton.RadioRealButtonGroup;
 import dagger.android.AndroidInjection;
+import timber.log.Timber;
 
 import static com.dglozano.escale.util.ValidationHelper.getGoalDueDateError;
 import static com.dglozano.escale.util.ValidationHelper.getWeightError;
@@ -80,15 +83,11 @@ public class AddGoalActivity extends BaseActivity {
         mViewModel.getSuccessEvent().observe(this, this::onSuccessEventFired);
     }
 
-    private void onSuccessEventFired(Event<Boolean> successEvent) {
-        setResult(Activity.RESULT_OK);
-        finish();
-    }
-
-    private void onErrorEventFired(Event<Integer> errorEvent) {
-        if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.handleContent());
-        }
+    @Override
+    public void onErrorEventFired(Event<Integer> errorEvent) {
+        super.onErrorEventFired(errorEvent);
+        setErrorInInputLayout(getWeightError(mAddGoalEditText.getText()), mAddGoalInputLayout);
+        setErrorInInputLayout(getGoalDueDateError(mDueDateEditText.getText()), mDueDateInputLayout);
     }
 
     private void onLoadingStateChange(Boolean isLoading) {
@@ -108,22 +107,22 @@ public class AddGoalActivity extends BaseActivity {
             myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-            mDueDateEditText.setText(sdf.format(myCalendar.getTime()));
-
             mDueDateEditText.clearFocus();
             View focusView = this.getCurrentFocus();
             if (focusView != null) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
             }
+
+            mDueDateEditText.setText(sdf.format(myCalendar.getTime()));
         };
     }
 
     @OnClick(R.id.add_goal_btn)
     public void onAddGoalClick(View v) {
         mViewModel.hitChangeGoal(
-                Objects.requireNonNull(mAddGoalEditText).getText(),
-                Objects.requireNonNull(mDueDateEditText).getText(),
+                Objects.requireNonNull(mAddGoalInputLayout.getEditText()).getText(),
+                Objects.requireNonNull(mDueDateInputLayout.getEditText()).getText(),
                 mGoalDirectionGroup.getPosition() == 0
         );
     }
@@ -151,6 +150,15 @@ public class AddGoalActivity extends BaseActivity {
 
     private void showDatePickerDialog() {
         Calendar myCalendar = Calendar.getInstance();
+        try {
+            String dateString = Objects.requireNonNull(mDueDateInputLayout.getEditText()).getText().toString();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date dateInput = sdf.parse(dateString);
+            myCalendar.setTime(dateInput);
+        } catch (ParseException e) {
+            Timber.e(e);
+        }
+
         if (mDatePickerDialog == null) {
             mDatePickerDialog = new DatePickerDialog(this,
                     onDateSetListener,
@@ -165,31 +173,27 @@ public class AddGoalActivity extends BaseActivity {
     @OnFocusChange(R.id.add_goal_edittext)
     public void onFocusChangeGoal(View v, boolean hasFocus) {
         if (!hasFocus) {
-            Integer errorString = getWeightError(((EditText) v).getText().toString());
-            mAddGoalInputLayout.setError(errorString == null ? null : getString(errorString));
+            setErrorInInputLayout(getWeightError(((EditText) v).getText()), mAddGoalInputLayout);
         }
     }
 
     @OnTextChanged(value = R.id.add_goal_edittext,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextChangedGoal(Editable editable) {
-        Integer errorString = getWeightError(editable.toString());
-        mAddGoalInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(getWeightError(editable), mAddGoalInputLayout);
     }
 
     @OnFocusChange(R.id.add_goal_due_date_edittext)
-    public void onFocusChangeBirthday(View v, boolean hasFocus) {
+    public void onFocusChangeDueDate(View v, boolean hasFocus) {
         if (!hasFocus) {
-            Integer errorString = getGoalDueDateError(((EditText) v).getText());
-            mDueDateInputLayout.setError(errorString == null ? null : getString(errorString));
+            setErrorInInputLayout(getGoalDueDateError(((EditText) v).getText()), mDueDateInputLayout);
         }
     }
 
     @OnTextChanged(value = R.id.add_goal_due_date_edittext,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    protected void afterEditTextBirthday(Editable editable) {
-        Integer errorString = getGoalDueDateError(editable);
-        mDueDateInputLayout.setError(errorString == null ? null : getString(errorString));
+    protected void afterEditTextDueDate(Editable editable) {
+        setErrorInInputLayout(getGoalDueDateError(editable), mDueDateInputLayout);
     }
 
     @Override

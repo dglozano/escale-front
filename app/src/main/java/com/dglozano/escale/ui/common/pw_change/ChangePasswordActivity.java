@@ -1,6 +1,5 @@
 package com.dglozano.escale.ui.common.pw_change;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -81,18 +80,12 @@ public class ChangePasswordActivity extends BaseActivity {
         mViewModel.getSuccessEvent().observe(this, this::onSuccessEventFired);
     }
 
-    private void onSuccessEventFired(Event<Long> successEvent) {
-        setResult(Activity.RESULT_OK);
-        finish();
-    }
-
-    private void onErrorEventFired(Event<Integer> errorEvent) {
-        if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.handleContent());
-            validateCurrentPassword(mCurrentPasswordEditText.getText());
-            validateNewPassword(mNewPasswordEditText.getText().toString(), mNewPasswordInputLayout, mNewPasswordRepeatInputLayout);
-            validateNewPassword(mNewPasswordRepeatEditText.getText().toString(), mNewPasswordRepeatInputLayout, mNewPasswordInputLayout);
-        }
+    @Override
+    public void onErrorEventFired(Event<Integer> errorEvent) {
+        super.onErrorEventFired(errorEvent);
+        validateCurrentPassword(mCurrentPasswordEditText.getText());
+        validateNewPassword(mNewPasswordEditText.getText().toString(), mNewPasswordInputLayout, mNewPasswordRepeatInputLayout);
+        validateNewPassword(mNewPasswordRepeatEditText.getText().toString(), mNewPasswordRepeatInputLayout, mNewPasswordInputLayout);
     }
 
     private void onLoadingStateChange(Boolean isLoading) {
@@ -215,14 +208,6 @@ public class ChangePasswordActivity extends BaseActivity {
             mNewPasswordInputLayout.setError(null);
         }
         setErrorInInputLayout(error, mCurrentPasswordInputLayout);
-    }
-
-    private void setErrorInInputLayout(Integer error, TextInputLayout inputLayout) {
-        if (error != null) {
-            inputLayout.setError(getString(error));
-        } else {
-            inputLayout.setError(null);
-        }
     }
 
     @Override

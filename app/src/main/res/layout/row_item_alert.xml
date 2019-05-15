@@ -24,8 +24,8 @@
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_toEndOf="@id/alert_row_img"
-        android:maxLines="5"
         android:ellipsize="end"
+        android:maxLines="5"
         android:text="Miércoles 20/12/19 a las 15:30hs"
         android:textAppearance="@android:style/TextAppearance.Material.Small"
         android:textSize="16sp" />

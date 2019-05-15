@@ -129,6 +129,6 @@ public class PatientDTO {
                 "   changedpass: %s \n" +
                 "   height: %s \n" +
                 "   physicalactivity: %s \n" +
-                "}", id, firstName, lastName, email,gender,changedDefaultPassword, heightInCm, physicalActivity);
+                "}", id, firstName, lastName, email, gender, changedDefaultPassword, heightInCm, physicalActivity);
     }
 }

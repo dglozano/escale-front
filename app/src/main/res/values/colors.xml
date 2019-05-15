@@ -13,6 +13,8 @@
     <color name="colorTextDark">#616161</color>
     <color name="lightGrayTransparent">#CCbdbdbd</color>
     <color name="gray">#757575</color>
+    <color name="errorRed">#B00020</color>
+    <color name="errorLightRed">#F8BBD0</color>
     <color name="lightGray">#bdbdbd</color>
     <color name="colorStartGradientOverlay">#dd4797ba</color>
     <color name="colorCenterGradientOverlay">#de266580</color>

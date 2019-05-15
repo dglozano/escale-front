@@ -138,10 +138,4 @@ public class LoginActivity extends BaseActivity {
             mProgressBarContainer.setVisibility(View.GONE);
         }
     }
-
-    private void onErrorEventFired(Event<Integer> errorEvent) {
-        if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.handleContent());
-        }
-    }
 }

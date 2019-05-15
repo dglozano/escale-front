@@ -19,6 +19,8 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static com.dglozano.escale.util.ValidationHelper.isValidFileName;
+
 public class AddDietActivityViewModel extends ViewModel {
 
     private final PatientRepository mPatientRepository;
@@ -39,23 +41,27 @@ public class AddDietActivityViewModel extends ViewModel {
         mPatientRepository = patientRepository;
     }
 
-    public void hitUploadDiet(File picture, String mediaType, String filename) {
-        disposables.add(mDoctorRepository.uploadDiet(picture, mediaType, filename, mPatientRepository.getLoggedPatientId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe((d) -> mLoading.postValue(true))
-                .subscribe(
-                        () -> {
-                            mSuccessEvent.postValue(new Event<>(R.string.upload_diet_success_msg));
-                            mLoading.postValue(false);
-                        },
-                        onError -> {
-                            Timber.e(onError, "Error uploading diet");
-                            mLoading.postValue(false);
-                            mErrorEvent.postValue(new Event<>(R.string.upload_diet_error_msg));
-                        }
-                )
-        );
+    public void hitUploadDiet(File diet, String mediaType, String filename) {
+        if (isValidFileName(filename)) {
+            disposables.add(mDoctorRepository.uploadDiet(diet, mediaType, filename, mPatientRepository.getLoggedPatientId())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe((d) -> mLoading.postValue(true))
+                    .subscribe(
+                            () -> {
+                                mSuccessEvent.postValue(new Event<>(R.string.upload_diet_success_msg));
+                                mLoading.postValue(false);
+                            },
+                            onError -> {
+                                Timber.e(onError, "Error uploading diet");
+                                mLoading.postValue(false);
+                                mErrorEvent.postValue(new Event<>(R.string.upload_diet_error_msg));
+                            }
+                    )
+            );
+        } else {
+            mErrorEvent.postValue(new Event<>(R.string.input_validation_filename));
+        }
     }
 
     public Uri getDietFileUri() {

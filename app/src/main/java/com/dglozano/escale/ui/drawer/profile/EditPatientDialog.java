@@ -51,11 +51,6 @@ public class EditPatientDialog extends DialogFragment {
     private Unbinder mViewUnbinder;
     private int mCurrentHeight;
     private int mCurrentActivity;
-
-    public interface EditPatientDialogListener {
-        void onEditSubmit();
-    }
-
     private EditPatientDialogListener mListener;
 
     public static EditPatientDialog newInstance(int currentHeight, int currentPhysicalActivity) {
@@ -195,6 +190,10 @@ public class EditPatientDialog extends DialogFragment {
         super.onDestroyView();
         Timber.d("onDestroyView().");
         mViewUnbinder.unbind();
+    }
+
+    public interface EditPatientDialogListener {
+        void onEditSubmit();
     }
 }
 

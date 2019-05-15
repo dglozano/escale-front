@@ -115,7 +115,7 @@ public class AllDietsListAdapter extends RecyclerView.Adapter<AllDietsListAdapte
             holder.mDietFileName.setText(diet.getFileName());
             holder.mDietStartDate.setText(String.format("Empezada el %shs.",
                     simpleDateFormat.format(diet.getStartDate())));
-            if(position != 0) {
+            if (position != 0) {
                 // If it is not the current diet, then show the action button.
                 switch (diet.getFileStatus()) {
                     case NOT_DOWNLOADED:
@@ -183,7 +183,7 @@ public class AllDietsListAdapter extends RecyclerView.Adapter<AllDietsListAdapte
         void onClick(Diet diet);
     }
 
-    public class DietViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class DietViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         @BindView(R.id.diet_item_btn)
         ImageView mDietBtnImageView;

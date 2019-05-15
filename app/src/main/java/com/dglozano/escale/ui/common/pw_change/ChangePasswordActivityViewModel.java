@@ -1,7 +1,6 @@
 package com.dglozano.escale.ui.common.pw_change;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.repository.PatientRepository;
 import com.dglozano.escale.repository.UserRepository;
 import com.dglozano.escale.util.ui.Event;
 
@@ -66,7 +65,7 @@ public class ChangePasswordActivityViewModel extends ViewModel {
     }
 
     public void hitChangePassword(CharSequence currentPassword, CharSequence newPassword, CharSequence newPasswordRepeat) {
-        if(isInputValid(currentPassword, newPassword, newPasswordRepeat)) {
+        if (isInputValid(currentPassword, newPassword, newPasswordRepeat)) {
             disposables.add(mUserRepository.changePassword(userId, currentPassword.toString(), newPassword.toString(), newPasswordRepeat.toString())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

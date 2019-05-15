@@ -21,15 +21,15 @@ public abstract class AbstractDownloadService extends IntentService {
     @RootFileDirectory
     File mFileDirectory;
 
+    public AbstractDownloadService() {
+        super(AbstractDownloadService.class.getName());
+        setIntentRedelivery(true);
+    }
+
     @Override
     public void onCreate() {
         AndroidInjection.inject(this);
         super.onCreate();
-    }
-
-    public AbstractDownloadService() {
-        super(AbstractDownloadService.class.getName());
-        setIntentRedelivery(true);
     }
 
     @Override

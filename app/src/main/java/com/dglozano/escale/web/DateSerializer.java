@@ -14,15 +14,15 @@ public class DateSerializer implements JsonSerializer<Date> {
 
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
-    @Override
-    public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
-        String formattedDate = formatDate(src);
-        return new JsonPrimitive(formattedDate);
-    }
-
     public static String formatDate(Date src) {
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         return sdf.format(src);
+    }
+
+    @Override
+    public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
+        String formattedDate = formatDate(src);
+        return new JsonPrimitive(formattedDate);
     }
 }

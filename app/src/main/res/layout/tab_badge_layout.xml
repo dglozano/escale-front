@@ -25,10 +25,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:maxLines="2"
             android:textColor="@drawable/tab_text_color_selector"
-            android:fontFamily="sans-serif-medium"
             app:tabTextAppearance="@android:style/Widget.Material.Tab" />
     </LinearLayout>
 

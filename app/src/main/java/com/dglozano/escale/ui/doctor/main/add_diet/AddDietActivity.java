@@ -20,7 +20,6 @@ import com.dglozano.escale.util.ui.CustomPdfScrollHandle;
 import com.dglozano.escale.util.ui.Event;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.apache.commons.io.FileUtils;
@@ -100,15 +99,11 @@ public class AddDietActivity extends BaseActivity {
         mViewModel.getSuccessEvent().observe(this, this::onSuccessEventFired);
     }
 
-    private void onSuccessEventFired(Event<Integer> successEvent) {
-        setResult(Activity.RESULT_OK);
-        finish();
-    }
-
-    private void onErrorEventFired(Event<Integer> errorEvent) {
-        if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.handleContent());
-        }
+    @Override
+    public void onErrorEventFired(Event<Integer> errorEvent) {
+        super.onErrorEventFired(errorEvent);
+        setErrorInInputLayout(getDietInputErrorStringResource(mDietNameEditText.getText()),
+                mDietFileNameInputLayout);
     }
 
     private void onLoadingStateChange(Boolean isLoading) {
@@ -125,12 +120,12 @@ public class AddDietActivity extends BaseActivity {
         Uri dietUri = mViewModel.getDietFileUri();
         if (dietUri == null) {
             Timber.e("dietUri is null");
-            showSnackbarWithDuration(R.string.upload_diet_error_msg, Snackbar.LENGTH_SHORT);
+            showErrorSnackbarWithOkDismiss(R.string.upload_diet_error_msg);
         } else {
             String mediaType = getMimeType(dietUri, getContentResolver());
             if (mediaType == null) {
                 Timber.e("mediaType is null");
-                showSnackbarWithDuration(R.string.upload_diet_error_msg, Snackbar.LENGTH_SHORT);
+                showErrorSnackbarWithOkDismiss(R.string.upload_diet_error_msg);
             } else {
                 InputStream dietInputStream = MyFileUtils.getFileInputStream(this, dietUri);
                 String randomTempName = UUID.randomUUID().toString() + ".pdf";
@@ -139,7 +134,7 @@ public class AddDietActivity extends BaseActivity {
                     FileUtils.copyInputStreamToFile(dietInputStream, dietFile);
                 } catch (IOException e) {
                     Timber.e(e);
-                    showSnackbarWithDuration(R.string.upload_diet_error_msg, Snackbar.LENGTH_SHORT);
+                    showErrorSnackbarWithOkDismiss(R.string.upload_diet_error_msg);
                 }
 
                 mViewModel.hitUploadDiet(dietFile, mediaType, filename);
@@ -186,7 +181,6 @@ public class AddDietActivity extends BaseActivity {
         }
     }
 
-
     @OnClick(R.id.add_diet_fullsize_btn)
     public void onFullScreenDietClick(View v) {
         Intent intent = new Intent(this, ShowDietPdfActivity.class);
@@ -210,8 +204,7 @@ public class AddDietActivity extends BaseActivity {
     @OnTextChanged(value = R.id.add_diet_filename_edittext,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     public void afterEditTextChangedDietName(Editable editable) {
-        Integer errorString = getDietInputErrorStringResource(editable);
-        mDietFileNameInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(getDietInputErrorStringResource(editable), mDietFileNameInputLayout);
     }
 
     @Nullable
@@ -225,9 +218,5 @@ public class AddDietActivity extends BaseActivity {
             errorString = ValidationHelper.isValidFileName(editable) ? null : R.string.input_validation_diet_name;
         }
         return errorString;
-    }
-
-    private boolean isDietNameInputValid() {
-        return getDietInputErrorStringResource(mDietNameEditText.getText()) == null;
     }
 }

@@ -22,12 +22,12 @@ import timber.log.Timber;
 
 public class AllDietsViewModel extends ViewModel {
 
-    private PatientRepository mPatientRepository;
-    private DietRepository mDietRepository;
-    private LiveData<List<Diet>> mPatientDiets;
     private final MutableLiveData<Boolean> mIsRefreshingDietsList;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
     private final MutableLiveData<Event<File>> mShowPdfEvent;
+    private PatientRepository mPatientRepository;
+    private DietRepository mDietRepository;
+    private LiveData<List<Diet>> mPatientDiets;
     private CompositeDisposable disposables;
 
     @Inject

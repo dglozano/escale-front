@@ -1,7 +1,6 @@
 package com.dglozano.escale.ui.doctor.main;
 
 import com.dglozano.escale.db.entity.Doctor;
-import com.dglozano.escale.db.entity.Patient;
 import com.dglozano.escale.db.entity.PatientInfo;
 import com.dglozano.escale.repository.BodyMeasurementRepository;
 import com.dglozano.escale.repository.ChatRepository;

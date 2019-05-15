@@ -5,5 +5,5 @@
         android:id="@+id/menu_messages_copy"
         android:icon="@drawable/ic_copy_content"
         android:title="@string/copy"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 </menu>

@@ -123,7 +123,7 @@ public interface EscaleRestApi {
 
     @POST("/api/doctors/{id}/patients/sign-up")
     Single<Response<PatientDTO>> createPatientForDoctor(@Body CreatePatientDTO createPatientDTO,
-                                              @Path("id") Long doctorId);
+                                                        @Path("id") Long doctorId);
 
     @GET("/api/doctors/{id}")
     Single<DoctorDTO> getDoctorById(@Path("id") Long doctorId);

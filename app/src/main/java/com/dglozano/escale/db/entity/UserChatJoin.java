@@ -7,7 +7,7 @@ import androidx.room.ForeignKey;
 import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(tableName = "user_chat_join",
-        primaryKeys = { "userId", "chatId" },
+        primaryKeys = {"userId", "chatId"},
         foreignKeys = {
                 @ForeignKey(entity = AppUser.class,
                         parentColumns = "id",

@@ -84,15 +84,15 @@ public class PatientRepository {
 
         mLastForecastWithPredictions = new MediatorLiveData<>();
         mLastForecastWithPredictions.addSource(Transformations.switchMap(mLoggedUserId, id -> mForecastDao.getLastForecastOfUserWithIdAsLiveData(getLoggedPatientId())),
-                        mfOpt -> {
-                            if (mfOpt.isPresent()) {
-                                this.appExecutors.getDiskIO().execute(() -> {
-                                    mLastForecastWithPredictions.postValue(mForecastDao.getForecastWithPredictions(mfOpt.get().getId()));
-                                });
-                            } else {
-                                mLastForecastWithPredictions.postValue(Optional.empty());
-                            }
+                mfOpt -> {
+                    if (mfOpt.isPresent()) {
+                        this.appExecutors.getDiskIO().execute(() -> {
+                            mLastForecastWithPredictions.postValue(mForecastDao.getForecastWithPredictions(mfOpt.get().getId()));
                         });
+                    } else {
+                        mLastForecastWithPredictions.postValue(Optional.empty());
+                    }
+                });
     }
 
     @Nullable
@@ -102,6 +102,12 @@ public class PatientRepository {
 
     public Long getLoggedPatientId() {
         return mSharedPreferences.getLong(Constants.LOGGED_USER_ID_SHARED_PREF, -1L);
+    }
+
+    public void setLoggedPatientId(Long patientId) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, patientId);
+        editor.apply();
     }
 
     public LiveData<Patient> getLoggedPatient() {
@@ -250,11 +256,5 @@ public class PatientRepository {
 
     public LiveData<Optional<MeasurementForecast>> getMeasurementForecastOfLoggedPatient() {
         return mLastForecastWithPredictions;
-    }
-
-    public void setLoggedPatientId(Long patientId) {
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putLong(Constants.LOGGED_USER_ID_SHARED_PREF, patientId);
-        editor.apply();
     }
 }

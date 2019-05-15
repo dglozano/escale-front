@@ -13,6 +13,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.dglozano.escale.util.ValidationHelper.isValidEmail;
+
 public class RecoverPasswordActivityViewModel extends ViewModel {
 
     private final CompositeDisposable disposables;
@@ -32,8 +34,7 @@ public class RecoverPasswordActivityViewModel extends ViewModel {
     }
 
     private boolean isInputValid(String email) {
-        //TODO
-        return true;
+        return isValidEmail(email);
     }
 
     public LiveData<Boolean> getLoading() {
@@ -49,7 +50,7 @@ public class RecoverPasswordActivityViewModel extends ViewModel {
     }
 
     public void hitRecoverPassword(String email) {
-        if(isInputValid(email)) {
+        if (isInputValid(email)) {
             disposables.add(mEscaleRestApi.passwordRecovery(email)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -66,7 +67,7 @@ public class RecoverPasswordActivityViewModel extends ViewModel {
                     )
             );
         } else {
-            // TODO
+            mErrorEvent.postValue(new Event<>(R.string.input_validation_email_error));
         }
     }
 

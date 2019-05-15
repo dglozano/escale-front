@@ -107,7 +107,7 @@ public class UserRepository {
                     }
                 })
                 .map(userOpt -> {
-                    if(userOpt.isPresent()) {
+                    if (userOpt.isPresent()) {
                         userOpt.get().setChangedDefaultPassword(true);
                         mUserDao.upsert(userOpt.get());
                         return userOpt.get().getId();

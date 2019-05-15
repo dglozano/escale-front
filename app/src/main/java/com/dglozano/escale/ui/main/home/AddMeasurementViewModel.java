@@ -21,12 +21,12 @@ import static com.dglozano.escale.util.ValidationHelper.isValidWeight;
 
 public class AddMeasurementViewModel extends ViewModel {
 
-    private PatientRepository mPatientRepository;
-    private BodyMeasurementRepository mMeasurementRepository;
     private final CompositeDisposable disposables;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
     private final MutableLiveData<Event<Boolean>> mSuccessEvent;
     private final MutableLiveData<Boolean> mLoading;
+    private PatientRepository mPatientRepository;
+    private BodyMeasurementRepository mMeasurementRepository;
 
     @Inject
     public AddMeasurementViewModel(PatientRepository patientRepository,

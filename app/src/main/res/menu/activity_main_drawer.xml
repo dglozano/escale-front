@@ -8,18 +8,18 @@
             android:id="@+id/nav_profile"
             android:icon="@drawable/drawer_ic_menu_profile"
             android:title="@string/drawer_option_profile" />
-        <item
-            android:id="@+id/nav_settings"
-            android:icon="@drawable/drawer_ic_menu_settings"
-            android:title="@string/drawer_option_settings" />
+        <!--<item-->
+        <!--android:id="@+id/nav_settings"-->
+        <!--android:icon="@drawable/drawer_ic_menu_settings"-->
+        <!--android:title="@string/drawer_option_settings" />-->
         <item
             android:id="@+id/nav_change_password"
             android:icon="@drawable/ic_change_password"
             android:title="@string/change_password_title" />
-        <item
-            android:id="@+id/nav_help"
-            android:icon="@drawable/drawer_ic_menu_help"
-            android:title="@string/help_and_contact_title" />
+        <!--<item-->
+        <!--android:id="@+id/nav_help"-->
+        <!--android:icon="@drawable/drawer_ic_menu_help"-->
+        <!--android:title="@string/help_and_contact_title" />-->
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/drawer_ic_menu_logout"

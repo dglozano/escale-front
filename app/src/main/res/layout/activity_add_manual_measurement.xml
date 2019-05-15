@@ -30,7 +30,8 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_small">
 
                     <ImageView
                         android:id="@+id/add_measurement_weight_image"
@@ -75,7 +76,8 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_small">
 
                     <ImageView
                         android:id="@+id/add_measurement_water_image"
@@ -120,7 +122,8 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_small">
 
                     <ImageView
                         android:id="@+id/add_measurement_fat_image"
@@ -165,7 +168,8 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_small">
 
                     <ImageView
                         android:id="@+id/add_measurement_bmi_image"
@@ -210,7 +214,8 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin_small">
 
                     <ImageView
                         android:id="@+id/add_measurement_muscles_image"
@@ -273,11 +278,11 @@
         <RelativeLayout
             android:id="@+id/add_measurement_progress_bar_container"
             android:layout_width="match_parent"
-            android:translationZ="10dp"
-            android:clickable="true"
-            android:focusable="true"
             android:layout_height="match_parent"
             android:background="@color/colorBlackOverlay"
+            android:clickable="true"
+            android:focusable="true"
+            android:translationZ="10dp"
             android:visibility="visible"
             tools:ignore="ExtraText">
 

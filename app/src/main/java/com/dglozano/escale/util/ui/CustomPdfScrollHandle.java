@@ -17,10 +17,8 @@ import timber.log.Timber;
 public class CustomPdfScrollHandle extends RelativeLayout implements ScrollHandle {
 
     private static final int HANDLE_SHORT = 4;
-
-    private float relativeHandlerMiddle = 0f;
-
     protected Context context;
+    private float relativeHandlerMiddle = 0f;
     private PDFView pdfView;
     private float currentPos;
 

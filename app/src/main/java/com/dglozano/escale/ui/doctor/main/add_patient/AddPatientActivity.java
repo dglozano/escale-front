@@ -1,6 +1,5 @@
 package com.dglozano.escale.ui.doctor.main.add_patient;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,8 +15,10 @@ import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.util.ui.Event;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -56,14 +57,22 @@ public class AddPatientActivity extends BaseActivity {
     TextInputLayout mHeightInputLayout;
     @BindView(R.id.add_patient_birthday_inputlayout)
     TextInputLayout mBirthdayInputLayout;
+    @BindView(R.id.add_patient_first_name_edittext)
+    EditText mFirstNameEditText;
+    @BindView(R.id.add_patient_last_name_edittext)
+    EditText mLastNameEditText;
+    @BindView(R.id.add_patient_email_edittext)
+    EditText mEmailEditText;
+    @BindView(R.id.add_patient_height_edittext)
+    EditText mHeightEditText;
+    @BindView(R.id.add_patient_birthday_edittext)
+    EditText mBirthdayEditText;
     @BindView(R.id.add_patient_genre_radiogroup)
     RadioRealButtonGroup mGenreRadioGroup;
     @BindView(R.id.add_patient_ph_activity_seekbar)
     SeekBar mPhActivitySeekBar;
     @BindView(R.id.add_patient_ph_activity_description)
     TextView mPhActivityDescription;
-    @BindView(R.id.add_patient_birthday_edittext)
-    EditText mBirthdayEditText;
 
     @BindString(R.string.dialog_edit_user_ph_activity_description_1)
     String mDescription1;
@@ -103,6 +112,16 @@ public class AddPatientActivity extends BaseActivity {
         mViewModel.getSuccessEvent().observe(this, this::onSuccessEventFired);
     }
 
+    @Override
+    public void onErrorEventFired(Event<Integer> errorEvent) {
+        super.onErrorEventFired(errorEvent);
+        setErrorInInputLayout(getNameError(mFirstNameEditText.getText()), mFirstNameInputLayout);
+        setErrorInInputLayout(getLastNameError(mLastNameEditText.getText()), mLastNameInputLayout);
+        setErrorInInputLayout(getEmailError(mEmailEditText.getText()), mEmailInputLayout);
+        setErrorInInputLayout(getBirthdayError(mBirthdayEditText.getText()), mBirthdayInputLayout);
+        setErrorInInputLayout(getHeightError(mHeightEditText.getText()), mHeightInputLayout);
+    }
+
     private void setBirthdayInput() {
         mBirthdayEditText.setKeyListener(null);
         onDateSetListener = (view, year, monthOfYear, dayOfMonth) -> {
@@ -134,7 +153,15 @@ public class AddPatientActivity extends BaseActivity {
 
     private void showDatePickerDialog() {
         Calendar myCalendar = Calendar.getInstance();
-        myCalendar.set(1990, 1, 1);
+        try {
+            String dateString = Objects.requireNonNull(mBirthdayInputLayout.getEditText()).getText().toString();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date dateInput = sdf.parse(dateString);
+            myCalendar.setTime(dateInput);
+        } catch (ParseException e) {
+            myCalendar.set(1990, 1, 1);
+        }
+
         if (mDatePickerDialog == null) {
             mDatePickerDialog = new DatePickerDialog(this,
                     onDateSetListener,
@@ -148,7 +175,6 @@ public class AddPatientActivity extends BaseActivity {
         }
     }
 
-
     @OnClick(R.id.add_patient_btn)
     public void onAddPatientClick(View view) {
         mViewModel.hitAddPatient(
@@ -160,17 +186,6 @@ public class AddPatientActivity extends BaseActivity {
                 mGenreRadioGroup.getPosition() + 1,
                 mPhActivitySeekBar.getProgress() + 1
         );
-    }
-
-    private void onSuccessEventFired(Event<Boolean> successEvent) {
-        setResult(Activity.RESULT_OK);
-        finish();
-    }
-
-    private void onErrorEventFired(Event<Integer> errorEvent) {
-        if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.handleContent());
-        }
     }
 
     private void onLoadingStateChange(Boolean isLoading) {
@@ -222,47 +237,34 @@ public class AddPatientActivity extends BaseActivity {
         }
     }
 
-    private void setErrorInInputLayout(Integer error, TextInputLayout inputLayout) {
-        if (error != null) {
-            inputLayout.setError(getString(error));
-        } else {
-            inputLayout.setError(null);
-        }
-    }
-
     @OnTextChanged(value = R.id.add_patient_first_name_edittext,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextFirstName(Editable editable) {
-        Integer errorString = getNameError(editable);
-        mFirstNameInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(getNameError(editable), mFirstNameInputLayout);
     }
 
     @OnTextChanged(value = R.id.add_patient_last_name_edittext,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextLastName(Editable editable) {
-        Integer errorString = getLastNameError(editable);
-        mLastNameInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(getLastNameError(editable), mLastNameInputLayout);
     }
 
     @OnTextChanged(value = R.id.add_patient_email_edittext,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextEmail(Editable editable) {
-        Integer errorString = getEmailError(editable);
-        mEmailInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(getEmailError(editable), mEmailInputLayout);
     }
 
     @OnTextChanged(value = R.id.add_patient_birthday_edittext,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextBirthday(Editable editable) {
-        Integer errorString = getBirthdayError(editable);
-        mBirthdayInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(getBirthdayError(editable), mBirthdayInputLayout);
     }
 
     @OnTextChanged(value = R.id.add_patient_height_edittext,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextHeight(Editable editable) {
-        Integer errorString = getHeightError(editable);
-        mHeightInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(getHeightError(editable), mHeightInputLayout);
     }
 
     @Override

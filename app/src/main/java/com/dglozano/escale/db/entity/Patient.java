@@ -142,10 +142,6 @@ public class Patient extends AppUser {
                 && otherPatient.email.equals(this.email);
     }
 
-    public void setGoalStartDate(Date goalStartDate) {
-        this.goalStartDate = goalStartDate;
-    }
-
     public Float getGoalInKg() {
         return goalInKg;
     }
@@ -195,9 +191,12 @@ public class Patient extends AppUser {
         }
     }
 
-
     public Date getGoalStartDate() {
         return goalStartDate;
+    }
+
+    public void setGoalStartDate(Date goalStartDate) {
+        this.goalStartDate = goalStartDate;
     }
 
     public boolean hasActiveGoal(Date today) {

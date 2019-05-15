@@ -27,16 +27,16 @@ import timber.log.Timber;
 
 public class MessagesViewModel extends ViewModel {
 
-    private PatientRepository mPatientRepository;
-    private DoctorRepository mDoctorRepository;
-    private boolean copyMenuVisible;
-    private ChatRepository mChatRepository;
     private final LiveData<List<ChatMessage>> mMessages;
     private final LiveData<List<MessageImpl>> mMessagesImpl;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
     private final MutableLiveData<Boolean> mIsSending;
     private final LiveData<List<Chat>> mChat;
     private final LongSparseArray<AuthorImpl> mChatParticipants;
+    private PatientRepository mPatientRepository;
+    private DoctorRepository mDoctorRepository;
+    private boolean copyMenuVisible;
+    private ChatRepository mChatRepository;
     private CompositeDisposable disposables;
 
     @Inject
@@ -126,11 +126,11 @@ public class MessagesViewModel extends ViewModel {
         return mErrorEvent;
     }
 
-    public void setCopyMenuVisible(boolean b) {
-        copyMenuVisible = b;
-    }
-
     public boolean isCopyMenuVisible() {
         return copyMenuVisible;
+    }
+
+    public void setCopyMenuVisible(boolean b) {
+        copyMenuVisible = b;
     }
 }
