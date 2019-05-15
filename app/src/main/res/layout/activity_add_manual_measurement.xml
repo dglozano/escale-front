@@ -278,11 +278,11 @@
         <RelativeLayout
             android:id="@+id/add_measurement_progress_bar_container"
             android:layout_width="match_parent"
-            android:translationZ="10dp"
-            android:clickable="true"
-            android:focusable="true"
             android:layout_height="match_parent"
             android:background="@color/colorBlackOverlay"
+            android:clickable="true"
+            android:focusable="true"
+            android:translationZ="10dp"
             android:visibility="visible"
             tools:ignore="ExtraText">
 

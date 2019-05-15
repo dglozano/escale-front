@@ -35,6 +35,12 @@ import timber.log.Timber;
 
 public class MainActivityViewModel extends ViewModel {
 
+    private final LiveData<Patient> mLoggedPatient;
+    private final MutableLiveData<Integer> positionOfCurrentFragment;
+    private final SharedPreferences mSharedPreferences;
+    private final CompositeDisposable disposables;
+    private final MutableLiveData<Event<Integer>> mErrorEvent;
+    private final MutableLiveData<Event<Integer>> mLogoutEvent;
     private PatientRepository mPatientRepository;
     private ChatRepository mChatRepository;
     private DoctorRepository mDoctorRepository;
@@ -42,12 +48,6 @@ public class MainActivityViewModel extends ViewModel {
     private UserRepository mUserRepository;
     private BodyMeasurementRepository mMeasurementRepository;
     private LiveData<Event<Boolean>> mMustChangePassword;
-    private final LiveData<Patient> mLoggedPatient;
-    private final MutableLiveData<Integer> positionOfCurrentFragment;
-    private final SharedPreferences mSharedPreferences;
-    private final CompositeDisposable disposables;
-    private final MutableLiveData<Event<Integer>> mErrorEvent;
-    private final MutableLiveData<Event<Integer>> mLogoutEvent;
     private MediatorLiveData<Boolean> mShowAppBarShadow;
     private LiveData<Boolean> mAreDietsEmpty;
     private LiveData<Boolean> mAreMeasurementsEmpty;
@@ -138,7 +138,7 @@ public class MainActivityViewModel extends ViewModel {
             checkEmptyStateAndFragmentPosition();
         });
         mShowAppBarShadow.addSource(mIsRefreshing, isLoading -> {
-            if(!isLoading) {
+            if (!isLoading) {
                 checkEmptyStateAndFragmentPosition();
             }
         });
@@ -167,24 +167,24 @@ public class MainActivityViewModel extends ViewModel {
 
     public void refreshData() {
         disposables.add(mPatientRepository.refreshPatient(mPatientRepository.getLoggedPatientId())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnSubscribe(d -> mIsRefreshingPatient.postValue(true))
-                        .subscribe(this::refreshEverythingElse,
-                                error -> {
-                                    if (error instanceof AccountDisabledException
-                                            || (error instanceof HttpException && error.getMessage().contains("401"))) {
-                                        Timber.d("The user's account was disabled or token is not valid");
-                                        mIsRefreshingPatient.postValue(false);
-                                        logout();
-                                    } else if (error instanceof NoSuchElementException) {
-                                        // Means that the user was fresh enough, so didn't have to call api
-                                        refreshEverythingElse(mPatientRepository.getLoggedPatientId());
-                                    } else {
-                                        mIsRefreshingPatient.postValue(false);
-                                        Timber.e(error);
-                                    }
-                                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(d -> mIsRefreshingPatient.postValue(true))
+                .subscribe(this::refreshEverythingElse,
+                        error -> {
+                            if (error instanceof AccountDisabledException
+                                    || (error instanceof HttpException && error.getMessage().contains("401"))) {
+                                Timber.d("The user's account was disabled or token is not valid");
+                                mIsRefreshingPatient.postValue(false);
+                                logout();
+                            } else if (error instanceof NoSuchElementException) {
+                                // Means that the user was fresh enough, so didn't have to call api
+                                refreshEverythingElse(mPatientRepository.getLoggedPatientId());
+                            } else {
+                                mIsRefreshingPatient.postValue(false);
+                                Timber.e(error);
+                            }
+                        })
 
         );
     }

@@ -1,6 +1,5 @@
 package com.dglozano.escale.db.entity;
 
-import com.dglozano.escale.util.Constants;
 import com.dglozano.escale.util.MyFileUtils;
 import com.dglozano.escale.web.dto.DietDTO;
 

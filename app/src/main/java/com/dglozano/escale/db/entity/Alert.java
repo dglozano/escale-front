@@ -52,6 +52,44 @@ public class Alert {
         this.dateCreated = date;
     }
 
+    public static Alert.AlertType intToAlertType(Integer i) {
+        switch (i) {
+            case 1:
+                return FORECAST_PREDICTS_GOAL_WILL_FAIL;
+            case 2:
+                return GOAL_FAILED;
+            case 3:
+                return MANUAL_MEASUREMENT;
+            case 4:
+                return NO_RECENT_MEASUREMENT;
+            case 5:
+                return GOAL_SUCCESS;
+            default:
+                return null;
+        }
+    }
+
+    public static Integer alertTypeToInt(AlertType alertType) {
+        if (alertType == null) {
+            return -1;
+        } else {
+            switch (alertType) {
+                case FORECAST_PREDICTS_GOAL_WILL_FAIL:
+                    return 1;
+                case GOAL_FAILED:
+                    return 2;
+                case MANUAL_MEASUREMENT:
+                    return 3;
+                case NO_RECENT_MEASUREMENT:
+                    return 4;
+                case GOAL_SUCCESS:
+                    return 5;
+                default:
+                    return -1;
+            }
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -127,43 +165,5 @@ public class Alert {
         NO_RECENT_MEASUREMENT,
         @SerializedName("5")
         GOAL_SUCCESS
-    }
-
-    public static Alert.AlertType intToAlertType(Integer i) {
-        switch (i) {
-            case 1:
-                return FORECAST_PREDICTS_GOAL_WILL_FAIL;
-            case 2:
-                return GOAL_FAILED;
-            case 3:
-                return MANUAL_MEASUREMENT;
-            case 4:
-                return NO_RECENT_MEASUREMENT;
-            case 5:
-                return GOAL_SUCCESS;
-            default:
-                return null;
-        }
-    }
-
-    public static Integer alertTypeToInt(AlertType alertType) {
-        if (alertType == null) {
-            return -1;
-        } else {
-            switch (alertType) {
-                case FORECAST_PREDICTS_GOAL_WILL_FAIL:
-                    return 1;
-                case GOAL_FAILED:
-                    return 2;
-                case MANUAL_MEASUREMENT:
-                    return 3;
-                case NO_RECENT_MEASUREMENT:
-                    return 4;
-                case GOAL_SUCCESS:
-                    return 5;
-                default:
-                    return -1;
-            }
-        }
     }
 }

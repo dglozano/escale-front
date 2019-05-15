@@ -56,6 +56,7 @@ import static com.dglozano.escale.ble.CommunicationHelper.parseFullMeasurementFr
 @ApplicationScope
 public class BF600BleService extends BaseBleService {
 
+    protected IBinder mBinder;
     @Inject
     RxBleClient rxBleClient;
     @Inject
@@ -67,7 +68,6 @@ public class BF600BleService extends BaseBleService {
     BodyMeasurementRepository bodyMeasurementRepository;
     @Inject
     SharedPreferences sharedPreferences;
-
     private Disposable mMeasurementTriggerDisposable;
     private Disposable mBatteryDisposable;
     private MutableLiveData<Boolean> mIsMeasurementTriggered;
@@ -75,8 +75,6 @@ public class BF600BleService extends BaseBleService {
     private MutableLiveData<Event<MaybeSubject<PinIndex>>> mTriggerScaleCredentialsDialog;
     private MutableLiveData<Event<MaybeSubject<PinIndex>>> mTriggerScaleDeleteUserDialog;
     private boolean hasMeasuredDuringThisConnection = false;
-
-    protected IBinder mBinder;
 
     @Override
     public void onCreate() {

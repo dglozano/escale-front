@@ -24,13 +24,13 @@ import timber.log.Timber;
 
 public class LoginActivityViewModel extends ViewModel {
 
-    public MutableLiveData<String> errorEmail;
-    public MutableLiveData<String> errorPassword;
     private final CompositeDisposable disposables;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
     private final LiveData<Event<Long>> mPatientIdChanged;
     private final LiveData<Event<Long>> mDoctorIdChanged;
     private final MutableLiveData<Boolean> mLoading;
+    public MutableLiveData<String> errorEmail;
+    public MutableLiveData<String> errorPassword;
     private PatientRepository mPatientRepository;
     private DoctorRepository mDoctorRepository;
     private UserRepository mUserRepository;

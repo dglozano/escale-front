@@ -12,10 +12,9 @@ public class MeasurementItem {
     public static final int ICON_RESOURCE_WEIGHT = 1;
     public static final int ICON_RESOURCE_WATER = 2;
     public static final int ICON_RESOURCE_FAT = 3;
-    static final int ICON_RESOURCE_BONES = 4;
     public static final int ICON_RESOURCE_BMI = 5;
     public static final int ICON_RESOURCE_MUSCLES = 6;
-
+    static final int ICON_RESOURCE_BONES = 4;
     private int iconResource;
     private String formattedValue;
     private MeasurementName name;

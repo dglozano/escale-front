@@ -27,7 +27,7 @@ import timber.log.Timber;
  * error. This will cause the device to unbond and bond again. After reseting the bonding, the ongoing
  * operations will work succesfuly. Chaining a retry() after the first read/write operation would be
  * a possible workaround, but it won't get to the retry() until the timeout has been triggered.
- *
+ * <p>
  * To prevent that situation, I created this helper class that will do the following:
  * 1- Check if the devices is bonded. If it is not bonded, it will start the bonding process (step #4)
  * 2- If it is already bonded, it will create a BroadcastReceiver, start the unbonding operation and
@@ -43,9 +43,6 @@ class BondingHelper {
 
     private static int DEFAULT_TIMEOUT = 30;
 
-    static class BondingFailedException extends RuntimeException {
-    }
-
     static Completable bondWithDevice(final Context context, final RxBleDevice rxBleDevice) {
         return bondWithDevice(context, rxBleDevice, DEFAULT_TIMEOUT, TimeUnit.SECONDS);
     }
@@ -56,7 +53,7 @@ class BondingHelper {
      * into an inner class that accepts a Predicate to decide when to complete
      */
     static Completable bondWithDevice(final Context context, final RxBleDevice rxBleDevice,
-                                             long timeout, TimeUnit timeunit) {
+                                      long timeout, TimeUnit timeunit) {
         return removeBond(context, rxBleDevice.getBluetoothDevice())
                 .andThen(Completable.create(completion -> {
                     Timber.d("Creating Bonding Broadcast Receiver.");
@@ -155,5 +152,8 @@ class BondingHelper {
                 completion.onComplete();
             }
         });
+    }
+
+    static class BondingFailedException extends RuntimeException {
     }
 }

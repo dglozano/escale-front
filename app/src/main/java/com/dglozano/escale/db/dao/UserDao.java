@@ -10,7 +10,7 @@ import androidx.room.Dao;
 import androidx.room.Query;
 
 @Dao
-public abstract class UserDao extends BaseDao<AppUser>{
+public abstract class UserDao extends BaseDao<AppUser> {
     @Query("SELECT * FROM AppUser")
     public abstract LiveData<List<AppUser>> getAllUsersAsLiveData();
 

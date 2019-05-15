@@ -35,22 +35,58 @@ import timber.log.Timber;
 
 public class MyFileUtils {
 
-    private MyFileUtils() {
-    } //private constructor to enforce Singleton pattern
-
-    private static final boolean DEBUG = true; // Set to true to enable logging
     public static final String DOCUMENTS_DIR = "documents";
-
     public static final String MIME_TYPE_AUDIO = "audio/*";
     public static final String MIME_TYPE_TEXT = "text/*";
     public static final String MIME_TYPE_IMAGE = "image/*";
     public static final String MIME_TYPE_VIDEO = "video/*";
     public static final String MIME_TYPE_APP = "application/*";
-
     // configured android:authorities in AndroidManifest (https://developer.android.com/reference/android/support/v4/content/FileProvider)
     public static final String AUTHORITY = "com.dglozano.escale.provider";
-
     public static final String HIDDEN_PREFIX = ".";
+    private static final boolean DEBUG = true; // Set to true to enable logging
+    /**
+     * File and folder comparator. TODO Expose sorting option method
+     *
+     * @author paulburke
+     */
+    public static Comparator<File> sComparator = new Comparator<File>() {
+        @Override
+        public int compare(File f1, File f2) {
+            // Sort alphabetically by lower case, which is much cleaner
+            return f1.getName().toLowerCase().compareTo(
+                    f2.getName().toLowerCase());
+        }
+    };
+    /**
+     * File (not directories) filter.
+     *
+     * @author paulburke
+     */
+    public static FileFilter sFileFilter = new FileFilter() {
+        @Override
+        public boolean accept(File file) {
+            final String fileName = file.getName();
+            // Return files only (not directories) and skip hidden files
+            return file.isFile() && !fileName.startsWith(HIDDEN_PREFIX);
+        }
+    };
+    /**
+     * Folder (directories) filter.
+     *
+     * @author paulburke
+     */
+    public static FileFilter sDirFilter = new FileFilter() {
+        @Override
+        public boolean accept(File file) {
+            final String fileName = file.getName();
+            // Return directories only and skip hidden directories
+            return file.isDirectory() && !fileName.startsWith(HIDDEN_PREFIX);
+        }
+    };
+
+    private MyFileUtils() {
+    } //private constructor to enforce Singleton pattern
 
     public static String getFileName(@NonNull Context context, Uri uri) {
         String mimeType = context.getContentResolver().getType(uri);
@@ -585,7 +621,6 @@ public class MyFileUtils {
         return null;
     }
 
-
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access
      * Framework Documents, as well as the _data field for the MediaStore and
@@ -715,48 +750,6 @@ public class MyFileUtils {
         }
         return bm;
     }
-
-    /**
-     * File and folder comparator. TODO Expose sorting option method
-     *
-     * @author paulburke
-     */
-    public static Comparator<File> sComparator = new Comparator<File>() {
-        @Override
-        public int compare(File f1, File f2) {
-            // Sort alphabetically by lower case, which is much cleaner
-            return f1.getName().toLowerCase().compareTo(
-                    f2.getName().toLowerCase());
-        }
-    };
-
-    /**
-     * File (not directories) filter.
-     *
-     * @author paulburke
-     */
-    public static FileFilter sFileFilter = new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-            final String fileName = file.getName();
-            // Return files only (not directories) and skip hidden files
-            return file.isFile() && !fileName.startsWith(HIDDEN_PREFIX);
-        }
-    };
-
-    /**
-     * Folder (directories) filter.
-     *
-     * @author paulburke
-     */
-    public static FileFilter sDirFilter = new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-            final String fileName = file.getName();
-            // Return directories only and skip hidden directories
-            return file.isDirectory() && !fileName.startsWith(HIDDEN_PREFIX);
-        }
-    };
 
     /**
      * Get the Intent for selecting content to be used in an Intent Chooser.

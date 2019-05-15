@@ -1,6 +1,5 @@
 package com.dglozano.escale.ui.main.home;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;

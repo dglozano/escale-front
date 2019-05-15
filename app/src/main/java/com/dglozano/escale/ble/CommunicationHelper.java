@@ -14,13 +14,12 @@ import timber.log.Timber;
 
 public class CommunicationHelper {
 
+    private final static char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
     private static SimpleDateFormat sdf = new SimpleDateFormat(Constants.SIMPLE_DATE_FORMAT);
 
     private CommunicationHelper() {
         // Utility class.
     }
-
-    private final static char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
     static String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
@@ -54,7 +53,7 @@ public class CommunicationHelper {
         String dateHex = Constants.DATE_SERVICE_FORMAT;
         Calendar calendar = Calendar.getInstance();
         String year = flipBytes(decToHex(calendar.get(Calendar.YEAR)));
-        String month = decToHex(calendar.get(Calendar.MONTH)+1);
+        String month = decToHex(calendar.get(Calendar.MONTH) + 1);
         String day = decToHex(calendar.get(Calendar.DAY_OF_MONTH));
         String hour = decToHex(calendar.get(Calendar.HOUR_OF_DAY));
         String min = decToHex(calendar.get(Calendar.MINUTE));
@@ -68,7 +67,7 @@ public class CommunicationHelper {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(dateOfBirth);
         String yyyy = flipBytes(decToHex(calendar.get(Calendar.YEAR)));
-        String mm = decToHex(calendar.get(Calendar.MONTH)+1);
+        String mm = decToHex(calendar.get(Calendar.MONTH) + 1);
         String dd = decToHex(calendar.get(Calendar.DAY_OF_MONTH));
         return String.format("%s%s%s", yyyy, mm, dd);
     }
@@ -86,13 +85,13 @@ public class CommunicationHelper {
     }
 
     static Date parseFullDateFromHex(String hexDate) {
-        if(hexDate.length() > 14) {
+        if (hexDate.length() > 14) {
             hexDate = hexDate.substring(0, 14);
         } else if (hexDate.length() < 14) {
             throw new IllegalArgumentException("parseFullDateFromHex requires a minimum 14 char long (7 bytes) String parameter");
         }
         int year = hexToDec(flipBytes(hexDate.substring(0, 4)));
-        int month = hexToDec(hexDate.substring(4, 6)) -1;
+        int month = hexToDec(hexDate.substring(4, 6)) - 1;
         int day = hexToDec(hexDate.substring(6, 8));
         int hour = hexToDec(hexDate.substring(8, 10));
         int min = hexToDec(hexDate.substring(10, 12));
@@ -104,10 +103,10 @@ public class CommunicationHelper {
     //TODO: See what happens if bits in flag for timeunit, bmi and user index are off
     static BodyMeasurement parseWeightMeasurementFromHex(String hexWeight) {
         //TODO Read flags
-        float weight = hexToDec(flipBytes(hexWeight.substring(2, 6 ))) * 0.005f;
-        Date date = parseFullDateFromHex(hexWeight.substring(6,20));
+        float weight = hexToDec(flipBytes(hexWeight.substring(2, 6))) * 0.005f;
+        Date date = parseFullDateFromHex(hexWeight.substring(6, 20));
         //TODO Read user index;
-        float bmi = hexToDec(flipBytes(hexWeight.substring(22,26))) * 0.1f;
+        float bmi = hexToDec(flipBytes(hexWeight.substring(22, 26))) * 0.1f;
         //TODO Read user height;
         BodyMeasurement bodyMeasurement = new BodyMeasurement();
         bodyMeasurement.setWeight(weight);
@@ -180,7 +179,7 @@ public class CommunicationHelper {
     static String getNextDbIncrement(String hex) {
         int nextDbInt = hex.equals("FFFFFFFF") ? 0x1 : hexToDec(hex) + 0x1;
         StringBuilder nextHex = new StringBuilder(decToHex(nextDbInt));
-        while(nextHex.length() < 8 ) {
+        while (nextHex.length() < 8) {
             nextHex.insert(0, "0");
         }
         Timber.d("Next Db Increment Int : %1$d - %2$s", nextDbInt, nextHex.toString());
@@ -226,6 +225,6 @@ public class CommunicationHelper {
 
     }
 
-    public static class DeleteScaleUserFailed extends Throwable{
+    public static class DeleteScaleUserFailed extends Throwable {
     }
 }

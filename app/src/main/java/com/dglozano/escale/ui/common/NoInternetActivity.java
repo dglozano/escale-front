@@ -34,7 +34,7 @@ public class NoInternetActivity extends AppCompatActivity {
     public void tryAgain() {
         showProgressDialog();
         mNetworkDisposable = NetworkUtil.checkInternetAccess(this).subscribe(hasInternet -> {
-            if(hasInternet) {
+            if (hasInternet) {
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 finish();
@@ -70,6 +70,6 @@ public class NoInternetActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if(mNetworkDisposable != null ) mNetworkDisposable.dispose();
+        if (mNetworkDisposable != null) mNetworkDisposable.dispose();
     }
 }

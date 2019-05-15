@@ -17,11 +17,11 @@ import timber.log.Timber;
 
 public class DoctorHomeAlertListViewModel extends ViewModel {
 
+    private final LiveData<List<Alert>> alerts;
     private PatientRepository mPatientRepository;
     private DoctorRepository mDoctorRepository;
     private AlertRepository mAlertRepository;
     private CompositeDisposable disposables;
-    private final LiveData<List<Alert>> alerts;
 
     @Inject
     public DoctorHomeAlertListViewModel(DoctorRepository doctorRepository,

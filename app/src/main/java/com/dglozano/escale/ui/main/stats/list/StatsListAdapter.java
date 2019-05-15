@@ -34,6 +34,9 @@ import timber.log.Timber;
 
 public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.BodyMeasurementViewHolder> {
 
+    private static final int UNSELECTED = -1;
+    private final SimpleDateFormat sdf = new SimpleDateFormat("EEE dd/MM/yyyy 'a las' H:mm 'hs.'", Locale.getDefault());
+    private final DecimalFormat df = new DecimalFormat("###.##");
     @BindDrawable(R.drawable.ic_stats_arrow_down)
     Drawable arrowDown;
     @BindDrawable(R.drawable.ic_stats_arrow_up)
@@ -46,14 +49,14 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
     int almostWhite;
     @BindColor(android.R.color.white)
     int white;
-
-    private static final int UNSELECTED = -1;
-
     private int mExpandedPosition = UNSELECTED;
     private RecyclerView mRecyclerView;
     private List<BodyMeasurement> mBodyMeasurementList;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("EEE dd/MM/yyyy 'a las' H:mm 'hs.'", Locale.getDefault());
-    private final DecimalFormat df = new DecimalFormat("###.##");
+
+    @Inject
+    public StatsListAdapter(MainActivity mainActivity) {
+        ButterKnife.bind(this, mainActivity);
+    }
 
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -61,15 +64,10 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
         mRecyclerView = recyclerView;
     }
 
-    @Inject
-    public StatsListAdapter(MainActivity mainActivity) {
-        ButterKnife.bind(this, mainActivity);
-    }
-
     @NonNull
     @Override
     public BodyMeasurementViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
-                                                   int viewType) {
+                                                        int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_group_stats, parent, false);
         return new BodyMeasurementViewHolder(itemView);
@@ -87,7 +85,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
 
     @Override
     public void onBindViewHolder(@NonNull BodyMeasurementViewHolder holder, int position) {
-        if(mBodyMeasurementList != null ) {
+        if (mBodyMeasurementList != null) {
             final BodyMeasurement bm = mBodyMeasurementList.get(position);
             String date = sdf.format(bm.getDate());
             holder.measurementItemWeight.setText(String.format("%s kg", df.format(bm.getWeight())));
@@ -101,7 +99,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
             holder.measurementItemManualOrScaleImage.setImageDrawable(bm.isManual() ?
                     manualMeasurementIcon : scaleMeasurementIcon);
             holder.measurementItemManualOrScaleText.setText(bm.isManual() ?
-                    R.string.manual_measurement : R.string.scale_measurement );
+                    R.string.manual_measurement : R.string.scale_measurement);
             holder.measurementHeaderManualOrScaleImage.setImageDrawable(bm.isManual() ?
                     manualMeasurementIcon : scaleMeasurementIcon);
         }
@@ -116,7 +114,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
 
     private void animateBackgroundColorChange(@NonNull BodyMeasurementViewHolder holder, boolean isSelected) {
         ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(),
-                ((ColorDrawable)holder.itemView.getBackground()).getColor(), isSelected ? white : almostWhite);
+                ((ColorDrawable) holder.itemView.getBackground()).getColor(), isSelected ? white : almostWhite);
         colorAnimation.setDuration(200); // milliseconds
         colorAnimation.addUpdateListener(animator ->
                 holder.itemView.setBackgroundColor((int) animator.getAnimatedValue()));
@@ -131,7 +129,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
         } else return 0;
     }
 
-    public class BodyMeasurementViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, ExpandableLayout.OnExpansionUpdateListener  {
+    public class BodyMeasurementViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, ExpandableLayout.OnExpansionUpdateListener {
 
         @BindView(R.id.measurement_group_text)
         TextView measurementDate;
@@ -165,7 +163,7 @@ public class StatsListAdapter extends RecyclerView.Adapter<StatsListAdapter.Body
 
             v.setOnClickListener(this);
         }
-        
+
         @Override
         public void onClick(View view) {
             BodyMeasurementViewHolder holder = (BodyMeasurementViewHolder) mRecyclerView.findViewHolderForAdapterPosition(mExpandedPosition);

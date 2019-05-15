@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.dglozano.escale.R;
 import com.dglozano.escale.db.entity.PatientInfo;
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
@@ -33,32 +32,6 @@ import butterknife.ButterKnife;
 import timber.log.Timber;
 
 public class PatientsListAdapter extends RecyclerView.Adapter<PatientsListAdapter.PatientViewHolder> {
-
-    @BindDrawable(R.drawable.ic_user_profile_image_default)
-    Drawable defaultProfileImage;
-    @BindDrawable(R.drawable.ic_no_alert)
-    Drawable noAlertDrawable;
-    @BindDrawable(R.drawable.ic_alert)
-    Drawable alertDrawable;
-    @BindDrawable(R.drawable.ic_message)
-    Drawable messageDrawable;
-    @BindDrawable(R.drawable.ic_no_message)
-    Drawable noMessageDrawable;
-    @BindColor(R.color.almostWhite)
-    int almostWhite;
-    @BindColor(R.color.colorAccentVeryLight)
-    int accentVeryLight;
-    @BindString(R.string.number_of_new_patient_messages)
-    String newMessagesString;
-    @BindString(R.string.number_of_new_patient_alerts)
-    String newAlertsString;
-
-    @Inject
-    Picasso mPicasso;
-    @Inject
-    ViewModelProvider.Factory mViewModelFactory;
-
-//    private List<PatientInfo> mPatientsInfoList;
 
     private final SortedList<PatientInfo> mPatientsInfoList = new SortedList<>(PatientInfo.class, new SortedList.Callback<PatientInfo>() {
         @Override
@@ -96,6 +69,30 @@ public class PatientsListAdapter extends RecyclerView.Adapter<PatientsListAdapte
             return item1.getPatientId().equals(item2.getPatientId());
         }
     });
+    @BindDrawable(R.drawable.ic_user_profile_image_default)
+    Drawable defaultProfileImage;
+    @BindDrawable(R.drawable.ic_no_alert)
+    Drawable noAlertDrawable;
+    @BindDrawable(R.drawable.ic_alert)
+    Drawable alertDrawable;
+    @BindDrawable(R.drawable.ic_message)
+    Drawable messageDrawable;
+    @BindDrawable(R.drawable.ic_no_message)
+    Drawable noMessageDrawable;
+    @BindColor(R.color.almostWhite)
+    int almostWhite;
+    @BindColor(R.color.colorAccentVeryLight)
+    int accentVeryLight;
+    @BindString(R.string.number_of_new_patient_messages)
+    String newMessagesString;
+    @BindString(R.string.number_of_new_patient_alerts)
+    String newAlertsString;
+    @Inject
+    Picasso mPicasso;
+
+//    private List<PatientInfo> mPatientsInfoList;
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
     private PatientClickListener mClickListener;
     private DoctorMainActivityViewModel mDoctorMainActivityViewModel;
     private Context mContext;

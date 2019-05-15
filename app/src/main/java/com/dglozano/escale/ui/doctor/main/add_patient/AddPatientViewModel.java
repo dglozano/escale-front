@@ -119,7 +119,7 @@ public class AddPatientViewModel extends ViewModel {
                                 error -> {
                                     Timber.e(error);
                                     mLoading.postValue(false);
-                                    if(error instanceof EmailAlreadyUsedException) {
+                                    if (error instanceof EmailAlreadyUsedException) {
                                         mErrorEvent.postValue(new Event<>(R.string.email_already_exists));
                                     } else {
                                         mErrorEvent.postValue(new Event<>(R.string.add_patient_error_snackbar));

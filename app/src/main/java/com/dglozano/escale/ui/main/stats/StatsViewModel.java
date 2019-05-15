@@ -12,9 +12,9 @@ import timber.log.Timber;
 
 public class StatsViewModel extends ViewModel {
 
+    private final LiveData<Boolean> mAreMeasurementsEmpty;
     private PatientRepository mPatientRepository;
     private BodyMeasurementRepository mMeasurementsRepository;
-    private final LiveData<Boolean> mAreMeasurementsEmpty;
 
     @Inject
     public StatsViewModel(PatientRepository patientRepository,

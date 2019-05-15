@@ -1,7 +1,6 @@
 package com.dglozano.escale.ui.common.pw_recovery;
 
 import com.dglozano.escale.R;
-import com.dglozano.escale.util.ValidationHelper;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.web.EscaleRestApi;
 
@@ -51,7 +50,7 @@ public class RecoverPasswordActivityViewModel extends ViewModel {
     }
 
     public void hitRecoverPassword(String email) {
-        if(isInputValid(email)) {
+        if (isInputValid(email)) {
             disposables.add(mEscaleRestApi.passwordRecovery(email)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

@@ -73,6 +73,19 @@ public class DoctorMainActivity extends BaseActivity
     private DoctorMainActivityViewModel mViewModel;
     private AlertDialog activeDialog = null;
 
+    private static List<PatientInfo> filter(List<PatientInfo> models, String query) {
+        final String lowerCaseQuery = query.toLowerCase();
+
+        final List<PatientInfo> filteredModelList = new ArrayList<>();
+        for (PatientInfo model : models) {
+            final String text = model.getFullName().toLowerCase();
+            if (text.contains(lowerCaseQuery)) {
+                filteredModelList.add(model);
+            }
+        }
+        return filteredModelList;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
@@ -191,19 +204,6 @@ public class DoctorMainActivity extends BaseActivity
             mPatientsRecyclerList.scrollToPosition(0);
         }
         return true;
-    }
-
-    private static List<PatientInfo> filter(List<PatientInfo> models, String query) {
-        final String lowerCaseQuery = query.toLowerCase();
-
-        final List<PatientInfo> filteredModelList = new ArrayList<>();
-        for (PatientInfo model : models) {
-            final String text = model.getFullName().toLowerCase();
-            if (text.contains(lowerCaseQuery)) {
-                filteredModelList.add(model);
-            }
-        }
-        return filteredModelList;
     }
 
     @Override

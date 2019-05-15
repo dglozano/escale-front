@@ -11,7 +11,6 @@ import com.dglozano.escale.util.ui.CustomPdfScrollHandle;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
 
-import java.io.File;
 import java.util.Objects;
 
 import javax.inject.Inject;

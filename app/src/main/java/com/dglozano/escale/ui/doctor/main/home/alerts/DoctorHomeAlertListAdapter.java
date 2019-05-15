@@ -32,6 +32,8 @@ import butterknife.ButterKnife;
 
 public class DoctorHomeAlertListAdapter extends RecyclerView.Adapter<DoctorHomeAlertListAdapter.AlertViewHolder> {
 
+    private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy H:mm 'hs.'", Locale.getDefault());
+    private final DecimalFormat df = new DecimalFormat("###.##");
     @BindDrawable(R.drawable.ic_forecast_alert)
     Drawable forecastIcon;
     @BindDrawable(R.drawable.ic_goal_fail_alert)
@@ -44,17 +46,18 @@ public class DoctorHomeAlertListAdapter extends RecyclerView.Adapter<DoctorHomeA
     Drawable manualMeasurementIcon;
     @BindDrawable(R.drawable.ic_alert)
     Drawable defaultAlert;
-
     @BindColor(R.color.colorAccentVeryLight)
     int lightAccent;
     @BindColor(android.R.color.white)
     int white;
-
     private AlertClickListener mClickListener;
     private RecyclerView mRecyclerView;
     private List<Alert> mAlertList;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy H:mm 'hs.'", Locale.getDefault());
-    private final DecimalFormat df = new DecimalFormat("###.##");
+
+    @Inject
+    public DoctorHomeAlertListAdapter(MainActivity mainActivity) {
+        ButterKnife.bind(this, mainActivity);
+    }
 
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -62,18 +65,8 @@ public class DoctorHomeAlertListAdapter extends RecyclerView.Adapter<DoctorHomeA
         mRecyclerView = recyclerView;
     }
 
-    @Inject
-    public DoctorHomeAlertListAdapter(MainActivity mainActivity) {
-        ButterKnife.bind(this, mainActivity);
-    }
-
     public void setAlertClickListener(AlertClickListener alertClickListener) {
         this.mClickListener = alertClickListener;
-    }
-
-    public interface AlertClickListener {
-
-        void onClick(Alert alert);
     }
 
     @NonNull
@@ -141,6 +134,11 @@ public class DoctorHomeAlertListAdapter extends RecyclerView.Adapter<DoctorHomeA
         if (mAlertList != null) {
             return mAlertList.size();
         } else return 0;
+    }
+
+    public interface AlertClickListener {
+
+        void onClick(Alert alert);
     }
 
     public class AlertViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

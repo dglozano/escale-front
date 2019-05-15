@@ -121,7 +121,7 @@ public class DoctorRepository {
         return mEscaleRestApi.createPatientForDoctor(createPatientDTO, getLoggedDoctorId())
                 .map(response -> {
                     PatientDTO dto = response.body();
-                    if(response.code() == 409) {
+                    if (response.code() == 409) {
                         throw new EmailAlreadyUsedException(email);
                     } else if (dto == null) {
                         throw new Exception();

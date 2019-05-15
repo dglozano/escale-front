@@ -23,8 +23,8 @@
     <FrameLayout
         android:id="@+id/frame_btn_diet"
         android:layout_width="wrap_content"
-        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_vertical_margin_medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">

@@ -76,9 +76,8 @@ public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         HasSupportFragmentInjector, LogoutDialog.LogoutDialogListener {
 
-    private static final int CHANGE_PASSWORD_CODE = 123;
     public static final int ADD_MEASUREMENT_CODE = 456;
-
+    private static final int CHANGE_PASSWORD_CODE = 123;
     // Binding views with Butterknife
     @BindView(R.id.bnve)
     BottomNavigationViewEx mBnv;

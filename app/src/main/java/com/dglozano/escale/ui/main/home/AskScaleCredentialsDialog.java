@@ -35,15 +35,6 @@ public class AskScaleCredentialsDialog extends DialogFragment {
 
     private Unbinder mViewUnbinder;
     private boolean mIsDeleteDialog;
-
-    public interface ScaleCredentialsDialogListener {
-        void onScaleCredentialsDialogSubmitCredentials();
-
-        void onScaleCredentialsDialogCreateNewUser();
-
-        void onScaleCredentialsDialogCancel();
-    }
-
     private ScaleCredentialsDialogListener mListener;
     private Fragment parentFragment;
 
@@ -65,7 +56,7 @@ public class AskScaleCredentialsDialog extends DialogFragment {
             parentFragment = getParentFragment();
             mListener = (ScaleCredentialsDialogListener) parentFragment;
 
-            if(getArguments() != null) {
+            if (getArguments() != null) {
                 mIsDeleteDialog = getArguments().getBoolean("isDeleteDialog", false);
             } else {
                 mIsDeleteDialog = false;
@@ -86,7 +77,7 @@ public class AskScaleCredentialsDialog extends DialogFragment {
         View dialogView = inflater.inflate(R.layout.dialog_ask_scale_credentials, null);
         mViewUnbinder = ButterKnife.bind(this, dialogView);
 
-        if(mIsDeleteDialog) {
+        if (mIsDeleteDialog) {
             mTitle.setText(R.string.dialog_scale_full_title);
             mInstructions.setText(R.string.dialog_scale_full_instructions);
             builder.setView(dialogView)
@@ -132,6 +123,14 @@ public class AskScaleCredentialsDialog extends DialogFragment {
         Timber.d("Dialog PIN final %s", PIN);
 
         return new CommunicationHelper.PinIndex(index, PIN);
+    }
+
+    public interface ScaleCredentialsDialogListener {
+        void onScaleCredentialsDialogSubmitCredentials();
+
+        void onScaleCredentialsDialogCreateNewUser();
+
+        void onScaleCredentialsDialogCancel();
     }
 }
 

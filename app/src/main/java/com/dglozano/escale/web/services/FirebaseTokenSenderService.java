@@ -23,15 +23,15 @@ public class FirebaseTokenSenderService extends IntentService {
     @Inject
     SharedPreferences sharedPreferences;
 
+    public FirebaseTokenSenderService() {
+        super(FirebaseTokenSenderService.class.getName());
+        setIntentRedelivery(true);
+    }
+
     @Override
     public void onCreate() {
         AndroidInjection.inject(this);
         super.onCreate();
-    }
-
-    public FirebaseTokenSenderService() {
-        super(FirebaseTokenSenderService.class.getName());
-        setIntentRedelivery(true);
     }
 
     @Override

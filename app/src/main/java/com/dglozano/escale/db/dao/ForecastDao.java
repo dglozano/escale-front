@@ -61,7 +61,7 @@ public abstract class ForecastDao extends BaseDao<MeasurementForecast> {
     }
 
     @Transaction
-    public Optional<MeasurementForecast>  getForecastWithPredictions(Long id) {
+    public Optional<MeasurementForecast> getForecastWithPredictions(Long id) {
         Optional<MeasurementForecast> mfOpt = getForecast(id);
         if (mfOpt.isPresent()) {
             MeasurementForecast mf = mfOpt.get();

@@ -10,7 +10,7 @@ public class BodyMeasurementDTO extends AddBodyMeasurementDTO {
     }
 
     public BodyMeasurementDTO(Long id, Long patientId, float weight, float water, float fat,
-                                 float bmi, float bones, float muscles, Date date, boolean isManual) {
+                              float bmi, float bones, float muscles, Date date, boolean isManual) {
         super(patientId, weight, water, bmi, fat, bones, muscles, date, isManual);
         this.id = id;
     }

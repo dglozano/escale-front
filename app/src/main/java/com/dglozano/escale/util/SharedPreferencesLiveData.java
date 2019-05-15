@@ -12,13 +12,6 @@ public abstract class SharedPreferencesLiveData<T> extends LiveData<T> {
     SharedPreferences sharedPrefs;
     String key;
     T defValue;
-
-    public SharedPreferencesLiveData(SharedPreferences prefs, String key, T defValue) {
-        this.sharedPrefs = prefs;
-        this.key = key;
-        this.defValue = defValue;
-    }
-
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -27,6 +20,12 @@ public abstract class SharedPreferencesLiveData<T> extends LiveData<T> {
             }
         }
     };
+
+    public SharedPreferencesLiveData(SharedPreferences prefs, String key, T defValue) {
+        this.sharedPrefs = prefs;
+        this.key = key;
+        this.defValue = defValue;
+    }
 
     abstract T getValueFromPreferences(String key, T defValue);
 
@@ -80,18 +79,6 @@ public abstract class SharedPreferencesLiveData<T> extends LiveData<T> {
         }
     }
 
-    public class SharedPreferenceFloatLiveData extends SharedPreferencesLiveData<Float> {
-
-        public SharedPreferenceFloatLiveData(SharedPreferences prefs, String key, Float defValue) {
-            super(prefs, key, defValue);
-        }
-
-        @Override
-        Float getValueFromPreferences(String key, Float defValue) {
-            return sharedPrefs.getFloat(key, defValue);
-        }
-    }
-
     public static class SharedPreferenceLongLiveData extends SharedPreferencesLiveData<Long> {
 
         public SharedPreferenceLongLiveData(SharedPreferences prefs, String key, Long defValue) {
@@ -101,6 +88,18 @@ public abstract class SharedPreferencesLiveData<T> extends LiveData<T> {
         @Override
         Long getValueFromPreferences(String key, Long defValue) {
             return sharedPrefs.getLong(key, defValue);
+        }
+    }
+
+    public class SharedPreferenceFloatLiveData extends SharedPreferencesLiveData<Float> {
+
+        public SharedPreferenceFloatLiveData(SharedPreferences prefs, String key, Float defValue) {
+            super(prefs, key, defValue);
+        }
+
+        @Override
+        Float getValueFromPreferences(String key, Float defValue) {
+            return sharedPrefs.getFloat(key, defValue);
         }
     }
 

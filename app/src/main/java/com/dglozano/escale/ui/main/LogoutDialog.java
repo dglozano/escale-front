@@ -15,10 +15,6 @@ import timber.log.Timber;
 
 public class LogoutDialog extends DialogFragment {
 
-    public interface LogoutDialogListener {
-        void onLogoutConfirmed();
-    }
-
     private LogoutDialogListener mListener;
 
     public static LogoutDialog newInstance() {
@@ -57,6 +53,10 @@ public class LogoutDialog extends DialogFragment {
                         (dialog, which) -> Timber.d("Logout cancelled"));
 
         return builder.create();
+    }
+
+    public interface LogoutDialogListener {
+        void onLogoutConfirmed();
     }
 
 }

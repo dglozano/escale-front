@@ -15,7 +15,7 @@ import timber.log.Timber;
 
 public class DateDeserializer implements JsonDeserializer<Date> {
 
-    private static final String[] DATE_FORMATS = new String[] {
+    private static final String[] DATE_FORMATS = new String[]{
             "yyyy-MM-dd'T'HH:mm:ss.SSS",
             "yyyy-MM-dd"
     };
@@ -26,7 +26,7 @@ public class DateDeserializer implements JsonDeserializer<Date> {
 
         int parsingErrors = 0;
         ParseException e = null;
-        for(String format : DATE_FORMATS) {
+        for (String format : DATE_FORMATS) {
             SimpleDateFormat sdf = new SimpleDateFormat(format);
             sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 
@@ -39,7 +39,7 @@ public class DateDeserializer implements JsonDeserializer<Date> {
                 e = exp;
             }
         }
-        if(parsingErrors == DATE_FORMATS.length) {
+        if (parsingErrors == DATE_FORMATS.length) {
             Timber.e(e);
         }
         return null;

@@ -15,7 +15,7 @@ public class Event<T> {
     }
 
     public T handleContent() {
-        if(hasBeenHandled) {
+        if (hasBeenHandled) {
             return null;
         } else {
             hasBeenHandled = true;

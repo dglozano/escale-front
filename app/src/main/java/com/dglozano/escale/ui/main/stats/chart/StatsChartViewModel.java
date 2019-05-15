@@ -32,9 +32,6 @@ import static com.dglozano.escale.ui.main.stats.chart.StatsChartViewModel.StatFi
 
 public class StatsChartViewModel extends ViewModel {
 
-    private PatientRepository mPatientRepository;
-    private BodyMeasurementRepository mMeasurementsRepository;
-    private CompositeDisposable disposables;
     private final MutableLiveData<Event<Integer>> mErrorEvent;
     private final LiveData<List<BodyMeasurement>> mBodyMeasurementList;
     private final LiveData<Entry> mGoalEntry;
@@ -42,6 +39,9 @@ public class StatsChartViewModel extends ViewModel {
     private final MutableLiveData<StatFilter> mSelectedStat;
     private final MutableLiveData<Boolean> mFilterExpandedState;
     private final MediatorLiveData<List<Entry>> mChartEntriesList;
+    private PatientRepository mPatientRepository;
+    private BodyMeasurementRepository mMeasurementsRepository;
+    private CompositeDisposable disposables;
 
 
     @Inject
@@ -154,16 +154,16 @@ public class StatsChartViewModel extends ViewModel {
         return mFilterExpandedState;
     }
 
-    public void setSelectedStat(int position) {
-        mSelectedStat.postValue(valueOf(position));
-    }
-
     public LiveData<StatFilter> getSelectedStatAsLiveData() {
         return mSelectedStat;
     }
 
     public StatFilter getSelectedStat() {
         return mSelectedStat.getValue() == null ? StatFilter.WEIGHT : mSelectedStat.getValue();
+    }
+
+    public void setSelectedStat(int position) {
+        mSelectedStat.postValue(valueOf(position));
     }
 
     public void toggleFiltersExpansion() {
@@ -185,18 +185,18 @@ public class StatsChartViewModel extends ViewModel {
         IMC(3),
         MUSCLE(4);
 
-        private int value;
-
         private static Map map = new HashMap<>();
-
-        StatFilter(int value) {
-            this.value = value;
-        }
 
         static {
             for (StatFilter pageType : StatFilter.values()) {
                 map.put(pageType.value, pageType);
             }
+        }
+
+        private int value;
+
+        StatFilter(int value) {
+            this.value = value;
         }
 
         public static StatFilter valueOf(int statFilter) {
