@@ -2,6 +2,7 @@ package com.dglozano.escale.ui.common.pw_recovery;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -10,6 +11,7 @@ import com.dglozano.escale.R;
 import com.dglozano.escale.databinding.ActivityRecoverPasswordBinding;
 import com.dglozano.escale.ui.BaseActivity;
 import com.dglozano.escale.util.ui.Event;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Objects;
 
@@ -21,14 +23,20 @@ import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
+import butterknife.OnTextChanged;
 import dagger.android.AndroidInjection;
+
+import static com.dglozano.escale.util.ValidationHelper.getEmailError;
 
 public class RecoverPasswordActivity extends BaseActivity {
 
     @BindView(R.id.recover_password_progress_bar_container)
     RelativeLayout mProgressBarContainer;
-    @BindView(R.id.recover_email_edittext)
-    EditText mEmail;
+    @BindView(R.id.recover_password_email_edittext)
+    EditText mEmailEditText;
+    @BindView(R.id.recover_password_email_inputlayout)
+    TextInputLayout mEmailInputLayout;
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -56,18 +64,13 @@ public class RecoverPasswordActivity extends BaseActivity {
         mViewModel.getSuccessEvent().observe(this, this::onSuccessEventFired);
     }
 
-    private void onSuccessEventFired(Event<String> successEvent) {
-        if(successEvent != null && !successEvent.hasBeenHandled()) {
+    @Override
+    public void onSuccessEventFired(Event<?> successEvent) {
+        if (successEvent != null && !successEvent.hasBeenHandled()) {
             Intent intent = getIntent();
-            intent.putExtra("email", successEvent.handleContent());
+            intent.putExtra("email", successEvent.handleContent().toString());
             setResult(RESULT_OK, intent);
             finish();
-        }
-    }
-
-    private void onErrorEventFired(Event<Integer> errorEvent) {
-        if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.handleContent());
         }
     }
 
@@ -80,19 +83,27 @@ public class RecoverPasswordActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
+    public void onErrorEventFired(Event<Integer> errorEvent) {
+        super.onErrorEventFired(errorEvent);
+        setErrorInInputLayout(getEmailError(mEmailEditText.getText()), mEmailInputLayout);
     }
 
-    @Override
-    public void onBackPressed() {
-        finish();
+    @OnTextChanged(value = R.id.recover_password_email_edittext,
+            callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    protected void afterEditTextEmail(Editable editable) {
+        setErrorInInputLayout(getEmailError(editable), mEmailInputLayout);
+    }
+
+    @OnFocusChange(R.id.recover_password_email_edittext)
+    public void onFocusChangeEmail(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            setErrorInInputLayout(getEmailError(((EditText) v).getText()), mEmailInputLayout);
+        }
     }
 
     @OnClick(R.id.recover_password_btn)
     public void recoverPassword() {
-        mViewModel.hitRecoverPassword(mEmail.getText().toString());
+        mViewModel.hitRecoverPassword(mEmailEditText.getText().toString());
     }
 
     @Override

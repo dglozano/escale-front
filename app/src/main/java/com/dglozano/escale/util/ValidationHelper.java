@@ -1,6 +1,5 @@
 package com.dglozano.escale.util;
 
-import android.text.Editable;
 import android.text.TextUtils;
 
 import com.dglozano.escale.R;
@@ -35,28 +34,34 @@ public class ValidationHelper {
         return !TextUtils.isEmpty(password) && password.toString().matches("^(?=.*[0-9])(?=.*[a-zA-Z])(?=\\S+$).{8,100}$");
     }
 
-    public static boolean isValidFileName(Editable filename) {
+    public static boolean isValidFileName(CharSequence filename) {
         return !TextUtils.isEmpty(filename) && filename.toString().matches("^(?!\\.)(?!.*\\.$)(?!.*?\\.\\.)^[\\w\\-_,(). ]+$");
     }
 
     public static boolean isValidHeight(CharSequence height) {
-        int value = Integer.parseInt(height.toString());
-        return !TextUtils.isEmpty(height) && value >= 100 && value <= 250;
+        return isValidRange(height, 100, 250);
     }
 
     public static boolean isValidWeight(CharSequence weight) {
-        float value = Float.parseFloat(weight.toString());
-        return !TextUtils.isEmpty(weight) && value >= 40 && value <= 250;
+        return isValidRange(weight, 40, 250);
+
     }
 
     public static boolean isValidBmi(CharSequence bmi) {
-        float value = Float.parseFloat(bmi.toString());
-        return !TextUtils.isEmpty(bmi) && value >= 10 && value <= 60;
+        return isValidRange(bmi, 10, 60);
     }
 
     public static boolean isValidPercentage(CharSequence percentage) {
-        float value = Float.parseFloat(percentage.toString());
-        return !TextUtils.isEmpty(percentage) && value > 0 && value < 100;
+        return isValidRange(percentage, 0, 100);
+    }
+
+    private static boolean isValidRange(CharSequence valueString, int min, int max) {
+        if (TextUtils.isEmpty(valueString)) {
+            return false;
+        } else {
+            float value = Float.parseFloat(valueString.toString());
+            return value > min && value < max;
+        }
     }
 
     public static boolean isValidBirthday(CharSequence birthday) {

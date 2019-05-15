@@ -1,6 +1,7 @@
 package com.dglozano.escale.ui.common.pw_recovery;
 
 import com.dglozano.escale.R;
+import com.dglozano.escale.util.ValidationHelper;
 import com.dglozano.escale.util.ui.Event;
 import com.dglozano.escale.web.EscaleRestApi;
 
@@ -12,6 +13,8 @@ import androidx.lifecycle.ViewModel;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.dglozano.escale.util.ValidationHelper.isValidEmail;
 
 public class RecoverPasswordActivityViewModel extends ViewModel {
 
@@ -32,8 +35,7 @@ public class RecoverPasswordActivityViewModel extends ViewModel {
     }
 
     private boolean isInputValid(String email) {
-        //TODO
-        return true;
+        return isValidEmail(email);
     }
 
     public LiveData<Boolean> getLoading() {
@@ -66,7 +68,7 @@ public class RecoverPasswordActivityViewModel extends ViewModel {
                     )
             );
         } else {
-            // TODO
+            mErrorEvent.postValue(new Event<>(R.string.input_validation_email_error));
         }
     }
 

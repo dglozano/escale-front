@@ -170,9 +170,10 @@ public class PatientProfileActivity extends BaseActivity implements EditPatientD
         }
     }
 
-    private void onSuccessEventFired(Event<Integer> successEvent) {
+    @Override
+    public void onSuccessEventFired(Event<?> successEvent) {
         if (successEvent != null && !successEvent.hasBeenHandled()) {
-            Integer successMessageResId = successEvent.handleContent();
+            Integer successMessageResId = (Integer) successEvent.handleContent();
             boolean isPictureChangedEvent = successMessageResId == R.string.upload_picture_success_msg;
             if (isPictureChangedEvent) {
                 try {
@@ -183,12 +184,6 @@ public class PatientProfileActivity extends BaseActivity implements EditPatientD
                 }
             }
             showSnackbarWithDuration(successMessageResId, Snackbar.LENGTH_SHORT);
-        }
-    }
-
-    private void onErrorEventFired(Event<Integer> errorEvent) {
-        if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.handleContent());
         }
     }
 
@@ -254,17 +249,6 @@ public class PatientProfileActivity extends BaseActivity implements EditPatientD
             Timber.d("Doesn't have Permission. Asking for it...");
             PermissionHelper.requestExternalStoragePermission(this);
         }
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish();
     }
 
     @Override

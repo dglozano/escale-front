@@ -30,6 +30,7 @@ import dagger.android.AndroidInjection;
 
 import static com.dglozano.escale.util.ValidationHelper.getBmiError;
 import static com.dglozano.escale.util.ValidationHelper.getWeightError;
+import static com.dglozano.escale.util.ValidationHelper.isValidPercentage;
 
 public class AddMeasurementActivity extends BaseActivity {
 
@@ -66,17 +67,6 @@ public class AddMeasurementActivity extends BaseActivity {
         mViewModel.getSuccessEvent().observe(this, this::onSuccessEventFired);
     }
 
-    private void onSuccessEventFired(Event<Boolean> successEvent) {
-        setResult(Activity.RESULT_OK);
-        finish();
-    }
-
-    private void onErrorEventFired(Event<Integer> errorEvent) {
-        if (errorEvent != null && !errorEvent.hasBeenHandled()) {
-            showSnackbarWithOkDismiss(errorEvent.handleContent());
-        }
-    }
-
     private void onLoadingStateChange(Boolean isLoading) {
         if (isLoading != null && isLoading) {
             mProgressBarContainer.setVisibility(View.VISIBLE);
@@ -86,11 +76,20 @@ public class AddMeasurementActivity extends BaseActivity {
     }
 
     @Override
+    public void onErrorEventFired(Event<Integer> errorEvent) {
+        super.onErrorEventFired(errorEvent);
+        setErrorInInputLayout(getWeightError(Objects.requireNonNull(mWeightInputLayout.getEditText()).getText()), mWeightInputLayout);
+        setErrorInInputLayout(getBmiError(Objects.requireNonNull(mBmiInputLayout.getEditText()).getText()), mBmiInputLayout);
+        setErrorInInputLayout(validatePercentage(Objects.requireNonNull(mMusclesInputLayout.getEditText()).getText()), mMusclesInputLayout);
+        setErrorInInputLayout(validatePercentage(Objects.requireNonNull(mWaterInputLayout.getEditText()).getText()), mWaterInputLayout);
+        setErrorInInputLayout(validatePercentage(Objects.requireNonNull(mFatInputLayout.getEditText()).getText()), mFatInputLayout);
+    }
+
+    @Override
     public boolean onSupportNavigateUp() {
         finish();
         return true;
     }
-
 
     @OnClick(R.id.add_measurement_btn)
     public void onAddMeasurementBtnClick(View view) {
@@ -115,8 +114,7 @@ public class AddMeasurementActivity extends BaseActivity {
     @OnFocusChange(R.id.add_measurement_water_input)
     public void onFocusChangeWater(View v, boolean hasFocus) {
         if (!hasFocus) {
-            Integer errorString = validatePercentage(((EditText) v).getText());
-            mWaterInputLayout.setError(errorString == null ? null : getString(errorString));
+            setErrorInInputLayout(validatePercentage(((EditText) v).getText()), mWaterInputLayout);
         }
     }
 
@@ -124,8 +122,7 @@ public class AddMeasurementActivity extends BaseActivity {
     @OnFocusChange(R.id.add_measurement_fat_input)
     public void onFocusChangeFat(View v, boolean hasFocus) {
         if (!hasFocus) {
-            Integer errorString = validatePercentage(((EditText) v).getText());
-            mFatInputLayout.setError(errorString == null ? null : getString(errorString));
+            setErrorInInputLayout(validatePercentage(((EditText) v).getText()), mFatInputLayout);
         }
     }
 
@@ -139,16 +136,14 @@ public class AddMeasurementActivity extends BaseActivity {
     @OnFocusChange(R.id.add_measurement_muscles_input)
     public void onFocusChangeMuscle(View v, boolean hasFocus) {
         if (!hasFocus) {
-            Integer errorString = validatePercentage(((EditText) v).getText());
-            mMusclesInputLayout.setError(errorString == null ? null : getString(errorString));
+            setErrorInInputLayout(validatePercentage(((EditText) v).getText()), mMusclesInputLayout);
         }
     }
 
     @OnTextChanged(value = R.id.add_measurement_muscles_input,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextChangedMuscle(Editable editable) {
-        Integer errorString = validatePercentage(editable);
-        mMusclesInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(validatePercentage(editable), mMusclesInputLayout);
     }
 
     @OnTextChanged(value = R.id.add_measurement_weight_input_edittext,
@@ -160,15 +155,13 @@ public class AddMeasurementActivity extends BaseActivity {
     @OnTextChanged(value = R.id.add_measurement_water_input,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextChangedWater(Editable editable) {
-        Integer errorString = validatePercentage(editable);
-        mWaterInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(validatePercentage(editable), mWaterInputLayout);
     }
 
     @OnTextChanged(value = R.id.add_measurement_fat_input,
             callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     protected void afterEditTextChangedFat(Editable editable) {
-        Integer errorString = validatePercentage(editable);
-        mFatInputLayout.setError(errorString == null ? null : getString(errorString));
+        setErrorInInputLayout(validatePercentage(editable), mFatInputLayout);
     }
 
     @OnTextChanged(value = R.id.add_measurement_imc_input,
@@ -177,18 +170,9 @@ public class AddMeasurementActivity extends BaseActivity {
         setErrorInInputLayout(getBmiError(editable.toString()), mBmiInputLayout);
     }
 
-    private void setErrorInInputLayout(Integer error, TextInputLayout inputLayout) {
-        if (error != null) {
-            inputLayout.setError(getString(error));
-        } else {
-            inputLayout.setError(null);
-        }
-    }
-
     private Integer validatePercentage(Editable inputLayout) {
         if (!TextUtils.isEmpty(inputLayout)) {
-            float value = Float.parseFloat(inputLayout.toString());
-            return value >= 0f && value <= 100f ? null : R.string.add_measurement_percentage_range_error;
+            return isValidPercentage(inputLayout.toString()) ? null : R.string.add_measurement_percentage_range_error;
         } else {
             return R.string.input_validation_empty_error;
         }
